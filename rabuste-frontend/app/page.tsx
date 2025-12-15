@@ -1,43 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PremiumIntro2D from "@/components/PremiumIntro2D";
 import { AnimatePresence } from "framer-motion";
-import SimpleIntro from "@/components/SimpleIntro";
-import FinalIntro from "@/components/FinalIntro";
 import SVGIntro from "@/components/SVGIntro";
 
 export default function Home() {
-  const [showIntro, setShowIntro] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [showIntro, setShowIntro] = useState(true); // Start with true
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
+    // Check if intro was already seen in this session
     try {
       const seen = sessionStorage.getItem("rabuste_intro_seen");
-      if (!seen) {
-        setShowIntro(true);
-        sessionStorage.setItem("rabuste_intro_seen", "true");
-      } else {
-        setIsReady(true);
+      if (seen) {
+        setShowIntro(false);
       }
     } catch {
-      setIsReady(true);
+      // If sessionStorage fails, show intro anyway
     }
   }, []);
 
-  useEffect(() => {
-    if (!showIntro) {
-      setIsReady(true);
+  const handleIntroFinish = () => {
+    try {
+      sessionStorage.setItem("rabuste_intro_seen", "true");
+    } catch {
+      // Ignore storage errors
     }
-  }, [showIntro]);
+    setShowIntro(false);
+  };
+
+  // Don't render anything until mounted
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <>
       <AnimatePresence mode="wait">
-        {showIntro && <SVGIntro onFinish={() => setShowIntro(false)} />}
+        {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
       
-      {isReady && (
+      {!showIntro && (
         <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] text-white text-4xl">
           HOME PAGE CONTENT
         </div>

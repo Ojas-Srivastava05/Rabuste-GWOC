@@ -123,52 +123,52 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               strokeLinecap="round"
             />
 
-            {/* NECK STRUCTURE - THINNER STROKES */}
-            {/* Left neck section */}
+            {/* NECK STRUCTURE - SLEEKER, LESS CHUNKY */}
+            {/* Left neck section - just outline, no fill */}
             <motion.path
               d="M96.645,60 L72.5,60 L72.5,115 L80.107,115"
               stroke="url(#cupGrad)"
-              strokeWidth="1.5"
+              strokeWidth="1"
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
               strokeLinecap="round"
             />
 
-            {/* Right neck section */}
+            {/* Right neck section - just outline, no fill */}
             <motion.path
               d="M373.355,60 L397.5,60 L397.5,115 L389.393,115"
               stroke="url(#cupGrad)"
-              strokeWidth="1.5"
+              strokeWidth="1"
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
               strokeLinecap="round"
             />
 
-            {/* Neck bands */}
+            {/* Neck bands - thinner */}
             <motion.path
               d="M80.107,115 L389.393,115"
               stroke="url(#cupGrad)"
-              strokeWidth="1.5"
+              strokeWidth="1"
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 0.4, delay: 1.8, ease: "easeOut" }}
               strokeLinecap="round"
             />
 
-            {/* CONNECTING VERTICAL LINES - THINNER */}
+            {/* CONNECTING VERTICAL LINES - MUCH THINNER */}
             {/* Left vertical connector */}
             <motion.path
               d="M80.107,115 L101.154,180"
               stroke="url(#cupGrad)"
-              strokeWidth="1.5"
+              strokeWidth="1"
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
+              animate={{ pathLength: 1, opacity: 0.5 }}
               transition={{ duration: 0.4, delay: 1.85, ease: "easeOut" }}
               strokeLinecap="round"
             />
@@ -177,10 +177,10 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
             <motion.path
               d="M389.393,115 L368.847,180"
               stroke="url(#cupGrad)"
-              strokeWidth="1.5"
+              strokeWidth="1"
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
+              animate={{ pathLength: 1, opacity: 0.5 }}
               transition={{ duration: 0.4, delay: 1.85, ease: "easeOut" }}
               strokeLinecap="round"
             />
@@ -223,9 +223,9 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               strokeLinecap="round"
             />
 
-            {/* Fill cup body */}
+            {/* Fill cup body - EXTENDED HEIGHT */}
             <motion.path
-              d="M101.154,180 L368.847,180 L351.1,390 Q 325,405 235,405 Q 145,405 118.9,390 Z"
+              d="M80.107,115 L389.393,115 L368.847,180 L351.1,390 Q 325,405 235,405 Q 145,405 118.9,390 L101.154,180 L80.107,115 Z"
               fill="white"
               fillOpacity="0"
               animate={{ fillOpacity: 0.95 }}
@@ -233,7 +233,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
             />
           </g>
 
-          {/* COFFEE RISES - SLOWER AND MORE ELEGANT */}
+          {/* COFFEE RISES - HIGHER LEVEL */}
           <motion.g>
             <motion.path
               d="M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z"
@@ -241,31 +241,31 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               animate={{
                 d: [
                   "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,320 Q 235,317 101.154,320 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,250 Q 235,247 101.154,250 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,190 Q 235,187 101.154,190 L118.9,390 Z"
+                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,280 Q 235,277 101.154,280 L118.9,390 Z",
+                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,190 Q 235,187 101.154,190 L118.9,390 Z",
+                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,130 Q 235,127 101.154,130 L118.9,390 Z"
                 ]
               }}
               transition={{
-                duration: 3.5, // Slower fill - 3.5 seconds
+                duration: 3.5,
                 delay: 2.2,
-                ease: "linear", // Perfectly linear for steady pour
+                ease: "linear",
                 times: [0, 0.33, 0.66, 1]
               }}
             />
 
-            {/* Coffee surface shine - smoother */}
+            {/* Coffee surface shine - higher position */}
             <motion.ellipse
               cx="235"
-              cy="190"
-              rx="135"
-              ry="6"
+              cy="130"
+              rx="145"
+              ry="7"
               fill="#a07856"
               fillOpacity="0"
               animate={{ 
                 fillOpacity: [0, 0, 0.5, 0.7],
-                cy: [405, 320, 250, 190],
-                ry: [6, 6, 7, 6]
+                cy: [405, 280, 190, 130],
+                ry: [6, 6.5, 7, 7]
               }}
               transition={{
                 duration: 3.5,
@@ -275,19 +275,19 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               filter="url(#glow)"
             />
 
-            {/* Subtle steam rising */}
+            {/* Subtle steam rising - adjusted position */}
             {[0, 1, 2].map((i) => (
               <motion.ellipse
                 key={i}
                 cx={215 + i * 20}
-                cy="180"
+                cy="120"
                 rx="3"
                 ry="15"
                 fill="white"
                 fillOpacity="0"
                 animate={{
                   fillOpacity: [0, 0, 0.2, 0],
-                  cy: [180, 180, 140, 100],
+                  cy: [120, 120, 80, 40],
                   ry: [15, 15, 20, 25]
                 }}
                 transition={{
