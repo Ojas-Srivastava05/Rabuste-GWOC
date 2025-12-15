@@ -18,24 +18,24 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.8 }}
       onAnimationComplete={() => {
-        setTimeout(onFinish, 5500);
+        setTimeout(onFinish, 7000); // Increased to 7 seconds
       }}
     >
       <motion.div
-        initial={{ scale: 0.85, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
         className="relative"
       >
         <svg
-          width="320"
-          height="380"
+          width="340"
+          height="400"
           viewBox="0 0 470 510"
           xmlns="http://www.w3.org/2000/svg"
           style={{ 
-            filter: "drop-shadow(0 20px 50px rgba(255, 116, 0, 0.3))",
+            filter: "drop-shadow(0 25px 60px rgba(255, 116, 0, 0.35))",
           }}
         >
           <defs>
@@ -233,7 +233,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
             />
           </g>
 
-          {/* COFFEE RISES - MATCHES CUP EXACTLY */}
+          {/* COFFEE RISES - SLOWER AND MORE ELEGANT */}
           <motion.g>
             <motion.path
               d="M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z"
@@ -241,44 +241,70 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               animate={{
                 d: [
                   "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,285 Q 235,280 101.154,285 L118.9,390 Z",
+                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,320 Q 235,317 101.154,320 L118.9,390 Z",
+                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,250 Q 235,247 101.154,250 L118.9,390 Z",
                   "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,190 Q 235,187 101.154,190 L118.9,390 Z"
                 ]
               }}
               transition={{
-                duration: 2.0,
+                duration: 3.5, // Slower fill - 3.5 seconds
                 delay: 2.2,
-                ease: [0.19, 1, 0.22, 1],
-                times: [0, 0.5, 1]
+                ease: "linear", // Perfectly linear for steady pour
+                times: [0, 0.33, 0.66, 1]
               }}
             />
 
-            {/* Coffee surface shine */}
+            {/* Coffee surface shine - smoother */}
             <motion.ellipse
               cx="235"
               cy="190"
               rx="135"
               ry="6"
-              fill="#8d6e46"
+              fill="#a07856"
               fillOpacity="0"
               animate={{ 
-                fillOpacity: [0, 0, 0.6],
-                cy: [405, 285, 190]
+                fillOpacity: [0, 0, 0.5, 0.7],
+                cy: [405, 320, 250, 190],
+                ry: [6, 6, 7, 6]
               }}
               transition={{
-                duration: 2.0,
+                duration: 3.5,
                 delay: 2.2,
-                ease: [0.19, 1, 0.22, 1]
+                ease: "linear"
               }}
               filter="url(#glow)"
             />
+
+            {/* Subtle steam rising */}
+            {[0, 1, 2].map((i) => (
+              <motion.ellipse
+                key={i}
+                cx={215 + i * 20}
+                cy="180"
+                rx="3"
+                ry="15"
+                fill="white"
+                fillOpacity="0"
+                animate={{
+                  fillOpacity: [0, 0, 0.2, 0],
+                  cy: [180, 180, 140, 100],
+                  ry: [15, 15, 20, 25]
+                }}
+                transition={{
+                  duration: 2,
+                  delay: 5.5 + i * 0.3,
+                  ease: "easeOut"
+                }}
+                style={{ filter: "blur(3px)" }}
+              />
+            ))}
           </motion.g>
 
-          {/* LOGO + BRANDING - MORE SPACING */}
+          {/* LOGO + BRANDING - DELAYED */}
           <motion.g
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 4.0 }}
+            transition={{ duration: 1.0, delay: 5.5 }}
           >
             <motion.image
               href="/logo.svg"
@@ -286,11 +312,11 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               y="205"
               width="50"
               height="50"
-              initial={{ opacity: 0, scale: 0.7, rotate: -10 }}
+              initial={{ opacity: 0, scale: 0.7, rotate: -15 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ 
-                duration: 0.7, 
-                delay: 4.1,
+                duration: 0.9, 
+                delay: 5.6,
                 ease: [0.34, 1.56, 0.64, 1]
               }}
             />
@@ -300,15 +326,15 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               y="290"
               textAnchor="middle"
               fill="#FF7400"
-              fontSize="30"
+              fontSize="32"
               fontWeight="700"
-              letterSpacing="9"
+              letterSpacing="10"
               fontFamily="Helvetica Neue, Arial, sans-serif"
-              initial={{ opacity: 0, letterSpacing: "20" }}
-              animate={{ opacity: 1, letterSpacing: "9" }}
+              initial={{ opacity: 0, letterSpacing: "22" }}
+              animate={{ opacity: 1, letterSpacing: "10" }}
               transition={{ 
-                duration: 0.8, 
-                delay: 4.3,
+                duration: 1.0, 
+                delay: 5.8,
                 ease: [0.22, 1, 0.36, 1]
               }}
               filter="url(#glow)"
@@ -317,16 +343,16 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
             </motion.text>
 
             <motion.path
-              d="M 180,303 Q 235,306 290,303"
+              d="M 175,303 Q 235,307 295,303"
               stroke="#FF7400"
-              strokeWidth="2"
+              strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.7 }}
+              animate={{ pathLength: 1, opacity: 0.8 }}
               transition={{ 
-                duration: 0.8, 
-                delay: 4.5,
+                duration: 1.0, 
+                delay: 6.0,
                 ease: [0.22, 1, 0.36, 1]
               }}
             />
@@ -334,13 +360,18 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
         </svg>
       </motion.div>
 
+      {/* Enhanced ambient glow */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.1 }}
-        transition={{ duration: 2.5 }}
+        animate={{ opacity: [0, 0.12, 0.12, 0.08] }}
+        transition={{ 
+          duration: 7,
+          times: [0, 0.3, 0.8, 1],
+          ease: "easeInOut"
+        }}
         style={{
-          background: "radial-gradient(circle at center, rgba(255, 116, 0, 0.15), transparent 55%)",
+          background: "radial-gradient(circle at center, rgba(255, 116, 0, 0.18), transparent 50%)",
         }}
       />
     </motion.div>
