@@ -141,8 +141,7 @@ const SplitText = ({
   const renderTag = () => {
     const style = {
       textAlign,
-      overflow: 'hidden',
-      display: 'inline-block',
+      display: 'block',
       whiteSpace: 'normal',
       wordWrap: 'break-word',
       willChange: 'transform, opacity'

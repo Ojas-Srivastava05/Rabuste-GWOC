@@ -81,19 +81,6 @@ export default function RabusteHero() {
               />
             </div>
           </div>
-
-          <div
-            className="mx-auto mt-6 transition-all duration-1000 delay-300"
-            style={{
-              width: visible ? '120px' : '0px',
-              height: '2px',
-              backgroundColor: '#FF7400',
-              opacity: visible ? 0.6 : 0,
-              boxShadow: '0 0 10px rgba(255,116,0,0.3)',
-              position: 'relative',
-              zIndex: 100
-            }}
-          />
         </div>
       </div>
 
