@@ -71,7 +71,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -83,7 +83,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -95,7 +95,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -107,7 +107,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.0, ease: "easeOut" }}
+              transition={{ duration: 0.5, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -119,7 +119,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 1.3, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -132,7 +132,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -144,7 +144,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.6, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -156,7 +156,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.8, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -169,7 +169,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.4, delay: 1.85, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -181,7 +181,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.4, delay: 1.85, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -193,7 +193,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 1.5, ease: "easeOut" }}
+              transition={{ duration: 0.4, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
@@ -206,7 +206,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fillOpacity="0.95"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -219,17 +219,22 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="none"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.3, delay: 1.4, ease: "easeOut" }}
+              transition={{ duration: 0.3, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
               strokeLinecap="round"
             />
 
-            {/* Fill cup body - EXTENDED HEIGHT */}
+            {/* Fill cup body - PROPERLY ALIGNED */}
             <motion.path
-              d="M80.107,115 L389.393,115 L368.847,180 L351.1,390 Q 325,405 235,405 Q 145,405 118.9,390 L101.154,180 L80.107,115 Z"
+              d="M101.154,180 L118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,180 L389.393,115 L80.107,115 Z"
               fill="white"
               fillOpacity="0"
-              animate={{ fillOpacity: 0.95 }}
-              transition={{ duration: 0.4, delay: 2.0 }}
+              animate={{ fillOpacity: [0, 0, 0.96] }}
+              transition={{ 
+                duration: 0.6, 
+                delay: 2.0,
+                times: [0, 0.5, 1],
+                ease: [0.16, 1, 0.3, 1]
+              }}
             />
           </g>
 
@@ -248,8 +253,8 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               }}
               transition={{
                 duration: 3.5,
-                delay: 2.2,
-                ease: "linear",
+                delay: 2.4,
+                ease: [0.45, 0, 0.55, 1],
                 times: [0, 0.33, 0.66, 1]
               }}
             />
@@ -263,14 +268,14 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               fill="#a07856"
               fillOpacity="0"
               animate={{ 
-                fillOpacity: [0, 0, 0.5, 0.7],
+                fillOpacity: [0, 0, 0.4, 0.65],
                 cy: [405, 280, 190, 130],
                 ry: [6, 6.5, 7, 7]
               }}
               transition={{
                 duration: 3.5,
-                delay: 2.2,
-                ease: "linear"
+                delay: 2.4,
+                ease: [0.45, 0, 0.55, 1]
               }}
               filter="url(#glow)"
             />
@@ -292,8 +297,8 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                 }}
                 transition={{
                   duration: 2,
-                  delay: 5.5 + i * 0.3,
-                  ease: "easeOut"
+                  delay: 5.7 + i * 0.3,
+                  ease: [0.22, 1, 0.36, 1]
                 }}
                 style={{ filter: "blur(3px)" }}
               />
@@ -304,7 +309,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
           <motion.g
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, delay: 5.5 }}
+            transition={{ duration: 1.0, delay: 5.7, ease: [0.16, 1, 0.3, 1] }}
           >
             <motion.image
               href="/logo.svg"
@@ -316,7 +321,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ 
                 duration: 0.9, 
-                delay: 5.6,
+                delay: 5.8,
                 ease: [0.34, 1.56, 0.64, 1]
               }}
             />
@@ -334,7 +339,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               animate={{ opacity: 1, letterSpacing: "10" }}
               transition={{ 
                 duration: 1.0, 
-                delay: 5.8,
+                delay: 6.0,
                 ease: [0.22, 1, 0.36, 1]
               }}
               filter="url(#glow)"
@@ -352,7 +357,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
               animate={{ pathLength: 1, opacity: 0.8 }}
               transition={{ 
                 duration: 1.0, 
-                delay: 6.0,
+                delay: 6.2,
                 ease: [0.22, 1, 0.36, 1]
               }}
             />
@@ -368,7 +373,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
         transition={{ 
           duration: 7,
           times: [0, 0.3, 0.8, 1],
-          ease: "easeInOut"
+          ease: [0.16, 1, 0.3, 1]
         }}
         style={{
           background: "radial-gradient(circle at center, rgba(255, 116, 0, 0.18), transparent 50%)",
