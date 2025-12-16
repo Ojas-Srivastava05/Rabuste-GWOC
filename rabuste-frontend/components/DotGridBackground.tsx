@@ -17,7 +17,7 @@ export default function DotGridBackground() {
         height: "100vh",
         zIndex: 0,
         backgroundColor: "#0a0a0a",
-        pointerEvents: "auto",
+        pointerEvents: "none",
       }}
     >
       <DotGrid

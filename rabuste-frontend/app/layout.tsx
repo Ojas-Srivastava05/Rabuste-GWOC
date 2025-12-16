@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import DotGridBackground from "@/components/DotGridBackground";
+import ClickSpark from '@/components/ClickSpark';
+import Image from "next/image";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +31,33 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ backgroundColor: '#0a0a0a', margin: 0, padding: 0 }}
       >
-        <DotGridBackground />
-        {children}
+        <ClickSpark
+          sparkColor="#FF7400"
+          sparkSize={10}
+          sparkRadius={15}
+          sparkCount={8}
+          duration={400}
+        >
+          <DotGridBackground />
+          <div
+            style={{
+              position: "fixed",
+              top: 20,
+              left: 20,
+              zIndex: 1000,
+              pointerEvents: "auto"
+            }}
+          >
+            <Image
+              src="/logo.svg"
+              alt="Rabuste Coffee Logo"
+              width={60}
+              height={60}
+              priority
+            />
+          </div>
+          {children}
+        </ClickSpark>
       </body>
     </html>
   );
