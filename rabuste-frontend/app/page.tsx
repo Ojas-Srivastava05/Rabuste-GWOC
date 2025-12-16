@@ -5,20 +5,16 @@ import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
 
 export default function Home() {
-  const [showIntro, setShowIntro] = useState(true); // Start with true
+  const [showIntro, setShowIntro] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Check if intro was already seen in this session
     try {
       const seen = sessionStorage.getItem("rabuste_intro_seen");
-      if (seen) {
-        setShowIntro(false);
-      }
+      if (seen) setShowIntro(false);
     } catch {
-      // If sessionStorage fails, show intro anyway
+      // ignore storage errors
     }
   }, []);
 
@@ -26,26 +22,33 @@ export default function Home() {
     try {
       sessionStorage.setItem("rabuste_intro_seen", "true");
     } catch {
-      // Ignore storage errors
+      // ignore storage errors
     }
     setShowIntro(false);
   };
 
-  // Don't render anything until mounted
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <>
       <AnimatePresence mode="wait">
         {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
-      
+
       {!showIntro && (
-        <div className="h-screen flex items-center justify-center bg-gradient-to-b from-[#0a0a0a] to-[#1a1a1a] text-white text-4xl">
-          HOME PAGE CONTENT
-        </div>
+        <main className="min-h-screen bg-[#fffbd6] flex items-center justify-center">
+          <section className="max-w-2xl px-6 text-center">
+            <h1 className="text-4xl md:text-5xl font-medium text-[#4a2825] mb-6">
+              What Are Robusta Beans?
+            </h1>
+
+            <p className="text-lg leading-relaxed text-[#4a2825]">
+              Robusta coffee beans are known for their bold character, higher caffeine
+              content, and deep, earthy flavor. Grown at lower altitudes and naturally
+              resilient, Robusta delivers intensity, strength, and a crema-rich cup.
+            </p>
+          </section>
+        </main>
       )}
     </>
   );
