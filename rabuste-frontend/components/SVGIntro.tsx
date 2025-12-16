@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Squares from "./Squares";
 
 export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -14,371 +15,220 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
 
   return (
     <motion.div
-      className="fixed inset-0 bg-[#0f0f0f] flex items-center justify-center z-50 overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="fixed inset-0 flex items-center justify-center"
+      style={{ zIndex: 50, backgroundColor: '#0a0a0a' }}
+      initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      onAnimationComplete={() => {
-        setTimeout(onFinish, 7000); // Increased to 7 seconds
-      }}
+      transition={{ duration: 0.5 }}
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative"
-      >
-        <svg
-          width="340"
-          height="400"
-          viewBox="0 0 470 510"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ 
-            filter: "drop-shadow(0 25px 60px rgba(255, 116, 0, 0.35))",
+      {/* Squares Grid Background */}
+      <div className="absolute inset-0" style={{ zIndex: 0 }}>
+        <Squares
+          speed={0.5}
+          squareSize={60}
+          direction="diagonal"
+          borderColor="#6b3a2e"
+          hoverFillColor="#3d2317"
+          className="opacity-60"
+        />
+      </div>
+
+      {/* SVG Content */}
+      <div className="relative" style={{ zIndex: 2 }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          onAnimationComplete={() => {
+            setTimeout(onFinish, 7000);
           }}
         >
-          <defs>
-            <linearGradient id="coffeeGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#1f1108" />
-              <stop offset="30%" stopColor="#2d1810" />
-              <stop offset="60%" stopColor="#3d2317" />
-              <stop offset="100%" stopColor="#5d3520" />
-            </linearGradient>
-
-            <linearGradient id="cupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="50%" stopColor="#f5f5f5" />
-              <stop offset="100%" stopColor="#ffffff" />
-            </linearGradient>
-
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-
-          {/* CUP OUTLINE - COMPLETE STRUCTURE */}
-          <g>
-            {/* Bottom base curve */}
-            <motion.path
-              d="M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390"
-              stroke="url(#cupGrad)"
-              strokeWidth="3"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Left side */}
-            <motion.path
-              d="M118.9,390 L101.154,180"
-              stroke="url(#cupGrad)"
-              strokeWidth="3"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Right side */}
-            <motion.path
-              d="M351.1,390 L368.847,180"
-              stroke="url(#cupGrad)"
-              strokeWidth="3"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Top rim */}
-            <motion.path
-              d="M101.154,180 L368.847,180"
-              stroke="url(#cupGrad)"
-              strokeWidth="3"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.0, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Middle band sections */}
-            <motion.path
-              d="M99.886,165 L370.114,165"
-              stroke="url(#cupGrad)"
-              strokeWidth="1.5"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* NECK STRUCTURE - SLEEKER, LESS CHUNKY */}
-            {/* Left neck section - just outline, no fill */}
-            <motion.path
-              d="M96.645,60 L72.5,60 L72.5,115 L80.107,115"
-              stroke="url(#cupGrad)"
-              strokeWidth="1"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Right neck section - just outline, no fill */}
-            <motion.path
-              d="M373.355,60 L397.5,60 L397.5,115 L389.393,115"
-              stroke="url(#cupGrad)"
-              strokeWidth="1"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Neck bands - thinner */}
-            <motion.path
-              d="M80.107,115 L389.393,115"
-              stroke="url(#cupGrad)"
-              strokeWidth="1"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.6 }}
-              transition={{ duration: 0.4, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* CONNECTING VERTICAL LINES - MUCH THINNER */}
-            {/* Left vertical connector */}
-            <motion.path
-              d="M80.107,115 L101.154,180"
-              stroke="url(#cupGrad)"
-              strokeWidth="1"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.4, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Right vertical connector */}
-            <motion.path
-              d="M389.393,115 L368.847,180"
-              stroke="url(#cupGrad)"
-              strokeWidth="1"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.5 }}
-              transition={{ duration: 0.4, delay: 1.85, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Bottom section lines */}
-            <motion.path
-              d="M124.393,405 L345.608,405"
-              stroke="url(#cupGrad)"
-              strokeWidth="1.5"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.4, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Lid top structure - CLEANER */}
-            <motion.path
-              d="M359.776,5.681 L352.5,0 L117.5,0 L110.224,5.681 L96.645,60 L373.355,60"
-              stroke="url(#cupGrad)"
-              strokeWidth="2"
-              fill="white"
-              fillOpacity="0.95"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.6, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-
-            {/* Top lid band details */}
-            <motion.path
-              d="M112.105,15 L357.895,15"
-              stroke="url(#cupGrad)"
-              strokeWidth="1.5"
-              fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 0.3, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
-              strokeLinecap="round"
-            />
-
-            {/* Fill cup body - PROPERLY ALIGNED */}
-            <motion.path
-              d="M101.154,180 L118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,180 L389.393,115 L80.107,115 Z"
-              fill="white"
-              fillOpacity="0"
-              animate={{ fillOpacity: [0, 0, 0.96] }}
-              transition={{ 
-                duration: 0.6, 
-                delay: 2.0,
-                times: [0, 0.5, 1],
-                ease: [0.16, 1, 0.3, 1]
-              }}
-            />
-          </g>
-
-          {/* COFFEE RISES - HIGHER LEVEL */}
-          <motion.g>
-            <motion.path
-              d="M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z"
-              fill="url(#coffeeGrad)"
-              animate={{
-                d: [
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L351.1,390 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,280 Q 235,277 101.154,280 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,190 Q 235,187 101.154,190 L118.9,390 Z",
-                  "M118.9,390 Q 145,405 235,405 Q 325,405 351.1,390 L368.847,130 Q 235,127 101.154,130 L118.9,390 Z"
-                ]
-              }}
-              transition={{
-                duration: 3.5,
-                delay: 2.4,
-                ease: [0.45, 0, 0.55, 1],
-                times: [0, 0.33, 0.66, 1]
-              }}
-            />
-
-            {/* Coffee surface shine - higher position */}
-            <motion.ellipse
-              cx="235"
-              cy="130"
-              rx="145"
-              ry="7"
-              fill="#a07856"
-              fillOpacity="0"
-              animate={{ 
-                fillOpacity: [0, 0, 0.4, 0.65],
-                cy: [405, 280, 190, 130],
-                ry: [6, 6.5, 7, 7]
-              }}
-              transition={{
-                duration: 3.5,
-                delay: 2.4,
-                ease: [0.45, 0, 0.55, 1]
-              }}
-              filter="url(#glow)"
-            />
-
-            {/* Subtle steam rising - adjusted position */}
-            {[0, 1, 2].map((i) => (
-              <motion.ellipse
-                key={i}
-                cx={215 + i * 20}
-                cy="120"
-                rx="3"
-                ry="15"
-                fill="white"
-                fillOpacity="0"
-                animate={{
-                  fillOpacity: [0, 0, 0.2, 0],
-                  cy: [120, 120, 80, 40],
-                  ry: [15, 15, 20, 25]
-                }}
-                transition={{
-                  duration: 2,
-                  delay: 5.7 + i * 0.3,
-                  ease: [0.22, 1, 0.36, 1]
-                }}
-                style={{ filter: "blur(3px)" }}
-              />
-            ))}
-          </motion.g>
-
-          {/* LOGO + BRANDING - DELAYED */}
-          <motion.g
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.0, delay: 5.7, ease: [0.16, 1, 0.3, 1] }}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="relative"
           >
-            <motion.image
-              href="/logo.svg"
-              x="210"
-              y="205"
-              width="50"
-              height="50"
-              initial={{ opacity: 0, scale: 0.7, rotate: -15 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ 
-                duration: 0.9, 
-                delay: 5.8,
-                ease: [0.34, 1.56, 0.64, 1]
+            <svg
+              width="360"
+              height="480"
+              viewBox="0 0 470 560"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ 
+                filter: "drop-shadow(0 30px 70px rgba(255, 116, 0, 0.4))",
               }}
-            />
-
-            <motion.text
-              x="235"
-              y="290"
-              textAnchor="middle"
-              fill="#FF7400"
-              fontSize="32"
-              fontWeight="700"
-              letterSpacing="10"
-              fontFamily="Helvetica Neue, Arial, sans-serif"
-              initial={{ opacity: 0, letterSpacing: "22" }}
-              animate={{ opacity: 1, letterSpacing: "10" }}
-              transition={{ 
-                duration: 1.0, 
-                delay: 6.0,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-              filter="url(#glow)"
             >
-              RABUSTE
-            </motion.text>
+              <defs>
+                <linearGradient id="coffeeGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stopColor="#1a0f08" />
+                  <stop offset="30%" stopColor="#3d2317" />
+                  <stop offset="60%" stopColor="#6b3e2e" />
+                  <stop offset="100%" stopColor="#9d6b4f" />
+                </linearGradient>
 
-            <motion.path
-              d="M 175,303 Q 235,307 295,303"
-              stroke="#FF7400"
-              strokeWidth="2.5"
-              fill="none"
-              strokeLinecap="round"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.8 }}
-              transition={{ 
-                duration: 1.0, 
-                delay: 6.2,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-            />
-          </motion.g>
-        </svg>
-      </motion.div>
+                <linearGradient id="cupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#f8f8f8" />
+                </linearGradient>
 
-      {/* Enhanced ambient glow */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [0, 0.12, 0.12, 0.08] }}
-        transition={{ 
-          duration: 7,
-          times: [0, 0.3, 0.8, 1],
-          ease: [0.16, 1, 0.3, 1]
-        }}
-        style={{
-          background: "radial-gradient(circle at center, rgba(255, 116, 0, 0.18), transparent 50%)",
-        }}
-      />
+                <linearGradient id="thinLidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#1f1f1f" />
+                  <stop offset="50%" stopColor="#0f0f0f" />
+                  <stop offset="100%" stopColor="#0a0a0a" />
+                </linearGradient>
+
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+
+                <filter id="strongGlow">
+                  <feGaussianBlur stdDeviation="15" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+
+                <radialGradient id="cupShine" cx="30%" cy="30%">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.4"/>
+                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                </radialGradient>
+              </defs>
+
+              {/* CUP BODY */}
+              <g>
+                <motion.path
+                  d="M 95,160 L 108,460 Q 135,480 235,480 Q 335,480 362,460 L 375,160 Z"
+                  fill="url(#cupGrad)"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                />
+
+                <motion.path
+                  d="M 105,180 L 115,450 Q 140,468 235,468 L 235,180 Z"
+                  fill="url(#cupShine)"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                />
+
+                {/* THIN BLACK LID */}
+                <motion.g
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                >
+                  <ellipse cx="235" cy="10" rx="115" ry="10" fill="url(#thinLidGrad)" />
+                  <ellipse cx="235" cy="8" rx="105" ry="8" fill="white" fillOpacity="0.08" />
+                  <ellipse cx="235" cy="10" rx="12" ry="7" fill="#000000" />
+                  <path d="M 120,10 L 112,45 L 95,160 L 375,160 L 358,45 L 350,10 Z" fill="url(#thinLidGrad)" />
+                  <ellipse cx="235" cy="160" rx="140" ry="3" fill="#0a0a0a" />
+                </motion.g>
+
+                <motion.ellipse cx="235" cy="478" rx="130" ry="6" fill="#000000" fillOpacity="0" initial={{ opacity: 0 }} animate={{ opacity: 0.2 }} transition={{ duration: 0.6, delay: 1.0 }} style={{ filter: "blur(8px)" }} />
+              </g>
+
+              {/* COFFEE FILL */}
+              <motion.g>
+                <motion.path
+                  d="M 108,460 Q 135,480 235,480 Q 335,480 362,460 L 362,460 L 108,460 Z"
+                  fill="url(#coffeeGrad)"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    d: [
+                      "M 108,460 Q 135,480 235,480 Q 335,480 362,460 L 362,460 L 108,460 Z",
+                      "M 108,460 Q 135,480 235,480 Q 335,480 362,460 L 370,320 Q 235,318 100,320 L 108,460 Z",
+                      "M 108,460 Q 135,480 235,480 Q 335,480 362,460 L 375,175 Q 235,173 95,175 L 108,460 Z"
+                    ],
+                    opacity: [0, 1, 1]
+                  }}
+                  transition={{
+                    duration: 2.8,
+                    delay: 1.5,
+                    ease: [0.34, 1.56, 0.64, 1],
+                    times: [0, 0.5, 1]
+                  }}
+                />
+
+                <motion.ellipse cx="235" cy="175" rx="140" ry="5" fill="white" fillOpacity="0" animate={{ fillOpacity: [0, 0, 0.3], cy: [480, 320, 175], rx: [125, 135, 140] }} transition={{ duration: 2.8, delay: 1.5, ease: [0.34, 1.56, 0.64, 1] }} filter="url(#glow)" />
+
+                {/* Steam */}
+                {[...Array(8)].map((_, i) => (
+                  <motion.path key={i} d={`M ${190 + i * 12},165 Q ${195 + i * 12},130 ${190 + i * 12},95 Q ${185 + i * 12},60 ${190 + i * 12},25`} stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0" animate={{ opacity: [0, 0, 0.4, 0.25, 0], y: [0, 0, -15, -30, -50], strokeWidth: [1.5, 1.5, 1.2, 0.8, 0.4] }} transition={{ duration: 3.5, delay: 4.2 + i * 0.15, ease: [0.22, 1, 0.36, 1] }} style={{ filter: "blur(1.5px)" }} />
+                ))}
+              </motion.g>
+
+              {/* LOGO + BRANDING - USING EXACT POSITIONING FROM REFERENCE CODE */}
+              <motion.g
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.0, delay: 4.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <motion.image
+                  href="/logo.svg"
+                  x="210"
+                  y="240"
+                  width="50"
+                  height="50"
+                  initial={{ opacity: 0, scale: 0.7, rotate: -15 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ 
+                    duration: 0.9, 
+                    delay: 4.6,
+                    ease: [0.34, 1.56, 0.64, 1]
+                  }}
+                />
+
+                <motion.text
+                  x="235"
+                  y="325"
+                  textAnchor="middle"
+                  fill="#FF7400"
+                  fontSize="32"
+                  fontWeight="700"
+                  letterSpacing="10"
+                  fontFamily="Helvetica Neue, Arial, sans-serif"
+                  initial={{ opacity: 0, letterSpacing: "22" }}
+                  animate={{ opacity: 1, letterSpacing: "10" }}
+                  transition={{ 
+                    duration: 1.0, 
+                    delay: 4.8,
+                    ease: [0.22, 1, 0.36, 1]
+                  }}
+                  filter="url(#glow)"
+                >
+                  RABUSTE
+                </motion.text>
+
+                <motion.path
+                  d="M 170,338 Q 235,342 300,338"
+                  stroke="#FF7400"
+                  strokeWidth="2.5"
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.8 }}
+                  transition={{ 
+                    duration: 1.0, 
+                    delay: 5.0,
+                    ease: [0.22, 1, 0.36, 1]
+                  }}
+                />
+              </motion.g>
+            </svg>
+          </motion.div>
+
+          {/* Ambient effects */}
+          <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: [0, 0.18, 0.15, 0.18, 0.12], scale: [1, 1.08, 1.04, 1.08, 1] }} transition={{ duration: 7, times: [0, 0.3, 0.5, 0.7, 1], ease: [0.16, 1, 0.3, 1] }} style={{ background: "radial-gradient(circle at center, rgba(255, 116, 0, 0.3), rgba(255, 116, 0, 0.1) 35%, transparent 65%)" }} />
+          <motion.div className="absolute inset-0 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} transition={{ duration: 2, delay: 1 }} style={{ background: "radial-gradient(ellipse at center, transparent 25%, rgba(0, 0, 0, 0.7) 100%)" }} />
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
