@@ -5,11 +5,13 @@ import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
 import './DotGrid.css';
 
-gsap.registerPlugin(InertiaPlugin);
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(InertiaPlugin);
+}
 
-const throttle = (func: Function, limit: number) => {
+const throttle = (func, limit) => {
   let lastCall = 0;
-  return function (...args: any[]) {
+  return function (...args) {
     const now = performance.now();
     if (now - lastCall >= limit) {
       lastCall = now;
@@ -18,7 +20,7 @@ const throttle = (func: Function, limit: number) => {
   };
 };
 
-function hexToRgb(hex: string) {
+function hexToRgb(hex) {
   const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
   if (!m) return { r: 0, g: 0, b: 0 };
   return {
@@ -26,22 +28,6 @@ function hexToRgb(hex: string) {
     g: parseInt(m[2], 16),
     b: parseInt(m[3], 16)
   };
-}
-
-interface DotGridProps {
-  dotSize?: number;
-  gap?: number;
-  baseColor?: string;
-  activeColor?: string;
-  proximity?: number;
-  speedTrigger?: number;
-  shockRadius?: number;
-  shockStrength?: number;
-  maxSpeed?: number;
-  resistance?: number;
-  returnDuration?: number;
-  className?: string;
-  style?: React.CSSProperties;
 }
 
 const DotGrid = ({
@@ -58,10 +44,10 @@ const DotGrid = ({
   returnDuration = 1.5,
   className = '',
   style
-}: DotGridProps) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dotsRef = useRef<any[]>([]);
+}) => {
+  const wrapperRef = useRef(null);
+  const canvasRef = useRef(null);
+  const dotsRef = useRef([]);
   const pointerRef = useRef({
     x: 0,
     y: 0,
@@ -123,11 +109,10 @@ const DotGrid = ({
     dotsRef.current = dots;
   }, [dotSize, gap]);
 
-  // ...existing code for draw effect...
   useEffect(() => {
     if (!circlePath) return;
 
-    let rafId: number;
+    let rafId;
     const proxSq = proximity * proximity;
 
     const draw = () => {
@@ -159,7 +144,7 @@ const DotGrid = ({
         ctx.save();
         ctx.translate(ox, oy);
         ctx.fillStyle = style;
-        ctx.fill(circlePath!);
+        ctx.fill(circlePath);
         ctx.restore();
       }
 
@@ -172,7 +157,7 @@ const DotGrid = ({
 
   useEffect(() => {
     buildGrid();
-    let ro: ResizeObserver | null = null;
+    let ro = null;
     if ('ResizeObserver' in window) {
       ro = new ResizeObserver(buildGrid);
       wrapperRef.current && ro.observe(wrapperRef.current);
@@ -185,9 +170,8 @@ const DotGrid = ({
     };
   }, [buildGrid]);
 
-  // ...existing code for mouse events...
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
+    const onMove = e => {
       const now = performance.now();
       const pr = pointerRef.current;
       const dt = pr.lastTime ? now - pr.lastTime : 16;
@@ -209,11 +193,9 @@ const DotGrid = ({
       pr.vy = vy;
       pr.speed = speed;
 
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
-        pr.x = e.clientX - rect.left;
-        pr.y = e.clientY - rect.top;
-      }
+      const rect = canvasRef.current.getBoundingClientRect();
+      pr.x = e.clientX - rect.left;
+      pr.y = e.clientY - rect.top;
 
       for (const dot of dotsRef.current) {
         const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
@@ -238,9 +220,8 @@ const DotGrid = ({
       }
     };
 
-    const onClick = (e: MouseEvent) => {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (!rect) return;
+    const onClick = e => {
+      const rect = canvasRef.current.getBoundingClientRect();
       const cx = e.clientX - rect.left;
       const cy = e.clientY - rect.top;
       for (const dot of dotsRef.current) {
@@ -268,11 +249,11 @@ const DotGrid = ({
     };
 
     const throttledMove = throttle(onMove, 50);
-    window.addEventListener('mousemove', throttledMove as EventListener, { passive: true });
+    window.addEventListener('mousemove', throttledMove, { passive: true });
     window.addEventListener('click', onClick);
 
     return () => {
-      window.removeEventListener('mousemove', throttledMove as EventListener);
+      window.removeEventListener('mousemove', throttledMove);
       window.removeEventListener('click', onClick);
     };
   }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);

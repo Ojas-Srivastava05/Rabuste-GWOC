@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import DotGrid from "@/components/DotGrid";
 
 export default function RabusteHero() {
   const [visible, setVisible] = useState(false);
@@ -17,132 +16,96 @@ export default function RabusteHero() {
   }, []);
 
   return (
-    <section style={{ width: '100%', position: 'relative', backgroundColor: '#0a0a0a' }}>
-      {/* DotGrid Background - Extended to full height */}
-      <div style={{ 
-        width: '100%', 
-        minHeight: '100vh', 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        zIndex: 0,
-        backgroundColor: '#0a0a0a'
-      }}>
-        <DotGrid
-          dotSize={10}
-          gap={15}
-          baseColor="#6b3a2e"
-          activeColor="#FF7400"
-          proximity={120}
-          shockRadius={250}
-          shockStrength={5}
-          resistance={750}
-          returnDuration={1.5}
-          style={{ height: '100%', width: '100%' }}
-        />
-      </div>
-
-      {/* Hero Content */}
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <div className="relative w-full h-screen overflow-hidden bg-black">
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(255,116,0,0.3) 0%, transparent 50%)',
-              filter: 'blur(80px)',
-              zIndex: 1
-            }}
-          />
-
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, rgba(255,116,0,0.1) 0%, transparent 70%)',
-              filter: 'blur(120px)',
-              zIndex: 2
-            }}
-          />
-
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.7) 100%)',
-              zIndex: 3
-            }}
-          />
-
-          <div className="relative z-10 flex items-center justify-center h-full">
-            <div
-              className="transition-all duration-1000 ease-out"
+    <section style={{ width: '100%', position: 'relative', minHeight: '100vh', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 10, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div
+          className="transition-all duration-1000 ease-out"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateY(0)' : 'translateY(20px)'
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <h1
+              className="text-center tracking-widest select-none"
               style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'translateY(0)' : 'translateY(20px)'
+                color: '#FF7400',
+                fontSize: 'clamp(3rem, 8vw, 7rem)',
+                letterSpacing: '0.3em',
+                textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
+                fontFamily: '"Montserrat", sans-serif',
+                fontWeight: 800,
+                lineHeight: '1.2',
+                margin: 0
               }}
             >
-              <h1
-                className="text-center tracking-widest select-none"
-                style={{
-                  color: '#FF7400',
-                  fontSize: 'clamp(3rem, 8vw, 7rem)',
-                  letterSpacing: '0.3em',
-                  textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
-                  fontFamily: '"Montserrat", sans-serif',
-                  fontWeight: 800
-                }}
-              >
-                RABUSTE COFFEE
-              </h1>
-
-              <div
-                className="mx-auto mt-6 transition-all duration-1000 delay-300"
-                style={{
-                  width: visible ? '120px' : '0px',
-                  height: '2px',
-                  backgroundColor: '#FF7400',
-                  opacity: visible ? 0.6 : 0,
-                  boxShadow: '0 0 10px rgba(255,116,0,0.3)'
-                }}
-              />
-            </div>
+              RABUSTE
+            </h1>
+            <h1
+              className="text-center tracking-widest select-none"
+              style={{
+                color: '#FF7400',
+                fontSize: 'clamp(3rem, 8vw, 7rem)',
+                letterSpacing: '0.3em',
+                textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
+                fontFamily: '"Montserrat", sans-serif',
+                fontWeight: 800,
+                lineHeight: '1.2',
+                margin: 0
+              }}
+            >
+              COFFEE
+            </h1>
           </div>
 
           <div
-            className="absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-opacity duration-1000 delay-1000"
-            style={{ opacity: visible ? 0.4 : 0 }}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <div
-                className="w-px h-16 animate-pulse"
-                style={{
-                  background: 'linear-gradient(to bottom, transparent, rgba(255,116,0,0.3), transparent)',
-                  animationDuration: '2s'
-                }}
-              />
-              <span className="text-xs tracking-widest uppercase" style={{ color: 'rgba(255,116,0,0.5)' }}>
-                Scroll
-              </span>
-            </div>
-          </div>
-
-          <div
-            className="absolute bottom-0 w-full transition-transform duration-700"
+            className="mx-auto mt-6 transition-all duration-1000 delay-300"
             style={{
-              transform: 'translateY(100%)',
-              backgroundColor: '#0a0a0a',
-              borderTop: '1px solid rgba(255,116,0,0.1)',
-              zIndex: 5
+              width: visible ? '120px' : '0px',
+              height: '2px',
+              backgroundColor: '#FF7400',
+              opacity: visible ? 0.6 : 0,
+              boxShadow: '0 0 10px rgba(255,116,0,0.3)'
             }}
-          >
-            <div className="container mx-auto px-6 py-24">
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-4xl font-bold mb-6 tracking-wide" style={{ color: '#FF7400' }}>
-                  The Ritual Begins
-                </h2>
-                <p className="text-lg leading-relaxed opacity-80" style={{ color: '#d4d4d4' }}>
-                  Every bean tells a story. Every roast marks a moment. This is not just coffee—this is presence, craft, and intention.
-                </p>
-              </div>
-            </div>
+          />
+        </div>
+      </div>
+
+      <div
+        className="absolute bottom-12 left-1/2 transform -translate-x-1/2 transition-opacity duration-1000 delay-1000"
+        style={{ opacity: visible ? 0.4 : 0, zIndex: 10 }}
+      >
+        <div className="flex flex-col items-center gap-2">
+          <div
+            className="w-px h-16 animate-pulse"
+            style={{
+              background: 'linear-gradient(to bottom, transparent, rgba(255,116,0,0.3), transparent)',
+              animationDuration: '2s'
+            }}
+          />
+          <span className="text-xs tracking-widest uppercase" style={{ color: 'rgba(255,116,0,0.5)' }}>
+            Scroll
+          </span>
+        </div>
+      </div>
+
+      <div
+        className="absolute bottom-0 w-full transition-transform duration-700"
+        style={{
+          transform: 'translateY(100%)',
+          backgroundColor: '#0a0a0a',
+          borderTop: '1px solid rgba(255,116,0,0.1)',
+          zIndex: 5
+        }}
+      >
+        <div className="container mx-auto px-6 py-24">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-4xl font-bold mb-6 tracking-wide" style={{ color: '#FF7400' }}>
+              The Ritual Begins
+            </h2>
+            <p className="text-lg leading-relaxed opacity-80" style={{ color: '#d4d4d4' }}>
+              Every bean tells a story. Every roast marks a moment. This is not just coffee—this is presence, craft, and intention.
+            </p>
           </div>
         </div>
       </div>
