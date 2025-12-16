@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import SplitText from '@/components/SplitText';
+import ScrollReveal from '@/components/ScrollReveal';
 
 export default function RabusteHero() {
   const [visible, setVisible] = useState(false);
@@ -22,12 +23,12 @@ export default function RabusteHero() {
 
   const titleStyle = {
     color: '#FF7400',
-    fontSize: 'clamp(3rem, 8vw, 7rem)',
+    fontSize: 'clamp(2.5rem, 7vw, 6rem)',
     letterSpacing: '0.3em',
     textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
     fontFamily: '"Montserrat", sans-serif',
     fontWeight: 800,
-    lineHeight: '1.2',
+    lineHeight: '1.5',
     margin: 0,
     position: 'relative',
     zIndex: 100
@@ -116,9 +117,16 @@ export default function RabusteHero() {
             <h2 className="text-4xl font-bold mb-6 tracking-wide" style={{ color: '#FF7400' }}>
               The Ritual Begins
             </h2>
-            <p className="text-lg leading-relaxed opacity-80" style={{ color: '#d4d4d4' }}>
+            <ScrollReveal
+              baseOpacity={0}
+              enableBlur={true}
+              baseRotation={5}
+              blurStrength={10}
+              containerClassName="text-lg leading-relaxed opacity-80"
+              textClassName=""
+            >
               Every bean tells a story. Every roast marks a moment. This is not just coffee—this is presence, craft, and intention.
-            </p>
+            </ScrollReveal>
           </div>
         </div>
       </div>
