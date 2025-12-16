@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import SplitText from '@/components/SplitText';
 
 export default function RabusteHero() {
   const [visible, setVisible] = useState(false);
@@ -15,6 +16,23 @@ export default function RabusteHero() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleAnimationComplete = () => {
+    console.log('All letters have animated!');
+  };
+
+  const titleStyle = {
+    color: '#FF7400',
+    fontSize: 'clamp(3rem, 8vw, 7rem)',
+    letterSpacing: '0.3em',
+    textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
+    fontFamily: '"Montserrat", sans-serif',
+    fontWeight: 800,
+    lineHeight: '1.2',
+    margin: 0,
+    position: 'relative',
+    zIndex: 100
+  };
+
   return (
     <section style={{ width: '100%', position: 'relative', minHeight: '100vh', zIndex: 1 }}>
       <div style={{ position: 'relative', zIndex: 10, height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -22,40 +40,46 @@ export default function RabusteHero() {
           className="transition-all duration-1000 ease-out"
           style={{
             opacity: visible ? 1 : 0,
-            transform: visible ? 'translateY(0)' : 'translateY(20px)'
+            transform: visible ? 'translateY(0)' : 'translateY(20px)',
+            position: 'relative',
+            zIndex: 100
           }}
         >
-          <div style={{ textAlign: 'center' }}>
-            <h1
-              className="text-center tracking-widest select-none"
-              style={{
-                color: '#FF7400',
-                fontSize: 'clamp(3rem, 8vw, 7rem)',
-                letterSpacing: '0.3em',
-                textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
-                fontFamily: '"Montserrat", sans-serif',
-                fontWeight: 800,
-                lineHeight: '1.2',
-                margin: 0
-              }}
-            >
-              RABUSTE
-            </h1>
-            <h1
-              className="text-center tracking-widest select-none"
-              style={{
-                color: '#FF7400',
-                fontSize: 'clamp(3rem, 8vw, 7rem)',
-                letterSpacing: '0.3em',
-                textShadow: '0 0 40px rgba(255,116,0,0.4), 0 0 80px rgba(255,116,0,0.2)',
-                fontFamily: '"Montserrat", sans-serif',
-                fontWeight: 800,
-                lineHeight: '1.2',
-                margin: 0
-              }}
-            >
-              COFFEE
-            </h1>
+          <div style={{ textAlign: 'center', position: 'relative', zIndex: 100 }}>
+            <div style={titleStyle}>
+              <SplitText
+                text="RABUSTE"
+                tag="h1"
+                className="text-center tracking-widest select-none"
+                delay={80}
+                duration={0.5}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-100px"
+                textAlign="center"
+                onLetterAnimationComplete={handleAnimationComplete}
+              />
+            </div>
+            <div style={titleStyle}>
+              <SplitText
+                text="COFFEE"
+                tag="h1"
+                className="text-center tracking-widest select-none"
+                delay={80}
+                duration={0.5}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="-100px"
+                textAlign="center"
+                onLetterAnimationComplete={handleAnimationComplete}
+              />
+            </div>
           </div>
 
           <div
@@ -65,7 +89,9 @@ export default function RabusteHero() {
               height: '2px',
               backgroundColor: '#FF7400',
               opacity: visible ? 0.6 : 0,
-              boxShadow: '0 0 10px rgba(255,116,0,0.3)'
+              boxShadow: '0 0 10px rgba(255,116,0,0.3)',
+              position: 'relative',
+              zIndex: 100
             }}
           />
         </div>
