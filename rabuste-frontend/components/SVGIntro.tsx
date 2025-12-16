@@ -73,9 +73,9 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                 </linearGradient>
 
                 <linearGradient id="thinLidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#1f1f1f" />
-                  <stop offset="50%" stopColor="#0f0f0f" />
-                  <stop offset="100%" stopColor="#0a0a0a" />
+                  <stop offset="0%" stopColor="#1f1f1f" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#0f0f0f" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0.28" />
                 </linearGradient>
 
                 <filter id="glow">
@@ -125,19 +125,19 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                   transition={{ duration: 0.7, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
                 >
                   {/* Thin lid top */}
-                  <ellipse cx="235" cy="100" rx="115" ry="6" fill="url(#thinLidGrad)" />
+                  <ellipse cx="235" cy="100" rx="115" ry="6" fill="url(#thinLidGrad)" fillOpacity="0.75" />
                   
                   {/* Thin highlight */}
                   <ellipse cx="235" cy="99" rx="105" ry="5" fill="white" fillOpacity="0.08" />
 
                   {/* Drinking hole */}
-                  <ellipse cx="235" cy="100" rx="11" ry="5" fill="#000000" />
+                  <ellipse cx="235" cy="100" rx="11" ry="5" fill="#000000" fillOpacity="0.35" />
 
                   {/* Lid body - gentle taper from y=100 to y=160 (60px total) */}
-                  <path d="M 122,100 L 117,120 L 110,140 L 95,160 L 375,160 L 360,140 L 353,120 L 348,100 Z" fill="url(#thinLidGrad)" />
+                  <path d="M 122,100 L 117,120 L 110,140 L 95,160 L 375,160 L 360,140 L 353,120 L 348,100 Z" fill="url(#thinLidGrad)" fillOpacity="0.55" />
 
                   {/* Thin rim at cup connection */}
-                  <ellipse cx="235" cy="160" rx="140" ry="2" fill="#0a0a0a" />
+                  <ellipse cx="235" cy="160" rx="140" ry="2" fill="#0a0a0a" fillOpacity="0.4" />
                 </motion.g>
 
                 <motion.ellipse cx="235" cy="478" rx="130" ry="6" fill="#000000" fillOpacity="0" initial={{ opacity: 0 }} animate={{ opacity: 0.2 }} transition={{ duration: 0.6, delay: 1.0 }} style={{ filter: "blur(8px)" }} />
