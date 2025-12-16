@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import SplitText from '@/components/SplitText';
-import ScrollReveal from '@/components/ScrollReveal';
 
 export default function RabusteHero() {
   const [visible, setVisible] = useState(false);
@@ -100,34 +99,6 @@ export default function RabusteHero() {
           <span className="text-xs tracking-widest uppercase" style={{ color: 'rgba(255,116,0,0.5)' }}>
             Scroll
           </span>
-        </div>
-      </div>
-
-      <div
-        className="absolute bottom-0 w-full transition-transform duration-700"
-        style={{
-          transform: 'translateY(100%)',
-          backgroundColor: '#0a0a0a',
-          borderTop: '1px solid rgba(255,116,0,0.1)',
-          zIndex: 5
-        }}
-      >
-        <div className="container mx-auto px-6 py-24">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6 tracking-wide" style={{ color: '#FF7400' }}>
-              The Ritual Begins
-            </h2>
-            <ScrollReveal
-              baseOpacity={0}
-              enableBlur={true}
-              baseRotation={5}
-              blurStrength={10}
-              containerClassName="text-lg leading-relaxed opacity-80"
-              textClassName=""
-            >
-              Every bean tells a story. Every roast marks a moment. This is not just coffee—this is presence, craft, and intention.
-            </ScrollReveal>
-          </div>
         </div>
       </div>
     </section>

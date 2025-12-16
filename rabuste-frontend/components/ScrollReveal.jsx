@@ -98,9 +98,15 @@ const ScrollReveal = ({
   }, [scrollContainerRef, enableBlur, baseRotation, baseOpacity, rotationEnd, wordAnimationEnd, blurStrength]);
 
   return (
-    <h2 ref={containerRef} className={`scroll-reveal ${containerClassName}`}>
-      <p className={`scroll-reveal-text ${textClassName}`}>{splitText}</p>
-    </h2>
+    <div 
+      ref={containerRef} 
+      className={`scroll-reveal ${containerClassName}`}
+      style={{ color: '#fffbd6' }}
+    >
+      <p className={`scroll-reveal-text ${textClassName}`} style={{ color: 'inherit', margin: 0 }}>
+        {splitText}
+      </p>
+    </div>
   );
 };
 
