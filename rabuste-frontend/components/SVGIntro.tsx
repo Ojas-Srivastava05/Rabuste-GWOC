@@ -118,17 +118,26 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                   transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 />
 
-                {/* THIN BLACK LID */}
+                {/* PERFECT PROPORTIONED LID - 60px tall (from y=100 to y=160) */}
                 <motion.g
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
                 >
-                  <ellipse cx="235" cy="10" rx="115" ry="10" fill="url(#thinLidGrad)" />
-                  <ellipse cx="235" cy="8" rx="105" ry="8" fill="white" fillOpacity="0.08" />
-                  <ellipse cx="235" cy="10" rx="12" ry="7" fill="#000000" />
-                  <path d="M 120,10 L 112,45 L 95,160 L 375,160 L 358,45 L 350,10 Z" fill="url(#thinLidGrad)" />
-                  <ellipse cx="235" cy="160" rx="140" ry="3" fill="#0a0a0a" />
+                  {/* Thin lid top */}
+                  <ellipse cx="235" cy="100" rx="115" ry="6" fill="url(#thinLidGrad)" />
+                  
+                  {/* Thin highlight */}
+                  <ellipse cx="235" cy="99" rx="105" ry="5" fill="white" fillOpacity="0.08" />
+
+                  {/* Drinking hole */}
+                  <ellipse cx="235" cy="100" rx="11" ry="5" fill="#000000" />
+
+                  {/* Lid body - gentle taper from y=100 to y=160 (60px total) */}
+                  <path d="M 122,100 L 117,120 L 110,140 L 95,160 L 375,160 L 360,140 L 353,120 L 348,100 Z" fill="url(#thinLidGrad)" />
+
+                  {/* Thin rim at cup connection */}
+                  <ellipse cx="235" cy="160" rx="140" ry="2" fill="#0a0a0a" />
                 </motion.g>
 
                 <motion.ellipse cx="235" cy="478" rx="130" ry="6" fill="#000000" fillOpacity="0" initial={{ opacity: 0 }} animate={{ opacity: 0.2 }} transition={{ duration: 0.6, delay: 1.0 }} style={{ filter: "blur(8px)" }} />
