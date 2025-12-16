@@ -36,10 +36,7 @@ export default function Home() {
         {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
 
-      {!showIntro && (
-        // replaced the previous main with the RabusteHero component
-        <RabusteHero />
-      )}
+      {!showIntro && <RabusteHero />}
     </>
   );
 }
