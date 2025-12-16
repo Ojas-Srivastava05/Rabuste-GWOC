@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
 import RabusteHero from "@/components/sections/RabusteHero";
-import WhyRobusta from "@/components/sections/WhyRobusta";
+import WhatIsRobusta from "@/components/sections/WhatIsRobusta";
+import RobustaOrigin from "@/components/sections/RobustaOrigin";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -40,7 +41,8 @@ export default function Home() {
       {!showIntro && (
         <main>
           <RabusteHero />
-          <WhyRobusta />
+          <WhatIsRobusta />
+          <RobustaOrigin />
         </main>
       )}
     </>

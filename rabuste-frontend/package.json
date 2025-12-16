@@ -21,6 +21,8 @@
     "lamina": "^1.2.2",
     "leva": "^0.10.1",
     "lucide-react": "^0.561.0",
+    "mathjs": "^14.9.1",
+    "motion": "^12.23.26",
     "next": "16.0.10",
     "nice-color-palettes": "^4.0.0",
     "react": "19.2.1",
