@@ -61,14 +61,14 @@ interface StackProps {
 }
 
 export default function Stack({
-  randomRotation = false,
+  randomRotation = true,
   sensitivity = 200,
   cards = [],
   animationConfig = { stiffness: 260, damping: 20 },
   sendToBackOnClick = false,
-  autoplay = false,
-  autoplayDelay = 3000,
-  pauseOnHover = false,
+  autoplay = true,
+  autoplayDelay = 1000,
+  pauseOnHover = true,
   mobileClickOnly = false,
   mobileBreakpoint = 768
 }: StackProps) {
