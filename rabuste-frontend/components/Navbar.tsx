@@ -13,7 +13,7 @@ type NavButtonProps = {
 export default function Navbar() {
   return (
     <nav
-      className="w-full bg-[#4A2825] py-6 px-8"
+      className="w-full py-6 px-8"
       style={{ fontFamily: "'Montserrat', sans-serif" }}
     >
       <div className="flex items-center justify-between">
