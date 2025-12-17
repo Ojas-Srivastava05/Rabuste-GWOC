@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/sections/Hero";
+import Hero from "@/components/sections/Hero"
+import Gallery from "@/components/sections/Gallery";
 import Origin from "@/components/sections/Origin";
 import Balatro from '@/components/bg';
 
@@ -56,6 +57,7 @@ export default function Home() {
           <main>
             <Hero />
             <Origin />
+            <Gallery />
           </main>
         </>
       )}
