@@ -110,8 +110,19 @@ vec4 effect(vec2 screenSize, vec2 screen_coords) {
     float c2p = max(0.0, 1.0 - contrast_mod * abs(paint_res));
     float c3p = 1.0 - min(1.0, c1p + c2p);
     float light = (uLighting - 0.2) * max(c1p * 5.0 - 4.0, 0.0) + uLighting * max(c2p * 5.0 - 4.0, 0.0);
-    
-    return (0.3 / uContrast) * uColor1 + (1.0 - 0.3 / uContrast) * (uColor1 * c1p + uColor2 * c2p + vec4(c3p * uColor3.rgb, c3p * uColor1.a)) + light;
+
+    vec4 col = (0.3 / uContrast) * uColor1
+         + (1.0 - 0.3 / uContrast)
+         * (uColor1 * c1p
+         + uColor2 * c2p
+         + vec4(c3p * uColor3.rgb, c3p * uColor1.a))
+         + light;
+
+// DARK BIAS (critical)
+col.rgb *= vec3(0.85, 0.8, 0.75);
+
+return col;
+
 }
 
 void main() {
@@ -124,12 +135,12 @@ export default function Balatro({
   spinRotation = -2.0,
   spinSpeed = 7.0,
   offset = [0.0, 0.0],
-  color1 = '#4A2825',
-  color2 = '#4A2825',
-  color3 = '#4A2825',
-  contrast = 3.5,
-  lighting = 0.4,
-  spinAmount = 0.25,
+  color1 = '#0a0a0a',   // deep black (unchanged)
+  color2 = '#2f1e15' ,  // slightly lighter espresso
+  color3 = '#000000',
+  contrast = 2.6,
+  lighting = 0.15,
+  spinAmount = 0.15,
   pixelFilter = 1970.0,
   spinEase = 1.0,
   isRotate = false,
