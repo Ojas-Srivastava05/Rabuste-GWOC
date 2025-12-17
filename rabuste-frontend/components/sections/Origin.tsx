@@ -9,7 +9,7 @@ export default function Origin() {
       style={{
         position: 'relative',
         width: '100%',
-        minHeight: '60vh',
+        minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -27,9 +27,9 @@ export default function Origin() {
           backgroundPosition: 'center',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
-          filter: 'blur(18px) saturate(1.05)',
+          filter: 'blur(10px) saturate(1.05)',
           transform: 'scale(1.06)', // avoid visible edges when blurred
-          opacity: 0.95,
+          opacity: 0.90,
           zIndex: 0,
         }}
       />
