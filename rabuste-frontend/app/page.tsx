@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -37,7 +38,7 @@ export default function Home() {
 
       {!showIntro && (
         <main>
-          
+          <Navbar />
         </main>
       )}
     </>
