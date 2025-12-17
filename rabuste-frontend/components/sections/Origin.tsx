@@ -20,8 +20,9 @@ export default function Origin() {
         width: '100%',
         minHeight: '100vh',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',      // ensure content stacks from the top
         justifyContent: 'center',
+        paddingTop: '28px',            // room at top for the title
         overflow: 'hidden',
         backgroundColor: '#0a0a0a'
       }}
@@ -54,39 +55,40 @@ export default function Origin() {
         }}
       />
 
-      {/* Section title: animated into view (no StarBorder) */}
-      <AnimatedContent distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
-        <div
-          style={{
-            position: 'absolute',
-            top: '36px',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            zIndex: 20,
-            pointerEvents: 'none'
-          }}
-        >
+      {/* Section title: absolute full-width row (centers reliably). Animate only the H1 so wrapper positioning isn't affected by AnimatedContent internals */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '18px',
+          left: 0,
+          right: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          zIndex: 60,
+          pointerEvents: 'auto'
+        }}
+      >
+        <AnimatedContent distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
           <h1
             role="heading"
             aria-level={1}
             className="plantation-header"
             style={{
               margin: 0,
+              display: 'inline-block',
               fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
               color: '#FAD0C4',
-              padding: '6px 16px',
-              background: 'rgba(44,30,22,0.6)', /* subtle dark pill for contrast */
+              padding: '8px 18px',
+              background: 'rgba(44,30,22,0.86)',
               borderRadius: 12,
-              boxShadow: '0 8px 24px rgba(12,8,6,0.45)',
-              pointerEvents: 'none'
+              boxShadow: '0 10px 30px rgba(12,8,6,0.55)',
+              textAlign: 'center',
             }}
           >
             ORIGIN
           </h1>
-        </div>
-      </AnimatedContent>
+        </AnimatedContent>
+      </div>
 
       <AnimatedContent distance={120} reverse={false} duration={1.0} delay={0.08} threshold={0.2}>
         <div
@@ -108,8 +110,9 @@ export default function Origin() {
               width: '100%',
               height: 'auto',
               objectFit: 'contain',
-              filter: 'drop-shadow(0 30px 60px rgba(0,0,0,0.6))',
-              transform: 'translateY(-6px)'
+              // stronger brighten + contrast so the beans read clearly
+              filter: 'brightness(1.35) contrast(1.12) saturate(1.2) drop-shadow(0 30px 60px rgba(0,0,0,0.45))',
+              transform: 'translateY(-4px)'
             }}
           />
         </div>
