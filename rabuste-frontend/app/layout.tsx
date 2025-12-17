@@ -27,13 +27,6 @@ export default function RootLayout({
               pointerEvents: "auto"
             }}
           >
-            <Image
-              src="/logo.svg"
-              alt="Rabuste Coffee Logo"
-              width={60}
-              height={60}
-              priority
-            />
           </div>
           {children}
        
