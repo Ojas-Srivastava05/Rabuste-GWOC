@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
-import Hero from "@/components/sections/Hero";
+import Hero from "@/components/sections/Gallery";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
