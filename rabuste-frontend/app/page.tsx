@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
+<<<<<<< Updated upstream
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/sections/Hero";
+=======
+import Hero from "@/components/sections/Hero";
+import Origin from "@/components/sections/Origin";
+>>>>>>> Stashed changes
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -39,10 +44,15 @@ export default function Home() {
 
       {!showIntro && (
         <>
+<<<<<<< Updated upstream
           <Navbar />
           <main>
             <Hero />
           </main>
+=======
+          <Hero />
+          <Origin />
+>>>>>>> Stashed changes
         </>
       )}
     </>
