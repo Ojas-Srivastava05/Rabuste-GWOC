@@ -33,7 +33,7 @@ export default function Origin() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: "url('/origin/originbg.jpg')",
+          backgroundImage: "url('/origin/file.jpg')",
           backgroundPosition: 'center',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
@@ -77,11 +77,8 @@ export default function Origin() {
               margin: 0,
               display: 'inline-block',
               fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
-              color: '#FAD0C4',
+              color: '#3B2B23',
               padding: '8px 18px',
-              background: 'rgba(44,30,22,0.86)',
-              borderRadius: 12,
-              boxShadow: '0 10px 30px rgba(12,8,6,0.55)',
               textAlign: 'center',
             }}
           >
