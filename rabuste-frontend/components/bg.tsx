@@ -135,9 +135,9 @@ export default function Balatro({
   spinRotation = -2.0,
   spinSpeed = 7.0,
   offset = [0.0, 0.0],
-  color1 = '#050505',   // near pure black
-color2 = '#3a261c'   ,// clearly brighter espresso
-color3 = '#000000',
+  color1 = '#050505'  , // deep black (background)
+  color2 = '#2e211a'   ,// dominant espresso field (this spreads)
+  color3 = '#4a352a'   ,// lighter mocha edge (gives width)
   contrast = 2.6,
   lighting = 0.15,
   spinAmount = 0.15,
