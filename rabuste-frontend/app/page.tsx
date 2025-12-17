@@ -41,7 +41,7 @@ export default function Home() {
         <Balatro
         isRotate={false}
         mouseInteraction={true}
-        pixelFilter={700}
+        pixelFilter={2000}
         />
         </div>
 
