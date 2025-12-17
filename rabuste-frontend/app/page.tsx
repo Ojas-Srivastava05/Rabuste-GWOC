@@ -3,13 +3,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
-<<<<<<< HEAD
-import Hero from "@/components/sections/Gallery";
-=======
 import Navbar from "@/components/Navbar";
->>>>>>> samanvitha
 import Hero from "@/components/sections/Hero";
-import Navbar from "@/components/Navbar";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -45,9 +40,9 @@ export default function Home() {
       {!showIntro && (
         <>
           <Navbar />
-          <Hero />
-        <main>
-        </main>
+          <main>
+            <Hero />
+          </main>
         </>
       )}
     </>
