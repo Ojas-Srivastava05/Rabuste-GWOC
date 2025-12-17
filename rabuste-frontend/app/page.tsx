@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
-
-import Hero from "@/components/sections/Hero";
 import Navbar from "@/components/Navbar";
+import Hero from "@/components/sections/Hero";
+import Origin from "@/components/sections/Origin";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -41,9 +41,10 @@ export default function Home() {
       {!showIntro && (
         <>
           <Navbar />
-          <Hero />
-        <main>
-        </main>
+          <main>
+            <Hero />
+            <Origin />
+          </main>
         </>
       )}
     </>
