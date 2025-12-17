@@ -180,53 +180,17 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                 transition={{ duration: 1.0, delay: 4.5, ease: [0.16, 1, 0.3, 1] }}
               >
                 <motion.image
-                  href="/logo.svg"
-                  x="210"
-                  y="240"
-                  width="50"
-                  height="50"
+                  href="/Rabuste logo.png"
+                  x="170"
+                  y="220"
+                  width="135"
+                  height="135"
                   initial={{ opacity: 0, scale: 0.7, rotate: -15 }}
                   animate={{ opacity: 1, scale: 1, rotate: 0 }}
                   transition={{ 
                     duration: 0.9, 
                     delay: 4.6,
                     ease: [0.34, 1.56, 0.64, 1]
-                  }}
-                />
-
-                <motion.text
-                  x="235"
-                  y="325"
-                  textAnchor="middle"
-                  fill="#FF7400"
-                  fontSize="32"
-                  fontWeight="700"
-                  letterSpacing="10"
-                  fontFamily="Helvetica Neue, Arial, sans-serif"
-                  initial={{ opacity: 0, letterSpacing: "22" }}
-                  animate={{ opacity: 1, letterSpacing: "10" }}
-                  transition={{ 
-                    duration: 1.0, 
-                    delay: 4.8,
-                    ease: [0.22, 1, 0.36, 1]
-                  }}
-                  filter="url(#glow)"
-                >
-                  RABUSTE
-                </motion.text>
-
-                <motion.path
-                  d="M 170,338 Q 235,342 300,338"
-                  stroke="#FF7400"
-                  strokeWidth="2.5"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 0.8 }}
-                  transition={{ 
-                    duration: 1.0, 
-                    delay: 5.0,
-                    ease: [0.22, 1, 0.36, 1]
                   }}
                 />
               </motion.g>
