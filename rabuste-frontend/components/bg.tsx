@@ -130,7 +130,7 @@ export default function Balatro({
   contrast = 3.5,
   lighting = 0.4,
   spinAmount = 0.25,
-  pixelFilter = 745.0,
+  pixelFilter = 1970.0,
   spinEase = 1.0,
   isRotate = false,
   mouseInteraction = true
