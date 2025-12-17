@@ -6,6 +6,7 @@ import SVGIntro from "@/components/SVGIntro";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/sections/Hero";
 import Origin from "@/components/sections/Origin";
+import Balatro from '@/components/bg';
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -34,6 +35,17 @@ export default function Home() {
 
   return (
     <>
+    {/*Background Effect*/}
+    {!showIntro && (
+      <div className="fixed inset-0 -z-10">
+        <Balatro
+        isRotate={false}
+        mouseInteraction={true}
+        pixelFilter={700}
+        />
+        </div>
+
+    )}
       <AnimatePresence mode="wait">
         {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
