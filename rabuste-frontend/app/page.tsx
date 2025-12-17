@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
-import Navbar from "@/components/Navbar";
+
 import Hero from "@/components/sections/Hero";
 import Navbar from "@/components/Navbar";
 
