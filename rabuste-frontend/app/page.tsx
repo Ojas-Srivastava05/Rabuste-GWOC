@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
+import Hero from "@/components/sections/Hero";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -36,9 +37,8 @@ export default function Home() {
       </AnimatePresence>
 
       {!showIntro && (
-        <main>
-          
-        </main>
+        // show masonry hero when intro dismissed
+        <Hero />
       )}
     </>
   );
