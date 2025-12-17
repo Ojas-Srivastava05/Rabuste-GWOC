@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import AnimatedContent from '../AnimatedContent';
-import StarBorder from '../StarBorder';
 
 export default function Origin() {
   useEffect(() => {
@@ -55,11 +54,9 @@ export default function Origin() {
         }}
       />
 
-      {/* Section title: use StarBorder to render a clearly visible card in dark coffee */}
+      {/* Section title: animated into view (no StarBorder) */}
       <AnimatedContent distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
-        {/* absolute full-width row to reliably center the StarBorder card */}
         <div
-          aria-hidden
           style={{
             position: 'absolute',
             top: '36px',
@@ -67,33 +64,27 @@ export default function Origin() {
             right: 0,
             display: 'flex',
             justifyContent: 'center',
-            zIndex: 10,
+            zIndex: 20,
             pointerEvents: 'none'
           }}
         >
-          <StarBorder
-            as="div"
-            className="star-border-origin"
-            color="#3B2B23"
-            speed="8s"
+          <h1
+            role="heading"
+            aria-level={1}
+            className="plantation-header"
             style={{
-              borderRadius: 14,
-              // ensure the StarBorder itself doesn't expand to full width
-              display: 'inline-flex',
+              margin: 0,
+              fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
+              color: '#FAD0C4',
+              padding: '6px 16px',
+              background: 'rgba(44,30,22,0.6)', /* subtle dark pill for contrast */
+              borderRadius: 12,
+              boxShadow: '0 8px 24px rgba(12,8,6,0.45)',
+              pointerEvents: 'none'
             }}
           >
-            <h1
-              className="plantation-header"
-              style={{
-                margin: 0,
-                fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
-                color: '#FAD0C4',
-                pointerEvents: 'none'
-              }}
-            >
-              ORIGIN
-            </h1>
-          </StarBorder>
+            ORIGIN
+          </h1>
         </div>
       </AnimatedContent>
 
