@@ -14,6 +14,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className="antialiased"
         style={{ backgroundColor: '#0a0a0a', margin: 0, padding: 0 }}

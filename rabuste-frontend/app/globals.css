@@ -115,6 +115,15 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.plantation-header {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600; /* SemiBold */
+  text-transform: uppercase;
+  letter-spacing: 0.3em; /* Adds the wide gap between letters */
+  color: #6D4C41; /* Light coffee (warm grey/brown) */
+  text-align: center;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

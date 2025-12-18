@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/sections/Hero";
+import Hero from "@/components/sections/Hero"
+import Gallery from "@/components/sections/Gallery";
 import Origin from "@/components/sections/Origin";
+import Balatro from '@/components/bg';
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -34,6 +36,17 @@ export default function Home() {
 
   return (
     <>
+    {/*Background Effect*/}
+    {!showIntro && (
+      <div className="fixed inset-0 -z-10">
+        <Balatro
+        isRotate={false}
+        mouseInteraction={true}
+        pixelFilter={2000}
+        />
+        </div>
+
+    )}
       <AnimatePresence mode="wait">
         {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
@@ -44,6 +57,7 @@ export default function Home() {
           <main>
             <Hero />
             <Origin />
+            <Gallery />
           </main>
         </>
       )}

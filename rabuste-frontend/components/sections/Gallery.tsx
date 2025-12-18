@@ -28,7 +28,6 @@ export default function Hero() {
         alignItems: 'flex-start', // move content toward the top
         justifyContent: 'center',
         paddingTop: '100px',       // extra space from the very top, adjust as needed
-        background: '#0a0a0a',
         overflow: 'hidden',
       }}
     >
