@@ -105,13 +105,10 @@ export default function AuthPage() {
         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
         {info && <p className="text-yellow-300 text-sm mb-3">{info}</p>}
 
-        <AnimatePresence mode="wait">
+        {/* <AnimatePresence mode="wait"> */}
           {!isLogin && (
-            <motion.input
-              key="name"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+            <input
+              type="text"
               name="name"
               placeholder="Full name"
               required
@@ -120,7 +117,7 @@ export default function AuthPage() {
               className="auth-input"
             />
           )}
-        </AnimatePresence>
+        {/* </AnimatePresence> */}
 
         <input
           name="email"
