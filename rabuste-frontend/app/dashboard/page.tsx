@@ -17,11 +17,12 @@ export default function DashboardPage() {
     }
 
     // 3️⃣ Call protected backend route WITH token
-    fetch("http://127.0.0.1:5000/api/protected/dashboard", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/protected/dashboard`, {
       headers: {
-        Authorization: `Bearer ${token}`, // 🔑 THIS IS IMPORTANT
+        Authorization: `Bearer ${token}`,
       },
     })
+    
       .then((res) => {
         // 4️⃣ If backend rejects token
         if (!res.ok) {

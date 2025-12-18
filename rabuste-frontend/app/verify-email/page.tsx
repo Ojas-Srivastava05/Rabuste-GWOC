@@ -15,7 +15,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     if (!token) return;
 
-    fetch(`http://127.0.0.1:5000/api/auth/verify-email?token=${token}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-email?token=${token}`)
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();

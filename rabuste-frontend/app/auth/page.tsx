@@ -35,8 +35,8 @@ export default function AuthPage() {
     }
 
     const endpoint = isLogin
-      ? "http://127.0.0.1:5000/api/auth/login"
-      : "http://127.0.0.1:5000/api/auth/signup";
+      ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`
+      : `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`;
 
     try {
       const res = await fetch(endpoint, {
