@@ -33,7 +33,7 @@ export default function Origin() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: "url('/origin/file.jpg')",
+          backgroundImage: "url('/origin/origindark.png')",
           backgroundPosition: 'center',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
