@@ -51,6 +51,9 @@ export default function Navbar() {
           <NavButton href="#add-venue" bg="bg-[#8B5E3C]">
             Franchise
           </NavButton>
+          <NavButton href="#add-venue" bg="bg-[#8B5E3C]">
+            Login/Signup
+          </NavButton>
         </div>
 
       </div>
