@@ -10,6 +10,7 @@ import Origin from "@/components/sections/Origin";
 import Balatro from '@/components/bg';
 import Menu from "@/components/sections/Menu";
 import CoffeeComparison from "@/components/sections/CoffeeComparison";
+import VRGallery from "@/components/sections/VR";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -78,6 +79,10 @@ export default function Home() {
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
               <CoffeeComparison />
+            </div>
+
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <VRGallery />
             </div>
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
