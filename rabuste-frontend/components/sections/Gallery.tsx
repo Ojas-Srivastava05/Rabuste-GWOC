@@ -5,15 +5,15 @@ import Masonry from '../Masonry';
 
 const items = [
   { id: '1', img: '../hero/img1.jpeg', url: '#', height: 400 },
-  { id: '2', img: '../hero/img2.jpeg', url: '#', height: 750 },
+  { id: '2', img: '../hero/img2.jpeg', url: '#', height: 700 },
   { id: '3', img: '../hero/img3.jpeg', url: '#', height: 600 },
-  { id: '4', img: '../hero/img4.jpeg', url: '#', height: 750 },
+  { id: '4', img: '../hero/img4.jpeg', url: '#', height: 700 },
   { id: '5', img: '../hero/img5.jpeg', url: '#', height: 400 },
   { id: '6', img: '../hero/img6.jpeg', url: '#', height: 600 },
   { id: '7', img: '../hero/img7.jpeg', url: '#', height: 600 },
   { id: '8', img: '../hero/img8.jpeg', url: '#', height: 400 },
-  { id: '9', img: '../hero/img9.jpeg', url: '#', height: 750 },
-  { id: '10', img: '../hero/img10.jpeg', url: '#', height: 750 },
+  { id: '9', img: '../hero/img9.jpeg', url: '#', height: 700 },
+  { id: '10', img: '../hero/img10.jpeg', url: '#', height: 700 },
   // add more items as needed
 ];
 
