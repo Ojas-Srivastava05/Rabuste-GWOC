@@ -1,17 +1,29 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import AnimatedContent from '../AnimatedContent';
-import SpringCard from '../SpringCard';
+import React, { useEffect, useState } from 'react';
 
 export default function Origin() {
+  const [hoveredStat, setHoveredStat] = useState(null);
+
   useEffect(() => {
     const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap';
+    link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     return () => { document.head.removeChild(link); };
   }, []);
+
+  const stats = [
+    { label: "Caffeine", value: "2x", icon: "⚡" },
+    { label: "Altitude", value: "0-800m", icon: "⛰️" },
+    { label: "Structure", value: "Stronger", icon: "💪" }
+  ];
+
+  const regions = [
+    { name: "Congo Basin", position: "Central Africa" },
+    { name: "Vietnam", position: "Southeast Asia" },
+    { name: "India", position: "South Asia" }
+  ];
 
   return (
     <section
@@ -21,123 +33,218 @@ export default function Origin() {
         width: '100%',
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',       // stack children vertically (image above paragraph)
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: '28px',            // room at top for the title
+        justifyContent: 'center',
+        padding: '20px',
         overflow: 'hidden',
-        backgroundColor: 'transparent' // removed applied background
+        backgroundColor: 'transparent'
       }}
     >
-      {/* background image and overlay removed */}
+      {/* Decorative glow */}
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        left: '10%',
+        width: '200px',
+        height: '200px',
+        background: 'radial-gradient(circle, rgba(196, 165, 116, 0.06) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(40px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
 
-      {/* Section title: absolute full-width row (centers reliably). Animate only the H1 so wrapper positioning isn't affected by AnimatedContent internals */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '18px',
-          left: 0,
-          right: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          zIndex: 60,
-          pointerEvents: 'auto'
-        }}
-      >
-        <AnimatedContent container="#snap-main-container" distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
-          <SpringCard className="origin-spring-card">
+      <div style={{
+        maxWidth: '1200px',
+        width: '100%',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '30px',
+        alignItems: 'center'
+      }}>
+        {/* Left: Image + Stats */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center' }}>
+            <span style={{
+              fontSize: '0.7rem',
+              letterSpacing: '0.15em',
+              color: '#c4a574',
+              fontWeight: 600,
+              textTransform: 'uppercase'
+            }}>
+              Where It All Begins
+            </span>
+            <h1 style={{
+              margin: '8px 0',
+              fontSize: 'clamp(2rem, 4vw, 3rem)',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontFamily: "Montserrat, sans-serif"
+            }}>
+              ORIGIN
+            </h1>
+          </div>
 
-              <h1
-                role="heading"
-                aria-level={1}
-                className="plantation-header"
+          {/* Bean Image */}
+          <div style={{ position: 'relative' }}>
+            <img
+              src="/origin/RobustaBeans.png"
+              alt="Robusta beans"
+              style={{
+                width: '100%',
+                height: 'auto',
+                objectFit: 'contain',
+                filter: 'brightness(1.4) contrast(1.15) saturate(1.25) drop-shadow(0 20px 40px rgba(0,0,0,0.5))',
+                maxHeight: '300px'
+              }}
+            />
+          </div>
+
+          {/* Stats */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            justifyContent: 'center'
+          }}>
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                onMouseEnter={() => setHoveredStat(index)}
+                onMouseLeave={() => setHoveredStat(null)}
                 style={{
-                  margin: 0,
-                  display: 'inline-block',
-                  fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
-                  color: '#FAD0C4',
-                  padding: '6px 14px',
-                  textAlign: 'center',
+                  background: hoveredStat === index 
+                    ? 'linear-gradient(135deg, rgba(74, 40, 37, 0.4) 0%, rgba(26, 26, 26, 0.6) 100%)'
+                    : 'rgba(26, 26, 26, 0.5)',
+                  border: `1px solid ${hoveredStat === index ? '#c4a574' : 'rgba(42, 42, 42, 0.8)'}`,
+                  borderRadius: '12px',
+                  padding: '16px',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s ease',
+                  transform: hoveredStat === index ? 'translateY(-2px)' : 'translateY(0)',
+                  cursor: 'pointer',
+                  flex: 1,
+                  textAlign: 'center'
                 }}
               >
-                ORIGIN
-              </h1>
-        
-          </SpringCard>
-        </AnimatedContent>
-      </div>
-
-      <AnimatedContent container="#snap-main-container" distance={120} reverse={false} duration={1.0} delay={0.08} threshold={0.2}>
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '40px 40px 0', // remove bottom padding so following content sits below
-            pointerEvents: 'none'
-          }}
-        >
-          <img
-            src="/origin/RobustaBeans.png"
-            alt="Robusta beans"
-            style={{
-              maxWidth: 'min(1000px, 85%)',
-              width: '100%',
-              height: 'auto',
-              objectFit: 'contain',
-              // stronger brighten + contrast so the beans read clearly
-              filter: 'brightness(1.35) contrast(1.12) saturate(1.2) drop-shadow(0 30px 60px rgba(0,0,0,0.45))',
-              transform: 'translateY(-4px)',
-              display: 'block',
-              marginBottom: '28px' // ensure visual gap between image and paragraph
-            }}
-          />
+                <div style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{stat.icon}</div>
+                <div style={{
+                  fontSize: '1.1rem',
+                  fontWeight: 700,
+                  color: '#c4a574',
+                  fontFamily: "Montserrat, sans-serif"
+                }}>
+                  {stat.value}
+                </div>
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: '#FAD0C4',
+                  opacity: 0.8
+                }}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </AnimatedContent>
 
-      {/* descriptive text below the beans, rendered as a SpotlightCard */}
-      <AnimatedContent container="#snap-main-container" distance={40} reverse={false} duration={0.8} delay={0.12} threshold={0.15}>
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 2,
-            display: 'flex',
-            justifyContent: 'center',
-            padding: '20px 40px',
-            pointerEvents: 'auto'
-          }}
-        >
-          {/* ensure spotlight pseudo-element is visible above overlays:
-              - set CSS var directly on the element
-              - raise z-index and give padding on the SpotlightCard itself
-          */}
-            {/* wrap paragraph in SpringCard so hover/tilt applies to the text block */}
-            <SpringCard className="origin-paragraph-spring">
-              <div style={{ color: '#FAD0C4', textAlign: 'center', lineHeight: 1.8, fontFamily: "Montserrat, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial" }}>
-                <p style={{ margin: 0 }}>
-                  Robusta coffee beans originate from the{' '}
-                  <span style={{ color: '#E6C9A8', fontWeight: 700 }}>rainforests of Central &amp; Western Africa</span>, especially the{' '}
-                  <strong style={{ color: '#C89B7B' }}>Congo Basin</strong>.
-                </p>
+        {/* Right: Content */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Main Content */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(42, 42, 42, 0.4) 100%)',
+            border: '1px solid rgba(196, 165, 116, 0.2)',
+            borderRadius: '20px',
+            padding: '30px',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+          }}>
+            <div style={{
+              color: '#FAD0C4',
+              fontSize: 'clamp(0.9rem, 1.5vw, 1rem)',
+              lineHeight: 1.7,
+              fontFamily: "Montserrat, sans-serif"
+            }}>
+              <p style={{ margin: '0 0 1rem 0', fontWeight: 400 }}>
+                Robusta beans originate from the{' '}
+                <span style={{ color: '#c4a574', fontWeight: 700 }}>
+                  rainforests of Central & Western Africa
+                </span>, especially the{' '}
+                <strong style={{ color: '#C89B7B', fontWeight: 700 }}>Congo Basin</strong>.
+              </p>
 
-                <p style={{ margin: '0.8rem 0 0' }}>
-                  They evolved to survive{' '}
-                  <em style={{ color: '#FAD0C4', fontStyle: 'italic' }}>harsh climates, pests, and lower altitudes</em>, which gives them{' '}
-                  <strong style={{ color: '#C89B7B' }}>higher caffeine</strong> and a{' '}
-                  <span style={{ color: '#C89B7B', fontWeight: 700 }}>stronger structure</span> than other coffee beans.
-                </p>
+              <p style={{ margin: '0 0 1rem 0', fontWeight: 400 }}>
+                They evolved to survive{' '}
+                <em style={{ color: '#E6C9A8', fontStyle: 'italic', fontWeight: 600 }}>
+                  harsh climates, pests, and lower altitudes
+                </em>, giving them{' '}
+                <strong style={{ color: '#c4a574', fontWeight: 700 }}>higher caffeine</strong> and{' '}
+                <span style={{ color: '#c4a574', fontWeight: 700 }}>stronger structure</span>.
+              </p>
 
-                <p style={{ margin: '0.8rem 0 0' }}>
-                  As coffee spread globally, Robusta found its place in{' '}
-                  <span style={{ color: '#E6C9A8' }}>Asia and India</span>, valued for its{' '}
-                  <strong style={{ color: '#C89B7B' }}>resilience, intensity, and bold character</strong> — a bean shaped by endurance and strength.
+              <p style={{ margin: 0, fontWeight: 400 }}>
+                As coffee spread globally, Robusta found its place in{' '}
+                <span style={{ color: '#E6C9A8', fontWeight: 600 }}>Asia and India</span>, valued for{' '}
+                <strong style={{ color: '#C89B7B', fontWeight: 700 }}>
+                  resilience, intensity, and bold character
+                </strong>.
+              </p>
+            </div>
+          </div>
+
+          {/* Regions */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '12px'
+          }}>
+            {regions.map((region, index) => (
+              <div
+                key={index}
+                style={{
+                  background: 'rgba(26, 26, 26, 0.6)',
+                  border: '1px solid rgba(42, 42, 42, 0.8)',
+                  borderRadius: '12px',
+                  padding: '16px 12px',
+                  backdropFilter: 'blur(10px)',
+                  transition: 'all 0.3s ease',
+                  textAlign: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#c4a574';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(42, 42, 42, 0.8)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <h4 style={{
+                  fontSize: '0.95rem',
+                  fontWeight: 700,
+                  color: '#FAD0C4',
+                  margin: '0 0 4px 0',
+                  fontFamily: "Montserrat, sans-serif"
+                }}>
+                  {region.name}
+                </h4>
+                <p style={{
+                  fontSize: '0.75rem',
+                  color: '#E6C9A8',
+                  margin: 0,
+                  opacity: 0.8
+                }}>
+                  {region.position}
                 </p>
               </div>
-            </SpringCard>
+            ))}
+          </div>
         </div>
-      </AnimatedContent>
+      </div>
     </section>
   );
 }
