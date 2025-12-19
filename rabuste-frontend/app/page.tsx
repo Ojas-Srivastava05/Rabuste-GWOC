@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SVGIntro from "@/components/SVGIntro";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/sections/Hero"
+import Hero from "@/components/sections/Hero";
 import Gallery from "@/components/sections/Gallery";
 import Origin from "@/components/sections/Origin";
 import Balatro from '@/components/bg';
@@ -36,17 +36,16 @@ export default function Home() {
 
   return (
     <>
-    {/*Background Effect*/}
-    {!showIntro && (
-      <div className="fixed inset-0 -z-10">
-        <Balatro
-        isRotate={false}
-        mouseInteraction={true}
-        pixelFilter={700}
-        />
+      {!showIntro && (
+        <div className="fixed inset-0 -z-10">
+          <Balatro
+            isRotate={false}
+            mouseInteraction={true}
+            pixelFilter={700}
+          />
         </div>
+      )}
 
-    )}
       <AnimatePresence mode="wait">
         {showIntro && <SVGIntro onFinish={handleIntroFinish} />}
       </AnimatePresence>
@@ -54,10 +53,30 @@ export default function Home() {
       {!showIntro && (
         <>
           <Navbar />
-          <main>
-            <Hero />
-            <Origin />
-            <Gallery />
+
+          {/* Scroll-snap container */}
+          <main
+            id="snap-main-container" /* add id so IntersectionObservers can use this scroll root */
+            style={{
+              height: 'calc(100vh)',            // full viewport
+              overflowY: 'auto',                // enable scrolling inside this container
+              scrollSnapType: 'y mandatory',    // enable vertical snapping
+              scrollBehavior: 'smooth',         // smooth snap transition
+              WebkitOverflowScrolling: 'touch', // momentum scrolling on mobile
+            }}
+          >
+            {/* each section wrapped so it snaps to viewport on scroll */}
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <Hero />
+            </div>
+
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <Origin />
+            </div>
+
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <Gallery />
+            </div>
           </main>
         </>
       )}

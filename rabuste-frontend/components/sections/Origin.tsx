@@ -70,7 +70,7 @@ export default function Origin() {
           pointerEvents: 'auto'
         }}
       >
-        <AnimatedContent distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
+        <AnimatedContent container="#snap-main-container" distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
           <SpotlightCard spotlightColor="rgba(250,208,196,0.08)" className="origin-title-spotlight">
             <h1
               role="heading"
@@ -91,7 +91,7 @@ export default function Origin() {
         </AnimatedContent>
       </div>
 
-      <AnimatedContent distance={120} reverse={false} duration={1.0} delay={0.08} threshold={0.2}>
+      <AnimatedContent container="#snap-main-container" distance={120} reverse={false} duration={1.0} delay={0.08} threshold={0.2}>
         <div
           style={{
             position: 'relative',
@@ -122,7 +122,7 @@ export default function Origin() {
       </AnimatedContent>
 
       {/* descriptive text below the beans, rendered as a SpotlightCard */}
-      <AnimatedContent distance={40} reverse={false} duration={0.8} delay={0.12} threshold={0.15}>
+      <AnimatedContent container="#snap-main-container" distance={40} reverse={false} duration={0.8} delay={0.12} threshold={0.15}>
         <div
           style={{
             position: 'relative',
