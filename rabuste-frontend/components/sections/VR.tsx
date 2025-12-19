@@ -2,6 +2,8 @@
 
 import "aframe";
 import { useState } from "react";
+import AnimatedContent from "@/components/AnimatedContent";
+import SpringCard from "@/components/SpringCard";
 
 const scenes = [
   {
@@ -26,12 +28,18 @@ export default function VRGallery() {
 
   return (
     <section className="text-white py-24">
-      <h2 className="text-4xl font-bold text-center mb-4">
-        Step Inside Rabuste
-      </h2>
-      <p className="text-center text-gray-400 mb-10">
-        Explore the coffee, the space, and the story
-      </p>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+        <AnimatedContent container="#snap-main-container" distance={40} duration={0.8} threshold={0.15}>
+          <SpringCard className="vr-spring-card" style={{ display: "inline-block", padding: "10px 16px" }}>
+            <h2 className="text-4xl font-bold text-center mb-2" style={{ margin: 0 }}>
+              Step Inside Rabuste
+            </h2>
+            <p className="text-center text-gray-400 mb-0" style={{ margin: 0 }}>
+              Explore the coffee, the space, and the story
+            </p>
+          </SpringCard>
+        </AnimatedContent>
+      </div>
 
       {/* VR Scene */}
       <div

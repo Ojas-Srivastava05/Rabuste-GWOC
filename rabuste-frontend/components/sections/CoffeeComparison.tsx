@@ -12,6 +12,8 @@ import {
   LabelList,
   Cell,
 } from "recharts";
+import AnimatedContent from "@/components/AnimatedContent";
+import SpringCard from "@/components/SpringCard";
 
 const coffeeComparisonData = [
   { metric: "Caffeine", Arabica: 1.2, Robusta: 2.2, unit: "%" },
@@ -137,12 +139,18 @@ export default function CoffeeComparison() {
         }
       `}</style>
 
-      <h2 className="text-3xl font-bold text-center mb-4 text-[#f6e6dc]" style={{ letterSpacing: "-0.02em" }}>
-        Not all beans are built the same.
-      </h2>
-      <p className="text-center text-[#8a7a6a] mb-10 text-sm" style={{ letterSpacing: "0.03em" }}>
-        Toggle a preference to focus the chart
-      </p>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+        <AnimatedContent container="#snap-main-container" distance={40} duration={0.8} threshold={0.15}>
+          <SpringCard className="coffee-spring-card" style={{ display: "inline-block", padding: "10px 16px" }}>
+            <h2 className="text-3xl font-bold text-center mb-2 text-[#f6e6dc]" style={{ margin: 0, letterSpacing: "-0.02em" }}>
+              Not all beans are built the same.
+            </h2>
+            <p className="text-center text-[#8a7a6a] mb-0 text-sm" style={{ margin: 0, letterSpacing: "0.03em" }}>
+              Toggle a preference to focus the chart
+            </p>
+          </SpringCard>
+        </AnimatedContent>
+      </div>
 
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-center gap-3 mb-10">
