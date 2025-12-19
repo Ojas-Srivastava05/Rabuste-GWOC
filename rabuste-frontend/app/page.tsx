@@ -8,6 +8,7 @@ import Hero from "@/components/sections/Hero";
 import Gallery from "@/components/sections/Gallery";
 import Origin from "@/components/sections/Origin";
 import Balatro from '@/components/bg';
+import Menu from "@/components/sections/Menu";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -72,6 +73,10 @@ export default function Home() {
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
               <Origin />
+            </div>
+
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <Menu />
             </div>
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
