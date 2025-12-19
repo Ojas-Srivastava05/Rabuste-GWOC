@@ -1,24 +1,3 @@
-// import { NextResponse } from "next/server";
-// import  connectDB  from "@/src/lib/mongodb";
-// import { Workshop } from "@/src/models/Workshop";
-
-// // GET all workshops
-// export async function GET() {
-//   await connectDB();
-//   const workshops = await Workshop.find().sort({ date: 1 });
-//   return NextResponse.json(workshops);
-// }
-
-// // ADD a new workshop
-// export async function POST(req: Request) {
-//   await connectDB();
-//   const body = await req.json();
-
-//   const workshop = await Workshop.create(body);
-//   return NextResponse.json(workshop, { status: 201 });
-// }
-
-
 
 import { NextResponse } from "next/server";
 import connectDB from "@/src/lib/mongodb";
@@ -49,3 +28,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
