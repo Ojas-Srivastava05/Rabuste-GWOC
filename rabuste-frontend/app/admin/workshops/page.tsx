@@ -248,23 +248,24 @@ export default function App() {
   };
 
   const handleDeleteWorkshop = async (workshopId: string) => {
-    console.log("handleDeleteWorkshop called with workshopId:", workshopId);
     try {
+      console.log("Deleting workshop ID:", workshopId);
+
       const res = await fetch(`/api/workshops/${workshopId}`, {
         method: "DELETE",
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.error || "Delete failed");
+        // Try to read error safely
+        const errorText = await res.text();
+        throw new Error(errorText || "Delete failed");
       }
 
-      console.log("Deleted successfully", data);
-      // Optionally, remove the workshop from state so UI updates
+      // ✅ Update UI immediately
       setWorkshops((prev) => prev.filter((w) => w._id !== workshopId));
       setIsModalOpen(false);
       setSelectedWorkshop(null);
+      setEditWorkshop(null);
     } catch (err: any) {
       console.error("Error deleting workshop:", err.message);
       alert(err.message);
@@ -796,7 +797,7 @@ export default function App() {
                       )}
                     </div>
                   </div>
-                  {/* <div className="mt-10 flex justify-end gap-4">
+                  <div className="mt-10 flex justify-end gap-4">
                     {!isEditing && (
                       <button
                         onClick={() => setIsEditing(true)}
@@ -826,7 +827,7 @@ export default function App() {
                     >
                       Delete
                     </button>
-                  </div> */}
+                  </div>
                 </div>
               </div>
             );
