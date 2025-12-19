@@ -9,6 +9,7 @@ import Gallery from "@/components/sections/Gallery";
 import Origin from "@/components/sections/Origin";
 import Balatro from '@/components/bg';
 import Menu from "@/components/sections/Menu";
+import CoffeeComparison from "@/components/sections/CoffeeComparison";
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -73,6 +74,10 @@ export default function Home() {
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
               <Origin />
+            </div>
+
+            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+              <CoffeeComparison />
             </div>
 
             <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>

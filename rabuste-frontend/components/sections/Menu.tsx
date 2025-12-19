@@ -60,6 +60,7 @@ export default function Menu() {
           fit={0.65}
           overlayBlurColor="#060010"
           onItemOpen={(name) => setSelectedName(name)}
+          grayscale={false}
         />
       </div>
     </div>
