@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Image from "next/image";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata: Metadata = {
   title: "Rabuste Coffee",
@@ -34,6 +35,8 @@ export default function RootLayout({
             }}
           >
           </div>
+          {/* scroll-to-top control */}
+          <ScrollToTop />
           {children}
        
       </body>

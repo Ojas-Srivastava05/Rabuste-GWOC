@@ -151,6 +151,13 @@ export default function Balatro({
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
+
+    // ensure background sits behind UI and doesn't intercept events
+    container.style.position = "fixed";
+    container.style.inset = "0";
+    container.style.zIndex = "0";
+    container.style.pointerEvents = "none";
+
     const renderer = new Renderer();
     const gl = renderer.gl;
     gl.clearColor(0, 0, 0, 1);
@@ -201,6 +208,14 @@ export default function Balatro({
     }
     animationFrameId = requestAnimationFrame(update);
     container.appendChild(gl.canvas);
+
+    // make sure the canvas fills container and does not create an interactive stacking context
+    gl.canvas.style.position = "absolute";
+    gl.canvas.style.left = "0";
+    gl.canvas.style.top = "0";
+    gl.canvas.style.width = "100%";
+    gl.canvas.style.height = "100%";
+    gl.canvas.style.pointerEvents = "none";
 
     function handleMouseMove(e: MouseEvent) {
       if (!mouseInteraction) return;
