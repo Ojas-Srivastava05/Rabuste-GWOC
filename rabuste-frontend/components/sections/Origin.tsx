@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import AnimatedContent from '../AnimatedContent';
-import SpotlightCard from '../SpotlightCard';
+import SpringCard from '../SpringCard';
 
 export default function Origin() {
   useEffect(() => {
@@ -71,23 +71,25 @@ export default function Origin() {
         }}
       >
         <AnimatedContent container="#snap-main-container" distance={60} reverse={true} duration={0.9} delay={0.05} threshold={0.15}>
-          <SpotlightCard spotlightColor="rgba(250,208,196,0.08)" className="origin-title-spotlight">
-            <h1
-              role="heading"
-              aria-level={1}
-              className="plantation-header"
-              style={{
-                margin: 0,
-                display: 'inline-block',
-                fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
-                color: '#FAD0C4',
-                padding: '6px 14px',
-                textAlign: 'center',
-              }}
-            >
-              ORIGIN
-            </h1>
-          </SpotlightCard>
+          <SpringCard className="origin-spring-card">
+
+              <h1
+                role="heading"
+                aria-level={1}
+                className="plantation-header"
+                style={{
+                  margin: 0,
+                  display: 'inline-block',
+                  fontSize: 'clamp(1.5rem, 3.5vw, 3rem)',
+                  color: '#FAD0C4',
+                  padding: '6px 14px',
+                  textAlign: 'center',
+                }}
+              >
+                ORIGIN
+              </h1>
+        
+          </SpringCard>
         </AnimatedContent>
       </div>
 
@@ -137,45 +139,29 @@ export default function Origin() {
               - set CSS var directly on the element
               - raise z-index and give padding on the SpotlightCard itself
           */}
-          <SpotlightCard
-            className="origin-spotlight"
-            spotlightColor="rgba(250,208,196,0.12)"
-            style={
-              {
-                // set CSS variable used by SpotlightCard.css
-                ['--spotlight-color' as any]: 'rgba(250,208,196,0.12)',
-                position: 'relative',
-                zIndex: 60, // make sure spotlight sits above overlays
-                padding: '18px 22px',
-                borderRadius: 12,
-                maxWidth: '880px',
-                display: 'inline-block',
-                background: 'transparent',
-              } as React.CSSProperties
-            }
-          >
-            {/* split into separate lines at each sentence (dot) */}
-            <div style={{ color: '#FAD0C4', textAlign: 'center', lineHeight: 1.8, fontFamily: "Montserrat, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial" }}>
-              <p style={{ margin: 0 }}>
-                Robusta coffee beans originate from the{' '}
-                <span style={{ color: '#E6C9A8', fontWeight: 700 }}>rainforests of Central &amp; Western Africa</span>, especially the{' '}
-                <strong style={{ color: '#C89B7B' }}>Congo Basin</strong>.
-              </p>
+            {/* wrap paragraph in SpringCard so hover/tilt applies to the text block */}
+            <SpringCard className="origin-paragraph-spring">
+              <div style={{ color: '#FAD0C4', textAlign: 'center', lineHeight: 1.8, fontFamily: "Montserrat, 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial" }}>
+                <p style={{ margin: 0 }}>
+                  Robusta coffee beans originate from the{' '}
+                  <span style={{ color: '#E6C9A8', fontWeight: 700 }}>rainforests of Central &amp; Western Africa</span>, especially the{' '}
+                  <strong style={{ color: '#C89B7B' }}>Congo Basin</strong>.
+                </p>
 
-              <p style={{ margin: '0.8rem 0 0' }}>
-                They evolved to survive{' '}
-                <em style={{ color: '#FAD0C4', fontStyle: 'italic' }}>harsh climates, pests, and lower altitudes</em>, which gives them{' '}
-                <strong style={{ color: '#C89B7B' }}>higher caffeine</strong> and a{' '}
-                <span style={{ color: '#C89B7B', fontWeight: 700 }}>stronger structure</span> than other coffee beans.
-              </p>
+                <p style={{ margin: '0.8rem 0 0' }}>
+                  They evolved to survive{' '}
+                  <em style={{ color: '#FAD0C4', fontStyle: 'italic' }}>harsh climates, pests, and lower altitudes</em>, which gives them{' '}
+                  <strong style={{ color: '#C89B7B' }}>higher caffeine</strong> and a{' '}
+                  <span style={{ color: '#C89B7B', fontWeight: 700 }}>stronger structure</span> than other coffee beans.
+                </p>
 
-              <p style={{ margin: '0.8rem 0 0' }}>
-                As coffee spread globally, Robusta found its place in{' '}
-                <span style={{ color: '#E6C9A8' }}>Asia and India</span>, valued for its{' '}
-                <strong style={{ color: '#C89B7B' }}>resilience, intensity, and bold character</strong> — a bean shaped by endurance and strength.
-              </p>
-            </div>
-          </SpotlightCard>
+                <p style={{ margin: '0.8rem 0 0' }}>
+                  As coffee spread globally, Robusta found its place in{' '}
+                  <span style={{ color: '#E6C9A8' }}>Asia and India</span>, valued for its{' '}
+                  <strong style={{ color: '#C89B7B' }}>resilience, intensity, and bold character</strong> — a bean shaped by endurance and strength.
+                </p>
+              </div>
+            </SpringCard>
         </div>
       </AnimatedContent>
     </section>
