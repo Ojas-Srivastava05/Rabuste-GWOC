@@ -12,14 +12,12 @@ import {
   LabelList,
   Cell,
 } from "recharts";
-import AnimatedContent from "@/components/AnimatedContent";
-import SpringCard from "@/components/SpringCard";
 
 const coffeeComparisonData = [
   { metric: "Caffeine", Arabica: 1.2, Robusta: 2.2, unit: "%" },
-  { metric: "Body / Strength", Arabica: 60, Robusta: 85, unit: "relative" },
-  { metric: "Bitterness", Arabica: 45, Robusta: 80, unit: "relative" },
-  { metric: "Acidity", Arabica: 75, Robusta: 40, unit: "relative" }
+  { metric: "Body", Arabica: 60, Robusta: 85, unit: "strength" },
+  { metric: "Bitterness", Arabica: 45, Robusta: 80, unit: "intensity" },
+  { metric: "Acidity", Arabica: 75, Robusta: 40, unit: "level" }
 ];
 
 type FocusMode = "energy" | "taste" | "strength";
@@ -27,7 +25,6 @@ type FocusMode = "energy" | "taste" | "strength";
 const MetricTooltip = ({ active, payload }: any) => {
   if (!active || !payload || !payload.length) return null;
   
-  // Get the metric data from the payload
   const data = payload[0]?.payload;
   if (!data) return null;
   
@@ -37,24 +34,22 @@ const MetricTooltip = ({ active, payload }: any) => {
   const beanType = data.name ?? "";
   
   return (
-    <div
-      style={{
-        background: "rgba(8,8,8,0.98)",
-        color: "#f6e6dc",
-        padding: "14px 18px",
-        borderRadius: 6,
-        fontSize: 13,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.8)",
-        border: "1px solid rgba(246,230,220,0.15)",
-        minWidth: 140,
-      }}
-    >
-      <div style={{ opacity: 0.7, fontSize: 11, marginBottom: 8, letterSpacing: "0.5px" }}>
+    <div style={{
+      background: "rgba(8,8,8,0.98)",
+      color: "#FAD0C4",
+      padding: "12px 16px",
+      borderRadius: 8,
+      fontSize: 12,
+      boxShadow: "0 8px 32px rgba(0,0,0,0.8)",
+      border: "1px solid rgba(196, 165, 116, 0.2)",
+      backdropFilter: "blur(10px)"
+    }}>
+      <div style={{ opacity: 0.7, fontSize: 10, marginBottom: 6, letterSpacing: "0.5px", textTransform: "uppercase" }}>
         {metric} {unit ? `• ${unit}` : ""}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
-        <div style={{ color: "#cbbba0", fontSize: 12 }}>{beanType}</div>
-        <div style={{ fontWeight: 600, color: "#f6e6dc" }}>{value}</div>
+        <div style={{ color: "#E6C9A8", fontSize: 11 }}>{beanType}</div>
+        <div style={{ fontWeight: 700, color: "#c4a574" }}>{value}</div>
       </div>
     </div>
   );
@@ -64,9 +59,9 @@ export default function CoffeeComparison() {
   const [focus, setFocus] = useState<FocusMode>("energy");
 
   const focusMap: Record<FocusMode, string[]> = {
-    energy: ["Caffeine", "Body / Strength"],
+    energy: ["Caffeine", "Body"],
     taste: ["Bitterness", "Acidity"],
-    strength: ["Body / Strength", "Bitterness"],
+    strength: ["Body", "Bitterness"],
   };
 
   const allowed = useMemo(() => focusMap[focus].map((s) => s.toLowerCase()), [focus]);
@@ -91,24 +86,20 @@ export default function CoffeeComparison() {
     if (unit.includes("%")) {
       return Math.ceil(maxVal * 1.3 * 10) / 10;
     }
-    if (unit.includes("relative")) {
-      return 100;
-    }
-    return Math.ceil(maxVal * 1.2);
+    return 100;
   };
 
-  if (!filtered.length) {
-    return (
-      <section className="min-h-screen bg-[#0a0a0a] text-white px-6 py-24">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-center text-gray-400">No metrics available for selected focus.</p>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="min-h-screen text-white px-6 py-12" style={{ background: "transparent" }}>
+    <section style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "30px 20px",
+      position: "relative",
+      overflow: "hidden"
+    }}>
       <style>{`
         @keyframes fadeInUp {
           from {
@@ -120,14 +111,6 @@ export default function CoffeeComparison() {
             transform: translateY(0);
           }
         }
-        @keyframes shimmer {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
-        }
         .animate-fade-in-up {
           animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -135,89 +118,162 @@ export default function CoffeeComparison() {
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .bar-elegant:hover {
-          filter: brightness(1.15) drop-shadow(0 4px 12px rgba(246, 230, 220, 0.3));
+          filter: brightness(1.15) drop-shadow(0 4px 12px rgba(196, 165, 116, 0.3));
         }
       `}</style>
 
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
-        <AnimatedContent container="#snap-main-container" distance={40} duration={0.8} threshold={0.15}>
-          <SpringCard className="coffee-spring-card" style={{ display: "inline-block", padding: "10px 16px" }}>
-            <h2 className="text-3xl font-bold text-center mb-2 text-[#f6e6dc]" style={{ margin: 0, letterSpacing: "-0.02em" }}>
-              Not all beans are built the same.
-            </h2>
-            <p className="text-center text-[#8a7a6a] mb-0 text-sm" style={{ margin: 0, letterSpacing: "0.03em" }}>
-              Toggle a preference to focus the chart
-            </p>
-          </SpringCard>
-        </AnimatedContent>
-      </div>
+      {/* Decorative glow */}
+      <div style={{
+        position: 'absolute',
+        bottom: '20%',
+        left: '10%',
+        width: '200px',
+        height: '200px',
+        background: 'radial-gradient(circle, rgba(196, 165, 116, 0.06) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(40px)',
+        pointerEvents: 'none'
+      }} />
 
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-center gap-3 mb-10">
-          <button
-            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-              focus === "energy"
-                ? "bg-[#f6e6dc]/12 ring-1 ring-[#cbbba0]/40 text-[#f6e6dc] shadow-lg"
-                : "bg-transparent text-[#8a7a6a] hover:text-[#cbbba0] hover:bg-[#f6e6dc]/5"
-            }`}
-            style={{ letterSpacing: "0.02em" }}
-            onClick={() => setFocus("energy")}
-          >
-            ⚡ Energy
-          </button>
-          <button
-            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-              focus === "taste"
-                ? "bg-[#f6e6dc]/12 ring-1 ring-[#cbbba0]/40 text-[#f6e6dc] shadow-lg"
-                : "bg-transparent text-[#8a7a6a] hover:text-[#cbbba0] hover:bg-[#f6e6dc]/5"
-            }`}
-            style={{ letterSpacing: "0.02em" }}
-            onClick={() => setFocus("taste")}
-          >
-            🎨 Taste
-          </button>
-          <button
-            className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-              focus === "strength"
-                ? "bg-[#f6e6dc]/12 ring-1 ring-[#cbbba0]/40 text-[#f6e6dc] shadow-lg"
-                : "bg-transparent text-[#8a7a6a] hover:text-[#cbbba0] hover:bg-[#f6e6dc]/5"
-            }`}
-            style={{ letterSpacing: "0.02em" }}
-            onClick={() => setFocus("strength")}
-          >
-            💪 Strength
-          </button>
+      <div style={{
+        maxWidth: "1200px",
+        width: "100%",
+        position: "relative",
+        zIndex: 1
+      }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <h2 style={{
+            fontSize: "clamp(2rem, 4vw, 3rem)",
+            fontWeight: 800,
+            color: "#FAD0C4",
+            margin: "0 0 8px 0",
+            letterSpacing: "-0.02em",
+            background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Not All Beans Are Built the Same
+          </h2>
+          <p style={{
+            color: "#E6C9A8",
+            fontSize: "0.9rem",
+            margin: 0,
+            opacity: 0.9
+          }}>
+            Compare Arabica vs Robusta across key metrics
+          </p>
         </div>
 
-        <div
-          key={focus}
-          style={{
-            opacity: 0,
-            animation: "fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
-          }}
-        >
-          <div style={{ display: "grid", gap: 20 }}>
+        {/* Focus Buttons */}
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "12px",
+          marginBottom: "30px",
+          flexWrap: "wrap"
+        }}>
+          {[
+            { id: "energy" as FocusMode, label: "Energy", icon: "⚡" },
+            { id: "taste" as FocusMode, label: "Taste", icon: "🎨" },
+            { id: "strength" as FocusMode, label: "Strength", icon: "💪" }
+          ].map((btn) => (
+            <button
+              key={btn.id}
+              onClick={() => setFocus(btn.id)}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "10px",
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                border: `1px solid ${focus === btn.id ? "#c4a574" : "rgba(42, 42, 42, 0.8)"}`,
+                background: focus === btn.id 
+                  ? "linear-gradient(135deg, rgba(74, 40, 37, 0.4) 0%, rgba(26, 26, 26, 0.6) 100%)"
+                  : "rgba(26, 26, 26, 0.5)",
+                color: focus === btn.id ? "#FAD0C4" : "#E6C9A8",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                backdropFilter: "blur(10px)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                letterSpacing: "0.02em",
+                boxShadow: focus === btn.id ? "0 4px 20px rgba(196, 165, 116, 0.2)" : "none"
+              }}
+              onMouseEnter={(e) => {
+                if (focus !== btn.id) {
+                  e.currentTarget.style.borderColor = "#c4a574";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (focus !== btn.id) {
+                  e.currentTarget.style.borderColor = "rgba(42, 42, 42, 0.8)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>{btn.icon}</span>
+              {btn.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Charts */}
+        <div key={focus} style={{
+          opacity: 0,
+          animation: "fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards"
+        }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: filtered.length === 1 ? "1fr" : "repeat(auto-fit, minmax(450px, 1fr))",
+            gap: "20px"
+          }}>
             {filtered.map((entry: any, idx: number) => {
               const chartData = perMetricChartData(entry);
               const yMax = computeYMaxFor(entry);
-              const singleHeight = filtered.length === 1 ? 420 : 220;
+              const singleHeight = filtered.length === 1 ? 380 : 280;
+              
               return (
                 <div
                   key={entry.metric + idx}
                   style={{
-                    background: "transparent",
-                    borderRadius: 10,
-                    padding: "16px 12px 12px",
-                    border: "1px solid rgba(246,230,220,0.06)",
+                    background: "linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(42, 42, 42, 0.4) 100%)",
+                    borderRadius: 16,
+                    padding: "20px",
+                    border: "1px solid rgba(196, 165, 116, 0.15)",
+                    backdropFilter: "blur(20px)",
                     opacity: 0,
-                    animation: `fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${0.1 + idx * 0.08}s forwards`
+                    animation: `fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${0.1 + idx * 0.08}s forwards`,
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)"
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12, paddingLeft: 8 }}>
-                    <div style={{ fontSize: 15, color: "#f6e6dc", fontWeight: 600, letterSpacing: "-0.01em" }}>
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 16,
+                    paddingBottom: 12,
+                    borderBottom: "1px solid rgba(196, 165, 116, 0.1)"
+                  }}>
+                    <div style={{
+                      fontSize: 16,
+                      color: "#FAD0C4",
+                      fontWeight: 700,
+                      letterSpacing: "-0.01em"
+                    }}>
                       {entry.metric}
                     </div>
-                    <div style={{ color: "#8a7a6a", fontSize: 12, letterSpacing: "0.02em" }}>
+                    <div style={{
+                      color: "#c4a574",
+                      fontSize: 11,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      background: "rgba(196, 165, 116, 0.1)",
+                      padding: "4px 10px",
+                      borderRadius: 6
+                    }}>
                       {entry.unit ?? ""}
                     </div>
                   </div>
@@ -225,49 +281,49 @@ export default function CoffeeComparison() {
                   <ResponsiveContainer width="100%" height={singleHeight}>
                     <BarChart
                       data={chartData}
-                      margin={{ top: 12, right: 16, left: 8, bottom: 8 }}
-                      barCategoryGap="35%"
+                      margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
+                      barCategoryGap="30%"
                     >
                       <defs>
                         <linearGradient id={`arabicaGrad-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#f6e6dc" stopOpacity={0.95} />
-                          <stop offset="100%" stopColor="#cbbba0" stopOpacity={0.85} />
+                          <stop offset="0%" stopColor="#FAD0C4" stopOpacity={0.95} />
+                          <stop offset="100%" stopColor="#E6C9A8" stopOpacity={0.85} />
                         </linearGradient>
                         <linearGradient id={`robustaGrad-${idx}`} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#81523f" stopOpacity={0.9} />
-                          <stop offset="100%" stopColor="#4a2825" stopOpacity={0.75} />
+                          <stop offset="0%" stopColor="#c4a574" stopOpacity={0.9} />
+                          <stop offset="100%" stopColor="#81523f" stopOpacity={0.75} />
                         </linearGradient>
                         <filter id={`shadow-${idx}`}>
-                          <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.4"/>
+                          <feDropShadow dx="0" dy="3" stdDeviation="4" floodColor="#000" floodOpacity="0.5"/>
                         </filter>
                       </defs>
                       <CartesianGrid 
-                        stroke="rgba(246,230,220,0.06)" 
+                        stroke="rgba(196, 165, 116, 0.08)" 
                         strokeDasharray="4 8" 
                         vertical={false} 
                       />
                       <XAxis 
                         dataKey="name" 
-                        stroke="#8a7a6a" 
+                        stroke="rgba(196, 165, 116, 0.3)" 
                         tickLine={false} 
-                        axisLine={{ stroke: "rgba(246,230,220,0.1)" }} 
-                        tick={{ fill: "#cbbba0", fontSize: 13, fontWeight: 500 }} 
+                        axisLine={{ stroke: "rgba(196, 165, 116, 0.15)" }} 
+                        tick={{ fill: "#E6C9A8", fontSize: 13, fontWeight: 600 }} 
                       />
                       <YAxis 
                         domain={[0, yMax]} 
-                        tick={{ fill: "#8a7a6a", fontSize: 11 }} 
+                        tick={{ fill: "#c4a574", fontSize: 11 }} 
                         axisLine={false} 
                         tickLine={false}
-                        stroke="#8a7a6a"
+                        stroke="rgba(196, 165, 116, 0.3)"
                       />
                       <Tooltip 
                         content={<MetricTooltip />} 
-                        cursor={{ fill: "rgba(246,230,220,0.03)" }}
+                        cursor={{ fill: "rgba(196, 165, 116, 0.05)" }}
                         wrapperStyle={{ zIndex: 1000 }}
                       />
                       <Bar 
                         dataKey="value" 
-                        radius={[6, 6, 0, 0]} 
+                        radius={[8, 8, 0, 0]} 
                         animationDuration={900}
                         animationEasing="ease-out"
                         className="bar-elegant"
@@ -278,10 +334,10 @@ export default function CoffeeComparison() {
                           position="top" 
                           formatter={(v: any) => v} 
                           style={{ 
-                            fill: "#f6e6dc", 
-                            fontSize: 13, 
-                            fontWeight: 600,
-                            textShadow: "0 1px 4px rgba(0,0,0,0.6)"
+                            fill: "#FAD0C4", 
+                            fontSize: 14, 
+                            fontWeight: 700,
+                            textShadow: "0 2px 6px rgba(0,0,0,0.7)"
                           }} 
                         />
                         {chartData.map((d: any, i: number) => (
