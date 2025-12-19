@@ -53,7 +53,21 @@ export default function App() {
         if (!res.ok) throw new Error("Failed to fetch workshops");
         const text = await res.text();
         const data = text ? JSON.parse(text) : [];
-        setWorkshops(data);
+        // setWorkshops(data);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const processed = data.map((w: Workshop) => {
+          const workshopDate = new Date(w.date);
+          workshopDate.setHours(0, 0, 0, 0);
+
+          return {
+            ...w,
+            status: workshopDate < today ? "past" : "upcoming",
+          };
+        });
+
+        setWorkshops(processed);
       } catch (err) {
         console.error(err);
       }
