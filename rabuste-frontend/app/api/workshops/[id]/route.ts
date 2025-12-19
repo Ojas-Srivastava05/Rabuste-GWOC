@@ -7,7 +7,7 @@ export async function PUT(
   req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ✅ REQUIRED
+  const { id } = await context.params; 
 
   console.log("PUT received id:", id);
 
@@ -51,7 +51,7 @@ export async function DELETE(
   _req: Request,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params; // ✅ THIS IS THE FIX
+  const { id } = await context.params; 
 
   console.log("DELETE received id:", id);
 
