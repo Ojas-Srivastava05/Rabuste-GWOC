@@ -2,67 +2,152 @@
 
 import React, { useRef, useState } from 'react';
 import DomeGallery from '../DomeGallery';
-import SpringCard from '../SpringCard';
 
 export default function Menu() {
-  const [selectedName, setSelectedName] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>('');
   const galleryRef = useRef<HTMLDivElement | null>(null);
 
-  const images = [
-    { src: 'https://images.unsplash.com/photo-1755331039789-7e5680e26e8f?q=80&w=774&auto=format&fit=crop', alt: 'Abstract art' },
-    { src: 'https://images.unsplash.com/photo-1755569309049-98410b94f66d?q=80&w=772&auto=format&fit=crop', alt: 'Modern sculpture' },
-    { src: 'https://images.unsplash.com/photo-1755497595318-7e5e3523854f?q=80&w=774&auto=format&fit=crop', alt: 'Digital artwork' },
-    // add more images with meaningful alt names as needed
+  // Coffee menu images with names
+  const menuImages = [
+    { src: '/menu/espresso.jpg', alt: 'Rabuste Robusta Espresso' },
+    { src: '/menu/coldBrew.jpg', alt: 'Cold Brew Supreme' },
+    { src: '/menu/macchiato.jpg', alt: 'Caramel Macchiato' },
+    { src: '/menu/mocha.jpg', alt: 'Mocha Delight' },
+    { src: '/menu/vietnamese.jpg', alt: 'Vietnamese Robusta' },
+    { src: '/menu/affogato.jpg', alt: 'Affogato' },
+    { src: '/menu/nitro.jpg', alt: 'Nitro Coffee' },
+    { src: '/menu/cortado.jpg', alt: 'Cortado' },
+    { src: '/menu/americano.jpg', alt: 'Americano' },
+    { src: '/menu/cappuccino.jpg', alt: 'Cappuccino' },
+    { src: '/menu/latte.jpg', alt: 'Latte' },
+    { src: '/menu/flatWhite.jpg', alt: 'Flat White' }
   ];
 
-  const openFullMenu = () => {
-    // smooth-scroll the gallery into view inside the same section
+  const scrollToGallery = () => {
     if (galleryRef.current) {
       galleryRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   };
 
   return (
-    <div style={{ width: '100%', minHeight: '100vh', display: 'grid', placeItems: 'start center', padding: 24, gap: 18 }}>
-      {/* Top action button */}
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <SpringCard className="px-2" onClick={openFullMenu}>
-          <div
-            style={{
-              padding: '10px 18px',
-              borderRadius: 12,
-              background: 'linear-gradient(180deg, rgba(250,210,196,0.06), rgba(250,210,196,0.03))',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              userSelect: 'none',
-            }}
-            aria-label="Open full menu"
-          >
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#F6EDE9' }}>Full menu</span>
-          </div>
-        </SpringCard>
-      </div>
+    <section style={{
+      width: '100%',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '30px 20px',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Decorative glow */}
+      <div style={{
+        position: 'absolute',
+        top: '20%',
+        right: '15%',
+        width: '250px',
+        height: '250px',
+        background: 'radial-gradient(circle, rgba(196, 165, 116, 0.08) 0%, transparent 70%)',
+        borderRadius: '50%',
+        filter: 'blur(50px)',
+        pointerEvents: 'none'
+      }} />
 
-      {/* Display selected clicked item name */}
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', color: '#F6EDE9' }}>
-          <div style={{ fontSize: 12, opacity: 0.8 }}>Clicked item name:</div>
-          <div style={{ fontSize: 18, fontWeight: 600 }}>{selectedName || '—'}</div>
+      <div style={{
+        maxWidth: '1400px',
+        width: '100%',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+          <h1 style={{
+            margin: '0 0 8px 0',
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            letterSpacing: '-0.02em'
+          }}>
+            Our Menu
+          </h1>
+          <p style={{
+            color: '#E6C9A8',
+            fontSize: '0.9rem',
+            opacity: 0.9,
+            margin: 0
+          }}>
+            Explore our signature brews in 360° • Drag to rotate • Click to view
+          </p>
         </div>
-      </div>
 
-      {/* Dome gallery area */}
-      <div ref={galleryRef} style={{ width: '100%', height: '720px', maxWidth: 1200 }}>
-        <DomeGallery
-          images={images}
-          segments={28}
-          fit={0.65}
-          overlayBlurColor="#060010"
-          onItemOpen={(name) => setSelectedName(name)}
-          grayscale={false}
-        />
+        {/* Selected item display */}
+        {selectedItem && (
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '20px',
+            background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(42, 42, 42, 0.4) 100%)',
+            border: '1px solid rgba(196, 165, 116, 0.3)',
+            borderRadius: '12px',
+            padding: '12px 20px',
+            backdropFilter: 'blur(20px)',
+            display: 'inline-block',
+            margin: '0 auto 20px',
+            position: 'relative',
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}>
+            <div style={{ fontSize: '0.7rem', color: '#c4a574', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Now Viewing
+            </div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FAD0C4' }}>
+              {selectedItem}
+            </div>
+          </div>
+        )}
+
+        {/* Dome Gallery Container */}
+        <div ref={galleryRef} style={{
+          width: '100%',
+          height: '650px',
+          position: 'relative',
+          background: 'rgba(10, 10, 10, 0.4)',
+          borderRadius: '24px',
+          border: '1px solid rgba(42, 42, 42, 0.8)',
+          overflow: 'hidden',
+          backdropFilter: 'blur(10px)'
+        }}>
+           <DomeGallery /*images={menuImages} */
+  segments={28}
+  fit={0.65}
+  overlayBlurColor="#060010"
+  onItemOpen={(name) => setSelectedItem(name)}
+  grayscale={false}/>
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#c4a574',
+            fontSize: '1.2rem',
+            fontWeight: 600
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '16px' }}>☕</div>
+              <div>Interactive 3D Menu Gallery</div>
+              <div style={{ fontSize: '0.9rem', color: '#E6C9A8', marginTop: '8px', opacity: 0.8 }}>
+                Drag to explore • Click to view details
+              </div>
+            </div>
+          </div>
+        </div>
+
+
       </div>
-    </div>
+    </section>
   );
 }
