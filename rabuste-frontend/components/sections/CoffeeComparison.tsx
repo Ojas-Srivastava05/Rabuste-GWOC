@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -56,6 +56,15 @@ const MetricTooltip = ({ active, payload }: any) => {
 };
 
 export default function CoffeeComparison() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const [focus, setFocus] = useState<FocusMode>("energy");
 
   const focusMap: Record<FocusMode, string[]> = {
@@ -227,19 +236,20 @@ export default function CoffeeComparison() {
         }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: filtered.length === 1 ? "1fr" : "repeat(auto-fit, minmax(450px, 1fr))",
-            gap: "20px"
+            gridTemplateColumns: isMobile ? "1fr" : (filtered.length === 1 ? "1fr" : "repeat(auto-fit, minmax(450px, 1fr))"),
+            gap: isMobile ? "12px" : "20px"
           }}>
             {filtered.map((entry: any, idx: number) => {
               const chartData = perMetricChartData(entry);
               const yMax = computeYMaxFor(entry);
-              const singleHeight = filtered.length === 1 ? 380 : 280;
+              // on mobile show taller stacked charts so each is readable without awkward clipping
+              const singleHeight = isMobile ? 360 : (filtered.length === 1 ? 380 : 280);
               
               return (
                 <div
                   key={entry.metric + idx}
                   style={{
-                    background: "linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(42, 42, 42, 0.4) 100%)",
+                    background: isMobile ? "rgba(26,26,26,0.35)" : "linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(42, 42, 42, 0.4) 100%)",
                     borderRadius: 16,
                     padding: "20px",
                     border: "1px solid rgba(196, 165, 116, 0.15)",
@@ -282,7 +292,7 @@ export default function CoffeeComparison() {
                     <BarChart
                       data={chartData}
                       margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
-                      barCategoryGap="30%"
+                      barCategoryGap={isMobile ? "12%" : "30%"}
                     >
                       <defs>
                         <linearGradient id={`arabicaGrad-${idx}`} x1="0" y1="0" x2="0" y2="1">
