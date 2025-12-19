@@ -53,6 +53,8 @@ export default function App() {
         if (!res.ok) throw new Error("Failed to fetch workshops");
         const text = await res.text();
         const data = text ? JSON.parse(text) : [];
+        console.log("Fetched workshops:", data);
+
         setWorkshops(data);
       } catch (err) {
         console.error(err);
@@ -162,6 +164,7 @@ export default function App() {
 
     if (workshop) {
       setSelectedWorkshop(workshop);
+      //   setEditWorkshop({ ...workshop });
       setEditWorkshop(workshop);
       setIsEditing(false);
       setIsModalOpen(true);
@@ -221,35 +224,51 @@ export default function App() {
     });
   };
 
-  const handleUpdateWorkshop = async () => {
-    if (!editWorkshop) return;
-
-    const res = await fetch(`/api/workshops/${editWorkshop._id}`, {
+  const handleUpdateWorkshop = async (workshopId: string, updatedData: any) => {
+    console.log(
+      "handleUpdateWorkshop called with workshopId:",
+      workshopId,
+      "updatedData:",
+      updatedData
+    );
+    const res = await fetch(`/api/workshops/${workshopId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editWorkshop),
+      body: JSON.stringify(updatedData),
     });
 
-    const updated = await res.json();
+    const data = await res.json();
 
-    setWorkshops((prev) =>
-      prev.map((w) => (w._id === updated._id ? updated : w))
-    );
+    if (!res.ok) throw new Error(data.error || "Update failed");
 
-    setSelectedWorkshop(updated);
+    // Update the workshops state with the new data
+    setWorkshops((prev) => prev.map((w) => (w._id === workshopId ? data : w)));
+    setSelectedWorkshop(data);
     setIsEditing(false);
   };
 
-  const handleDeleteWorkshop = async () => {
-    if (!selectedWorkshop) return;
+  const handleDeleteWorkshop = async (workshopId: string) => {
+    console.log("handleDeleteWorkshop called with workshopId:", workshopId);
+    try {
+      const res = await fetch(`/api/workshops/${workshopId}`, {
+        method: "DELETE",
+      });
 
-    await fetch(`/api/workshops/${selectedWorkshop._id}`, {
-      method: "DELETE",
-    });
+      const data = await res.json();
 
-    setWorkshops((prev) => prev.filter((w) => w._id !== selectedWorkshop._id));
+      if (!res.ok) {
+        throw new Error(data.error || "Delete failed");
+      }
 
-    setIsModalOpen(false);
+      console.log("Deleted successfully", data);
+      // Optionally, remove the workshop from state so UI updates
+      setWorkshops((prev) => prev.filter((w) => w._id !== workshopId));
+      setIsModalOpen(false);
+      setSelectedWorkshop(null);
+    } catch (err: any) {
+      console.error("Error deleting workshop:", err.message);
+      alert(err.message);
+    }
   };
 
   //   calender
@@ -265,10 +284,10 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2c1810] via-[#3d2419] to-[#1a0f0a]">
+    <div className="min-h-screen bg-linear-to-br from-[#2c1810] via-[#3d2419] to-[#1a0f0a]">
       {/* scrolling ticker */}
       {upcomingWorkshopsWithinMonth.length > 0 && (
-        <div className="relative bg-gradient-to-r from-amber-900/90 via-orange-800/90 to-amber-900/90 backdrop-blur-md border-b-4 border-amber-600/50 shadow-2xl">
+        <div className="relative bg-linear-to-r from-amber-900/90 via-orange-800/90 to-amber-900/90 backdrop-blur-md border-b-4 border-amber-600/50 shadow-2xl">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
 
           <div className="relative py-8 px-4 overflow-hidden">
@@ -317,13 +336,13 @@ export default function App() {
           <div className="absolute inset-0 flex items-center justify-center opacity-5">
             <Coffee className="w-64 h-64" />
           </div>
-          <h1 className="relative text-6xl md:text-8xl font-montserrat font-extrabold mb-6 bg-gradient-to-r from-amber-200 via-amber-100 to-orange-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
+          <h1 className="relative text-6xl md:text-8xl font-montserrat font-extrabold mb-6 bg-linear-to-r from-amber-200 via-amber-100 to-orange-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
             The Robusta Assemblée
           </h1>
           <div className="flex items-center justify-center mb-6">
-            <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+            <div className="h-1 w-24 bg-linear-to-r from-transparent via-amber-500 to-transparent"></div>
             <Coffee className="w-8 h-8 mx-4 text-amber-400" />
-            <div className="h-1 w-24 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+            <div className="h-1 w-24 bg-linear-to-r from-transparent via-amber-500 to-transparent"></div>
           </div>
           <p className="relative text-xl md:text-2xl text-amber-300/90 max-w-3xl mx-auto leading-relaxed font-light italic">
             A curated calendar of intimate workshops and gallery evenings
@@ -333,7 +352,7 @@ export default function App() {
         </div>
 
         {/* Admin – Add New Workshop */}
-        <div className="max-w-5xl mx-auto mb-16 bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-10 border-4 border-amber-200/50">
+        <div className="max-w-5xl mx-auto mb-16 bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-10 border-4 border-amber-200/50">
           <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900">
             Admin • Add New Workshop
           </h2>
@@ -437,28 +456,28 @@ export default function App() {
 
           <button
             onClick={handleAddWorkshop}
-            className="mt-8 px-10 py-4 bg-gradient-to-r from-amber-700 to-orange-800 text-white font-bold rounded-2xl hover:scale-105 transition"
+            className="mt-8 px-10 py-4 bg-linear-to-r from-amber-700 to-orange-800 text-white font-bold rounded-2xl hover:scale-105 transition"
           >
             Add Workshop
           </button>
         </div>
 
         {/* calendar */}
-        <div className="max-w-6xl mx-auto bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-10 border-4 border-amber-200/50 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-10 border-4 border-amber-200/50 backdrop-blur-sm">
           {/* month navigation */}
           <div className="flex items-center justify-between mb-10">
             <button
               onClick={() => changeMonth(-1)}
-              className="px-8 py-4 bg-gradient-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
+              className="px-8 py-4 bg-linear-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
             >
               ←
             </button>
-            <h2 className="text-4xl md:text-5xl font-montserrat font-extrabold bg-gradient-to-r from-amber-900 to-orange-900 bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-montserrat font-extrabold bg-linear-to-r from-amber-900 to-orange-900 bg-clip-text text-transparent">
               {monthName}
             </h2>
             <button
               onClick={() => changeMonth(1)}
-              className="px-8 py-4 bg-gradient-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
+              className="px-8 py-4 bg-linear-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
             >
               →
             </button>
@@ -495,7 +514,7 @@ export default function App() {
                   className={`
                     aspect-square rounded-2xl flex items-center justify-center text-xl font-bold
                     transition-all duration-300 cursor-pointer relative overflow-hidden
-                    
+
                     ${
                       workshop
                         ? "transform hover:scale-110 hover:shadow-2xl hover:z-10"
@@ -503,7 +522,7 @@ export default function App() {
                     }
                     ${
                       today && !workshop
-                        ? "bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-lg ring-4 ring-blue-300 today-pulse"
+                        ? "bg-linear-to-br from-blue-400 to-blue-500 text-white shadow-lg ring-4 ring-blue-300 today-pulse"
                         : ""
                     }
                     ${
@@ -513,17 +532,17 @@ export default function App() {
                     }
                     ${
                       isCoffee && !isPast
-                        ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white shadow-xl coffee-date"
+                        ? "bg-linear-to-br from-amber-400 via-orange-500 to-amber-600 text-white shadow-xl coffee-date"
                         : ""
                     }
                     ${
                       isPainting && !isPast
-                        ? "bg-gradient-to-br from-pink-400 via-rose-500 to-pink-600 text-white shadow-xl painting-date"
+                        ? "bg-linear-to-br from-pink-400 via-rose-500 to-pink-600 text-white shadow-xl painting-date"
                         : ""
                     }
                     ${
                       isPast
-                        ? "bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 opacity-60"
+                        ? "bg-linear-to-br from-gray-300 to-gray-400 text-gray-600 opacity-60"
                         : ""
                     }
                     ${
@@ -556,23 +575,23 @@ export default function App() {
           <div className="mt-10 pt-8 border-t-2 border-amber-300/50">
             <div className="flex flex-wrap justify-center gap-6 text-sm md:text-base">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-blue-500 shadow-md"></div>
+                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-400 to-blue-500 shadow-md"></div>
                 <span className="font-semibold text-gray-700">Today</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 shadow-md"></div>
+                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-amber-400 to-amber-600 shadow-md"></div>
                 <span className="font-semibold text-gray-700">
                   Coffee Workshop
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-400 to-pink-600 shadow-md"></div>
+                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-pink-400 to-pink-600 shadow-md"></div>
                 <span className="font-semibold text-gray-700">
                   Painting Workshop
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-300 to-gray-400 shadow-md opacity-60"></div>
+                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-gray-300 to-gray-400 shadow-md opacity-60"></div>
                 <span className="font-semibold text-gray-700">
                   Past Workshop
                 </span>
@@ -584,131 +603,235 @@ export default function App() {
 
       {/* modal */}
       {isModalOpen && selectedWorkshop && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 modal-overlay"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl max-w-3xl w-full p-10 relative modal-content transform shadow-2xl border-4 border-amber-300/50"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 p-3 hover:bg-amber-200/50 rounded-full transition-all hover:rotate-90 duration-300"
-            >
-              <X className="w-7 h-7 text-amber-900" />
-            </button>
+        <>
+          {(() => {
+            const workshopToShow = isEditing ? editWorkshop : selectedWorkshop;
 
-            <div className="mb-8">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-amber-200 to-orange-200 mb-6 shadow-lg">
-                {selectedWorkshop.category === "coffee" ? (
-                  <Coffee className="w-6 h-6 text-amber-900" />
-                ) : (
-                  <Palette className="w-6 h-6 text-amber-900" />
-                )}
-                <span className="font-bold text-amber-900 text-base uppercase tracking-widest">
-                  {selectedWorkshop.category}
-                </span>
-              </div>
-
-              {isEditing ? (
-                <input
-                  value={editWorkshop?.title}
-                  onChange={(e) =>
-                    setEditWorkshop((prev) =>
-                      prev ? { ...prev, title: e.target.value } : prev
-                    )
-                  }
-                  className="w-full text-4xl font-bold border-b-2 border-amber-600"
-                />
-              ) : (
-                <h3 className="text-5xl font-bold">{selectedWorkshop.title}</h3>
-              )}
-
-              {selectedWorkshop.status === "past" && (
-                <span className="inline-block px-4 py-2 bg-gray-300 text-gray-700 rounded-full font-semibold shadow-md">
-                  Past Workshop
-                </span>
-              )}
-            </div>
-
-            {isEditing ? (
-              <textarea
-                value={editWorkshop?.description}
-                onChange={(e) =>
-                  setEditWorkshop((prev) =>
-                    prev ? { ...prev, description: e.target.value } : prev
-                  )
-                }
-                className="w-full text-lg border rounded-xl p-4"
-              />
-            ) : (
-              <p className="text-xl text-gray-800 mb-8 leading-relaxed">
-                {selectedWorkshop.description}
-              </p>
-            )}
-
-            <div className="space-y-5 bg-white/50 rounded-2xl p-6 backdrop-blur-sm">
-              <div className="flex items-center gap-4 text-gray-800">
-                <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-amber-900" />
-                </div>
-                <span className="font-semibold text-lg">
-                  {selectedWorkshop.date}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4 text-gray-800">
-                <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-amber-900" />
-                </div>
-                <span className="text-lg">{selectedWorkshop.time}</span>
-              </div>
-
-              <div className="flex items-center gap-4 text-gray-800">
-                <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                  <User className="w-6 h-6 text-amber-900" />
-                </div>
-                <span className="text-lg">
-                  Instructor: {selectedWorkshop.instructor}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4 text-gray-800">
-                <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-amber-900" />
-                </div>
-                <span className="text-lg">{selectedWorkshop.location}</span>
-              </div>
-            </div>
-            <div className="mt-10 flex justify-end gap-4">
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-6 py-3 bg-amber-600 text-white rounded-xl font-bold"
-                >
-                  Modify
-                </button>
-              )}
-
-              {isEditing && (
-                <button
-                  onClick={handleUpdateWorkshop}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold"
-                >
-                  Save
-                </button>
-              )}
-
-              <button
-                onClick={handleDeleteWorkshop}
-                className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold"
+            return (
+              <div
+                className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 modal-overlay"
+                onClick={() => setIsModalOpen(false)}
               >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+                <div
+                  className="bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl max-w-3xl w-full p-10 relative modal-content transform shadow-2xl border-4 border-amber-300/50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="absolute top-6 right-6 p-3 hover:bg-amber-200/50 rounded-full transition-all hover:rotate-90 duration-300"
+                  >
+                    <X className="w-7 h-7 text-amber-900" />
+                  </button>
+
+                  <div className="mb-8">
+                    <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-linear-to-r from-amber-200 to-orange-200 mb-6 shadow-lg">
+                      {selectedWorkshop.category === "coffee" ? (
+                        <Coffee className="w-6 h-6 text-amber-900" />
+                      ) : (
+                        <Palette className="w-6 h-6 text-amber-900" />
+                      )}
+                      {/* <span className="font-bold text-amber-900 text-base uppercase tracking-widest">
+                  {selectedWorkshop.category}
+                </span> */}
+                      {isEditing ? (
+                        <select
+                          value={editWorkshop?.category}
+                          onChange={(e) =>
+                            setEditWorkshop((prev) =>
+                              prev
+                                ? {
+                                    ...prev,
+                                    category: e.target.value as
+                                      | "coffee"
+                                      | "painting",
+                                  }
+                                : prev
+                            )
+                          }
+                          className="border rounded-lg p-2"
+                        >
+                          <option value="coffee">Coffee</option>
+                          <option value="painting">Painting</option>
+                        </select>
+                      ) : (
+                        <span className="uppercase font-bold">
+                          {workshopToShow?.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {isEditing ? (
+                      <input
+                        value={editWorkshop?.title || ""}
+                        onChange={(e) =>
+                          setEditWorkshop((prev) =>
+                            prev ? { ...prev, title: e.target.value } : prev
+                          )
+                        }
+                        className="w-full text-4xl font-bold border-b-2 border-amber-600"
+                      />
+                    ) : (
+                      <h3 className="text-5xl font-bold">
+                        {workshopToShow?.title}
+                      </h3>
+                    )}
+
+                    {selectedWorkshop.status === "past" && (
+                      <span className="inline-block px-4 py-2 bg-gray-300 text-gray-700 rounded-full font-semibold shadow-md">
+                        Past Workshop
+                      </span>
+                    )}
+                  </div>
+
+                  {isEditing ? (
+                    <textarea
+                      value={editWorkshop?.description || ""}
+                      onChange={(e) =>
+                        setEditWorkshop((prev) =>
+                          prev ? { ...prev, description: e.target.value } : prev
+                        )
+                      }
+                      className="w-full text-lg border rounded-xl p-4"
+                    />
+                  ) : (
+                    <p className="text-xl text-gray-800 mb-8 leading-relaxed">
+                      {workshopToShow?.description}
+                    </p>
+                  )}
+
+                  <div className="space-y-5 bg-white/50 rounded-2xl p-6 backdrop-blur-sm">
+                    <div className="flex items-center gap-4 text-gray-800">
+                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
+                        <Calendar className="w-6 h-6 text-amber-900" />
+                      </div>
+                      {/* <span className="font-semibold text-lg">
+                  {selectedWorkshop.date}
+                </span> */}
+                      {isEditing ? (
+                        <input
+                          type="date"
+                          value={editWorkshop?.date || ""}
+                          onChange={(e) =>
+                            setEditWorkshop((prev) =>
+                              prev ? { ...prev, date: e.target.value } : prev
+                            )
+                          }
+                          className="border rounded-lg p-2"
+                        />
+                      ) : (
+                        <span className="font-semibold text-lg">
+                          {workshopToShow?.date}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4 text-gray-800">
+                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-amber-900" />
+                      </div>
+                      {/* <span className="text-lg">{selectedWorkshop.time}</span> */}
+                      {isEditing ? (
+                        <input
+                          value={editWorkshop?.time || ""}
+                          onChange={(e) =>
+                            setEditWorkshop((prev) =>
+                              prev ? { ...prev, time: e.target.value } : prev
+                            )
+                          }
+                          placeholder="06:30 PM"
+                          className="border rounded-lg p-2"
+                        />
+                      ) : (
+                        <span className="text-lg">{workshopToShow?.time}</span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4 text-gray-800">
+                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
+                        <User className="w-6 h-6 text-amber-900" />
+                      </div>
+                      {/* <span className="text-lg">
+                  Instructor: {selectedWorkshop.instructor}
+                </span> */}
+                      {isEditing ? (
+                        <input
+                          value={editWorkshop?.instructor || ""}
+                          onChange={(e) =>
+                            setEditWorkshop((prev) =>
+                              prev
+                                ? { ...prev, instructor: e.target.value }
+                                : prev
+                            )
+                          }
+                          className="border rounded-lg p-2"
+                        />
+                      ) : (
+                        <span className="text-lg">
+                          Instructor: {workshopToShow?.instructor}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4 text-gray-800">
+                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
+                        <MapPin className="w-6 h-6 text-amber-900" />
+                      </div>
+                      {/* <span className="text-lg">{selectedWorkshop.location}</span> */}
+                      {isEditing ? (
+                        <input
+                          value={editWorkshop?.location || ""}
+                          onChange={(e) =>
+                            setEditWorkshop((prev) =>
+                              prev
+                                ? { ...prev, location: e.target.value }
+                                : prev
+                            )
+                          }
+                          className="border rounded-lg p-2"
+                        />
+                      ) : (
+                        <span className="text-lg">
+                          {workshopToShow?.location}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {/* <div className="mt-10 flex justify-end gap-4">
+                    {!isEditing && (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="px-6 py-3 bg-amber-600 text-white rounded-xl font-bold"
+                      >
+                        Modify
+                      </button>
+                    )}
+
+                    {isEditing && (
+                      <button
+                        onClick={() =>
+                          handleUpdateWorkshop(
+                            selectedWorkshop._id,
+                            editWorkshop
+                          )
+                        }
+                        className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold"
+                      >
+                        Save
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => handleDeleteWorkshop(selectedWorkshop._id)}
+                      className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold"
+                    >
+                      Delete
+                    </button>
+                  </div> */}
+                </div>
+              </div>
+            );
+          })()}
+        </>
       )}
 
       <style jsx>{`
