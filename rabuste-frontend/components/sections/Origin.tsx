@@ -26,36 +26,10 @@ export default function Origin() {
         justifyContent: 'flex-start',
         paddingTop: '28px',            // room at top for the title
         overflow: 'hidden',
-        backgroundColor: '#0a0a0a'
+        backgroundColor: 'transparent' // removed applied background
       }}
     >
-      {/* Blurred background image (from public/origin/originbg.jpg) */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: "url('/origin/origindark.png')",
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          filter: 'blur(5px) saturate(1.05)',
-          transform: 'scale(1.06)', // avoid visible edges when blurred
-          opacity: 0.90,
-          zIndex: 0,
-        }}
-      />
-
-      {/* Soft dark overlay to improve contrast */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(10,10,10,0.35)',
-          zIndex: 1,
-        }}
-      />
+      {/* background image and overlay removed */}
 
       {/* Section title: absolute full-width row (centers reliably). Animate only the H1 so wrapper positioning isn't affected by AnimatedContent internals */}
       <div
