@@ -51,7 +51,7 @@ const CoffeeBean = ({
     <div
       className="coffee-bean"
       style={{
-        left: `${left}%`,
+        left: `${left}vw`,
         width: `${size}px`,
         height: `${size}px`,
         fontSize: `${size}px`,
@@ -299,13 +299,27 @@ export default function App() {
         />
 
         {/* Floating Coffee Beans */}
-        {[...Array(20)].map((_, i) => (
-          <CoffeeBean
-            key={i}
-            delay={i * 2}
-            duration={15 + Math.random() * 10}
-          />
-        ))}
+
+        <div className="absolute inset-0">
+          <div className="hidden sm:block">
+            {[...Array(20)].map((_, i) => (
+              <CoffeeBean
+                key={i}
+                delay={i * 2}
+                duration={15 + Math.random() * 10}
+              />
+            ))}
+          </div>
+          <div className="sm:hidden">
+            {[...Array(10)].map((_, i) => (
+              <CoffeeBean
+                key={i}
+                delay={i * 2}
+                duration={15 + Math.random() * 10}
+              />
+            ))}
+          </div>
+        </div>
 
         {/* Steam Effects */}
         <SteamEffect />
@@ -439,7 +453,7 @@ export default function App() {
 
             {/* Calendar Grid */}
             <div className="overflow-x-auto">
-              <div className="grid grid-cols-7 gap-2 md:gap-4 min-w-[280px]">
+              <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 min-w-[280px]">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
                   (day) => (
                     <div

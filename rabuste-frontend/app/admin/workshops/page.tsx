@@ -49,7 +49,7 @@ const CoffeeBean = ({
     <div
       className="coffee-bean"
       style={{
-        left: `${left}%`,
+        left: `${left}vw`,
         width: `${size}px`,
         height: `${size}px`,
         fontSize: `${size}px`,
@@ -412,13 +412,26 @@ export default function App() {
         />
 
         {/* Floating Coffee Beans */}
-        {[...Array(20)].map((_, i) => (
-          <CoffeeBean
-            key={i}
-            delay={i * 2}
-            duration={15 + Math.random() * 10}
-          />
-        ))}
+        <div className="absolute inset-0">
+          <div className="hidden sm:block">
+            {[...Array(20)].map((_, i) => (
+              <CoffeeBean
+                key={i}
+                delay={i * 2}
+                duration={15 + Math.random() * 10}
+              />
+            ))}
+          </div>
+          <div className="sm:hidden">
+            {[...Array(10)].map((_, i) => (
+              <CoffeeBean
+                key={i}
+                delay={i * 2}
+                duration={15 + Math.random() * 10}
+              />
+            ))}
+          </div>
+        </div>
 
         {/* Steam Effects */}
         <SteamEffect />
@@ -521,114 +534,118 @@ export default function App() {
             </div>
           </div>
         </div>
-        <div className="max-w-5xl mx-auto mb-16 bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50">
-          <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900">
-            Admin • Add New Workshop
-          </h2>
+        {/* <div className="max-w-5xl mx-auto mb-16 bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50">
+          <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900"> */}
+        <div className="container mx-auto px-4 sm:px-6 mb-16">
+          <div className="max-w-5xl mx-auto bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50">
+            <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900">
+              Admin • Add New Workshop
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <input
-              value={newWorkshop.title}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, title: e.target.value })
-              }
-              placeholder="Workshop Title"
-              className="p-4 rounded-xl border border-amber-300 w-full"
-            />
-
-            <select
-              value={newWorkshop.category}
-              onChange={(e) =>
-                setNewWorkshop({
-                  ...newWorkshop,
-                  category: e.target.value as "coffee" | "painting",
-                })
-              }
-              className="p-4 rounded-xl border border-amber-300 w-full"
-            >
-              <option value="coffee">Coffee</option>
-              <option value="painting">Painting</option>
-            </select>
-
-            <input
-              type="date"
-              value={newWorkshop.date}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, date: e.target.value })
-              }
-              className="p-4 rounded-xl border border-amber-300 w-full"
-            />
-
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <input
-                type="number"
-                min={1}
-                max={12}
-                value={newWorkshop.hour}
+                value={newWorkshop.title}
                 onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, hour: e.target.value })
+                  setNewWorkshop({ ...newWorkshop, title: e.target.value })
                 }
-                className="p-4 rounded-xl border border-amber-300 w-16 sm:w-20"
-                placeholder="HH"
+                placeholder="Workshop Title"
+                className="p-4 rounded-xl border border-amber-300 w-full"
               />
-              <span className="flex items-center">:</span>
-              <input
-                type="number"
-                min={0}
-                max={59}
-                value={newWorkshop.minute}
-                onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, minute: e.target.value })
-                }
-                className="p-4 rounded-xl border border-amber-300 w-16 sm:w-20"
-                placeholder="MM"
-              />
+
               <select
-                value={newWorkshop.ampm}
+                value={newWorkshop.category}
                 onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, ampm: e.target.value })
+                  setNewWorkshop({
+                    ...newWorkshop,
+                    category: e.target.value as "coffee" | "painting",
+                  })
                 }
                 className="p-4 rounded-xl border border-amber-300 w-full"
               >
-                <option value="AM">AM</option>
-                <option value="PM">PM</option>
+                <option value="coffee">Coffee</option>
+                <option value="painting">Painting</option>
               </select>
+
+              <input
+                type="date"
+                value={newWorkshop.date}
+                onChange={(e) =>
+                  setNewWorkshop({ ...newWorkshop, date: e.target.value })
+                }
+                className="p-4 rounded-xl border border-amber-300 w-full"
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  max={12}
+                  value={newWorkshop.hour}
+                  onChange={(e) =>
+                    setNewWorkshop({ ...newWorkshop, hour: e.target.value })
+                  }
+                  className="p-4 rounded-xl border border-amber-300 w-16 sm:w-20"
+                  placeholder="HH"
+                />
+                <span className="flex items-center">:</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={59}
+                  value={newWorkshop.minute}
+                  onChange={(e) =>
+                    setNewWorkshop({ ...newWorkshop, minute: e.target.value })
+                  }
+                  className="p-4 rounded-xl border border-amber-300 w-16 sm:w-20"
+                  placeholder="MM"
+                />
+                <select
+                  value={newWorkshop.ampm}
+                  onChange={(e) =>
+                    setNewWorkshop({ ...newWorkshop, ampm: e.target.value })
+                  }
+                  className="p-4 rounded-xl border border-amber-300 w-full"
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+
+              <input
+                value={newWorkshop.instructor}
+                onChange={(e) =>
+                  setNewWorkshop({ ...newWorkshop, instructor: e.target.value })
+                }
+                placeholder="Instructor Name"
+                className="p-4 rounded-xl border border-amber-300 w-full"
+              />
+
+              <input
+                value={newWorkshop.location}
+                onChange={(e) =>
+                  setNewWorkshop({ ...newWorkshop, location: e.target.value })
+                }
+                placeholder="Location"
+                className="p-4 rounded-xl border border-amber-300 w-full"
+              />
             </div>
 
-            <input
-              value={newWorkshop.instructor}
+            <textarea
+              value={newWorkshop.description}
               onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, instructor: e.target.value })
+                setNewWorkshop({ ...newWorkshop, description: e.target.value })
               }
-              placeholder="Instructor Name"
-              className="p-4 rounded-xl border border-amber-300 w-full"
+              placeholder="Workshop Description"
+              className="mt-6 w-full p-4 rounded-xl border border-amber-300"
             />
 
-            <input
-              value={newWorkshop.location}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, location: e.target.value })
-              }
-              placeholder="Location"
-              className="p-4 rounded-xl border border-amber-300 w-full"
-            />
+            <button
+              onClick={handleAddWorkshop}
+              className="mt-8 px-6 sm:px-10 py-3 sm:py-4 bg-linear-to-r from-amber-700 to-orange-800 text-white font-bold rounded-2xl hover:scale-105 transition"
+            >
+              Add Workshop
+            </button>
           </div>
-
-          <textarea
-            value={newWorkshop.description}
-            onChange={(e) =>
-              setNewWorkshop({ ...newWorkshop, description: e.target.value })
-            }
-            placeholder="Workshop Description"
-            className="mt-6 w-full p-4 rounded-xl border border-amber-300"
-          />
-
-          <button
-            onClick={handleAddWorkshop}
-            className="mt-8 px-6 sm:px-10 py-3 sm:py-4 bg-linear-to-r from-amber-700 to-orange-800 text-white font-bold rounded-2xl hover:scale-105 transition"
-          >
-            Add Workshop
-          </button>
         </div>
 
         {/* Calendar Section */}
@@ -661,7 +678,7 @@ export default function App() {
 
             {/* Calendar Grid */}
             <div className="overflow-x-auto">
-              <div className="grid grid-cols-7 gap-2 md:gap-4 min-w-[280px]">
+              <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 min-w-[280px]">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
                   (day) => (
                     <div
