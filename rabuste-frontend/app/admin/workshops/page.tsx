@@ -806,26 +806,26 @@ export default function App() {
 
             return (
               <div
-                className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 modal-overlay"
+                className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in"
                 onClick={() => setIsModalOpen(false)}
               >
                 <div
-                  className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl w-full sm:w-[90%] max-w-3xl p-4 sm:p-6 md:p-8 relative modal-content transform shadow-2xl border-4 border-amber-300/50 max-h-[90vh] overflow-y-auto"
+                  className="backdrop-blur-xl bg-black/40 border border-amber-700/30 rounded-3xl w-full max-w-3xl p-8 md:p-10 relative shadow-2xl animate-scale-in overflow-y-auto max-h-[90vh]"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
                     onClick={() => setIsModalOpen(false)}
-                    className="absolute top-6 right-6 p-3 hover:bg-amber-200/50 rounded-full transition-all hover:rotate-90 duration-300"
+                    className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-xl transition-all hover:rotate-90 duration-300 group"
                   >
-                    <X className="w-7 h-7 text-amber-900" />
+                    <X className="w-6 h-6 text-amber-200 group-hover:text-amber-100" />
                   </button>
 
                   <div className="mb-8">
-                    <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-linear-to-r from-amber-200 to-orange-200 mb-6 shadow-lg">
+                    <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-gradient-to-r from-amber-900/60 to-orange-900/60 backdrop-blur-sm border border-amber-600/30 mb-6">
                       {selectedWorkshop.category === "coffee" ? (
-                        <Coffee className="w-6 h-6 text-amber-900" />
+                        <Coffee className="w-5 h-5 text-amber-300" />
                       ) : (
-                        <Palette className="w-6 h-6 text-amber-900" />
+                        <Palette className="w-5 h-5 text-rose-300" />
                       )}
 
                       {isEditing ? (
@@ -849,7 +849,7 @@ export default function App() {
                           <option value="painting">Painting</option>
                         </select>
                       ) : (
-                        <span className="uppercase font-bold">
+                        <span className="font-semibold text-amber-100 text-sm uppercase tracking-widest">
                           {workshopToShow?.category}
                         </span>
                       )}
@@ -866,13 +866,13 @@ export default function App() {
                         className="w-full text-4xl font-bold border-b-2 border-amber-600"
                       />
                     ) : (
-                      <h3 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-transparent bg-gradient-to-r from-amber-900 to-orange-900 bg-clip-text">
+                      <h3 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent">
                         {workshopToShow?.title}
                       </h3>
                     )}
 
                     {selectedWorkshop.status === "past" && (
-                      <span className="inline-block px-4 py-2 bg-gray-300 text-gray-700 rounded-full font-semibold shadow-md">
+                      <span className="inline-block px-4 py-2 bg-white/10 text-amber-200 border border-white/20 rounded-full font-medium text-sm">
                         Past Workshop
                       </span>
                     )}
@@ -889,15 +889,15 @@ export default function App() {
                       className="w-full text-lg border rounded-xl p-4"
                     />
                   ) : (
-                    <p className="text-sm sm:text-base md:text-xl text-gray-800 mb-6 md:mb-8 leading-relaxed break-words">
+                    <p className="text-base md:text-lg text-amber-100/80 mb-8 leading-relaxed">
                       {selectedWorkshop.description}
                     </p>
                   )}
 
-                  <div className="space-y-5 bg-white/50 rounded-2xl p-6 backdrop-blur-sm">
-                    <div className="flex items-center gap-4 text-gray-800">
-                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-amber-900" />
+                  <div className="space-y-4 bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
+                    <div className="flex items-center gap-4 text-amber-100">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
+                        <Calendar className="w-6 h-6 text-amber-300" />
                       </div>
 
                       {isEditing ? (
@@ -912,15 +912,15 @@ export default function App() {
                           className="border rounded-lg p-2"
                         />
                       ) : (
-                        <span className="font-semibold text-lg">
+                        <span className="font-medium text-lg">
                           {workshopToShow?.date}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-gray-800">
-                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-amber-900" />
+                    <div className="flex items-center gap-4 text-amber-100">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
+                        <Clock className="w-6 h-6 text-amber-300" />
                       </div>
 
                       {isEditing ? (
@@ -939,9 +939,9 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-gray-800">
-                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                        <User className="w-6 h-6 text-amber-900" />
+                    <div className="flex items-center gap-4 text-amber-100">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
+                        <User className="w-6 h-6 text-amber-300" />
                       </div>
 
                       {isEditing ? (
@@ -963,9 +963,9 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-4 text-gray-800">
-                      <div className="w-12 h-12 rounded-full bg-amber-200 flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-amber-900" />
+                    <div className="flex items-center gap-4 text-amber-100">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
+                        <MapPin className="w-6 h-6 text-amber-300" />
                       </div>
 
                       {isEditing ? (
