@@ -415,7 +415,7 @@ export default function App() {
         />
 
         {/* Floating Coffee Beans */}
-        <div className="absolute inset-0">
+        {/* <div className="absolute inset-0">
           <div className="hidden sm:block">
             {[...Array(20)].map((_, i) => (
               <CoffeeBean
@@ -434,7 +434,7 @@ export default function App() {
               />
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Steam Effects */}
         <SteamEffect />
@@ -492,7 +492,7 @@ export default function App() {
           <div className="container mx-auto px-4 py-16 md:py-24">
             <div className="text-center max-w-5xl mx-auto">
               {/* Logo/Icon */}
-              <div className="mb-8 flex justify-center">
+              {/* <div className="mb-8 flex justify-center">
                 <div className="relative">
                   <div className="absolute inset-0 animate-ping-slow">
                     <Image
@@ -513,7 +513,7 @@ export default function App() {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Main Title */}
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 animate-fade-in-up">
