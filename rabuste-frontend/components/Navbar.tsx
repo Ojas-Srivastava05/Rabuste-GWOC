@@ -9,6 +9,7 @@ type NavButtonProps = {
   children: ReactNode;
   bg?: string;
   mobile?: boolean;
+  onClick?: () => void;
 };
 
 export default function Navbar() {
@@ -162,6 +163,7 @@ function NavButton({
   children,
   bg = "bg-transparent",
   mobile = false,
+  onClick,
 }: NavButtonProps) {
   const base = `
     ${bg}
@@ -180,7 +182,7 @@ function NavButton({
       <Link
         href={href}
         onClick={(e: any) => {
-          /* allow parent to close via props */
+          onClick?.();
         }}
         className={`${base} w-full text-center`}
       >
@@ -192,6 +194,9 @@ function NavButton({
   return (
     <Link
       href={href}
+      onClick={(e: any) => {
+        onClick?.();
+      }}
       className={`${base} hover:translate-y-[2px] hover:shadow-[0_4px_0_#2B1412] active:translate-y-[4px] active:shadow-[0_2px_0_#2B1412]`}
     >
       {children}

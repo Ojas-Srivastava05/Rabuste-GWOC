@@ -1,25 +1,55 @@
-
 import { NextResponse } from "next/server";
-import connectDB from "@/src/lib/mongodb";
-import  Workshop  from "@/src/models/Workshop";
 
 export async function GET() {
   try {
-    await connectDB();
-    const workshops = await Workshop.find().sort({ date: 1 });
-    return NextResponse.json(workshops);
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+    const res = await fetch(`${backendUrl}/api/workshops`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: 'Failed to fetch workshops from backend' },
+        { status: res.status }
+      );
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
   } catch (error) {
     console.error("❌ GET /api/workshops failed:", error);
-    return NextResponse.json([], { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch workshops" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: Request) {
   try {
-    await connectDB();
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
     const body = await req.json();
-    const workshop = await Workshop.create(body);
-    return NextResponse.json(workshop, { status: 201 });
+    
+    const res = await fetch(`${backendUrl}/api/workshops`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: 'Failed to create workshop' },
+        { status: res.status }
+      );
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("❌ POST /api/workshops failed:", error);
     return NextResponse.json(
