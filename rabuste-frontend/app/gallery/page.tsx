@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import "./gallery.css";
 import gsap from "gsap";
-import { PreloaderManager, FashionGallery } from "./gallery.core";
+import { FashionGallery } from "./gallery.core";
 
 export default function GalleryPage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -13,7 +13,6 @@ export default function GalleryPage() {
 
     // inject markup
     rootRef.current.innerHTML = `
-      <div id="preloader-overlay"></div>
       <div class="header"></div>
       <div class="viewport" id="viewport">
         <div class="canvas-wrapper" id="canvasWrapper">
@@ -45,35 +44,23 @@ export default function GalleryPage() {
       >←</button>
     `;
 
-    const preloader = new PreloaderManager();
+    // Initialize gallery immediately on next frame to avoid any blocking overlay/black screen
     const gallery = new FashionGallery();
-
-    const timer = setTimeout(() => {
-      preloader.complete(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      try {
         gallery.init();
         (window as any).__dragGallery = gallery;
-      });
-    }, 2000);
+      } catch {}
+    });
 
     return () => {
-      clearTimeout(timer);
-
-      try {
-        gallery.destroy();
-      } catch {}
-
-      // 🚨 ABSOLUTE RESET (THIS SAVES YOU)
-      try {
-        document.body.className = "";
-        document.body.style.cssText = "";
-      } catch {}
-
-      // kill all gsap activity just in case
-      try {
-        gsap.globalTimeline.clear();
-      } catch {}
-
+      window.cancelAnimationFrame(rafId);
+      try { gallery.destroy(); } catch {}
+      // absolute reset (keeps previous cleanup behavior)
+      try { document.body.className = ""; document.body.style.cssText = ""; } catch {}
+      try { gsap.globalTimeline.clear(); } catch {}
       try { delete (window as any).__dragGallery; } catch {}
+      try { if (rootRef.current) rootRef.current.innerHTML = ""; } catch {}
     };
   }, []);
 
