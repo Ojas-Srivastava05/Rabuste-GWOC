@@ -52,119 +52,85 @@ class PreloaderManager {
   }
 
   startAnimation() {
+    // If duration is zero, skip animation and complete immediately.
+    if (this.duration === 0) {
+      // remove canvas quickly and allow caller to continue
+      this.complete();
+      return;
+    }
+
+    // Otherwise run the animation (kept as before but lighter)
     const centerX = this.canvas.width / 2;
     const centerY = this.canvas.height / 2;
     let time = 0;
     let lastTime = 0;
-
     const dotRings = [
       { radius: 20, count: 8 },
       { radius: 35, count: 12 },
-      { radius: 50, count: 16 },
-      { radius: 65, count: 20 },
-      { radius: 80, count: 24 }
+      { radius: 50, count: 16 }
     ];
-
-    const colors = {
-      primary: "#2C1B14",
-      accent: "#A64B23"
-    };
-
-    const hexToRgb = (hex) => {
-      return [
-        parseInt(hex.slice(1, 3), 16),
-        parseInt(hex.slice(3, 5), 16),
-        parseInt(hex.slice(5, 7), 16)
-      ];
-    };
-
+    const colors = { primary: "#2C1B14", accent: "#A64B23" };
+    const hexToRgb = (hex) => [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ];
     const animate = (timestamp) => {
       if (!this.startTime) this.startTime = timestamp;
-
       if (!lastTime) lastTime = timestamp;
       const deltaTime = timestamp - lastTime;
       lastTime = timestamp;
       time += deltaTime * 0.001;
-
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-      // Draw center dot
       this.ctx.beginPath();
       this.ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
       const rgb = hexToRgb(colors.primary);
       this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
       this.ctx.fill();
-
-      // Draw Line Pulse Wave animation
       dotRings.forEach((ring, ringIndex) => {
         for (let i = 0; i < ring.count; i++) {
           const angle = (i / ring.count) * Math.PI * 2;
-          const radiusPulse = Math.sin(time * 2 - ringIndex * 0.4) * 3;
+          const radiusPulse = Math.sin(time * 2 - ringIndex * 0.4) * 2;
           const x = centerX + Math.cos(angle) * (ring.radius + radiusPulse);
           const y = centerY + Math.sin(angle) * (ring.radius + radiusPulse);
-
           const opacityWave =
-            0.4 + Math.sin(time * 2 - ringIndex * 0.4 + i * 0.2) * 0.6;
-          const isActive = Math.sin(time * 2 - ringIndex * 0.4 + i * 0.2) > 0.6;
-
-          // Draw line from center to point
+            0.4 + Math.sin(time * 2 - ringIndex * 0.4 + i * 0.2) * 0.5;
           this.ctx.beginPath();
           this.ctx.moveTo(centerX, centerY);
           this.ctx.lineTo(x, y);
-          this.ctx.lineWidth = 0.8;
-
-          if (isActive) {
-            const accentRgb = hexToRgb(colors.accent);
-            this.ctx.strokeStyle = `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${
-              accentRgb[2]
-            }, ${opacityWave * 0.7})`;
-          } else {
-            const primaryRgb = hexToRgb(colors.primary);
-            this.ctx.strokeStyle = `rgba(${primaryRgb[0]}, ${primaryRgb[1]}, ${
-              primaryRgb[2]
-            }, ${opacityWave * 0.5})`;
-          }
+          this.ctx.lineWidth = 0.7;
+          const primaryRgb = hexToRgb(colors.primary);
+          this.ctx.strokeStyle = `rgba(${primaryRgb[0]}, ${primaryRgb[1]}, ${primaryRgb[2]}, ${opacityWave * 0.6})`;
           this.ctx.stroke();
-
-          // Draw dot at the end of the line
           this.ctx.beginPath();
-          this.ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-          if (isActive) {
-            const accentRgb = hexToRgb(colors.accent);
-            this.ctx.fillStyle = `rgba(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, ${opacityWave})`;
-          } else {
-            const primaryRgb = hexToRgb(colors.primary);
-            this.ctx.fillStyle = `rgba(${primaryRgb[0]}, ${primaryRgb[1]}, ${primaryRgb[2]}, ${opacityWave})`;
-          }
+          this.ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+          this.ctx.fillStyle = `rgba(${primaryRgb[0]}, ${primaryRgb[1]}, ${primaryRgb[2]}, ${opacityWave})`;
           this.ctx.fill();
         }
       });
-
-      // Check if we should complete the loading
       if (timestamp - this.startTime >= this.duration) {
         this.complete();
         return;
       }
-
       this.animationId = requestAnimationFrame(animate);
     };
-
     this.animationId = requestAnimationFrame(animate);
   }
 
   complete(onComplete) {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+    if (this.animationId) cancelAnimationFrame(this.animationId);
+    if (!this.overlay) {
+      if (onComplete) onComplete();
+      return;
     }
-
-    if (this.overlay) {
-      this.overlay.style.opacity = "0";
-      this.overlay.style.transition = "opacity 0.8s ease";
-      setTimeout(() => {
-        this.overlay?.remove();
-        if (onComplete) onComplete();
-      }, 800);
-    }
+    // If duration is zero, remove immediately without fade
+    const fadeMs = this.duration === 0 ? 0 : 800;
+    this.overlay.style.opacity = "0";
+    this.overlay.style.transition = `opacity ${fadeMs / 1000}s ease`;
+    setTimeout(() => {
+      try { this.overlay?.remove(); } catch {}
+      if (onComplete) onComplete();
+    }, fadeMs);
   }
 }
 
