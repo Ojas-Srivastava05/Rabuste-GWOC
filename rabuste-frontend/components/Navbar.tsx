@@ -23,8 +23,12 @@ export default function Navbar() {
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         {/* LEFT (hidden on small screens) */}
         <div className="hidden md:flex gap-6 flex-1">
-          <NavButton href="#faqs" bg="bg-[#C89B7B]">Menu</NavButton>
-          <NavButton href="#about" bg="bg-[#E6C9A8]">Art</NavButton>
+          <NavButton href="#faqs" bg="bg-[#C89B7B]">
+            Menu
+          </NavButton>
+          <NavButton href="#about" bg="bg-[#E6C9A8]">
+            Art
+          </NavButton>
         </div>
 
         {/* MOBILE: hamburger on left (keeps logo visually centered) */}
@@ -36,11 +40,26 @@ export default function Navbar() {
             className="inline-flex items-center justify-center w-10 h-10 rounded-md bg-white/6 backdrop-blur-sm border border-white/6 text-[#f6e6dc] hover:bg-white/8 transition"
             type="button"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               {open ? (
-                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+                <path
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 7h16M4 12h16M4 17h16"
+                />
               )}
             </svg>
           </button>
@@ -68,26 +87,69 @@ export default function Navbar() {
 
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-6 flex-1 justify-end">
-          <NavButton href="#contact" bg="bg-[#B57A5A]">Workshop</NavButton>
-          <NavButton href="#add-venue" bg="bg-[#8B5E3C]">Franchise</NavButton>
-          <NavButton href="/auth" bg="bg-[#8B5E3C]">Login/Signup</NavButton>
+          <NavButton href="/workshops" bg="bg-[#B57A5A]">
+            Workshop
+          </NavButton>
+          <NavButton href="#add-venue" bg="bg-[#8B5E3C]">
+            Franchise
+          </NavButton>
+          <NavButton href="/auth" bg="bg-[#8B5E3C]">
+            Login/Signup
+          </NavButton>
         </div>
       </div>
 
       {/* Mobile menu overlay */}
       <div
         className={`md:hidden fixed inset-x-4 top-20 z-50 transform-gpu transition-all duration-200 ${
-          open ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
+          open
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 -translate-y-2 pointer-events-none"
         }`}
         aria-hidden={!open}
       >
         <div className="rounded-xl backdrop-blur-sm bg-white/6 border border-white/6 p-4 shadow-lg">
           <div className="flex flex-col gap-3">
-            <NavButton href="#faqs" mobile onClick={() => setOpen(false)} bg="bg-[#C89B7B]">Menu</NavButton>
-            <NavButton href="#about" mobile onClick={() => setOpen(false)} bg="bg-[#E6C9A8]">Art</NavButton>
-            <NavButton href="#contact" mobile onClick={() => setOpen(false)} bg="bg-[#B57A5A]">Workshop</NavButton>
-            <NavButton href="#add-venue" mobile onClick={() => setOpen(false)} bg="bg-[#8B5E3C]">Franchise</NavButton>
-            <NavButton href="/auth" mobile onClick={() => setOpen(false)} bg="bg-[#8B5E3C]">Login / Signup</NavButton>
+            <NavButton
+              href="#faqs"
+              mobile
+              onClick={() => setOpen(false)}
+              bg="bg-[#C89B7B]"
+            >
+              Menu
+            </NavButton>
+            <NavButton
+              href="#about"
+              mobile
+              onClick={() => setOpen(false)}
+              bg="bg-[#E6C9A8]"
+            >
+              Art
+            </NavButton>
+            <NavButton
+              href="#contact"
+              mobile
+              onClick={() => setOpen(false)}
+              bg="bg-[#B57A5A]"
+            >
+              Workshop
+            </NavButton>
+            <NavButton
+              href="#add-venue"
+              mobile
+              onClick={() => setOpen(false)}
+              bg="bg-[#8B5E3C]"
+            >
+              Franchise
+            </NavButton>
+            <NavButton
+              href="/auth"
+              mobile
+              onClick={() => setOpen(false)}
+              bg="bg-[#8B5E3C]"
+            >
+              Login / Signup
+            </NavButton>
           </div>
         </div>
       </div>
@@ -95,7 +157,12 @@ export default function Navbar() {
   );
 }
 
-function NavButton({ href, children, bg = "bg-transparent", mobile = false }: NavButtonProps) {
+function NavButton({
+  href,
+  children,
+  bg = "bg-transparent",
+  mobile = false,
+}: NavButtonProps) {
   const base = `
     ${bg}
     px-6 py-2
@@ -110,14 +177,23 @@ function NavButton({ href, children, bg = "bg-transparent", mobile = false }: Na
 
   if (mobile) {
     return (
-      <Link href={href} onClick={(e: any) => { /* allow parent to close via props */ }} className={`${base} w-full text-center`}>
+      <Link
+        href={href}
+        onClick={(e: any) => {
+          /* allow parent to close via props */
+        }}
+        className={`${base} w-full text-center`}
+      >
         <span className="text-sm">{children}</span>
       </Link>
     );
   }
 
   return (
-    <Link href={href} className={`${base} hover:translate-y-[2px] hover:shadow-[0_4px_0_#2B1412] active:translate-y-[4px] active:shadow-[0_2px_0_#2B1412]`}>
+    <Link
+      href={href}
+      className={`${base} hover:translate-y-[2px] hover:shadow-[0_4px_0_#2B1412] active:translate-y-[4px] active:shadow-[0_2px_0_#2B1412]`}
+    >
       {children}
     </Link>
   );
