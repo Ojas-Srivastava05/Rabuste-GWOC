@@ -2,6 +2,7 @@
 
 import RotatingText from "../../../components/RotatingText";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Calendar,
   Coffee,
