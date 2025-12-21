@@ -1,5 +1,6 @@
 "use client";
 
+import RotatingText from "../../../components/RotatingText";
 import React, { useEffect, useState } from "react";
 import {
   Calendar,
@@ -298,48 +299,53 @@ export default function App() {
     year: "numeric",
   });
 
+  const rotatingWorkshopTexts = upcomingWorkshopsWithinMonth.map(
+    (workshop) =>
+      `${workshop.category === "coffee" ? "☕" : "🎨"} ${workshop.daysLeft} ${
+        workshop.daysLeft === 1 ? "day" : "days"
+      } left for ${workshop.title}`
+  );
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#2c1810] via-[#3d2419] to-[#1a0f0a]">
+    <div className="min-h-screen bg-gradient-to-br from-[#2c1810] via-[#3d2419] to-[#1a0f0a] px-2 sm:px-0">
       {/* scrolling ticker */}
       {upcomingWorkshopsWithinMonth.length > 0 && (
-        <div className="relative bg-linear-to-r from-amber-900/90 via-orange-800/90 to-amber-900/90 backdrop-blur-md border-b-4 border-amber-600/50 shadow-2xl">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30"></div>
+        <div className="relative overflow-hidden bg-gradient-to-r from-amber-950 via-orange-800 to-amber-950 border-b-8 border-amber-500 shadow-[0_20px_80px_-20px_rgba(251,191,36,0.6)]">
+          {/* Glow layer */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-orange-400/10 to-amber-500/10 blur-2xl"></div>
 
-          <div className="relative py-8 px-4 overflow-hidden">
-            <div className="flex items-center justify-center mb-3">
-              <Sparkles className="w-6 h-6 text-amber-300 mr-2 animate-pulse" />
-              <h2 className="text-2xl md:text-3xl font-bold text-amber-100 tracking-wide uppercase">
+          {/* Pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjA4Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
+
+          <div className="relative py-12 md:py-16 px-6 md:px-12">
+            {/* Heading */}
+            <div className="flex items-center justify-center mb-6">
+              <Sparkles className="w-8 h-8 text-amber-300 mr-3 animate-pulse" />
+              <h2 className="text-3xl md:text-5xl font-extrabold text-amber-100 tracking-widest uppercase drop-shadow-lg">
                 Upcoming Experiences
               </h2>
-              <Sparkles className="w-6 h-6 text-amber-300 ml-2 animate-pulse" />
+              <Sparkles className="w-8 h-8 text-amber-300 ml-3 animate-pulse" />
             </div>
 
-            <div className="animate-marquee whitespace-nowrap inline-block">
-              {[...Array(4)].map((_, repeatIndex) => (
-                <span key={repeatIndex} className="inline-flex items-center">
-                  {upcomingWorkshopsWithinMonth.map((workshop, idx) => (
-                    <span
-                      key={`${repeatIndex}-${workshop._id}`}
-                      className="inline-flex items-center mx-6 md:mx-12"
-                    >
-                      <span className="text-3xl md:text-4xl mr-3">
-                        {workshop.category === "coffee" ? "☕" : "🎨"}
-                      </span>
-                      <span className="text-xl md:text-2xl font-semibold text-amber-50">
-                        {workshop.daysLeft}{" "}
-                        {workshop.daysLeft === 1 ? "day" : "days"} left for
-                      </span>
-                      <span className="text-xl md:text-2xl font-bold text-white mx-2 px-4 py-1 bg-amber-700/50 rounded-full">
-                        {workshop.title}
-                      </span>
-                      {idx < upcomingWorkshopsWithinMonth.length - 1 && (
-                        <span className="text-amber-300 mx-4 text-2xl">✦</span>
-                      )}
-                    </span>
-                  ))}
-                  <span className="text-amber-300 mx-6 text-3xl">★</span>
-                </span>
-              ))}
+            {/* Rotating text */}
+            <div className="flex justify-center items-center">
+              <RotatingText
+                // texts={rotatingWorkshopTexts}
+                texts={
+                  rotatingWorkshopTexts.length
+                    ? rotatingWorkshopTexts
+                    : ["No upcoming workshops"]
+                }
+                mainClassName="px-2 sm:px-6 md:px-8 py-1 sm:py-3 md:py-4 bg-amber-700/60 text-white text-xs sm:text-lg md:text-2xl font-extrabold rounded-full shadow-lg ring-1 ring-amber-400/30 backdrop-blur-sm whitespace-nowrap overflow-hidden"
+                staggerFrom="last"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "-120%" }}
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={5000}
+              />
             </div>
           </div>
         </div>
@@ -351,7 +357,7 @@ export default function App() {
           <div className="absolute inset-0 flex items-center justify-center opacity-5">
             <Coffee className="w-64 h-64" />
           </div>
-          <h1 className="relative text-6xl md:text-8xl font-montserrat font-extrabold mb-6 bg-linear-to-r from-amber-200 via-amber-100 to-orange-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight">
+          <h1 className="relative text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-montserrat font-extrabold mb-6 bg-gradient-to-r from-amber-200 via-amber-100 to-orange-200 bg-clip-text text-transparent drop-shadow-2xl tracking-tight text-center px-2">
             The Robusta Assemblée
           </h1>
           <div className="flex items-center justify-center mb-6">
@@ -359,7 +365,7 @@ export default function App() {
             <Coffee className="w-8 h-8 mx-4 text-amber-400" />
             <div className="h-1 w-24 bg-linear-to-r from-transparent via-amber-500 to-transparent"></div>
           </div>
-          <p className="relative text-xl md:text-2xl text-amber-300/90 max-w-3xl mx-auto leading-relaxed font-light italic">
+          <p className="relative text-sm sm:text-lg md:text-2xl text-amber-300/90 max-w-3xl mx-auto leading-relaxed font-light italic text-center px-4">
             A curated calendar of intimate workshops and gallery evenings
             <br />
             for connoisseurs who savour art, aroma, and refined conversation.
@@ -478,117 +484,116 @@ export default function App() {
         </div>
 
         {/* calendar */}
-        <div className="max-w-6xl mx-auto bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-10 border-4 border-amber-200/50 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50 backdrop-blur-sm">
           {/* month navigation */}
           <div className="flex items-center justify-between mb-10">
             <button
               onClick={() => changeMonth(-1)}
-              className="px-8 py-4 bg-linear-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
+              className="px-4 sm:px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 font-bold text-sm sm:text-base md:text-lg"
             >
               ←
             </button>
-            <h2 className="text-4xl md:text-5xl font-montserrat font-extrabold bg-linear-to-r from-amber-900 to-orange-900 bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-montserrat font-extrabold bg-gradient-to-r from-amber-900 to-orange-900 bg-clip-text text-transparent text-center">
               {monthName}
             </h2>
             <button
               onClick={() => changeMonth(1)}
-              className="px-8 py-4 bg-linear-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-110 font-bold text-lg"
+              className="px-4 sm:px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-amber-800 to-orange-900 text-white rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 font-bold text-sm sm:text-base md:text-lg"
             >
               →
             </button>
           </div>
 
           {/* calendar grid */}
-          <div className="grid grid-cols-7 gap-3 md:gap-4">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="text-center font-montserrat font-bold text-amber-900 pb-6 text-lg"
-              >
-                {day}
-              </div>
-            ))}
-
-            {Array.from({ length: startingDayOfWeek }).map((_, i) => (
-              <div key={`empty-${i}`} />
-            ))}
-
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const day = i + 1;
-              const date = new Date(year, month, day);
-              const workshop = getWorkshopForDate(date);
-              const isCoffee = workshop?.category === "coffee";
-              const isPainting = workshop?.category === "painting";
-              const isPast = workshop?.status === "past";
-              const today = isToday(date);
-
-              return (
+          <div className="overflow-x-auto">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 text-xs sm:text-sm md:text-base">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                 <div
                   key={day}
-                  onClick={() => handleDateClick(day)}
-                  className={`
-                    aspect-square rounded-2xl flex items-center justify-center text-xl font-bold
-                    transition-all duration-300 cursor-pointer relative overflow-hidden
-
-                    ${
-                      workshop
-                        ? "transform hover:scale-110 hover:shadow-2xl hover:z-10"
-                        : "hover:bg-amber-100/50"
-                    }
-                    ${
-                      today && !workshop
-                        ? "bg-linear-to-br from-blue-400 to-blue-500 text-white shadow-lg ring-4 ring-blue-300 today-pulse"
-                        : ""
-                    }
-                    ${
-                      today && workshop
-                        ? "ring-4 ring-blue-400 today-pulse"
-                        : ""
-                    }
-                    ${
-                      isCoffee && !isPast
-                        ? "bg-linear-to-br from-amber-400 via-orange-500 to-amber-600 text-white shadow-xl coffee-date"
-                        : ""
-                    }
-                    ${
-                      isPainting && !isPast
-                        ? "bg-linear-to-br from-pink-400 via-rose-500 to-pink-600 text-white shadow-xl painting-date"
-                        : ""
-                    }
-                    ${
-                      isPast
-                        ? "bg-linear-to-br from-gray-300 to-gray-400 text-gray-600 opacity-60"
-                        : ""
-                    }
-                    ${
-                      !workshop && !today
-                        ? "bg-white/80 border-2 border-amber-200 text-gray-700"
-                        : ""
-                    }
-                  `}
+                  className="text-center font-montserrat font-bold text-amber-900 pb-6 text-lg sm:text-base md:text-lg"
                 >
-                  <span className="relative z-10 drop-shadow-md">{day}</span>
-                  {isCoffee && !isPast && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-25">
-                      <Coffee className="w-10 h-10 steam-animation text-white" />
-                    </div>
-                  )}
-                  {isPainting && !isPast && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-25">
-                      <Palette className="w-10 h-10 paint-splash text-white" />
-                    </div>
-                  )}
-                  {today && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-ping"></div>
-                  )}
+                  {day}
                 </div>
-              );
-            })}
+              ))}
+
+              {Array.from({ length: startingDayOfWeek }).map((_, i) => (
+                <div key={`empty-${i}`} />
+              ))}
+
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const day = i + 1;
+                const date = new Date(year, month, day);
+                const workshop = getWorkshopForDate(date);
+                const isCoffee = workshop?.category === "coffee";
+                const isPainting = workshop?.category === "painting";
+                const isPast = workshop?.status === "past";
+                const today = isToday(date);
+
+                return (
+                  <div
+                    key={day}
+                    onClick={() => handleDateClick(day)}
+                    className={`
+                      aspect-square min-w-[40px] sm:min-w-[50px] md:min-w-[60px] rounded-xl sm:rounded-2xl flex items-center justify-center text-sm sm:text-lg md:text-xl font-bold
+                      ${
+                        workshop
+                          ? "transform hover:scale-110 hover:shadow-2xl hover:z-10"
+                          : "hover:bg-amber-100/50"
+                      }
+                      ${
+                        today && !workshop
+                          ? "bg-gradient-to-br from-blue-400 to-blue-500 text-white shadow-lg ring-4 ring-blue-300 today-pulse"
+                          : ""
+                      }
+                      ${
+                        today && workshop
+                          ? "ring-4 ring-blue-400 today-pulse"
+                          : ""
+                      }
+                      ${
+                        isCoffee && !isPast
+                          ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white shadow-xl coffee-date"
+                          : ""
+                      }
+                      ${
+                        isPainting && !isPast
+                          ? "bg-gradient-to-br from-pink-400 via-rose-500 to-pink-600 text-white shadow-xl painting-date"
+                          : ""
+                      }
+                      ${
+                        isPast
+                          ? "bg-gradient-to-br from-gray-300 to-gray-400 text-gray-600 opacity-60"
+                          : ""
+                      }
+                      ${
+                        !workshop && !today
+                          ? "bg-white/80 border-2 border-amber-200 text-gray-700"
+                          : ""
+                      }
+                    `}
+                  >
+                    <span className="relative z-10 drop-shadow-md text-sm sm:text-base md:text-lg">
+                      {day}
+                    </span>
+
+                    {isCoffee && !isPast && (
+                      <Coffee className="absolute w-4 sm:w-6 md:w-10 h-4 sm:h-6 md:h-10 opacity-25 pointer-events-none steam-animation" />
+                    )}
+                    {isPainting && !isPast && (
+                      <Palette className="absolute w-4 sm:w-6 md:w-10 h-4 sm:h-6 md:h-10 opacity-25 pointer-events-none paint-splash" />
+                    )}
+                    {today && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full animate-ping pointer-events-none"></div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Legend */}
           <div className="mt-10 pt-8 border-t-2 border-amber-300/50">
-            <div className="flex flex-wrap justify-center gap-6 text-sm md:text-base">
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-xs sm:text-sm md:text-base">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-400 to-blue-500 shadow-md"></div>
                 <span className="font-semibold text-gray-700">Today</span>
@@ -628,7 +633,7 @@ export default function App() {
                 onClick={() => setIsModalOpen(false)}
               >
                 <div
-                  className="bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl max-w-3xl w-full p-10 relative modal-content transform shadow-2xl border-4 border-amber-300/50"
+                  className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl sm:rounded-3xl w-full sm:w-[90%] max-w-3xl p-4 sm:p-6 md:p-8 relative modal-content transform shadow-2xl border-4 border-amber-300/50 max-h-[90vh] overflow-y-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
@@ -684,7 +689,7 @@ export default function App() {
                         className="w-full text-4xl font-bold border-b-2 border-amber-600"
                       />
                     ) : (
-                      <h3 className="text-5xl font-bold">
+                      <h3 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4 text-transparent bg-gradient-to-r from-amber-900 to-orange-900 bg-clip-text">
                         {workshopToShow?.title}
                       </h3>
                     )}
@@ -707,8 +712,8 @@ export default function App() {
                       className="w-full text-lg border rounded-xl p-4"
                     />
                   ) : (
-                    <p className="text-xl text-gray-800 mb-8 leading-relaxed">
-                      {workshopToShow?.description}
+                    <p className="text-sm sm:text-base md:text-xl text-gray-800 mb-6 md:mb-8 leading-relaxed break-words">
+                      {selectedWorkshop.description}
                     </p>
                   )}
 
