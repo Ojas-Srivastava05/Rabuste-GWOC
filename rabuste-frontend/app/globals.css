@@ -132,3 +132,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes coffee-fall {
+  0% {
+    top: -10%;
+    opacity: 0;
+    transform: rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+    transform: rotate(360deg);
+  }
+}
+
+.coffee-bean {
+  position: absolute;
+  animation-name: coffee-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
