@@ -147,6 +147,9 @@ class FashionGallery {
     this.closeButton = root ? root.querySelector<HTMLElement>("#closeButton") : null;
     this.controlsContainer = root ? root.querySelector<HTMLElement>("#controlsContainer") : null;
     this.soundToggle = root ? root.querySelector<HTMLElement>("#soundToggle") : null;
+    // mobile detection (guarded for SSR)
+    this.isMobile = (typeof navigator !== "undefined") && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    this._mobileDialog = null; // ref to dialog element
     // Create custom eases
     this.customEase = CustomEase.create("smooth", ".87,0,.13,1");
     this.centerEase = CustomEase.create("center", ".25,.46,.45,.94");
@@ -546,8 +549,15 @@ class FashionGallery {
           imageUrl: imageUrl,
           index: this.gridItems.length
         };
-        // Add click event for zoom
-        item.addEventListener("click", () => {
+        // Add click event for zoom / mobile dialog
+        item.addEventListener("click", (e) => {
+          // on mobile, show a simple dialog with details instead of full zoom mode
+          if (this.isMobile) {
+            e.stopPropagation();
+            this.soundSystem.play("click");
+            this.showMobileDialog(itemData);
+            return;
+          }
           if (!this.zoomState.isActive) {
             this.soundSystem.play("click");
             this.enterZoomMode(itemData);
@@ -1252,6 +1262,7 @@ class FashionGallery {
       this.draggable?.kill?.();
       this.viewportObserver?.disconnect?.();
     } catch {}
+    try { this.hideMobileDialog(); } catch {}
 
     // Kill all GSAP tweens created by this gallery
     try {
@@ -1355,6 +1366,76 @@ class FashionGallery {
           break;
       }
     });
+  }
+
+  // Mobile dialog: lightweight card details overlay
+  showMobileDialog(itemData) {
+    try {
+      // avoid duplicate
+      if (this._mobileDialog) return;
+      const root = getRoot();
+      const overlay = document.createElement("div");
+      overlay.className = "mobile-card-dialog";
+      overlay.style.cssText = `
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.6);
+        z-index: 12000;
+        padding: 20px;
+      `;
+      const card = document.createElement("div");
+      card.style.cssText = `
+        width: 100%;
+        max-width: 520px;
+        background: #0f0f0f;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        overflow: hidden;
+        color: #fff;
+      `;
+      card.innerHTML = `
+        <div style="position:relative;">
+          <img src="${itemData.imageUrl}" alt="" style="width:100%; height: auto; display:block; object-fit:cover;">
+          <button id="mobile-dialog-close" aria-label="Close" style="position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; background:#c4a574; border:none; cursor:pointer;">✕</button>
+        </div>
+        <div style="padding:16px;">
+          <div id="mobile-dialog-number" style="font-size:12px; opacity:0.8; margin-bottom:6px;">${this.imageData[itemData.index % this.imageData.length].number}</div>
+          <h3 id="mobile-dialog-title" style="margin:0 0 8px 0;">${this.imageData[itemData.index % this.imageData.length].title}</h3>
+          <p id="mobile-dialog-desc" style="margin:0; opacity:0.9; line-height:1.4; font-size:14px;">${this.imageData[itemData.index % this.imageData.length].description}</p>
+        </div>
+      `;
+      overlay.appendChild(card);
+      root.appendChild(overlay);
+      this._mobileDialog = overlay;
+      // animate in
+      gsap.fromTo(card, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: "power2.out" });
+      // close handlers
+      const closeBtn = overlay.querySelector("#mobile-dialog-close");
+      const onClose = (ev) => {
+        ev.stopPropagation();
+        this.hideMobileDialog();
+      };
+      if (closeBtn) closeBtn.addEventListener("click", onClose);
+      overlay.addEventListener("click", (ev) => {
+        if (ev.target === overlay) this.hideMobileDialog();
+      });
+    } catch (e) {
+      // noop
+    }
+  }
+
+  hideMobileDialog() {
+    try {
+      if (!this._mobileDialog) return;
+      const el = this._mobileDialog;
+      const card = el.firstElementChild;
+      if (card) gsap.to(card, { y: 20, opacity: 0, duration: 0.18, ease: "power2.in", onComplete: () => { try { el.remove(); } catch {} } });
+      else try { el.remove(); } catch {}
+      this._mobileDialog = null;
+    } catch (e) {}
   }
 }
 
