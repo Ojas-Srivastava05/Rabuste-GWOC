@@ -197,16 +197,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2c1810] via-[#3d2419] to-[#1a0f0a] px-2 sm:px-0">
       {/* scrolling ticker */}
-      {upcomingWorkshopsWithinMonth.length > 0 && (
+      {/* {upcomingWorkshopsWithinMonth.length > 0 && (
         <div className="relative overflow-hidden bg-gradient-to-r from-amber-950 via-orange-800 to-amber-950 border-b-8 border-amber-500 shadow-[0_20px_80px_-20px_rgba(251,191,36,0.6)]">
-          {/* Glow layer */}
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-orange-400/10 to-amber-500/10 blur-2xl"></div>
 
-          {/* Pattern overlay */}
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjA4Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
 
           <div className="relative py-12 md:py-16 px-6 md:px-12">
-            {/* Heading */}
             <div className="flex items-center justify-center mb-6">
               <Sparkles className="w-8 h-8 text-amber-300 mr-3 animate-pulse" />
               <h2 className="text-3xl md:text-5xl font-extrabold text-amber-100 tracking-widest uppercase drop-shadow-lg">
@@ -215,11 +212,48 @@ export default function App() {
               <Sparkles className="w-8 h-8 text-amber-300 ml-3 animate-pulse" />
             </div>
 
-            {/* Rotating text */}
+           
             <div className="flex justify-center items-center">
               <RotatingText
                 texts={rotatingWorkshopTexts}
                 mainClassName="px-2 sm:px-6 md:px-8 py-1 sm:py-3 md:py-4 bg-amber-700/60 text-white text-xs sm:text-lg md:text-2xl font-extrabold rounded-full shadow-lg ring-1 ring-amber-400/30 backdrop-blur-sm whitespace-nowrap overflow-hidden"
+                staggerFrom="last"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "-120%" }}
+                staggerDuration={0.025}
+                splitLevelClassName="overflow-hidden"
+                transition={{ type: "spring", damping: 30, stiffness: 400 }}
+                rotationInterval={5000}
+              />
+            </div>
+          </div>
+        </div>
+      )} */}
+      {/* scrolling ticker */}
+      {upcomingWorkshopsWithinMonth.length > 0 && (
+        <div className="relative overflow-hidden bg-gradient-to-r from-amber-950 via-orange-800 to-amber-950 border-b-8 border-amber-500 shadow-[0_20px_80px_-20px_rgba(251,191,36,0.6)]">
+          {/* Glow layer */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 via-orange-400/10 to-amber-500/10 blur-2xl"></div>
+
+          {/* Pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,...')] opacity-40"></div>
+
+          <div className="relative py-10 md:py-14 px-6 md:px-12">
+            {/* Heading */}
+            <div className="flex items-center justify-center mb-4 md:mb-6">
+              <Sparkles className="w-6 h-6 text-amber-300 mr-2 animate-pulse" />
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-amber-100 tracking-wide uppercase drop-shadow-lg text-center">
+                Upcoming Experiences
+              </h2>
+              <Sparkles className="w-6 h-6 text-amber-300 ml-2 animate-pulse" />
+            </div>
+
+            {/* Rotating text */}
+            <div className="flex justify-center items-center mt-2 md:mt-4">
+              <RotatingText
+                texts={rotatingWorkshopTexts}
+                mainClassName="px-3 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 bg-amber-700/70 text-white text-xs sm:text-sm md:text-lg font-semibold rounded-full shadow-lg ring-1 ring-amber-400/40 backdrop-blur-sm whitespace-nowrap overflow-hidden"
                 staggerFrom="last"
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
