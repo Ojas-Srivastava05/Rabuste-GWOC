@@ -375,6 +375,9 @@ export default function App() {
     }
   }, [rotatingWorkshopTexts.length]);
 
+  const editInputClass =
+    "w-full bg-amber-950/40 text-amber-100 placeholder-amber-300/50 border border-amber-700/40 rounded-xl px-4 py-2 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500";
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Dynamic Animated Background */}
@@ -466,7 +469,6 @@ export default function App() {
                           ? rotatingWorkshopTexts
                           : ["No upcoming workshops"]
                       }
-                      // mainClassName="px-2 sm:px-6 md:px-8 py-1 sm:py-3 md:py-4  text-white text-xs sm:text-lg md:text-2xl font-extrabold rounded-full shadow-lg ring-1 ring-amber-400/30 backdrop-blur-sm whitespace-nowrap overflow-hidden"
                       staggerFrom="last"
                       initial={{ y: "100%" }}
                       animate={{ y: 0 }}
@@ -534,8 +536,7 @@ export default function App() {
             </div>
           </div>
         </div>
-        {/* <div className="max-w-5xl mx-auto mb-16 bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50">
-          <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900"> */}
+
         <div className="container mx-auto px-4 sm:px-6 mb-16">
           <div className="max-w-5xl mx-auto bg-linear-to-br from-amber-50 to-orange-50 rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border-4 border-amber-200/50">
             <h2 className="text-3xl font-montserrat font-extrabold mb-8 text-amber-900">
@@ -843,7 +844,7 @@ export default function App() {
                                 : prev
                             )
                           }
-                          className="border rounded-lg p-2"
+                          className={editInputClass}
                         >
                           <option value="coffee">Coffee</option>
                           <option value="painting">Painting</option>
@@ -863,7 +864,7 @@ export default function App() {
                             prev ? { ...prev, title: e.target.value } : prev
                           )
                         }
-                        className="w-full text-4xl font-bold border-b-2 border-amber-600"
+                        className={`text-4xl font-bold ${editInputClass}`}
                       />
                     ) : (
                       <h3 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent">
@@ -886,7 +887,8 @@ export default function App() {
                           prev ? { ...prev, description: e.target.value } : prev
                         )
                       }
-                      className="w-full text-lg border rounded-xl p-4"
+                      rows={4}
+                      className={`text-lg ${editInputClass}`}
                     />
                   ) : (
                     <p className="text-base md:text-lg text-amber-100/80 mb-8 leading-relaxed">
@@ -909,7 +911,7 @@ export default function App() {
                               prev ? { ...prev, date: e.target.value } : prev
                             )
                           }
-                          className="border rounded-lg p-2"
+                          className={editInputClass}
                         />
                       ) : (
                         <span className="font-medium text-lg">
@@ -932,7 +934,7 @@ export default function App() {
                             )
                           }
                           placeholder="06:30 PM"
-                          className="border rounded-lg p-2"
+                          className={editInputClass}
                         />
                       ) : (
                         <span className="text-lg">{workshopToShow?.time}</span>
@@ -954,7 +956,7 @@ export default function App() {
                                 : prev
                             )
                           }
-                          className="border rounded-lg p-2"
+                          className={editInputClass}
                         />
                       ) : (
                         <span className="text-lg">
@@ -978,7 +980,7 @@ export default function App() {
                                 : prev
                             )
                           }
-                          className="border rounded-lg p-2"
+                          className={editInputClass}
                         />
                       ) : (
                         <span className="text-lg">
