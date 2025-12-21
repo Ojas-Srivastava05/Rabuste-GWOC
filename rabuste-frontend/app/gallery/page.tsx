@@ -2,7 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import "./gallery.css";
-import { FashionGallery } from "./gallery.core";
+import gsap from "gsap";
+import { PreloaderManager, FashionGallery } from "./gallery.core";
 
 export default function GalleryPage() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -37,34 +38,42 @@ export default function GalleryPage() {
           <canvas id="soundWaveCanvas" width="32" height="16"></canvas>
         </button>
       </div>
-      <button id="gallery-exit" onclick="window.location.href = '/'">← Back</button>
+      <button id="gallery-exit"
+        style="position:fixed; top:20px; left:20px; z-index:2000; width:44px; height:44px; border-radius:9999px; background:#c4a574; color:#000; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 6px 18px rgba(0,0,0,.45); border:none; cursor:pointer;"
+        onclick="window.location.replace('/')"
+        aria-label="Back to home"
+      >←</button>
     `;
 
-    // initialize gallery immediately (no preloader)
+    const preloader = new PreloaderManager();
     const gallery = new FashionGallery();
-    // initialize on next tick so injected DOM is ready
-    const rafId = window.requestAnimationFrame(() => {
-      try {
+
+    const timer = setTimeout(() => {
+      preloader.complete(() => {
         gallery.init();
-        (window as any).gallery = gallery;
-      } catch (err) {
-        // inspect console if needed
-      }
-    });
+        (window as any).__dragGallery = gallery;
+      });
+    }, 2000);
 
     return () => {
-      window.cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+
       try {
-        if (gallery) {
-          if (typeof gallery.destroy === "function") gallery.destroy();
-          else {
-            try { gallery.draggable?.kill?.(); } catch {}
-            try { gallery.viewportObserver?.disconnect?.(); } catch {}
-          }
-        }
+        gallery.destroy();
       } catch {}
-      try { if ((window as any).gallery === gallery) delete (window as any).gallery; } catch {}
-      try { if (rootRef.current) rootRef.current.innerHTML = ""; } catch {}
+
+      // 🚨 ABSOLUTE RESET (THIS SAVES YOU)
+      try {
+        document.body.className = "";
+        document.body.style.cssText = "";
+      } catch {}
+
+      // kill all gsap activity just in case
+      try {
+        gsap.globalTimeline.clear();
+      } catch {}
+
+      try { delete (window as any).__dragGallery; } catch {}
     };
   }, []);
 

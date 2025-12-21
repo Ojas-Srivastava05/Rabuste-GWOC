@@ -491,7 +491,8 @@ class FashionGallery {
           font-weight: 300;
           line-height: 1.4;
         `;
-    document.body.appendChild(temp);
+    // append measurement node inside gallery root (do not touch global body)
+    try { getRoot().appendChild(temp); } catch (e) { document.body.appendChild(temp); }
     let currentLine = "";
     sentences.forEach((sentence) => {
       const words = sentence.split(" ");
@@ -509,7 +510,7 @@ class FashionGallery {
     if (currentLine) {
       lines.push(currentLine);
     }
-    document.body.removeChild(temp);
+    try { getRoot().removeChild(temp); } catch (e) { if (temp.parentNode) temp.parentNode.removeChild(temp); }
     // Create line elements
     lines.forEach((lineText) => {
       const lineSpan = document.createElement("span");
@@ -1279,6 +1280,28 @@ class FashionGallery {
         this.initDraggable();
       }
     });
+  }
+  destroy() {
+    try {
+      this.draggable?.kill?.();
+      this.viewportObserver?.disconnect?.();
+    } catch {}
+
+    // Kill all GSAP tweens created by this gallery
+    try {
+      gsap.killTweensOf("*");
+    } catch {}
+
+    // Clear any inline transforms/opacity GSAP applied inside the gallery root
+    const root = document.getElementById(ROOT_ID);
+    if (root) {
+      root.querySelectorAll<HTMLElement>("*").forEach((el) => {
+        try {
+          el.style.transform = "";
+          el.style.opacity = "";
+        } catch {}
+      });
+    }
   }
   init() {
     this.config.currentGap = this.calculateGapForZoom(this.config.currentZoom);
