@@ -27,7 +27,7 @@ export default function Navbar() {
           <NavButton href="#faqs" bg="bg-[#C89B7B]">
             Menu
           </NavButton>
-          <NavButton href="#about" bg="bg-[#E6C9A8]">
+          <NavButton href="/gallery" bg="bg-[#E6C9A8]">
             Art
           </NavButton>
         </div>
