@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./db.js";
 import authRoutes from "./routes/auth.js";
 import protectedRoutes from "./routes/protected.js";
-
+import franchiseRoutes from "./routes/franchise.js";
 dotenv.config();
 connectDB();
 
@@ -29,8 +29,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
-
-const PORT = process.env.PORT || 5000;
+app.use("/api/franchise", franchiseRoutes);
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
 });
