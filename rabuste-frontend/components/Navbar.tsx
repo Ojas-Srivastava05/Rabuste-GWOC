@@ -120,7 +120,7 @@ export default function Navbar() {
               Menu
             </NavButton>
             <NavButton
-              href="#about"
+              href="/gallery"
               mobile
               onClick={() => setOpen(false)}
               bg="bg-[#E6C9A8]"
