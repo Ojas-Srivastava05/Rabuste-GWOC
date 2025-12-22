@@ -3,7 +3,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.js";
 import protectedRoutes from "./routes/protected.js";
-
+import franchiseRoutes from "./routes/franchise.js";
 const app = express();
 
 // logger
@@ -28,5 +28,9 @@ app.get("/", (req, res) => {
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
-
-export default app;
+app.use("/api/franchise", franchiseRoutes);
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
+});
+export default app; 
