@@ -1,8 +1,4 @@
-import * as nodemailer from "nodemailer";
-
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  throw new Error("EMAIL_USER or EMAIL_PASS not defined");
-}
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -18,7 +14,7 @@ export async function sendOrderEmail(
   html: string
 ) {
   await transporter.sendMail({
-    from: `"Coffee Shop" <${process.env.EMAIL_USER}>`,
+    from: `"Coffee Shop ☕" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,
