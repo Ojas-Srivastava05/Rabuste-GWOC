@@ -1,0 +1,24 @@
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: radial-gradient(
+    circle at center,
+    #3a2a22 0%,
+    #2e211a 45%,
+    #1b120d 100%
+  );
+}
+
+.bg-gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 140px rgba(255, 251, 214, 0.08);
+}
+
+@media (max-width: 768px) {
+  .bg-gradient::after {
+    box-shadow: inset 0 0 80px rgba(255, 251, 214, 0.05);
+  }
+}

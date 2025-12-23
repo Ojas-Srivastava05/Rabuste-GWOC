@@ -3,6 +3,7 @@
 import RotatingText from "../../components/RotatingText";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import BackgroundWrapper from "../../components/background/BackgroundWrapper";
 import {
   Calendar,
   Coffee,
@@ -263,11 +264,11 @@ export default function App() {
   }, [rotatingWorkshopTexts.length]);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <BackgroundWrapper showParticles={true}>
       {/* Dynamic Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#1a0f0a] via-[#2d1810] to-[#0a0604] animate-gradient-shift">
+      {/* <div className="fixed inset-0 bg-gradient-to-br from-[#1a0f0a] via-[#2d1810] to-[#0a0604] animate-gradient-shift">
         {/* Gradient Orbs */}
-        <div
+        {/* <div
           className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-r from-amber-900/30 to-orange-800/20 blur-3xl animate-float"
           style={{
             top: "10%",
@@ -296,7 +297,7 @@ export default function App() {
               mousePosition.y * 0.015
             }px)`,
           }}
-        />
+        /> */}
 
         {/* Floating Coffee Beans */}
 
@@ -322,16 +323,16 @@ export default function App() {
         </div> */}
 
         {/* Steam Effects */}
-        <SteamEffect />
+        {/* <SteamEffect /> */}
 
         {/* Overlay Pattern */}
-        <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')]" />
-      </div>
+        {/* <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')]" />
+      </div> */}
 
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative pt-0">
         {/* Hero Section */}
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden pt-0">
           {/* Top Banner */}
           {upcomingWorkshopsWithinMonth.length > 0 && (
             <div className="relative backdrop-blur-xl bg-black/40 border-b border-amber-700/30 shadow-2xl">
@@ -910,6 +911,6 @@ export default function App() {
           animation: shine 0.6s ease-out;
         }
       `}</style>
-    </div>
+    </BackgroundWrapper>
   );
 }
