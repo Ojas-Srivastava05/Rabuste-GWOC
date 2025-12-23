@@ -89,9 +89,7 @@ export default function Navbar() {
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-6 flex-1 justify-end">
           
-          <NavButton href="/orders" bg="bg-[#B57A5A]">
-            Order
-          </NavButton>
+          
           <NavButton href="/workshops" bg="bg-[#B57A5A]">
             Workshop
           </NavButton>
