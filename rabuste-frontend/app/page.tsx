@@ -11,6 +11,7 @@ import Balatro from '@/components/bg';
 import Menu from "@/components/sections/Menu";
 import CoffeeComparison from "@/components/sections/CoffeeComparison";
 import VRGallery from "@/components/sections/VR";
+import Footer from "@/components/sections/footer"; // corrected casing to match the actual file name
 
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
@@ -59,38 +60,48 @@ export default function Home() {
 
           {/* Scroll-snap container */}
           <main
-            id="snap-main-container" /* add id so IntersectionObservers can use this scroll root */
+            id="snap-main-container"
             style={{
-              height: 'calc(100vh)',            // full viewport
-              overflowY: 'auto',                // enable scrolling inside this container
-              scrollSnapType: 'y mandatory',    // enable vertical snapping
-              scrollBehavior: 'smooth',         // smooth snap transition
-              WebkitOverflowScrolling: 'touch', // momentum scrolling on mobile
+              height: '100vh',               // required for consistent snap behavior
+              overflowY: 'auto',
+              scrollSnapType: 'y mandatory',
+              scrollBehavior: 'smooth',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: '40px'
             }}
           >
-            {/* each section wrapped so it snaps to viewport on scroll */}
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+            {/* each section must match the snap container height */}
+            <div style={{ scrollSnapAlign: 'start', height: '100vh' }}>
               <Hero />
             </div>
 
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+            <div style={{ scrollSnapAlign: 'start', height: '100vh' }}>
               <Origin />
             </div>
 
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+            <div style={{ scrollSnapAlign: 'start', height: '100vh' }}>
               <CoffeeComparison />
             </div>
 
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+            <div style={{ scrollSnapAlign: 'start', height: '100vh' }}>
               <VRGallery />
             </div>
 
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
+            <div style={{ scrollSnapAlign: 'start', height: '100vh' }}>
               <Menu />
             </div>
 
-            <div style={{ scrollSnapAlign: 'start', minHeight: '100vh' }}>
-              <Gallery />
+            {/* Gallery needs internal scrolling but must keep the direct child at 100vh for snapping */}
+            <div style={{ scrollSnapAlign: 'start', height: '100vh', display: 'flex', flexDirection: 'column' }}>
+              {/* inner area can scroll while outer snap behavior remains intact */}
+              <div style={{ flex: '1 1 auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <Gallery />
+              </div>
+            </div>
+
+            {/* footer should size to its content so it appears at the bottom of the page */}
+            <div style={{ scrollSnapAlign: 'start', minHeight: 'auto', paddingTop: '20px' }}>
+              <Footer />
             </div>
           </main>
         </>

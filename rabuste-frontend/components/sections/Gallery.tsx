@@ -1,22 +1,24 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRouter } from 'next/navigation';
+import SpringCard from '../SpringCard';
 
-gsap.registerPlugin(ScrollTrigger);
+// lightweight implementation — removed gsap/ScrollTrigger to speed up load
+// we'll use IntersectionObserver + CSS transitions instead of heavy GSAP timelines
 
+// Use public/ folder paths (leading slash) so Next.js serves them reliably
 const items = [
-  { id: '1', img: '../hero/img1.jpeg', title: 'Morning Brew' },
-  { id: '2', img: '../hero/img2.jpeg', title: 'Cozy Corner' },
-  { id: '3', img: '../hero/img3.jpeg', title: 'Perfect Pour' },
-  { id: '4', img: '../hero/img4.jpeg', title: 'Fresh Roast' },
-  { id: '5', img: '../hero/img5.jpeg', title: 'Latte Art' },
-  { id: '6', img: '../hero/img6.jpeg', title: 'Bean Selection' },
-  { id: '7', img: '../hero/img7.jpeg', title: 'Artisan Craft' },
-  { id: '8', img: '../hero/img8.jpeg', title: 'Sweet Treats' },
-  { id: '9', img: '../hero/img9.jpeg', title: 'Cafe Vibes' },
-  { id: '10', img: '../hero/img10.jpeg', title: 'Golden Hour' }
+  { id: '1', img: '/hero/img1.jpeg', title: 'Morning Brew' },
+  { id: '2', img: '/hero/img2.jpeg', title: 'Cozy Corner' },
+  { id: '3', img: '/hero/img3.jpeg', title: 'Perfect Pour' },
+  { id: '4', img: '/hero/img4.jpeg', title: 'Fresh Roast' },
+  { id: '5', img: '/hero/img5.jpeg', title: 'Latte Art' },
+  { id: '6', img: '/hero/img6.jpeg', title: 'Bean Selection' },
+  { id: '7', img: '/hero/img7.jpeg', title: 'Artisan Craft' },
+  { id: '8', img: '/hero/img8.jpeg', title: 'Sweet Treats' },
+  { id: '9', img: '/hero/img9.jpeg', title: 'Cafe Vibes' },
+  { id: '10', img: '/hero/img10.jpeg', title: 'Golden Hour' }
 ];
 
 export default function Gallery() {
@@ -25,47 +27,34 @@ export default function Gallery() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const thumbnailsRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   useEffect(() => {
     if (!sectionRef.current) return;
 
-    // Animate in when scrolled into view
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: 'top 70%',
-        once: true
-      }
+    const el = sectionRef.current;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            el.classList.add('in-view');
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    io.observe(el);
+
+    // preload a few images (lightweight) to avoid black frames on change
+    const preload = items.slice(0, 4).map((it) => {
+      const img = new Image();
+      img.src = it.img;
+      return img;
     });
 
-    tl.from('.gallery-header', {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      ease: 'power3.out'
-    })
-    .from('.gallery-main-image', {
-      opacity: 0,
-      scale: 0.9,
-      duration: 1,
-      ease: 'power3.out'
-    }, '-=0.4')
-    .from('.gallery-thumbnail', {
-      opacity: 0,
-      y: 30,
-      stagger: 0.05,
-      duration: 0.6,
-      ease: 'power3.out'
-    }, '-=0.6')
-    .from('.gallery-controls', {
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power3.out'
-    }, '-=0.4');
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
+    return () => io.disconnect();
   }, []);
 
   useEffect(() => {
@@ -102,9 +91,9 @@ export default function Gallery() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 20px',
+        padding: '40px 20px 100px', // add bottom padding so controls aren't flush to edge
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'visible' // allow page to scroll to controls / buttons
       }}
     >
       <style>{`
@@ -116,6 +105,14 @@ export default function Gallery() {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
+        }
+
+        /* springcard animation */
+        @keyframes spring {
+          0% { transform: scale(0.92) translateY(8px); opacity: 0; }
+          50% { transform: scale(1.06) translateY(-6px); opacity: 1; }
+          75% { transform: scale(0.98) translateY(2px); }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
         }
 
         @keyframes pulse-ring {
@@ -227,18 +224,83 @@ export default function Gallery() {
           }}>
             Visual Journey
           </span>
-          <h1 style={{
-            margin: '0 0 16px 0',
-            fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-0.02em'
-          }}>
-            Experience Rabuste
-          </h1>
+
+          {/* springcard wrapper for the title (clickable — navigates to /gallery) */}
+          <SpringCard>
+            <a
+              id="experience-art-link"
+              href="/gallery"
+              style={{ textDecoration: 'none', display: 'inline-block', outline: 'none' }}
+              aria-label="View Art Gallery"
+            >
+              <div
+                role="button"
+                tabIndex={0}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: '12px 18px',
+                  borderRadius: 16,
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00))',
+                  border: '1px solid rgba(196,165,116,0.12)',
+                  boxShadow: '0 10px 30px rgba(12,12,12,0.45), 0 2px 8px rgba(196,165,116,0.06)',
+                  cursor: 'pointer',
+                  transformOrigin: 'center',
+                  WebkitTapHighlightColor: 'transparent'
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter') (window.location.href = '/gallery'); }}
+              >
+                <div style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: '#c4a574',
+                  color: '#000',
+                  fontWeight: 800,
+                  fontSize: 20,
+                  flexShrink: 0
+                }}>
+                  🎨
+                </div>
+
+                <div style={{ textAlign: 'left', lineHeight: 1 }}>
+                  <h1 style={{
+                    margin: 0,
+                    fontSize: 'clamp(1.6rem, 3.6vw, 2.4rem)',
+                    fontWeight: 800,
+                    background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    letterSpacing: '-0.02em'
+                  }}>
+                    Experience art @Rabuste
+                  </h1>
+                  <div style={{ fontSize: '0.9rem', color: '#E6C9A8', opacity: 0.95, marginTop: 6 }}>
+                    View the full gallery
+                  </div>
+                </div>
+
+                <div style={{
+                  marginLeft: 12,
+                  padding: '6px 10px',
+                  borderRadius: 999,
+                  background: 'rgba(0,0,0,0.18)',
+                  color: '#c4a574',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  alignSelf: 'flex-start'
+                }}>
+                  Open
+                </div>
+              </div>
+            </a>
+          </SpringCard>
+ 
           <p style={{
             color: '#E6C9A8',
             fontSize: '1.1rem',
