@@ -4,7 +4,13 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import protectedRoutes from "./routes/protected.js";
 import franchiseRoutes from "./routes/franchise.js";
+import menuRoutes from "./routes/menu.js";
+
+
+
 const app = express();
+
+
 
 // logger
 app.use((req, res, next) => {
@@ -26,6 +32,7 @@ app.get("/", (req, res) => {
 });
 
 // routes
+app.use("/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
 app.use("/api/franchise", franchiseRoutes);
