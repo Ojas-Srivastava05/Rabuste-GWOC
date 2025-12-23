@@ -14,11 +14,13 @@ export async function POST(req: Request) {
     }
 
     const order = await Order.create({
-      customerName: data.customerName,
-      customerEmail: data.customerEmail,
-      items: data.items,
-      totalAmount: data.totalAmount,
-    });
+  customerName: data.customerName,
+  customerEmail: data.customerEmail,
+  items: data.items,
+  totalAmount: data.totalAmount,
+  instructions: data.instructions,
+});
+
 
     return NextResponse.json(order, { status: 201 });
   } catch (err) {

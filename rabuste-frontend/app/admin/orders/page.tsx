@@ -15,6 +15,7 @@ interface Order {
   totalAmount: number;
   status: "pending" | "completed";
   createdAt: string;
+  instructions?: string;
 }
 
 export default function AdminOrdersPage() {
@@ -30,17 +31,11 @@ export default function AdminOrdersPage() {
     const res = await fetch(`/api/orders/${orderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: "completed" }), // lowercase to match your schema
+      body: JSON.stringify({ status: "completed" }),
     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      console.error(err);
-    } else {
+    if (res.ok) {
       const updated = await res.json();
-      console.log("Order updated:", updated);
-
-      // Update the local orders state immediately
       setOrders((prev) =>
         prev.map((order) =>
           order._id === updated._id
@@ -56,50 +51,63 @@ export default function AdminOrdersPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6">☕ Admin – Orders</h1>
+    <div className="min-h-screen bg-[#1b120a] text-[#f3e9dc] p-6">
+      <h1 className="text-3xl font-bold mb-6 text-[#e6c9a8]">Admin – Orders</h1>
 
       <div className="space-y-4">
-        {orders.length === 0 && <p>No orders yet.</p>}
+        {orders.length === 0 && (
+          <p className="text-[#c9b8a3]">No orders yet.</p>
+        )}
 
         {orders.map((order) => (
           <div
             key={order._id}
-            className="bg-gray-800 p-4 rounded-lg shadow-md border border-gray-700"
+            className="bg-[#2b1d14] p-4 rounded-xl shadow-xl border border-[#3a2618]"
           >
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold">{order.customerName}</h2>
+              <h2 className="text-xl font-semibold text-[#f0dbc4]">
+                {order.customerName}
+              </h2>
+
               <span
-                className={`px-2 py-1 rounded-md text-sm font-medium ${
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   order.status === "pending"
-                    ? "bg-yellow-500 text-gray-900"
-                    : "bg-green-500 text-gray-900"
+                    ? "bg-[#c68642] text-[#1b120a]"
+                    : "bg-[#6f8f72] text-[#1b120a]"
                 }`}
               >
                 {order.status.toUpperCase()}
               </span>
             </div>
 
-            <p className="mb-2">Email: {order.customerEmail}</p>
+            <p className="mb-2 text-[#d6c4ae]">Email: {order.customerEmail}</p>
 
             <div className="mb-2">
-              <p className="font-semibold">Items:</p>
-              <ul className="list-disc list-inside">
+              <p className="font-semibold text-[#e6c9a8]">Items:</p>
+              <ul className="list-disc list-inside text-[#d6c4ae]">
                 {order.items.map((item, idx) => (
                   <li key={idx}>
-                    {item.name} x {item.quantity} = ₹
+                    {item.name} × {item.quantity} = ₹
                     {item.price * item.quantity}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <p className="font-semibold mb-2">Total: ₹{order.totalAmount}</p>
+            <p className="font-semibold text-[#e6c9a8] mb-2">
+              Total: ₹{order.totalAmount}
+            </p>
+
+            {order.instructions && (
+              <p className="mt-2 italic text-[#cbb59d]">
+                📝 <strong>Instructions:</strong> {order.instructions}
+              </p>
+            )}
 
             {order.status === "pending" && (
               <button
                 onClick={() => markCompleted(order._id)}
-                className="px-4 py-2 bg-amber-500 text-gray-900 font-semibold rounded-md hover:bg-amber-600"
+                className="mt-3 px-4 py-2 bg-[#c68642] text-[#1b120a] font-semibold rounded-md hover:bg-[#a9713a] transition"
               >
                 Mark Completed
               </button>
