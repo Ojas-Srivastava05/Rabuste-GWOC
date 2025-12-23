@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import DomeGallery from '../DomeGallery';
+import SpringCard from '../SpringCard';
 
 export default function Menu() {
   const [selectedItem, setSelectedItem] = useState<string>('');
@@ -60,28 +61,82 @@ export default function Menu() {
         position: 'relative',
         zIndex: 1
       }}>
-        {/* Header */}
+        {/* Header (clickable, animated via SpringCard) */}
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <h1 style={{
-            margin: '0 0 8px 0',
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-0.02em'
-          }}>
-            Our Menu
-          </h1>
-          <p style={{
-            color: '#E6C9A8',
-            fontSize: '0.9rem',
-            opacity: 0.9,
-            margin: 0
-          }}>
-            Explore our signature brews in 360° • Drag to rotate • Click to view
-          </p>
+          {/* visual/interactive card for "Our Menu" (SpringCard applied only to this element) */}
+          <SpringCard>
+            <a
+              id="our-menu-link"
+              href="/menu"
+              style={{ textDecoration: 'none', display: 'inline-block', outline: 'none' }}
+              aria-label="Open Our Menu"
+            >
+              <div
+                role="button"
+                tabIndex={0}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  padding: '12px 18px',
+                  borderRadius: 16,
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00))',
+                  border: '1px solid rgba(196,165,116,0.12)',
+                  boxShadow: '0 10px 30px rgba(12,12,12,0.45), 0 2px 8px rgba(196,165,116,0.06)',
+                  cursor: 'pointer',
+                  transformOrigin: 'center',
+                  WebkitTapHighlightColor: 'transparent'
+                }}
+              >
+                <div style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: '#c4a574',
+                  color: '#000',
+                  fontWeight: 800,
+                  fontSize: 20,
+                  flexShrink: 0
+                }}>
+                  ☕
+                </div>
+
+                <div style={{ textAlign: 'left', lineHeight: 1 }}>
+                  <h1 style={{
+                    margin: 0,
+                    fontSize: 'clamp(1.6rem, 3.6vw, 2.4rem)',
+                    fontWeight: 800,
+                    background: 'linear-gradient(135deg, #FAD0C4 0%, #c4a574 50%, #E6C9A8 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                    letterSpacing: '-0.02em'
+                  }}>
+                    Our Menu
+                  </h1>
+                  <div style={{ fontSize: '0.9rem', color: '#E6C9A8', opacity: 0.95, marginTop: 4 }}>
+                    Explore our signature brews • Interactive 3D menu
+                  </div>
+                </div>
+
+                <div style={{
+                  marginLeft: 12,
+                  padding: '6px 10px',
+                  borderRadius: 999,
+                  background: 'rgba(0,0,0,0.18)',
+                  color: '#c4a574',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  alignSelf: 'flex-start'
+                }}>
+                  Open
+                </div>
+              </div>
+            </a>
+          </SpringCard>
         </div>
 
         {/* Selected item display */}
