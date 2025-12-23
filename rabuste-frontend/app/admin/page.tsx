@@ -1,8 +1,13 @@
 "use client";
 
+import { redirect } from "next/navigation";
 import Link from "next/link";
+import { requireAdmin } from "@/lib/requireAdmin";
 
-export default function AdminHomePage() {
+export default async function AdminHomePage() {
+  const isAdmin = await requireAdmin();
+  if (!isAdmin) redirect("/");
+
   return (
     <div className="min-h-screen bg-[#1b120a] flex items-center justify-center p-6">
       <div className="w-full max-w-md bg-[#2b1d14] text-[#f3e9dc] rounded-xl shadow-xl p-6 border border-[#3a2618]">
@@ -10,19 +15,19 @@ export default function AdminHomePage() {
 
         <ul className="space-y-3">
           <li>
-            <Link
-              href="/admin/orders"
-              className="block px-4 py-2 bg-[#c68642] text-[#1b120a] font-semibold rounded-md hover:bg-[#a9713a] transition"
-            >
+            <Link href="/admin/orders" className="btn">
               Manage Orders
             </Link>
           </li>
 
           <li>
-            <Link
-              href="/admin/workshops"
-              className="block px-4 py-2 bg-[#c68642] text-[#1b120a] font-semibold rounded-md hover:bg-[#a9713a] transition"
-            >
+            <Link href="/admin/menu" className="btn">
+              Manage Menu
+            </Link>
+          </li>
+
+          <li>
+            <Link href="/admin/workshops" className="btn">
               Manage Workshops
             </Link>
           </li>
