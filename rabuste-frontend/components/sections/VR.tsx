@@ -2,6 +2,7 @@
 
 import "aframe";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // Extend JSX.IntrinsicElements to include A-Frame elements
 
@@ -94,6 +95,7 @@ export default function VRGallery() {
   const arrowRef = useRef<HTMLElement | null>(null);
   const cameraRef = useRef<any>(null);
   const skyRef = useRef<any>(null); // <-- moved inside component
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const active = walkthrough[step];
 
@@ -333,21 +335,43 @@ export default function VRGallery() {
             </div>
           )}
 
-          {/* STORY OVERLAY — only visible when in fullscreen */}
-          {isFullscreen && (
-            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-              <div className="bg-black/60 backdrop-blur-md rounded-xl px-4 py-2 text-center max-w-xs">
-                <h4 className="text-sm font-semibold text-white leading-tight">
-                  {active.title}
-                </h4>
-                <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
-                  {active.subtitle}
-                </p>
+          {/* STORY OVERLAY: render inline (absolute) when not fullscreen; portal into the fullscreen element when fullscreen */}
+          {(() => {
+            const overlay = (
+              <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[99999] pointer-events-none">
+                <div className="bg-black/60 backdrop-blur-md rounded-xl px-4 py-2 text-center max-w-xs">
+                  <h4 className="text-sm font-semibold text-white leading-tight">
+                    {active.title}
+                  </h4>
+                  <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
+                    {active.subtitle}
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            );
+
+            if (isFullscreen && typeof document !== "undefined" && document.fullscreenElement) {
+              // portal into the actual fullscreen element so it stays visible
+              return createPortal(overlay, document.fullscreenElement);
+            }
+
+            // non-fullscreen: render absolutely positioned inside the container
+            return (
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                <div className="bg-black/60 backdrop-blur-md rounded-xl px-4 py-2 text-center max-w-xs">
+                  <h4 className="text-sm font-semibold text-white leading-tight">
+                    {active.title}
+                  </h4>
+                  <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
+                    {active.subtitle}
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
 
           <div
+            ref={containerRef}
             className="w-full h-[500px] rounded-xl overflow-hidden border border-neutral-800"
             style={{ cursor: dragging ? "grabbing" : "grab" }}
             onMouseDown={onMouseDown}
@@ -425,8 +449,8 @@ export default function VRGallery() {
 
 </a-scene>
 
-          {/* STORY PROGRESS DOTS (optional) */}
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+          {/* STORY PROGRESS DOTS (only inside VR container) */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
             <div className="flex gap-1.5">
               {walkthrough.map((_, i) => (
                 <div
