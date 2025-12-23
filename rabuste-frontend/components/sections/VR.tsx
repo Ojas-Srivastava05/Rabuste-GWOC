@@ -1,198 +1,375 @@
 "use client";
 
 import "aframe";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-const scenes = [
+// Extend JSX.IntrinsicElements to include A-Frame elements
+
+/* -------------------------------
+   LINEAR WALKTHROUGH DATA
+--------------------------------*/
+const walkthrough = [
   {
-    id: "brewing",
-    title: "The Brewing Ritual",
-    subtitle: "Watch our baristas craft the perfect pour",
-    src: "/vr/brewing.png",
-    highlights: [
-      { label: "Espresso Machine", info: "Italian craftsmanship at its finest" },
-      { label: "Fresh Grinder", info: "Beans ground to perfection daily" },
-      { label: "Pour Over Station", info: "Precision brewing technique" }
-    ]
+    id: "outside-wide",
+    title: "Rabuste Awaits",
+    subtitle: "A quiet corner where stories begin",
+    src: "/vr/01-outside-wide.jpg",
+    intent: "First impression — calm, inviting, curiosity"
   },
   {
-    id: "cafe",
+    id: "outside-door",
+    title: "Closer to the Door",
+    subtitle: "Warm light spills onto the street",
+    src: "/vr/02-outside-door.jpg",
+    intent: "Anticipation — you are about to enter"
+  },
+  {
+    id: "entrance-threshold",
+    title: "The Threshold",
+    subtitle: "Step inside, leave the noise behind",
+    src: "/vr/03-entrance-threshold.jpg",
+    intent: "Transition — outside world fades"
+  },
+  {
+    id: "entrance-inside",
     title: "Inside Rabuste",
-    subtitle: "Experience the warmth of our space",
-    src: "/vr/cafe.png",
-    highlights: [
-      { label: "Cozy Seating", info: "Comfortable atmosphere for work or relaxation" },
-      { label: "Art Gallery", info: "Featuring local artists monthly" },
-      { label: "Natural Light", info: "Floor-to-ceiling windows" }
-    ]
+    subtitle: "The aroma of freshly brewed coffee",
+    src: "/vr/04-entrance-inside.jpg",
+    intent: "Arrival — first true interior moment"
   },
   {
-    id: "origin",
-    title: "From Bean to Cup",
-    subtitle: "Trace the journey of every bean",
-    src: "/vr/origin.png",
-    highlights: [
-      { label: "Ethiopian Highlands", info: "Single-origin coffee farms" },
-      { label: "Small Batch Roasting", info: "Roasted fresh weekly" },
-      { label: "Quality Control", info: "Every batch tested and cupped" }
-    ]
+    id: "seating-wide",
+    title: "The Sitting Area",
+    subtitle: "A space to pause and breathe",
+    src: "/vr/05-seating-wide.jpg",
+    intent: "Spatial understanding — openness and comfort"
   },
+  {
+    id: "seating-intimate",
+    title: "A Place to Stay",
+    subtitle: "One table, one cup, your moment",
+    src: "/vr/06-seating-intimate.jpg",
+    intent: "Intimacy — user imagines themselves sitting here"
+  },
+  {
+    id: "gallery-transition",
+    title: "Where Art Appears",
+    subtitle: "Coffee slowly meets culture",
+    src: "/vr/07-gallery-transition.jpg",
+    intent: "Shift — visual interest and curiosity"
+  },
+  {
+    id: "gallery-focus",
+    title: "The Art Gallery",
+    subtitle: "Local voices on these walls",
+    src: "/vr/08-gallery-focus.jpg",
+    intent: "Depth — brand philosophy and creativity"
+  },
+  {
+    id: "barista-wide",
+    title: "The Barista Counter",
+    subtitle: "The heart of Rabuste",
+    src: "/vr/09-barista-wide.jpg",
+    intent: "Energy — movement, machines, craft"
+  },
+  {
+    id: "barista-close",
+    title: "Crafted by Hand",
+    subtitle: "Every cup tells a story",
+    src: "/vr/10-barista-close.jpg",
+    intent: "Climax — human connection, warmth, finish"
+  }
 ];
 
-export default function VRGallery() {
-  const [active, setActive] = useState(scenes[0]);
-  const [loading, setLoading] = useState(false);
-  const [rotation, setRotation] = useState(-90);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
+// normalize base rotation once
+const BASE_ROTATION = 180;
 
+export default function VRGallery() {
+  const [step, setStep] = useState(0);
+  const [rotation, setRotation] = useState(-90);
+  const [loading, setLoading] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const startX = useRef(0);
+  const arrowRef = useRef<HTMLElement | null>(null);
+  const skyRef = useRef<any>(null); // <-- moved inside component
+
+  const active = walkthrough[step];
+
+  // useCallback so reference is stable for the DOM listener
+  const goForward = useCallback(() => {
+    if (step >= walkthrough.length - 1) return;
+
+    const sky = skyRef.current;
+    if (!sky) return;
+
+    const upcoming = Math.min(step + 1, walkthrough.length - 1);
+
+    // Fade out current sky
+    sky.setAttribute("animation__fadeout", {
+      property: "material.opacity",
+      from: 1,
+      to: 0,
+      dur: 400,
+      easing: "easeInOutQuad"
+    });
+
+    // After fade completes, commit step and swap the image, then fade in
+    setTimeout(() => {
+      setStep(upcoming);
+      // ensure src swap + fade-in happen after DOM update to avoid black frames
+      requestAnimationFrame(() => {
+        sky.setAttribute("src", walkthrough[upcoming].src);
+        sky.setAttribute("animation__fadein", {
+          property: "material.opacity",
+          from: 0,
+          to: 1,
+          dur: 400,
+          easing: "easeInOutQuad"
+        });
+      });
+      setRotation(-90);
+    }, 400);
+  }, [step]);
+
+  // backward handler ref + safe goBack (placed just below goForward)
+  const backArrowRef = useRef<HTMLElement | null>(null);
+
+  const goBack = useCallback(() => {
+    if (step <= 0) return;
+
+    const sky = skyRef.current;
+    if (!sky) return;
+
+    const previous = Math.max(step - 1, 0);
+
+    // Fade out
+    sky.setAttribute("animation__fadeout", {
+      property: "material.opacity",
+      from: 1,
+      to: 0,
+      dur: 400,
+      easing: "easeInOutQuad"
+    });
+
+    setTimeout(() => {
+      setStep(previous);
+      requestAnimationFrame(() => {
+        sky.setAttribute("src", walkthrough[previous].src);
+        sky.setAttribute("animation__fadein", {
+          property: "material.opacity",
+          from: 0,
+          to: 1,
+          dur: 400,
+          easing: "easeInOutQuad"
+        });
+      });
+      setRotation(-90);
+    }, 400);
+  }, [step]);
+
+  // attach native click listener to the A-Frame element (works reliably)
+  useEffect(() => {
+    const forward = arrowRef.current;
+    const back = backArrowRef.current;
+
+    if (forward) forward.addEventListener("click", goForward);
+    if (back) back.addEventListener("click", goBack);
+
+    return () => {
+      if (forward) forward.removeEventListener("click", goForward);
+      if (back) back.removeEventListener("click", goBack);
+    };
+  }, [goForward, goBack]);
+
+  /* -------------------------------
+     LOADING EFFECT
+  --------------------------------*/
   useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
-  }, [active]);
+    const t = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(t);
+  }, [step]);
 
-  const handleSceneChange = (scene) => {
-    if (scene.id !== active.id) {
-      setActive(scene);
-      setRotation(-90);
-    }
+  /* -------------------------------
+     FULLSCREEN DETECTION (overlay only in fullscreen)
+  --------------------------------*/
+  useEffect(() => {
+    const onChange = () => {
+      const fs =
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        null;
+      setIsFullscreen(!!fs);
+    };
+
+    document.addEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    document.addEventListener("mozfullscreenchange", onChange);
+    // initialize state
+    onChange();
+
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+      document.removeEventListener("mozfullscreenchange", onChange);
+    };
+  }, []);
+
+  /* -------------------------------
+     NEXT SKY logic removed (handled by step commit only)
+  --------------------------------*/
+  
+  /* -------------------------------
+     MOUSE DRAG ROTATION
+  --------------------------------*/
+  const onMouseDown = (e) => {
+    setDragging(true);
+    startX.current = e.clientX;
   };
 
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.clientX);
+  const onMouseMove = (e) => {
+    if (!dragging) return;
+    const delta = e.clientX - startX.current;
+    setRotation((r) => r + delta * 0.25);
+    startX.current = e.clientX;
   };
 
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      const delta = e.clientX - startX;
-      setRotation(prev => prev + delta * 0.3);
-      setStartX(e.clientX);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-
+  const stopDrag = () => setDragging(false);
 
   return (
     <section className="text-white py-16 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Compact Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-white via-[#c4a574] to-white bg-clip-text text-transparent">
+      <div className="max-w-6xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h2 className="text-4xl font-bold mb-2">
             Step Inside Rabuste
           </h2>
           <p className="text-sm text-gray-400">
-            Drag to explore in 360° and discover our story
+            Drag to look • Click arrow to move forward
           </p>
         </div>
 
-        {/* VR Viewer */}
-        <div className="relative group mb-6">
+        {/* VR Container */}
+        <div className="relative">
+
+          {/* Loading overlay */}
           {loading && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 rounded-2xl backdrop-blur-sm">
-              <div className="w-10 h-10 border-4 border-[#c4a574]/30 border-t-[#c4a574] rounded-full animate-spin" />
+            <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl">
+              <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
             </div>
           )}
 
-          <div className="absolute top-4 left-4 z-40 bg-black/70 backdrop-blur-md rounded-lg px-3 py-2 border border-[#2a2a2a]">
-            <h3 className="text-lg font-bold text-white">{active.title}</h3>
-            <p className="text-xs text-gray-400">{active.subtitle}</p>
-          </div>
-
-
-
-          <div
-            className="w-full rounded-2xl overflow-hidden border border-[#2a2a2a] shadow-2xl"
-            style={{
-              height: "500px",
-              cursor: isDragging ? "grabbing" : "grab"
-            }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            <a-scene 
-              embedded 
-              style={{ width: "100%", height: "100%" }}
-              vr-mode-ui="enabled: false"
-            >
-              <a-sky 
-                src={active.src} 
-                rotation={`0 ${rotation} 0`}
-              />
-            </a-scene>
-          </div>
-        </div>
-
-        {/* Highlight Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {active.highlights.map((highlight, index) => (
-            <div
-              key={index}
-              className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-4 hover:border-[#c4a574]/50 transition-all"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#c4a574] mt-2 flex-shrink-0" />
-                <div>
-                  <h4 className="text-sm font-semibold text-white mb-1">{highlight.label}</h4>
-                  <p className="text-xs text-gray-400">{highlight.info}</p>
-                </div>
+          {/* STORY OVERLAY — only visible when in fullscreen */}
+          {isFullscreen && (
+            <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+              <div className="bg-black/60 backdrop-blur-md rounded-xl px-4 py-2 text-center max-w-xs">
+                <h4 className="text-sm font-semibold text-white leading-tight">
+                  {active.title}
+                </h4>
+                <p className="text-[11px] text-gray-300 leading-snug mt-0.5">
+                  {active.subtitle}
+                </p>
               </div>
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* Scene Selector */}
-        <div className="flex justify-center gap-3 flex-wrap">
-          {scenes.map((scene) => (
-            <button
-              key={scene.id}
-              onClick={() => handleSceneChange(scene)}
-              className={`px-5 py-3 rounded-xl transition-all duration-300 border ${
-                active.id === scene.id
-                  ? "bg-gradient-to-br from-[#4a2825] to-[#3a1f1c] border-[#c4a574] shadow-lg shadow-[#c4a574]/20"
-                  : "bg-[#1a1a1a] border-[#2a2a2a] hover:border-[#c4a574]/50"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                  active.id === scene.id 
-                    ? "bg-[#c4a574] text-black" 
-                    : "bg-[#252525] text-gray-400"
-                }`}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div className="text-left">
-                  <p className={`text-sm font-semibold ${
-                    active.id === scene.id ? "text-white" : "text-gray-300"
-                  }`}>
-                    {scene.title}
-                  </p>
-                </div>
-              </div>
-            </button>
-          ))}
+          <div
+            className="w-full h-[500px] rounded-xl overflow-hidden border border-neutral-800"
+            style={{ cursor: dragging ? "grabbing" : "grab" }}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={stopDrag}
+            onMouseLeave={stopDrag}
+          >
+<a-scene
+  embedded
+  vr-mode-ui="enabled: false"
+  cursor="rayOrigin: mouse"
+  raycaster="objects: .clickable"
+>
+
+  {/* CAMERA (REQUIRED) */}
+  <a-entity
+    id="camera"
+    camera
+    position="0 0 0"
+  ></a-entity>
+
+  {/* 360 IMAGE */}
+{/* CURRENT SKY */}
+<a-sky
+  ref={skyRef}
+  src={active.src}
+  rotation={`0 ${BASE_ROTATION + rotation} 0`}
+  material="opacity: 1; transparent: true"
+  scale="1 1 1"
+/>
+
+{/* (next-sky removed — only current sky is rendered; nextStep/nextSkyRef eliminated) */}
+
+  {/* ARROWS STACKED VERTICALLY: BACK above FORWARD (swapped Y so forward sits above) */}
+  {step > 0 && (
+    <>
+      <a-image
+        src="/vr/arrow-backward.png"
+        position="0 -1.8 -3"
+        scale="0.7 0.7 0.7"
+        look-at="#camera"
+        material="transparent: true; opacity: 0.85; depthTest: false;"
+      />
+      <a-entity
+        ref={backArrowRef}
+        geometry="primitive: plane; width: 1.2; height: 1.2"
+        position="0 -1.8 -3"
+        look-at="#camera"
+        class="clickable"
+        material="opacity: 0"
+      />
+    </>
+  )}
+
+  {step < walkthrough.length - 1 && (
+    <>
+      <a-image
+        src="/vr/arrow-forward.png"
+        position="0 -1.0 -3"
+        scale="0.7 0.7 0.7"
+        look-at="#camera"
+        material="transparent: true; opacity: 0.9; depthTest: false;"
+      />
+      <a-entity
+        ref={arrowRef}
+        geometry="primitive: plane; width: 1.4; height: 1.4"
+        position="0 -1.0 -3"
+        look-at="#camera"
+        class="clickable"
+        material="opacity: 0"
+      />
+    </>
+  )}
+
+</a-scene>
+
+          {/* STORY PROGRESS DOTS (optional) */}
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+            <div className="flex gap-1.5">
+              {walkthrough.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === step ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-      `}</style>
     </section>
   );
 }
