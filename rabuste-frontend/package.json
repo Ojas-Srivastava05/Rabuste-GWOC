@@ -28,6 +28,7 @@
     "motion": "^12.23.26",
     "next": "16.0.10",
     "nice-color-palettes": "^4.0.0",
+    "nodemailer": "^7.0.12",
     "ogl": "^1.0.11",
     "react": "19.2.1",
     "react-dom": "19.2.1",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.23",
