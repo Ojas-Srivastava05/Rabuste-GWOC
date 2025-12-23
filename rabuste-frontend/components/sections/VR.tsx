@@ -133,6 +133,7 @@ export default function VRGallery() {
     });
 
     // PHASE 2 — commit & settle
+    // add a tiny pause (20ms) before the fade-in to produce a subtle blink
     setTimeout(() => {
       setStep(next);
       setRotation(-90);
@@ -164,7 +165,7 @@ export default function VRGallery() {
           easing: "easeOutCubic"
         });
       });
-    }, 300);
+    }, 320);
   }, [step]);
 
   // backward handler ref + safe goBack (placed just below goForward)
@@ -235,7 +236,7 @@ export default function VRGallery() {
           easing: "easeOutCubic"
         });
       });
-    }, 300);
+    }, 320);
   }, [step]);
 
   // attach native click listener to the A-Frame element (works reliably)
