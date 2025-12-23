@@ -92,6 +92,7 @@ export default function VRGallery() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const startX = useRef(0);
   const arrowRef = useRef<HTMLElement | null>(null);
+  const cameraRef = useRef<any>(null);
   const skyRef = useRef<any>(null); // <-- moved inside component
 
   const active = walkthrough[step];
@@ -101,35 +102,69 @@ export default function VRGallery() {
     if (step >= walkthrough.length - 1) return;
 
     const sky = skyRef.current;
-    if (!sky) return;
+    const cam = cameraRef.current;
+    if (!sky || !cam) return;
 
-    const upcoming = Math.min(step + 1, walkthrough.length - 1);
+    const next = step + 1;
 
-    // Fade out current sky
+    // PHASE 1 — lean into motion
     sky.setAttribute("animation__fadeout", {
       property: "material.opacity",
       from: 1,
       to: 0,
-      dur: 400,
-      easing: "easeInOutQuad"
+      dur: 300,
+      easing: "easeInQuad"
     });
 
-    // After fade completes, commit step and swap the image, then fade in
+    cam.setAttribute("animation__fov", {
+      property: "camera.fov",
+      from: 78,
+      to: 88,
+      dur: 300,
+      easing: "easeInQuad"
+    });
+
+    cam.setAttribute("animation__yaw", {
+      property: "rotation.y",
+      from: 0,
+      to: 4,
+      dur: 300,
+      easing: "easeInQuad"
+    });
+
+    // PHASE 2 — commit & settle
     setTimeout(() => {
-      setStep(upcoming);
-      // ensure src swap + fade-in happen after DOM update to avoid black frames
+      setStep(next);
+      setRotation(-90);
+
       requestAnimationFrame(() => {
-        sky.setAttribute("src", walkthrough[upcoming].src);
+        sky.setAttribute("src", walkthrough[next].src);
+
         sky.setAttribute("animation__fadein", {
           property: "material.opacity",
           from: 0,
           to: 1,
-          dur: 400,
-          easing: "easeInOutQuad"
+          dur: 450,
+          easing: "easeOutCubic"
+        });
+
+        cam.setAttribute("animation__fov", {
+          property: "camera.fov",
+          from: 88,
+          to: 78,
+          dur: 450,
+          easing: "easeOutCubic"
+        });
+
+        cam.setAttribute("animation__yaw", {
+          property: "rotation.y",
+          from: 4,
+          to: 0,
+          dur: 450,
+          easing: "easeOutCubic"
         });
       });
-      setRotation(-90);
-    }, 400);
+    }, 300);
   }, [step]);
 
   // backward handler ref + safe goBack (placed just below goForward)
@@ -139,33 +174,68 @@ export default function VRGallery() {
     if (step <= 0) return;
 
     const sky = skyRef.current;
-    if (!sky) return;
+    const cam = cameraRef.current;
+    if (!sky || !cam) return;
 
-    const previous = Math.max(step - 1, 0);
+    const prev = step - 1;
 
-    // Fade out
+    // PHASE 1 — pull back
     sky.setAttribute("animation__fadeout", {
       property: "material.opacity",
       from: 1,
       to: 0,
-      dur: 400,
-      easing: "easeInOutQuad"
+      dur: 300,
+      easing: "easeInQuad"
+    });
+
+    cam.setAttribute("animation__fov", {
+      property: "camera.fov",
+      from: 78,
+      to: 70,
+      dur: 300,
+      easing: "easeInQuad"
+    });
+
+    cam.setAttribute("animation__yaw", {
+      property: "rotation.y",
+      from: 0,
+      to: -4,
+      dur: 300,
+      easing: "easeInQuad"
     });
 
     setTimeout(() => {
-      setStep(previous);
+      setStep(prev);
+      setRotation(-90);
+
       requestAnimationFrame(() => {
-        sky.setAttribute("src", walkthrough[previous].src);
+        sky.setAttribute("src", walkthrough[prev].src);
+
         sky.setAttribute("animation__fadein", {
           property: "material.opacity",
           from: 0,
           to: 1,
-          dur: 400,
-          easing: "easeInOutQuad"
+          dur: 450,
+          easing: "easeOutCubic"
+        });
+
+        cam.setAttribute("animation__fov", {
+          property: "camera.fov",
+          from: 70,
+          to: 78,
+          dur: 450,
+          easing: "easeOutCubic"
+        });
+
+        cam.setAttribute("animation__yaw", {
+          property: "rotation.y",
+          from: -4,
+          to: 0,
+          dur: 450,
+          easing: "easeOutCubic"
         });
       });
-      setRotation(-90);
-    }, 400);
+    }, 300);
   }, [step]);
 
   // attach native click listener to the A-Frame element (works reliably)
@@ -294,7 +364,8 @@ export default function VRGallery() {
   {/* CAMERA (REQUIRED) */}
   <a-entity
     id="camera"
-    camera
+    ref={cameraRef}
+    camera="fov: 78"
     position="0 0 0"
   ></a-entity>
 
