@@ -1,14 +1,14 @@
 import express from "express";
-import authMiddleware from "../middleware/authMiddleware.js";
-import adminMiddleware from "../middleware/adminMiddleware.js";
-import {getAllUsers} from "../controllers/admin.controller";
+import * as menu from "../controllers/menu.controller.js";
+import auth from "../middleware/authMiddleware.js";
+import admin from "../middleware/adminMiddleware.js";
 
-const router=express.Router();
-router.get(
-    "/users",
-    authMiddleware,
-    adminMiddleware,
-    getAllUsers
-);
+const router = express.Router();
+
+router.post("/menu", auth, admin, menu.addMenuItem);
+router.get("/menu", auth, admin, menu.getAllMenuItems);
+router.get("/menu/:id", auth, admin, menu.getMenuItemById);
+router.put("/menu/:id", auth, admin, menu.updateMenuItem);
+router.delete("/menu/:id", auth, admin, menu.deleteMenuItem);
 
 export default router;
