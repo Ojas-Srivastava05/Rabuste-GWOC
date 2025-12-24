@@ -1,13 +1,19 @@
 import express from "express";
 import cors from "cors";
 
+/*}
 import authRoutes from "./routes/auth.js";
 import protectedRoutes from "./routes/protected.js";
 import franchiseRoutes from "./routes/franchise.js";
 import menuRoutes from "./routes/menu.js";
+*/
+import adminRoutes from "./routes/admin.routes.js";
+import adminMenuRoutes from "./routes/admin.menu.routes.js"
 
+app.use("/api/admin",adminRoutes);
+app.use("/api/admin",adminMenuRoutes);
 
-
+/*
 const app = express();
 
 
@@ -38,3 +44,4 @@ app.use("/api/protected", protectedRoutes);
 app.use("/api/franchise", franchiseRoutes);
 
 export default app; 
+*/
