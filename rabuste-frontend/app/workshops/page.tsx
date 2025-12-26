@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@/components/Navbar";
 import RotatingText from "../../components/RotatingText";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -263,12 +264,14 @@ export default function App() {
   }, [rotatingWorkshopTexts.length]);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Dynamic Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#1a0f0a] via-[#2d1810] to-[#0a0604] animate-gradient-shift">
-        {/* Gradient Orbs */}
+    <>
+      <Navbar />
+      <div className="min-h-screen relative overflow-hidden" style={{ background: '#000000' }}>
+        {/* Dynamic Animated Background */}
+        <div className="fixed inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#141414] to-[#000000] animate-gradient-shift">
+        {/* Gradient Orbs - Copper/Bronze theme */}
         <div
-          className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-r from-amber-900/30 to-orange-800/20 blur-3xl animate-float"
+          className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-r from-[#B87333]/20 to-[#733635]/15 blur-3xl animate-float"
           style={{
             top: "10%",
             left: "20%",
@@ -278,7 +281,7 @@ export default function App() {
           }}
         />
         <div
-          className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-r from-yellow-900/20 to-amber-900/30 blur-3xl animate-float-delayed"
+          className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#CD7F32]/15 to-[#B87333]/20 blur-3xl animate-float-delayed"
           style={{
             bottom: "20%",
             right: "15%",
@@ -288,7 +291,7 @@ export default function App() {
           }}
         />
         <div
-          className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-orange-900/25 to-red-900/15 blur-3xl animate-float-slow"
+          className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-[#733635]/20 to-[#592720]/10 blur-3xl animate-float-slow"
           style={{
             top: "50%",
             right: "30%",
@@ -334,20 +337,20 @@ export default function App() {
         <div className="relative overflow-hidden">
           {/* Top Banner */}
           {upcomingWorkshopsWithinMonth.length > 0 && (
-            <div className="relative backdrop-blur-xl bg-black/40 border-b border-amber-700/30 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-900/20 via-orange-800/20 to-amber-900/20 animate-shimmer" />
+            <div className="relative backdrop-blur-xl bg-black/40 border-b border-[#B87333]/30 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#B87333]/15 via-[#CD7F32]/15 to-[#B87333]/15 animate-shimmer" />
 
               <div className="relative py-4 md:py-6 px-6 md:px-12">
                 <div className="flex items-center justify-center mb-2">
-                  <Sparkles className="w-4 h-4 text-amber-400 mr-2 animate-pulse" />
-                  <h2 className="text-sm md:text-base font-semibold text-amber-200/90 tracking-[0.3em] uppercase">
+                  <Sparkles className="w-4 h-4 text-[#B87333] mr-2 animate-pulse" />
+                  <h2 className="text-sm md:text-base font-semibold text-[#FFFEF9]/90 tracking-[0.3em] uppercase" style={{ fontFamily: 'var(--font-heading)' }}>
                     Upcoming Experiences
                   </h2>
                   <Sparkles className="w-4 h-4 text-amber-400 ml-2 animate-pulse" />
                 </div>
 
                 <div className="flex justify-center items-center mt-2 md:mt-4">
-                  <div className="px-6 py-2 bg-gradient-to-r from-amber-900/40 to-orange-900/40 backdrop-blur-sm text-amber-100 text-xs md:text-sm font-medium rounded-full border border-amber-600/30 shadow-xl transition-all duration-500 animate-fade-in">
+                  <div className="px-6 py-2 bg-gradient-to-r from-[#B87333]/30 to-[#CD7F32]/30 backdrop-blur-sm text-[#FFFEF9] text-xs md:text-sm font-medium border border-[#B87333]/30 shadow-xl transition-all duration-500 animate-fade-in">
                     <RotatingText
                       texts={
                         rotatingWorkshopTexts.length
@@ -402,18 +405,18 @@ export default function App() {
               </div> */}
 
               {/* Main Title */}
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 animate-fade-in-up">
-                <span className="bg-gradient-to-r from-amber-200 via-amber-100 to-orange-200 bg-clip-text text-transparent drop-shadow-2xl">
-                  The Robusta
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 animate-fade-in-up" style={{ fontFamily: 'var(--font-heading)' }}>
+                <span className="gradient-copper drop-shadow-2xl">
+                  THE ROBUSTA
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-orange-200 via-amber-200 to-yellow-100 bg-clip-text text-transparent drop-shadow-2xl">
-                  Assemblée
+                <span style={{ color: '#FFFEF9' }} className="drop-shadow-2xl">
+                  ASSEMBLÉE
                 </span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-base sm:text-lg md:text-xl text-amber-200/80 max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up animation-delay-400">
+              <p className="text-base sm:text-lg md:text-xl text-[#B87333] max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up animation-delay-400">
                 A curated calendar of intimate workshops and gallery evenings
                 <br />
                 for connoisseurs who savour art, aroma, and refined
@@ -910,6 +913,7 @@ export default function App() {
           animation: shine 0.6s ease-out;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }
