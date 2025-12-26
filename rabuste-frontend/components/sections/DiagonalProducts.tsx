@@ -12,22 +12,25 @@ export default function DiagonalProducts() {
 
   const products = [
     {
-      name: 'Single Origin Espresso',
-      desc: 'Pure intensity, dark chocolate notes',
+      name: 'POWER SHOT',
+      desc: 'Double Robusta espresso. Maximum caffeine. Pure strength.',
       price: '₹140',
-      image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&q=90',
+      image: 'https://pixabay.com/get/gb3d8841ad2ff4736b3af62072b3c326fecd7a775e03243a9b409a82bd0a6958a69b2acc168a8b3e05ddb7fc4001888d2.png',
+      badge: '2X CAFFEINE',
     },
     {
-      name: 'Cold Brew Reserve',
-      desc: 'Smooth 18-hour cold extraction',
+      name: 'DARK REIGN',
+      desc: '20-hour cold brew. Bold, intense, unforgiving.',
       price: '₹220',
-      image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800&q=90',
+      image: 'https://pixabay.com/get/g4f71354e1832cd2ac2563e2a095f1b2884e004f01274147bd39dc92ae817f4a010da4494bd4c85888e40e70af7da7fcb.jpg',
+      badge: 'COLD BREW',
     },
     {
-      name: 'Signature Latte',
-      desc: 'Velvety perfection in every sip',
+      name: 'BRUTAL LATTE',
+      desc: 'Thick, rich, powerful. Not for the weak.',
       price: '₹180',
-      image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=800&q=90',
+      image: 'https://images.unsplash.com/photo-1575280112131-b69021e70471?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTAwNDR8MHwxfHNlYXJjaHw1fHxtYXNjdWxpbmUlMjBjb2ZmZWUlMjBjdXAlMjB3aXRoJTIwc3RlYW0lMkMlMjBkYXJrJTIwbW9vZHklMjBsaWdodGluZyUyQyUyMGJvbGQlMjBjb21wb3NpdGlvbiUyQyUyMHN0cmVuZ3RoJTIwYW5kJTIwcG93ZXJ8ZW58MHwxfHxibGFja3wxNzY2NzU3NzQzfDA&ixlib=rb-4.1.0&q=85',
+      badge: 'SIGNATURE',
     },
   ];
 
@@ -36,7 +39,7 @@ export default function DiagonalProducts() {
       ref={ref}
       className="section"
       style={{ 
-        background: 'linear-gradient(180deg, #141414 0%, #0A0A0A 100%)',
+        background: 'linear-gradient(180deg, #000000 0%, #0A0A0A 100%)',
       }}
     >
       <div className="container px-6">
@@ -48,28 +51,27 @@ export default function DiagonalProducts() {
           className="mb-24 max-w-4xl"
         >
           <div className="flex items-center gap-4 mb-8">
-            <div className="gold-line" />
-            <span className="section-label">Signature Collection</span>
+            <div className="copper-line" />
+            <span className="section-label">POWER MENU</span>
           </div>
           
           <h2 
             className="mb-6"
             style={{
-              color: '#F5F1E8',
-              fontWeight: 200,
+              color: '#FFFEF9',
+              fontWeight: 400,
             }}
           >
-            Masterfully
+            FUEL YOUR
             <br />
-            <span className="gradient-text">Crafted</span>
+            <span className="gradient-copper">AMBITION</span>
           </h2>
           
           <p 
             className="text-lg md:text-xl max-w-2xl"
-            style={{ color: '#8B6F47', lineHeight: 1.7 }}
+            style={{ color: '#B87333', lineHeight: 1.7, fontWeight: 500 }}
           >
-            Each cup is a testament to our dedication to quality. 
-            Premium beans, expert roasting, precise brewing.
+            Premium Robusta. Expertly roasted. Unapologetically intense.
           </p>
         </motion.div>
 
@@ -88,8 +90,7 @@ export default function DiagonalProducts() {
                 className="relative overflow-hidden mb-6"
                 style={{
                   aspectRatio: '4/5',
-                  border: '1px solid rgba(201, 168, 106, 0.15)',
-                  borderRadius: '4px',
+                  border: '2px solid rgba(184, 115, 51, 0.2)',
                 }}
               >
                 <img
@@ -102,23 +103,37 @@ export default function DiagonalProducts() {
                 <div 
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
-                    background: 'linear-gradient(180deg, transparent 0%, rgba(10, 10, 10, 0.8) 100%)',
+                    background: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.9) 100%)',
                   }}
                 />
+
+                {/* Badge */}
+                <div 
+                  className="absolute top-6 left-6 px-4 py-2"
+                  style={{
+                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                    color: '#000000',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '11px',
+                    letterSpacing: '0.15em',
+                    fontWeight: 400,
+                  }}
+                >
+                  {product.badge}
+                </div>
 
                 {/* Price badge */}
                 <div 
                   className="absolute top-6 right-6 px-5 py-3"
                   style={{
-                    background: 'rgba(10, 10, 10, 0.9)',
+                    background: 'rgba(0, 0, 0, 0.95)',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(201, 168, 106, 0.3)',
-                    borderRadius: '2px',
+                    border: '2px solid rgba(184, 115, 51, 0.5)',
                   }}
                 >
                   <span 
-                    className="text-xl gradient-text"
-                    style={{ fontFamily: 'var(--font-heading)', fontWeight: 300 }}
+                    className="text-xl gradient-copper"
+                    style={{ fontFamily: 'var(--font-heading)', fontWeight: 400 }}
                   >
                     {product.price}
                   </span>
@@ -128,21 +143,22 @@ export default function DiagonalProducts() {
               {/* Content */}
               <div className="space-y-4">
                 <h3 
-                  className="text-2xl"
+                  className="text-2xl mb-3"
                   style={{
                     fontFamily: 'var(--font-heading)',
-                    color: '#F5F1E8',
-                    fontWeight: 300,
+                    color: '#FFFEF9',
+                    fontWeight: 400,
+                    letterSpacing: '0.05em',
                   }}
                 >
                   {product.name}
                 </h3>
                 
                 <p 
-                  className="text-sm"
+                  className="text-sm mb-6"
                   style={{
                     color: '#8B6F47',
-                    lineHeight: 1.6,
+                    lineHeight: 1.7,
                   }}
                 >
                   {product.desc}
@@ -150,13 +166,16 @@ export default function DiagonalProducts() {
 
                 <button
                   onClick={() => router.push('/menu')}
-                  className="inline-flex items-center gap-2 text-sm uppercase tracking-widest transition-all duration-300 group-hover:gap-4"
+                  className="inline-flex items-center gap-3 text-xs uppercase tracking-wider transition-all duration-300 group-hover:gap-5 px-6 py-3"
                   style={{
-                    color: '#C9A86A',
+                    color: '#000000',
+                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                     fontFamily: 'var(--font-heading)',
+                    fontWeight: 400,
+                    letterSpacing: '0.15em',
                   }}
                 >
-                  Order Now
+                  ORDER NOW
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </button>
               </div>

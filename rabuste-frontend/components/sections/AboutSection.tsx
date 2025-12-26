@@ -12,7 +12,7 @@ export default function AboutSection() {
       id="about"
       ref={ref}
       className="section"
-      style={{ background: '#1E1E1E' }}
+      style={{ background: '#0A0A0A' }}
     >
       <div className="container px-6">
         <div className="grid lg:grid-cols-12 gap-16 items-center">
@@ -53,32 +53,32 @@ export default function AboutSection() {
             className="lg:col-span-5 space-y-8"
           >
             <div className="flex items-center gap-4">
-              <div className="gold-line" />
-              <span className="section-label">Our Legacy</span>
+              <div className="copper-line" />
+              <span className="section-label">THE RABUSTE WAY</span>
             </div>
 
             <h2 
               style={{
-                color: '#F5F1E8',
-                fontWeight: 200,
+                color: '#FFFEF9',
+                fontWeight: 400,
               }}
             >
-              Fifteen Years of
+              FIFTEEN YEARS
               <br />
-              <span className="gradient-text">Excellence</span>
+              <span className="gradient-copper">UNCOMPROMISED</span>
             </h2>
             
             <div className="space-y-6">
               <p 
                 className="text-base md:text-lg"
                 style={{ 
-                  color: '#C9A86A',
+                  color: '#B87333',
                   lineHeight: 1.8,
+                  fontWeight: 500,
                 }}
               >
-                What began as a passion for exceptional coffee has evolved into 
-                a destination for connoisseurs who appreciate the bold, distinctive 
-                character of premium Robusta beans.
+                We don't follow trends. We set standards. For 15 years, we've 
+                championed Robusta when the world dismissed it as "inferior."
               </p>
               
               <p 
@@ -88,32 +88,34 @@ export default function AboutSection() {
                   lineHeight: 1.8,
                 }}
               >
-                Every bean is carefully sourced from the finest plantations, 
-                roasted in small batches to perfection, and brewed with precision 
-                by our expert baristas.
+                Every bean is sourced from elite plantations, roasted to unlock 
+                maximum strength, and brewed with industrial precision. 
+                No compromise. No weakness. Just pure power.
               </p>
             </div>
 
             {/* Features grid */}
             <div className="grid grid-cols-2 gap-6 pt-4">
               {[
-                { label: 'Premium Beans' },
-                { label: 'Expert Roasting' },
-                { label: 'Artisan Craft' },
-                { label: 'Daily Fresh' },
+                { label: 'ZERO COMPROMISE' },
+                { label: 'MAXIMUM CAFFEINE' },
+                { label: 'BRUTAL STRENGTH' },
+                { label: 'DAILY FRESH' },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div 
                     className="w-1 h-8"
                     style={{
-                      background: 'linear-gradient(180deg, #C9A86A, transparent)',
+                      background: 'linear-gradient(180deg, #B87333, transparent)',
                     }}
                   />
                   <span 
-                    className="text-sm uppercase tracking-wide"
+                    className="text-xs uppercase tracking-wider"
                     style={{
-                      color: '#C9A86A',
+                      color: '#B87333',
                       fontFamily: 'var(--font-heading)',
+                      fontWeight: 400,
+                      letterSpacing: '0.15em',
                     }}
                   >
                     {feature.label}

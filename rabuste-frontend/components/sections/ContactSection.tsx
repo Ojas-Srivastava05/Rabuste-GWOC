@@ -35,7 +35,7 @@ export default function ContactSection() {
     <section
       ref={ref}
       className="section"
-      style={{ background: '#1E1E1E' }}
+      style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #000000 100%)' }}
     >
       
       <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -47,33 +47,24 @@ export default function ContactSection() {
           className="text-center mb-16"
         >
           <div className="flex items-center justify-center gap-4 mb-6">
-            <div 
-              className="w-12 h-px"
-              style={{ background: 'linear-gradient(90deg, transparent, #C9A86A)' }}
-            />
-            <span 
-              className="text-xs uppercase tracking-[0.2em] font-light"
-              style={{ color: '#A67C52' }}
-            >
-              Get In Touch
+            <div className="copper-line" />
+            <span className="section-label">
+              CONNECT WITH US
             </span>
-            <div 
-              className="w-12 h-px"
-              style={{ background: 'linear-gradient(90deg, #C9A86A, transparent)' }}
-            />
+            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
           </div>
 
           <h2 
             className="mb-6"
             style={{
-              color: '#F5F1E8',
+              color: '#FFFEF9',
               fontFamily: 'var(--font-heading)',
-              fontWeight: 200,
+              fontWeight: 400,
             }}
           >
-            Visit Our
+            VISIT THE
             <br />
-            <span className="gradient-text">Space</span>
+            <span className="gradient-copper">POWERHOUSE</span>
           </h2>
         </motion.div>
 
@@ -86,23 +77,26 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               whileHover={{ y: -8 }}
-              className="elegant-card p-6"
+              className="brutal-card p-6"
             >
               <div 
                 className="w-10 h-10 rounded-sm flex items-center justify-center mb-4"
                 style={{
-                  background: 'rgba(201, 168, 106, 0.1)',
-                  color: '#C9A86A',
+                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(115, 54, 53, 0.2))',
+                  border: '2px solid rgba(184, 115, 51, 0.3)',
+                  color: '#B87333',
                 }}
               >
                 {info.icon}
               </div>
               
               <h3 
-                className="text-lg font-light mb-3"
+                className="text-lg mb-3"
                 style={{
-                  color: '#F5F1E8',
+                  color: '#FFFEF9',
                   fontFamily: 'var(--font-heading)',
+                  fontWeight: 400,
+                  letterSpacing: '0.08em',
                 }}
               >
                 {info.title}

@@ -19,10 +19,10 @@ export default function Navbar() {
     <nav
       className="w-full py-5 px-6 md:px-12 relative"
       style={{ 
-        fontFamily: "'Josefin Sans', sans-serif",
-        background: 'rgba(10, 10, 10, 0.95)',
+        fontFamily: "'Work Sans', sans-serif",
+        background: 'rgba(0, 0, 0, 0.98)',
         backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(201, 168, 106, 0.1)',
+        borderBottom: '2px solid rgba(184, 115, 51, 0.2)',
         position: 'fixed',
         top: 0,
         left: 0,
@@ -48,7 +48,7 @@ export default function Navbar() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((s) => !s)}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-sm bg-transparent border border-[#C9A86A] text-[#C9A86A] hover:bg-[#C9A86A] hover:text-[#0A0A0A] transition"
+            className="inline-flex items-center justify-center w-10 h-10 bg-transparent border-2 border-[#B87333] text-[#B87333] hover:bg-[#B87333] hover:text-[#000000] transition"
             type="button"
           >
             <svg
@@ -83,11 +83,11 @@ export default function Navbar() {
           aria-hidden={false}
         >
           <Link href="/" aria-label="Home">
-            <div className="h-10 w-10 md:h-12 md:w-12 rounded-sm flex items-center justify-center cursor-pointer"
+            <div className="h-10 w-10 md:h-12 md:w-12 flex items-center justify-center cursor-pointer"
               style={{
-                background: 'linear-gradient(135deg, #8B6F47 0%, #C9A86A 100%)',
-                border: '1px solid rgba(201, 168, 106, 0.3)',
-                boxShadow: '0 4px 12px rgba(201, 168, 106, 0.3)',
+                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                border: '2px solid rgba(184, 115, 51, 0.4)',
+                boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
               }}
             >
               <Image
