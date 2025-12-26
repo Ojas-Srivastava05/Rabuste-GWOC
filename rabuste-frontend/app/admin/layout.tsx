@@ -11,27 +11,27 @@ type Props = {
 export default function AdminLayout({ children }: Props) {
   const router = useRouter();
 
-  useEffect(() => {
-    // Get token & user from localStorage
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+  // useEffect(() => {
+  //   // Get token & user from localStorage
+  //   const token = localStorage.getItem("token");
+  //   const user = localStorage.getItem("user");
 
-    if (!token || !user) {
-      router.push("/auth");
-      return;
-    }
+  //   if (!token || !user) {
+  //     router.push("/auth");
+  //     return;
+  //   }
 
-    try {
-      const parsedUser = JSON.parse(user);
+  //   try {
+  //     const parsedUser = JSON.parse(user);
 
-      // check admin role
-      if (parsedUser.role !== "admin") {
-        router.push("/");
-      }
-    } catch (err) {
-      router.push("/auth");
-    }
-  }, [router]);
+  //     // check admin role
+  //     if (parsedUser.role !== "admin") {
+  //       router.push("/");
+  //     }
+  //   } catch (err) {
+  //     router.push("/auth");
+  //   }
+  // }, [router]);
 
   return (
     <div className="flex min-h-screen bg-[#f8f5f2]">
@@ -62,9 +62,7 @@ export default function AdminLayout({ children }: Props) {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        {children}
-      </main>
+      <main className="flex-1 p-6 overflow-y-auto">{children}</main>
     </div>
   );
 }
