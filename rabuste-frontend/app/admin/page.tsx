@@ -1,37 +1,42 @@
-"use client";
-
-import { redirect } from "next/navigation";
-import Link from "next/link";
-import { requireAdmin } from "@/lib/requireAdmin";
-
-export default async function AdminHomePage() {
-  const isAdmin = await requireAdmin();
-  if (!isAdmin) redirect("/");
-
+export default function AdminPage() {
   return (
-    <div className="min-h-screen bg-[#1b120a] flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-[#2b1d14] text-[#f3e9dc] rounded-xl shadow-xl p-6 border border-[#3a2618]">
-        <h1 className="text-2xl font-bold mb-4 text-[#e6c9a8]">Admin Panel</h1>
+    <div>
+      {/* Page heading */}
+      <h1 className="text-2xl font-bold mb-6 text-[#2e211a]">
+        Admin Dashboard
+      </h1>
 
-        <ul className="space-y-3">
-          <li>
-            <Link href="/admin/orders" className="btn">
-              Manage Orders
-            </Link>
-          </li>
+      {/* Quick actions / links */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a
+          href="/admin/orders"
+          className="bg-[#3a2618] text-[#fffbd6] p-6 rounded-lg border border-[#4a3325] hover:shadow-lg transition"
+        >
+          <h2 className="text-lg font-semibold">Orders</h2>
+          <p className="text-sm text-[#e6d8c6] mt-1">
+            View and assign order slots
+          </p>
+        </a>
 
-          <li>
-            <Link href="/admin/menu" className="btn">
-              Manage Menu
-            </Link>
-          </li>
+        <a
+          href="/admin/menu"
+          className="bg-[#3a2618] text-[#fffbd6] p-6 rounded-lg border border-[#4a3325] hover:shadow-lg transition"
+        >
+          <h2 className="text-lg font-semibold">Menu</h2>
+          <p className="text-sm text-[#e6d8c6] mt-1">
+            Manage menu items & stock
+          </p>
+        </a>
 
-          <li>
-            <Link href="/admin/workshops" className="btn">
-              Manage Workshops
-            </Link>
-          </li>
-        </ul>
+        <a
+          href="/admin/workshops"
+          className="bg-[#3a2618] text-[#fffbd6] p-6 rounded-lg border border-[#4a3325] hover:shadow-lg transition"
+        >
+          <h2 className="text-lg font-semibold">Workshops</h2>
+          <p className="text-sm text-[#e6d8c6] mt-1">
+            Create and manage workshops
+          </p>
+        </a>
       </div>
     </div>
   );
