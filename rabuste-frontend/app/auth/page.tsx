@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import Background from "@/components/sections/bg_login";
+import Navbar from "@/components/Navbar";
+import BackgroundPattern from "@/components/BackgroundPattern";
+import { Coffee, Zap, Shield } from "lucide-react";
 
 const isStrongPassword = (password: string) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
@@ -54,9 +56,9 @@ export default function AuthPage() {
 
       if (isLogin) {
         localStorage.setItem("token", data.token);
-        router.push("/"); // redirect to home
+        router.push("/");
       } else {
-        setInfo("📩 Verify your email to activate your account");
+        setInfo("Check your email to verify your account");
         setForm({ name: "", email: "", password: "" });
       }
     } catch (err: unknown) {
@@ -67,168 +69,248 @@ export default function AuthPage() {
   };
 
   return (
-  <div className="relative min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
-    {/* 🌌 Animated Canvas Background */}
-    <div className="absolute inset-0 z-0">
-      <Background />
-    </div>
+    <>
+      <Navbar />
+      <div className="relative min-h-screen overflow-hidden" style={{ background: '#000000' }}>
+        {/* Background Pattern */}
+        <BackgroundPattern />
 
-    {/* 🧱 Main Layout */}
-    <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 w-full max-w-6xl">
+        {/* Main Layout */}
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full max-w-6xl">
 
-        {/* ───────────────────────── LEFT: Brand Panel ───────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="hidden md:flex flex-col justify-center"
-        >
-          <h1 className="text-5xl font-bold leading-tight mb-6">
-            Built for<br />
-            <span className="text-[#ff7400]">Craft</span>, Quality<br />
-            & Experience
-          </h1>
-
-          <p className="text-gray-400 text-lg max-w-md mb-10">
-            Rabuste is designed for creators and professionals who value
-            durability, precision, and long-term excellence.
-          </p>
-
-          <ul className="space-y-4 text-sm text-gray-300">
-            <li className="flex items-center gap-3">
-              <span className="text-[#ff7400]">●</span>
-              Premium-grade systems
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="text-[#ff7400]">●</span>
-              Trusted by growing teams
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="text-[#ff7400]">●</span>
-              Designed for longevity
-            </li>
-          </ul>
-        </motion.div>
-
-        {/* ───────────────────────── RIGHT: Auth Card ───────────────────────── */}
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-md mx-auto
-            bg-black/70 backdrop-blur-xl
-            border border-[#2a2a2a]
-            rounded-2xl p-8 shadow-2xl"
-        >
-
-          {/* Brand */}
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold tracking-wide">Rabuste</h1>
-            <p className="text-sm text-gray-400 mt-1">
-              Craft • Quality • Experience
-            </p>
-          </div>
-
-          {/* Title */}
-          <h2 className="text-xl font-semibold text-center mb-4">
-            {isLogin ? "Welcome Back" : "Create your account"}
-          </h2>
-
-          {verified && (
-            <p className="text-green-400 text-sm text-center mb-4">
-              ✅ Email verified. Please login.
-            </p>
-          )}
-
-          {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-          {info && <p className="text-yellow-300 text-sm mb-3">{info}</p>}
-
-          {!isLogin && (
-            <input
-              type="text"
-              name="name"
-              placeholder="Full name"
-              required
-              value={form.name}
-              onChange={handleChange}
-              className="auth-input"
-            />
-          )}
-
-          <input
-            name="email"
-            type="email"
-            placeholder="Email address"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="auth-input"
-          />
-
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-            value={form.password}
-            onChange={handleChange}
-            className="auth-input"
-          />
-
-          {!isLogin && (
-            <p className="text-xs text-red-400 mt-1">
-              * Password must be at least 8 characters and include uppercase,
-              lowercase, number, and special character.
-            </p>
-          )}
-
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            disabled={loading}
-            className="w-full mt-4 py-3 rounded-lg
-              bg-[#ff7400] text-black font-semibold
-              hover:bg-[#ff8a1f] transition"
-          >
-            {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
-          </motion.button>
-
-          <p className="text-sm text-center mt-6 text-gray-400">
-            {isLogin ? "New here?" : "Already have an account?"}
-            <span
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError("");
-                setInfo("");
-              }}
-              className="ml-2 underline cursor-pointer text-white"
+            {/* LEFT: Brand Panel */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="hidden lg:flex flex-col justify-center"
             >
-              {isLogin ? "Sign Up" : "Login"}
-            </span>
-          </p>
-        </motion.form>
+              <h1 
+                className="text-6xl mb-6"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 400,
+                  lineHeight: 1,
+                }}
+              >
+                <span style={{ color: '#FFFEF9' }}>RABUSTE</span>
+                <br />
+                <span className="gradient-copper">COFFEE</span>
+              </h1>
 
+              <p className="text-xl mb-12" style={{ color: '#B87333', lineHeight: 1.6 }}>
+                2X the caffeine. Twice the power.
+                <br />
+                <span style={{ color: '#8B6F47', fontSize: '1rem' }}>
+                  Join the unapologetically bold coffee movement.
+                </span>
+              </p>
+
+              <div className="space-y-6">
+                {[
+                  { icon: <Zap size={24} />, text: 'Maximum Caffeine Content' },
+                  { icon: <Coffee size={24} />, text: '100% Premium Robusta' },
+                  { icon: <Shield size={24} />, text: 'Exclusive Member Benefits' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 flex items-center justify-center"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(115, 54, 53, 0.2))',
+                        border: '2px solid rgba(184, 115, 51, 0.3)',
+                        color: '#B87333',
+                      }}
+                    >
+                      {item.icon}
+                    </div>
+                    <span 
+                      className="text-base"
+                      style={{ 
+                        color: '#FFFEF9',
+                        fontFamily: 'var(--font-heading)',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {item.text}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* RIGHT: Auth Card */}
+            <motion.form
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="w-full max-w-md mx-auto brutal-card p-10"
+            >
+              {/* Brand */}
+              <div className="text-center mb-8">
+                <h1 
+                  className="text-4xl mb-2"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#FFFEF9',
+                    fontWeight: 400,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  RABUSTE
+                </h1>
+                <div 
+                  className="w-16 h-px mx-auto mb-3"
+                  style={{ background: 'linear-gradient(90deg, transparent, #B87333, transparent)' }}
+                />
+                <p 
+                  className="text-xs tracking-[0.2em] uppercase"
+                  style={{ color: '#8B6F47' }}
+                >
+                  BOLD • INTENSE • POWERFUL
+                </p>
+              </div>
+
+              {/* Title */}
+              <h2 
+                className="text-2xl text-center mb-6"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#FFFEF9',
+                  fontWeight: 400,
+                  letterSpacing: '0.08em',
+                }}
+              >
+                {isLogin ? "WELCOME BACK" : "JOIN THE MOVEMENT"}
+              </h2>
+
+              {verified && (
+                <div className="mb-4 p-3 bg-green-950/30 border-2 border-green-700/50 text-green-300 text-sm text-center">
+                  ✓ Email verified. Please login.
+                </div>
+              )}
+
+              {error && (
+                <div className="mb-4 p-3 bg-red-950/30 border-2 border-red-700/50 text-red-300 text-sm">
+                  {error}
+                </div>
+              )}
+              
+              {info && (
+                <div className="mb-4 p-3 bg-amber-950/30 border-2 border-amber-700/50 text-amber-300 text-sm">
+                  {info}
+                </div>
+              )}
+
+              {!isLogin && (
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="FULL NAME"
+                  required
+                  value={form.name}
+                  onChange={handleChange}
+                  className="auth-input"
+                />
+              )}
+
+              <input
+                name="email"
+                type="email"
+                placeholder="EMAIL ADDRESS"
+                required
+                value={form.email}
+                onChange={handleChange}
+                className="auth-input"
+              />
+
+              <input
+                name="password"
+                type="password"
+                placeholder="PASSWORD"
+                required
+                value={form.password}
+                onChange={handleChange}
+                className="auth-input"
+              />
+
+              {!isLogin && (
+                <p className="text-xs mb-4" style={{ color: '#8B6F47' }}>
+                  * Min 8 chars: uppercase, lowercase, number & special character
+                </p>
+              )}
+
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                disabled={loading}
+                className="w-full mt-6 py-4 transition-all duration-300"
+                style={{
+                  background: loading 
+                    ? 'linear-gradient(135deg, #4A4A4A, #5A5A5A)' 
+                    : 'linear-gradient(135deg, #B87333, #CD7F32)',
+                  color: '#000000',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 400,
+                  letterSpacing: '0.15em',
+                  fontSize: '14px',
+                  border: '2px solid rgba(184, 115, 51, 0.4)',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {loading ? "PROCESSING..." : isLogin ? "LOGIN" : "SIGN UP"}
+              </motion.button>
+
+              <p className="text-sm text-center mt-8" style={{ color: '#8B6F47' }}>
+                {isLogin ? "New to Rabuste?" : "Already have an account?"}
+                <span
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setError("");
+                    setInfo("");
+                  }}
+                  className="ml-2 cursor-pointer transition-colors"
+                  style={{ 
+                    color: '#B87333',
+                    fontFamily: 'var(--font-heading)',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  {isLogin ? "SIGN UP" : "LOGIN"}
+                </span>
+              </p>
+            </motion.form>
+
+          </div>
+        </div>
+
+        {/* Input styles */}
+        <style jsx>{`
+          .auth-input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid rgba(184, 115, 51, 0.2);
+            color: #FFFEF9;
+            font-family: 'Work Sans', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            transition: all 0.3s;
+          }
+          .auth-input::placeholder {
+            color: #8B6F47;
+            letter-spacing: 0.1em;
+          }
+          .auth-input:focus {
+            outline: none;
+            border-color: #B87333;
+            background: rgba(20, 20, 20, 0.9);
+            box-shadow: 0 0 0 1px rgba(184, 115, 51, 0.3);
+          }
+        `}</style>
       </div>
-    </div>
-
-    {/* Input styles */}
-    <style jsx>{`
-      .auth-input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 10px;
-        background: #111;
-        border: 1px solid #2a2a2a;
-        color: #eaeaea;
-      }
-      .auth-input:focus {
-        outline: none;
-        border-color: #ff7400;
-        box-shadow: 0 0 0 1px rgba(255,116,0,0.3);
-      }
-    `}</style>
-  </div>
-);
+    </>
+  );
 }

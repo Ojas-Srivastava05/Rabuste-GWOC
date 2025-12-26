@@ -107,7 +107,7 @@ export default function CinematicHero() {
                 textTransform: 'uppercase',
               }}
             >
-              <span style={{ color: '#FFFEF9' }}>RABUSTE</span>
+              <span style={{ color: '#FFFEF9' }}>RABUSTE COFFEE</span>
               <br />
               <span className="gradient-copper" style={{
                 fontSize: 'clamp(2.5rem, 10vw, 8rem)',

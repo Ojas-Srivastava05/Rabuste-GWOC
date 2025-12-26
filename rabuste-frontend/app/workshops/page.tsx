@@ -1,9 +1,9 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import RotatingText from "../../components/RotatingText";
+import BackgroundPattern from "@/components/BackgroundPattern";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   Calendar,
   Coffee,
@@ -12,15 +12,8 @@ import {
   User,
   MapPin,
   X,
-  Sparkles,
-  Heart,
-  Star,
+  ArrowRight,
 } from "lucide-react";
-
-// types
-
-// Formats a date as YYYY-MM-DD (local time)
-const formatDate = (date: Date) => date.toLocaleDateString("en-CA");
 
 type Workshop = {
   _id: number;
@@ -34,68 +27,9 @@ type Workshop = {
   status: "upcoming" | "past";
 };
 
-type NextWorkshop = Workshop & {
-  daysLeft: number;
-};
-
-const CoffeeBean = ({
-  delay,
-  duration,
-}: {
-  delay: number;
-  duration: number;
-}) => {
-  const [left] = useState(Math.random() * 100); // random horizontal position
-  const [size] = useState(8 + Math.random() * 16); // random size
-
-  return (
-    <div
-      className="coffee-bean"
-      style={{
-        left: `${left}vw`,
-        width: `${size}px`,
-        height: `${size}px`,
-        fontSize: `${size}px`,
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`,
-      }}
-    >
-      ☕
-    </div>
-  );
-};
-
-// Steam Effect Component
-const SteamEffect = () => {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className="steam-particle"
-          style={{
-            left: `${20 + i * 15}%`,
-            animationDelay: `${i * 0.8}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-};
-
-// page
-
-export default function App() {
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(
-    null
-  );
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+export default function WorkshopsPage() {
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  // data
-
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
 
   useEffect(() => {
@@ -127,792 +61,451 @@ export default function App() {
     fetchWorkshops();
   }, []);
 
-  // Mouse move effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // helpers
-
-  const getUpcomingWorkshopsWithinMonth = (): NextWorkshop[] => {
-    const now = new Date();
-    const oneMonthFromNow = new Date();
-    oneMonthFromNow.setMonth(oneMonthFromNow.getMonth() + 1);
-
-    return workshops
-      .filter((w) => {
-        const workshopDate = new Date(w.date);
-        return (
-          w.status === "upcoming" &&
-          workshopDate > now &&
-          workshopDate <= oneMonthFromNow
-        );
-      })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .map((workshop) => {
-        const daysLeft = Math.ceil(
-          (new Date(workshop.date).getTime() - now.getTime()) /
-            (1000 * 60 * 60 * 24)
-        );
-        return { ...workshop, daysLeft };
-      });
-  };
-
-  const getNextWorkshop = (): NextWorkshop | null => {
-    const now = new Date();
-
-    const upcoming = workshops
-      .filter((w) => w.status === "upcoming" && new Date(w.date) > now)
-      .sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )[0];
-
-    if (!upcoming) return null;
-
-    const daysLeft = Math.ceil(
-      (new Date(upcoming.date).getTime() - now.getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-
-    return { ...upcoming, daysLeft };
-  };
-
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-
-    return {
-      daysInMonth: lastDay.getDate(),
-      startingDayOfWeek: firstDay.getDay(),
-      year,
-      month,
-    };
-  };
-
-  const getWorkshopForDate = (date: Date): Workshop | undefined => {
-    const dateStr = formatDate(date);
-    return workshops.find((w) => w.date === dateStr);
-  };
-
-  const isToday = (date: Date): boolean => {
-    const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
-  };
-
-  const handleDateClick = (day: number) => {
-    const date = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      day
-    );
-
-    const workshop = getWorkshopForDate(date);
-
-    if (workshop) {
-      setSelectedWorkshop(workshop);
-      setIsModalOpen(true);
-    }
-  };
-
-  const changeMonth = (direction: number) => {
-    setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() + direction,
-        1
-      )
-    );
-  };
-
-  const upcomingWorkshopsWithinMonth = getUpcomingWorkshopsWithinMonth();
-  const nextWorkshop = getNextWorkshop();
-  const { daysInMonth, startingDayOfWeek, year, month } =
-    getDaysInMonth(currentMonth);
-
-  const monthName = currentMonth.toLocaleString("default", {
-    month: "long",
-    year: "numeric",
-  });
-
-  const rotatingWorkshopTexts = upcomingWorkshopsWithinMonth.map(
-    (workshop) =>
-      `${workshop.category === "coffee" ? "☕" : "🎨"} ${workshop.daysLeft} ${
-        workshop.daysLeft === 1 ? "day" : "days"
-      } left for ${workshop.title}`
-  );
-
-  // Rotate text effect
-  useEffect(() => {
-    if (rotatingWorkshopTexts.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentTextIndex(
-          (prev) => (prev + 1) % rotatingWorkshopTexts.length
-        );
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-  }, [rotatingWorkshopTexts.length]);
+  const upcomingWorkshops = workshops.filter((w) => w.status === "upcoming");
+  const pastWorkshops = workshops.filter((w) => w.status === "past");
 
   return (
     <>
       <Navbar />
       <div className="min-h-screen relative overflow-hidden" style={{ background: '#000000' }}>
-        {/* Dynamic Animated Background */}
-        <div className="fixed inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#141414] to-[#000000] animate-gradient-shift">
-        {/* Gradient Orbs - Copper/Bronze theme */}
-        <div
-          className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-r from-[#B87333]/20 to-[#733635]/15 blur-3xl animate-float"
-          style={{
-            top: "10%",
-            left: "20%",
-            transform: `translate(${mousePosition.x * 0.02}px, ${
-              mousePosition.y * 0.02
-            }px)`,
-          }}
-        />
-        <div
-          className="absolute w-[500px] h-[500px] rounded-full bg-gradient-to-r from-[#CD7F32]/15 to-[#B87333]/20 blur-3xl animate-float-delayed"
-          style={{
-            bottom: "20%",
-            right: "15%",
-            transform: `translate(${-mousePosition.x * 0.03}px, ${
-              -mousePosition.y * 0.03
-            }px)`,
-          }}
-        />
-        <div
-          className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-r from-[#733635]/20 to-[#592720]/10 blur-3xl animate-float-slow"
-          style={{
-            top: "50%",
-            right: "30%",
-            transform: `translate(${mousePosition.x * 0.015}px, ${
-              mousePosition.y * 0.015
-            }px)`,
-          }}
-        />
+        <BackgroundPattern />
 
-        {/* Floating Coffee Beans */}
-
-        {/* <div className="absolute inset-0">
-          <div className="hidden sm:block">
-            {[...Array(20)].map((_, i) => (
-              <CoffeeBean
-                key={i}
-                delay={i * 2}
-                duration={15 + Math.random() * 10}
-              />
-            ))}
-          </div>
-          <div className="sm:hidden">
-            {[...Array(10)].map((_, i) => (
-              <CoffeeBean
-                key={i}
-                delay={i * 2}
-                duration={15 + Math.random() * 10}
-              />
-            ))}
-          </div>
-        </div> */}
-
-        {/* Steam Effects */}
-        <SteamEffect />
-
-        {/* Overlay Pattern */}
-        <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')]" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <div className="relative overflow-hidden">
-          {/* Top Banner */}
-          {upcomingWorkshopsWithinMonth.length > 0 && (
-            <div className="relative backdrop-blur-xl bg-black/40 border-b border-[#B87333]/30 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#B87333]/15 via-[#CD7F32]/15 to-[#B87333]/15 animate-shimmer" />
-
-              <div className="relative py-4 md:py-6 px-6 md:px-12">
-                <div className="flex items-center justify-center mb-2">
-                  <Sparkles className="w-4 h-4 text-[#B87333] mr-2 animate-pulse" />
-                  <h2 className="text-sm md:text-base font-semibold text-[#FFFEF9]/90 tracking-[0.3em] uppercase" style={{ fontFamily: 'var(--font-heading)' }}>
-                    Upcoming Experiences
-                  </h2>
-                  <Sparkles className="w-4 h-4 text-amber-400 ml-2 animate-pulse" />
-                </div>
-
-                <div className="flex justify-center items-center mt-2 md:mt-4">
-                  <div className="px-6 py-2 bg-gradient-to-r from-[#B87333]/30 to-[#CD7F32]/30 backdrop-blur-sm text-[#FFFEF9] text-xs md:text-sm font-medium border border-[#B87333]/30 shadow-xl transition-all duration-500 animate-fade-in">
-                    <RotatingText
-                      texts={
-                        rotatingWorkshopTexts.length
-                          ? rotatingWorkshopTexts
-                          : ["No upcoming workshops"]
-                      }
-                      // mainClassName="px-2 sm:px-6 md:px-8 py-1 sm:py-3 md:py-4  text-white text-xs sm:text-lg md:text-2xl font-extrabold rounded-full shadow-lg ring-1 ring-amber-400/30 backdrop-blur-sm whitespace-nowrap overflow-hidden"
-                      staggerFrom="last"
-                      initial={{ y: "100%" }}
-                      animate={{ y: 0 }}
-                      exit={{ y: "-120%" }}
-                      staggerDuration={0.025}
-                      splitLevelClassName="overflow-hidden"
-                      transition={{
-                        type: "spring",
-                        damping: 30,
-                        stiffness: 400,
-                      }}
-                      rotationInterval={5000}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Main Hero */}
-          <div className="container mx-auto px-4 py-16 md:py-24">
-            <div className="text-center max-w-5xl mx-auto">
-              {/* Logo/Icon */}
-              {/* <div className="mb-8 flex justify-center">
-                <div className="relative">
-                  <div className="absolute inset-0 animate-ping-slow">
-                    <Image
-                      src="/Rabuste logo.png"
-                      alt="Next Logo"
-                      width={64}
-                      height={64}
-                      className="md:w-20 md:h-20 text-amber-500/30"
-                    />
-                  </div>
-
-                  <div className="relative w-16 h-16 md:w-20 md:h-20">
-                    <Image
-                      src="/Rabuste logo.png"
-                      alt="Next Logo"
-                      fill
-                      className="object-contain text-amber-400 relative z-10 animate-pulse-slow"
-                    />
-                  </div>
-                </div>
-              </div> */}
-
-              {/* Main Title */}
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 animate-fade-in-up" style={{ fontFamily: 'var(--font-heading)' }}>
-                <span className="gradient-copper drop-shadow-2xl">
-                  THE ROBUSTA
-                </span>
-                <br />
-                <span style={{ color: '#FFFEF9' }} className="drop-shadow-2xl">
-                  ASSEMBLÉE
-                </span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="text-base sm:text-lg md:text-xl text-[#B87333] max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up animation-delay-400">
-                A curated calendar of intimate workshops and gallery evenings
-                <br />
-                for connoisseurs who savour art, aroma, and refined
-                conversation.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Calendar Section */}
-        <div className="container mx-auto px-4 pb-20">
-          <div className="max-w-6xl mx-auto backdrop-blur-xl bg-black/30 rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 border border-amber-700/20 animate-fade-in-up animation-delay-800">
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between mb-10">
-              <button
-                onClick={() => changeMonth(-1)}
-                className="group px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-amber-900/50 to-orange-900/50 backdrop-blur-md text-amber-100 rounded-xl hover:from-amber-800/60 hover:to-orange-800/60 transition-all border border-amber-600/30 font-bold text-base md:text-lg shadow-lg hover:shadow-amber-900/50 hover:scale-105 transform"
+        {/* Content */}
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <div className="relative overflow-hidden pt-32 pb-20 px-6">
+            <div className="max-w-6xl mx-auto text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="mb-8"
               >
-                <span className="group-hover:-translate-x-1 inline-block transition-transform">
-                  ←
-                </span>
-              </button>
+                <div className="inline-flex items-center gap-4 mb-6">
+                  <div className="copper-line" />
+                  <span className="section-label">POWER SESSIONS</span>
+                  <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+                </div>
+              </motion.div>
 
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent text-center">
-                {monthName}
+              <motion.h1
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+                className="text-6xl md:text-7xl lg:text-8xl mb-8"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 400,
+                  lineHeight: 0.9,
+                }}
+              >
+                <span style={{ color: '#FFFEF9' }}>RABUSTE</span>
+                <br />
+                <span className="gradient-copper">WORKSHOPS</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.6 }}
+                className="text-lg md:text-xl max-w-3xl mx-auto mb-6"
+                style={{ color: '#B87333', lineHeight: 1.7 }}
+              >
+                Master the art of bold coffee. Learn from experts.
+              </motion.p>
+            </div>
+          </div>
+
+          {/* Upcoming Workshops */}
+          <div className="max-w-7xl mx-auto px-6 pb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="mb-16"
+            >
+              <h2
+                className="text-4xl md:text-5xl mb-12"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#FFFEF9',
+                  fontWeight: 400,
+                  letterSpacing: '0.05em',
+                }}
+              >
+                UPCOMING SESSIONS
               </h2>
 
-              <button
-                onClick={() => changeMonth(1)}
-                className="group px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-amber-900/50 to-orange-900/50 backdrop-blur-md text-amber-100 rounded-xl hover:from-amber-800/60 hover:to-orange-800/60 transition-all border border-amber-600/30 font-bold text-base md:text-lg shadow-lg hover:shadow-amber-900/50 hover:scale-105 transform"
-              >
-                <span className="group-hover:translate-x-1 inline-block transition-transform">
-                  →
-                </span>
-              </button>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="overflow-x-auto">
-              <div className="grid grid-cols-7 gap-1 sm:gap-2 md:gap-4 min-w-[280px]">
-                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                  (day) => (
-                    <div
-                      key={day}
-                      className="text-center font-semibold text-amber-300/80 pb-4 text-xs sm:text-sm md:text-base tracking-wider uppercase"
+              {upcomingWorkshops.length === 0 ? (
+                <div className="brutal-card p-12 text-center">
+                  <Coffee size={48} className="mx-auto mb-4" style={{ color: '#B87333', opacity: 0.5 }} />
+                  <p style={{ color: '#8B6F47' }}>No upcoming workshops. Check back soon.</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {upcomingWorkshops.map((workshop, index) => (
+                    <motion.div
+                      key={workshop._id}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      whileHover={{ y: -8 }}
+                      onClick={() => {
+                        setSelectedWorkshop(workshop);
+                        setIsModalOpen(true);
+                      }}
+                      className="brutal-card p-8 cursor-pointer group"
                     >
-                      {day}
-                    </div>
-                  )
-                )}
+                      {/* Category Badge */}
+                      <div className="flex items-center gap-3 mb-6">
+                        <div
+                          className="w-12 h-12 flex items-center justify-center transition-transform group-hover:scale-110"
+                          style={{
+                            background: workshop.category === "coffee"
+                              ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))'
+                              : 'linear-gradient(135deg, rgba(205, 127, 50, 0.3), rgba(184, 115, 51, 0.3))',
+                            border: '2px solid rgba(184, 115, 51, 0.4)',
+                            color: '#B87333',
+                          }}
+                        >
+                          {workshop.category === "coffee" ? (
+                            <Coffee size={24} />
+                          ) : (
+                            <Palette size={24} />
+                          )}
+                        </div>
+                        <span
+                          className="text-xs uppercase tracking-[0.2em]"
+                          style={{
+                            color: '#B87333',
+                            fontFamily: 'var(--font-heading)',
+                            fontWeight: 400,
+                          }}
+                        >
+                          {workshop.category}
+                        </span>
+                      </div>
 
-                {Array.from({ length: startingDayOfWeek }).map((_, i) => (
-                  <div key={`empty-${i}`} />
-                ))}
+                      {/* Title */}
+                      <h3
+                        className="text-2xl mb-4"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#FFFEF9',
+                          fontWeight: 400,
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        {workshop.title}
+                      </h3>
 
-                {Array.from({ length: daysInMonth }).map((_, i) => {
-                  const day = i + 1;
-                  const date = new Date(year, month, day);
-                  const workshop = getWorkshopForDate(date);
-                  const isCoffee = workshop?.category === "coffee";
-                  const isPainting = workshop?.category === "painting";
-                  const isPast = workshop?.status === "past";
-                  const today = isToday(date);
+                      {/* Description */}
+                      <p
+                        className="text-sm mb-6 line-clamp-2"
+                        style={{ color: '#8B6F47', lineHeight: 1.6 }}
+                      >
+                        {workshop.description}
+                      </p>
 
-                  return (
-                    <div
-                      key={day}
-                      onClick={() => handleDateClick(day)}
-                      className={`
-                        group aspect-square min-w-[40px] rounded-xl flex items-center justify-center text-sm sm:text-base md:text-lg font-semibold transition-all duration-300 relative overflow-hidden
-                        ${
-                          workshop
-                            ? "cursor-pointer hover:scale-110 hover:z-10"
-                            : "hover:bg-white/5"
-                        }
-                        ${
-                          today && !workshop
-                            ? "bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-900/50 ring-2 ring-amber-400/50 animate-pulse-border"
-                            : ""
-                        }
-                        ${
-                          today && workshop
-                            ? "ring-2 ring-amber-400 animate-pulse-border"
-                            : ""
-                        }
-                        ${
-                          isCoffee && !isPast
-                            ? "bg-gradient-to-br from-amber-800/80 to-orange-900/80 backdrop-blur-sm text-amber-50 shadow-xl shadow-amber-900/60 border border-amber-600/40 hover:shadow-2xl hover:shadow-amber-800/70"
-                            : ""
-                        }
-                        ${
-                          isPainting && !isPast
-                            ? "bg-gradient-to-br from-rose-900/80 to-pink-900/80 backdrop-blur-sm text-rose-50 shadow-xl shadow-rose-900/60 border border-rose-600/40 hover:shadow-2xl hover:shadow-rose-800/70"
-                            : ""
-                        }
-                        ${
-                          isPast
-                            ? "bg-black/20 border border-white/5 text-gray-500 opacity-40"
-                            : ""
-                        }
-                        ${
-                          !workshop && !today
-                            ? "bg-white/5 border border-white/10 text-amber-200/70 hover:border-amber-600/30"
-                            : ""
-                        }
-                      `}
-                    >
-                      {/* Shine effect on hover for workshops */}
-                      {workshop && !isPast && (
-                        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 group-hover:animate-shine" />
-                      )}
+                      {/* Details */}
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <Calendar size={16} style={{ color: '#B87333' }} />
+                          <span className="text-sm" style={{ color: '#FFFEF9' }}>
+                            {new Date(workshop.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Clock size={16} style={{ color: '#B87333' }} />
+                          <span className="text-sm" style={{ color: '#FFFEF9' }}>
+                            {workshop.time}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <User size={16} style={{ color: '#B87333' }} />
+                          <span className="text-sm" style={{ color: '#FFFEF9' }}>
+                            {workshop.instructor}
+                          </span>
+                        </div>
+                      </div>
 
-                      <span className="relative z-10">{day}</span>
-
-                      {isCoffee && !isPast && (
-                        <Coffee className="absolute w-5 md:w-7 h-5 md:h-7 opacity-20 pointer-events-none group-hover:opacity-40 group-hover:scale-125 transition-all" />
-                      )}
-                      {isPainting && !isPast && (
-                        <Palette className="absolute w-5 md:w-7 h-5 md:h-7 opacity-20 pointer-events-none group-hover:opacity-40 group-hover:scale-125 transition-all" />
-                      )}
-                      {today && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full shadow-lg shadow-amber-400/50 pointer-events-none" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div className="mt-10 pt-8 border-t border-white/10">
-              <div className="flex flex-wrap justify-center gap-4 md:gap-6 text-xs sm:text-sm">
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 shadow-lg" />
-                  <span className="font-medium text-amber-200">Today</span>
+                      {/* CTA */}
+                      <div
+                        className="flex items-center gap-2 text-xs uppercase tracking-wider transition-all group-hover:gap-4"
+                        style={{
+                          color: '#B87333',
+                          fontFamily: 'var(--font-heading)',
+                        }}
+                      >
+                        LEARN MORE
+                        <ArrowRight size={14} />
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-800/80 to-orange-900/80 border border-amber-600/40 shadow-lg" />
-                  <span className="font-medium text-amber-200">
-                    Coffee Workshop
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
-                  <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-rose-900/80 to-pink-900/80 border border-rose-600/40 shadow-lg" />
-                  <span className="font-medium text-amber-200">
-                    Painting Workshop
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full backdrop-blur-sm border border-white/10">
-                  <div className="w-6 h-6 rounded-lg bg-black/20 border border-white/5 opacity-40" />
-                  <span className="font-medium text-amber-200">Past</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && selectedWorkshop && (
-        <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fade-in"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="backdrop-blur-xl bg-black/40 border border-amber-700/30 rounded-3xl w-full max-w-3xl p-8 md:p-10 relative shadow-2xl animate-scale-in overflow-y-auto max-h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-xl transition-all hover:rotate-90 duration-300 group"
-            >
-              <X className="w-6 h-6 text-amber-200 group-hover:text-amber-100" />
-            </button>
-
-            <div className="mb-8">
-              <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-gradient-to-r from-amber-900/60 to-orange-900/60 backdrop-blur-sm border border-amber-600/30 mb-6">
-                {selectedWorkshop.category === "coffee" ? (
-                  <Coffee className="w-5 h-5 text-amber-300" />
-                ) : (
-                  <Palette className="w-5 h-5 text-rose-300" />
-                )}
-                <span className="font-semibold text-amber-100 text-sm uppercase tracking-widest">
-                  {selectedWorkshop.category}
-                </span>
-              </div>
-
-              <h3 className="text-3xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-amber-200 to-orange-200 bg-clip-text text-transparent">
-                {selectedWorkshop.title}
-              </h3>
-
-              {selectedWorkshop.status === "past" && (
-                <span className="inline-block px-4 py-2 bg-white/10 text-amber-200 border border-white/20 rounded-full font-medium text-sm">
-                  Past Workshop
-                </span>
               )}
-            </div>
+            </motion.div>
 
-            <p className="text-base md:text-lg text-amber-100/80 mb-8 leading-relaxed">
-              {selectedWorkshop.description}
-            </p>
+            {/* Past Workshops */}
+            {pastWorkshops.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                viewport={{ once: true }}
+              >
+                <h2
+                  className="text-4xl md:text-5xl mb-12"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#FFFEF9',
+                    fontWeight: 400,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  PAST SESSIONS
+                </h2>
 
-            <div className="space-y-4 bg-white/5 rounded-2xl p-6 backdrop-blur-sm border border-white/10">
-              <div className="flex items-center gap-4 text-amber-100">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
-                  <Calendar className="w-6 h-6 text-amber-300" />
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {pastWorkshops.map((workshop, index) => (
+                    <motion.div
+                      key={workshop._id}
+                      initial={{ opacity: 0, y: 40 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                      className="brutal-card p-8 opacity-60"
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <div
+                          className="w-10 h-10 flex items-center justify-center"
+                          style={{
+                            background: 'rgba(139, 111, 71, 0.2)',
+                            border: '2px solid rgba(139, 111, 71, 0.3)',
+                            color: '#8B6F47',
+                          }}
+                        >
+                          {workshop.category === "coffee" ? <Coffee size={20} /> : <Palette size={20} />}
+                        </div>
+                        <span
+                          className="text-xs uppercase tracking-wider px-3 py-1"
+                          style={{
+                            background: 'rgba(139, 111, 71, 0.2)',
+                            border: '1px solid rgba(139, 111, 71, 0.3)',
+                            color: '#8B6F47',
+                          }}
+                        >
+                          PAST
+                        </span>
+                      </div>
+
+                      <h3
+                        className="text-xl mb-2"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#8B6F47',
+                          fontWeight: 400,
+                        }}
+                      >
+                        {workshop.title}
+                      </h3>
+
+                      <p className="text-sm" style={{ color: '#6B5B47' }}>
+                        {new Date(workshop.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </p>
+                    </motion.div>
+                  ))}
                 </div>
-                <span className="font-medium text-lg">
-                  {selectedWorkshop.date}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4 text-amber-100">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
-                  <Clock className="w-6 h-6 text-amber-300" />
-                </div>
-                <span className="text-lg">{selectedWorkshop.time}</span>
-              </div>
-
-              <div className="flex items-center gap-4 text-amber-100">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
-                  <User className="w-6 h-6 text-amber-300" />
-                </div>
-                <span className="text-lg">
-                  Instructor: {selectedWorkshop.instructor}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-4 text-amber-100">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center border border-amber-600/30">
-                  <MapPin className="w-6 h-6 text-amber-300" />
-                </div>
-                <span className="text-lg">{selectedWorkshop.location}</span>
-              </div>
-            </div>
+              </motion.div>
+            )}
           </div>
         </div>
-      )}
 
-      <style jsx>{`
-        @keyframes gradient-shift {
-          0%,
-          100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-        }
+        {/* Modal */}
+        {isModalOpen && selectedWorkshop && (
+          <div
+            className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
+            onClick={() => setIsModalOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="brutal-card w-full max-w-3xl p-10 relative max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-6 right-6 p-2 hover:bg-white/10 transition-all"
+                style={{ color: '#B87333' }}
+              >
+                <X size={24} />
+              </button>
 
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-30px) rotate(10deg);
-          }
-        }
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div
+                    className="w-14 h-14 flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
+                      border: '2px solid rgba(184, 115, 51, 0.4)',
+                      color: '#B87333',
+                    }}
+                  >
+                    {selectedWorkshop.category === "coffee" ? <Coffee size={28} /> : <Palette size={28} />}
+                  </div>
+                  <span
+                    className="text-xs uppercase tracking-[0.2em]"
+                    style={{
+                      color: '#B87333',
+                      fontFamily: 'var(--font-heading)',
+                      fontWeight: 400,
+                    }}
+                  >
+                    {selectedWorkshop.category} WORKSHOP
+                  </span>
+                </div>
 
-        @keyframes float-delayed {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-40px) rotate(-10deg);
-          }
-        }
+                <h3
+                  className="text-4xl md:text-5xl mb-6"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#FFFEF9',
+                    fontWeight: 400,
+                  }}
+                >
+                  {selectedWorkshop.title}
+                </h3>
 
-        @keyframes float-slow {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          50% {
-            transform: translateY(-20px) rotate(5deg);
-          }
-        }
+                {selectedWorkshop.status === "past" && (
+                  <span
+                    className="inline-block px-4 py-2 mb-6"
+                    style={{
+                      background: 'rgba(139, 111, 71, 0.2)',
+                      border: '2px solid rgba(139, 111, 71, 0.4)',
+                      color: '#8B6F47',
+                      fontSize: '12px',
+                      letterSpacing: '0.15em',
+                      fontFamily: 'var(--font-heading)',
+                    }}
+                  >
+                    PAST WORKSHOP
+                  </span>
+                )}
+              </div>
 
-        @keyframes coffee-fall {
-          0% {
-            top: -10%;
-            opacity: 0;
-            transform: rotate(0deg);
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            top: 110%;
-            opacity: 0;
-            transform: rotate(360deg);
-          }
-        }
+              <p
+                className="text-base md:text-lg mb-10"
+                style={{ color: '#B87333', lineHeight: 1.8 }}
+              >
+                {selectedWorkshop.description}
+              </p>
 
-        @keyframes steam-rise {
-          0% {
-            bottom: 0;
-            opacity: 0;
-            transform: translateX(0);
-          }
-          10% {
-            opacity: 0.5;
-          }
-          90% {
-            opacity: 0.3;
-          }
-          100% {
-            bottom: 100%;
-            opacity: 0;
-            transform: translateX(30px);
-          }
-        }
+              <div className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div
+                    className="p-6"
+                    style={{
+                      background: 'rgba(20, 20, 20, 0.6)',
+                      border: '2px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    <div className="flex items-center gap-4 mb-3">
+                      <Calendar size={20} style={{ color: '#B87333' }} />
+                      <span
+                        className="text-xs uppercase tracking-wider"
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      >
+                        DATE
+                      </span>
+                    </div>
+                    <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                      {new Date(selectedWorkshop.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </p>
+                  </div>
 
-        @keyframes shimmer {
-          0% {
-            background-position: -1000px 0;
-          }
-          100% {
-            background-position: 1000px 0;
-          }
-        }
+                  <div
+                    className="p-6"
+                    style={{
+                      background: 'rgba(20, 20, 20, 0.6)',
+                      border: '2px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    <div className="flex items-center gap-4 mb-3">
+                      <Clock size={20} style={{ color: '#B87333' }} />
+                      <span
+                        className="text-xs uppercase tracking-wider"
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      >
+                        TIME
+                      </span>
+                    </div>
+                    <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                      {selectedWorkshop.time}
+                    </p>
+                  </div>
 
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
+                  <div
+                    className="p-6"
+                    style={{
+                      background: 'rgba(20, 20, 20, 0.6)',
+                      border: '2px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    <div className="flex items-center gap-4 mb-3">
+                      <User size={20} style={{ color: '#B87333' }} />
+                      <span
+                        className="text-xs uppercase tracking-wider"
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      >
+                        INSTRUCTOR
+                      </span>
+                    </div>
+                    <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                      {selectedWorkshop.instructor}
+                    </p>
+                  </div>
 
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        @keyframes pulse-slow {
-          0%,
-          100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.7;
-          }
-        }
-
-        @keyframes ping-slow {
-          75%,
-          100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-
-        @keyframes spin-slow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes pulse-border {
-          0%,
-          100% {
-            box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4);
-          }
-          50% {
-            box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
-          }
-        }
-
-        @keyframes shine {
-          to {
-            transform: translateX(100%) translateY(100%);
-          }
-        }
-
-        .animate-gradient-shift {
-          background-size: 200% 200%;
-          animation: gradient-shift 15s ease infinite;
-        }
-
-        .animate-float {
-          animation: float 8s ease-in-out infinite;
-        }
-
-        .animate-float-delayed {
-          animation: float-delayed 10s ease-in-out infinite;
-        }
-
-        .animate-float-slow {
-          animation: float-slow 12s ease-in-out infinite;
-        }
-
-        .coffee-bean {
-          animation: coffee-fall linear infinite;
-          font-size: 1.5em;
-          filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.3));
-        }
-
-        .steam-particle {
-          position: absolute;
-          bottom: 0;
-          width: 50px;
-          height: 100px;
-          background: radial-gradient(
-            ellipse at center,
-            rgba(255, 255, 255, 0.3) 0%,
-            transparent 70%
-          );
-          border-radius: 50%;
-          animation: steam-rise 6s ease-out infinite;
-          filter: blur(8px);
-        }
-
-        .animate-shimmer {
-          background-size: 1000px 100%;
-          animation: shimmer 3s linear infinite;
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-        }
-
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-          opacity: 0;
-        }
-
-        .animation-delay-400 {
-          animation-delay: 0.4s;
-          opacity: 0;
-        }
-
-        .animation-delay-600 {
-          animation-delay: 0.6s;
-          opacity: 0;
-        }
-
-        .animation-delay-800 {
-          animation-delay: 0.8s;
-          opacity: 0;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 3s ease-in-out infinite;
-        }
-
-        .animate-ping-slow {
-          animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-
-        .animate-spin-slow {
-          animation: spin-slow 8s linear infinite;
-        }
-
-        .animate-pulse-border {
-          animation: pulse-border 2s ease-in-out infinite;
-        }
-
-        .animate-shine {
-          animation: shine 0.6s ease-out;
-        }
-      `}</style>
+                  <div
+                    className="p-6"
+                    style={{
+                      background: 'rgba(20, 20, 20, 0.6)',
+                      border: '2px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    <div className="flex items-center gap-4 mb-3">
+                      <MapPin size={20} style={{ color: '#B87333' }} />
+                      <span
+                        className="text-xs uppercase tracking-wider"
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      >
+                        LOCATION
+                      </span>
+                    </div>
+                    <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                      {selectedWorkshop.location}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </div>
     </>
   );

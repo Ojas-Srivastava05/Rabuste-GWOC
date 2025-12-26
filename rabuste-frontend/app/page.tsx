@@ -9,6 +9,7 @@ import Gallery from "@/components/sections/Gallery";
 import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
+import BackgroundPattern from "@/components/BackgroundPattern";
 
 export default function Home() {
   return (
@@ -16,10 +17,13 @@ export default function Home() {
       <Navbar />
       <FloatingCart />
 
+      {/* Background Pattern */}
+      <BackgroundPattern />
+
       {/* Noise overlay */}
       <div className="noise-overlay" />
       
-      <main style={{ background: '#000000' }}>
+      <main style={{ background: '#000000', position: 'relative', zIndex: 1 }}>
         {/* Hero */}
         <CinematicHero />
 

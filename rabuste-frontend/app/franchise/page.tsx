@@ -445,8 +445,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { FileText, Building2, MapPin, User, Mail, Phone, IndianRupee, Users, ArrowRight, CheckCircle2, Coffee, Award, TrendingUp } from 'lucide-react';
+import { FileText, Building2, MapPin, User, Mail, Phone, IndianRupee, Users, ArrowRight, CheckCircle2, Zap, Shield, Target } from 'lucide-react';
 import Navbar from "@/components/Navbar";
+import BackgroundPattern from "@/components/BackgroundPattern";
 
 export default function FranchisePage() {
   const [formData, setFormData] = useState({
@@ -528,76 +529,60 @@ export default function FranchisePage() {
     <>
       <Navbar />
       
-      <div className="min-h-screen" style={{ backgroundColor: '#0a0a0a' }}>
-        {/* Coffee Bean Background Animation */}
-        <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-5">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="coffee-bean absolute"
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDuration: `${15 + Math.random() * 10}s`,
-                animationDelay: `${Math.random() * 5}s`,
-                fontSize: '24px',
-              }}
-            >
-              ☕
-            </div>
-          ))}
-        </div>
+      <div className="min-h-screen" style={{ backgroundColor: '#000000' }}>
+        <BackgroundPattern />
 
         {/* Hero Header */}
         <div className="relative pt-32 pb-20 px-6 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-amber-950/20 via-transparent to-transparent" />
           <div className="max-w-6xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-950/30 border border-amber-800/40 rounded-full mb-8">
-              <Coffee className="w-5 h-5 text-amber-600" />
-              <span className="text-amber-600 text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                Franchise Opportunity
-              </span>
+            <div className="inline-flex items-center gap-4 mb-8">
+              <div className="copper-line" />
+              <span className="section-label">EXPANSION OPPORTUNITY</span>
+              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
             </div>
             
-            <h1 className="plantation-header text-6xl md:text-7xl lg:text-8xl mb-8" style={{ color: '#D4A574' }}>
-              Join the Rabuste Family
+            <h1 
+              className="text-6xl md:text-7xl lg:text-8xl mb-8"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 400,
+                lineHeight: 0.9,
+              }}
+            >
+              <span style={{ color: '#FFFEF9' }}>BUILD AN</span>
+              <br />
+              <span className="gradient-copper">EMPIRE</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-zinc-300 max-w-3xl mx-auto leading-relaxed mb-4">
-              Partner with India's fastest-growing specialty coffee brand.
-            </p>
-            <p className="text-2xl md:text-3xl font-bold mb-16" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-              Brew Success. Build Legacy.
+            <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-16" style={{ color: '#B87333', lineHeight: 1.7 }}>
+              Partner with Rabuste Coffee. Dominate your market.
             </p>
 
             {/* Stats Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="bg-gradient-to-br from-amber-950/30 to-zinc-900/40 backdrop-blur-sm border border-amber-900/30 rounded-3xl p-8 hover:border-amber-800/50 transition-all duration-300 hover:transform hover:scale-105">
-                <Award className="w-10 h-10 text-amber-600 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  50+
+              {[
+                { icon: <Target size={32} />, value: '50+', label: 'LOCATIONS' },
+                { icon: <Zap size={32} />, value: '25%', label: 'AVERAGE ROI' },
+                { icon: <Shield size={32} />, value: '100K+', label: 'DAILY CUPS' },
+              ].map((stat, i) => (
+                <div key={i} className="brutal-card p-8 group hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center transition-transform group-hover:scale-110"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
+                      border: '2px solid rgba(184, 115, 51, 0.4)',
+                      color: '#B87333',
+                    }}
+                  >
+                    {stat.icon}
+                  </div>
+                  <div className="text-5xl font-bold mb-2 gradient-copper" style={{ fontFamily: 'var(--font-heading)' }}>
+                    {stat.value}
+                  </div>
+                  <div className="text-sm uppercase tracking-[0.2em]" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-sm text-zinc-400 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Premium Locations
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-amber-950/30 to-zinc-900/40 backdrop-blur-sm border border-amber-900/30 rounded-3xl p-8 hover:border-amber-800/50 transition-all duration-300 hover:transform hover:scale-105">
-                <TrendingUp className="w-10 h-10 text-amber-600 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  25%
-                </div>
-                <div className="text-sm text-zinc-400 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Average ROI
-                </div>
-              </div>
-              <div className="bg-gradient-to-br from-amber-950/30 to-zinc-900/40 backdrop-blur-sm border border-amber-900/30 rounded-3xl p-8 hover:border-amber-800/50 transition-all duration-300 hover:transform hover:scale-105">
-                <Coffee className="w-10 h-10 text-amber-600 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  100K+
-                </div>
-                <div className="text-sm text-zinc-400 uppercase tracking-wider" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Cups Served Daily
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
