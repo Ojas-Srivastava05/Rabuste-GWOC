@@ -14,12 +14,16 @@ body {
 }
 
 .slider-container {
-	width: 100%;
-	max-width: 1200px;
-	height: 100vh;
+	width: 100vw;
+	max-width: none;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
 	position: relative;
+	height: 100vh;         /* <-- changed to full viewport height */
+	min-height: 100vh;    /* ensure full height on all viewports */
 	overflow: hidden;
 	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+	padding: 0 3.5vw;     /* keep some horizontal inset for visuals */
 }
 
 .now-showing {
@@ -47,18 +51,32 @@ body {
 	display: flex;
 	height: 100%;
 	position: relative;
+	gap: 22px;                /* prevents edge collision between slides */
+	align-items: stretch;
+	padding: 10px 0;         /* small inner spacing so slides never touch container edges */
 }
 
 .slide {
 	flex: 1;
 	position: relative;
+	box-sizing: border-box;  /* ensure padding/borders are included in size */
+	height: 100%;            /* make each slide match the container height */
+	max-height: 100%;        /* prevent any slide from growing beyond the container */
 	cursor: pointer;
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-	overflow: hidden;
+	transition: flex 700ms cubic-bezier(0.2,0.9,0.2,1), transform 420ms ease, filter 420ms ease, box-shadow 420ms ease;
+	min-width: 220px;        /* ensures slides have a reasonable base width */
+	overflow: hidden;        /* keep overflow hidden so slides don't bleed into neighbors */
 	filter: grayscale(1);
+	border-radius: 14px;
+	isolation: isolate;      /* keep stacking context to avoid visual bleeding */
+	will-change: flex, transform, filter;
+
+	/* finishing touches so the bottom edge looks complete */
+	background-clip: padding-box;               /* prevents background bleed on rounded corners */
+	box-shadow: 0 10px 30px rgba(3,3,3,0.35), inset 0 -18px 40px rgba(0,0,0,0.45);
 }
 
 .slide:hover {
@@ -66,32 +84,58 @@ body {
 }
 
 .slide.active {
-	flex: 2.5;
+	/* expand more, but gap prevents overlap */
+	flex: 4;
 	filter: grayscale(0);
+	z-index: 3;
+	box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+	/* remove vertical translate to avoid the slide being partially clipped by the container */
+	transform: none;
 }
 
+/* keep the overlay but inset slightly so edges don't visually bleed into neighbours */
 .slide::before {
 	content: "";
 	position: absolute;
 	top: 0;
-	left: 0;
-	right: 0;
+	left: 6px;    /* inset to avoid hard seam with neighboring slide */
+	right: 6px;
 	bottom: 0;
-	background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 80%);
+	background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.82) 82%);
+	border-radius: inherit;
+	pointer-events: none;
+	z-index: 1; /* make sure overlay is below the text */
+	/* slightly reduce opacity near the bottom so content remains legible */
+}
+
+/* subtle decorative bottom rim so the card looks finished */
+.slide::after {
+	content: "";
+	position: absolute;
+	left: 10px;
+	right: 10px;
+	bottom: 8px;
+	height: 18px;
+	pointer-events: none;
+	background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.28));
+	border-radius: 10px;
+	z-index: 2;
+	box-shadow: 0 8px 20px rgba(0,0,0,0.45);
 }
 
 .slide-content {
 	position: absolute;
-	bottom: 30px;
+	bottom: 46px;
 	left: 30px;
 	right: 30px;
 	color: white;
-	z-index: 2;
+	z-index: 4; /* above overlay */
+	padding-bottom: 8px; /* extra breathing room so text won't be clipped */
 }
 
 .slide.active .slide-content {
-	bottom: 80px;
-	transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+	bottom: 120px; /* move content up so full text is visible */
+	transition: all 0.6s cubic-bezier(0.2,0.9,0.2,1);
 }
 
 .slide-number {
@@ -268,19 +312,17 @@ body {
 
 .add-button {
 	position: absolute;
-	bottom: 30px;
-	right: 30px;
-	width: 32px;
-	height: 32px;
-	background: transparent;
-	border: 2px solid #9fff6b;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	top: 18px;
+	right: 18px;
+	padding: 10px 14px;
+	border-radius: 10px;
+	background: linear-gradient(135deg,#c4a574,#E6C9A8);
+	border: none;
+	color: #000;
+	font-weight: 700;
 	cursor: pointer;
-	transition: all 0.4s ease;
-	z-index: 3;
+	z-index: 6; /* above content and overlays */
+	box-shadow: 0 8px 20px rgba(0,0,0,0.45);
 }
 
 .add-button::before,
