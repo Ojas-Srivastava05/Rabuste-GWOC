@@ -41,7 +41,7 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
           onAnimationComplete={() => {
-            setTimeout(onFinish, 7000);
+            setTimeout(onFinish, 3500);
           }}
         >
           <motion.div
@@ -165,12 +165,43 @@ export default function SVGIntro({ onFinish }: { onFinish: () => void }) {
                   }}
                 />
 
-                <motion.ellipse cx="235" cy="175" rx="140" ry="5" fill="white" fillOpacity="0" animate={{ fillOpacity: [0, 0, 0.3], cy: [480, 320, 175], rx: [125, 135, 140] }} transition={{ duration: 2.8, delay: 1.5, ease: [0.34, 1.56, 0.64, 1] }} filter="url(#glow)" />
+                <motion.ellipse 
+                  cx="235" 
+                  cy={175}
+                  rx={140}
+                  ry="5" 
+                  fill="white" 
+                  fillOpacity="0" 
+                  animate={{ fillOpacity: [0, 0, 0.3] }} 
+                  transition={{ duration: 2.8, delay: 1.5, ease: [0.34, 1.56, 0.64, 1] }} 
+                  filter="url(#glow)" 
+                />
 
                 {/* Steam */}
-                {[...Array(8)].map((_, i) => (
-                  <motion.path key={i} d={`M ${190 + i * 12},165 Q ${195 + i * 12},130 ${190 + i * 12},95 Q ${185 + i * 12},60 ${190 + i * 12},25`} stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0" animate={{ opacity: [0, 0, 0.4, 0.25, 0], y: [0, 0, -15, -30, -50], strokeWidth: [1.5, 1.5, 1.2, 0.8, 0.4] }} transition={{ duration: 3.5, delay: 4.2 + i * 0.15, ease: [0.22, 1, 0.36, 1] }} style={{ filter: "blur(1.5px)" }} />
-                ))}
+                {[...Array(8)].map((_, i) => {
+                  const baseX = 190 + i * 12;
+                  return (
+                    <motion.path 
+                      key={i} 
+                      d={`M ${baseX},165 Q ${baseX + 5},130 ${baseX},95 Q ${baseX - 5},60 ${baseX},25`} 
+                      stroke="white" 
+                      strokeWidth={1.5}
+                      fill="none" 
+                      strokeLinecap="round" 
+                      opacity={0}
+                      animate={{ 
+                        opacity: [0, 0, 0.4, 0.25, 0], 
+                        y: [0, 0, -15, -30, -50]
+                      }} 
+                      transition={{ 
+                        duration: 2.5, 
+                        delay: 3.0 + i * 0.1, 
+                        ease: [0.22, 1, 0.36, 1] 
+                      }} 
+                      style={{ filter: "blur(1.5px)" }} 
+                    />
+                  );
+                })}
               </motion.g>
 
               {/* LOGO + BRANDING - USING EXACT POSITIONING FROM REFERENCE CODE */}

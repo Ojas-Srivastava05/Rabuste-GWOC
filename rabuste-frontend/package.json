@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fontsource/josefin-sans": "^5.2.8",
+    "@fontsource/lora": "^5.2.8",
     "@gsap/react": "^2.1.2",
     "@react-spring/three": "^10.0.3",
     "@react-three/drei": "^10.7.7",
