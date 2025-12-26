@@ -18,7 +18,7 @@ export default function MenuItem({ id, name, price }: Props) {
         <p className="text-sm text-[#cbb39a]">₹{price}</p>
       </div>
       <button
-        onClick={() => addItem({ id, name, price })}
+        onClick={() => addItem({ id, name, price, quantity: 1 })}
         className="px-3 py-1 bg-amber-600 text-black rounded"
       >
         Add

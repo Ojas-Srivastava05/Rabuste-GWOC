@@ -9,7 +9,8 @@ export type CartItem = {
 
 type CartStore = {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, "quantity">) => void;
+  addItem: (item: CartItem) => void;
+
   updateItem: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
