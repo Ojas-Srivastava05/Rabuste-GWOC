@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export const metadata: Metadata = {
   title: "Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee",
@@ -31,6 +32,7 @@ export default function RootLayout({
           paddingTop: '80px',
         }}
       >
+          <LoadingScreen />
           <ScrollToTop />
           {children}
       </body>

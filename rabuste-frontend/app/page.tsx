@@ -2,14 +2,14 @@
 
 import Navbar from "@/components/Navbar";
 import CinematicHero from "@/components/sections/CinematicHero";
-import RobustaSuperioritySection from "@/components/sections/RobustaSuperioritySection";
+import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
+import ComparisonSection from "@/components/sections/ComparisonSection";
 import DiagonalProducts from "@/components/sections/DiagonalProducts";
-import AboutSection from "@/components/sections/AboutSection";
-import Gallery from "@/components/sections/Gallery";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
-import BackgroundPattern from "@/components/BackgroundPattern";
+import DynamicBackground from "@/components/DynamicBackground";
 
 export default function Home() {
   return (
@@ -17,33 +17,33 @@ export default function Home() {
       <Navbar />
       <FloatingCart />
 
-      {/* Background Pattern */}
-      <BackgroundPattern />
+      {/* Dynamic animated background */}
+      <DynamicBackground />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
       
-      <main style={{ background: '#000000', position: 'relative', zIndex: 1 }}>
+      <main style={{ background: 'transparent', position: 'relative', zIndex: 1 }}>
         {/* Hero */}
         <CinematicHero />
 
-        {/* Robusta Superiority */}
-        <RobustaSuperioritySection />
+        {/* Benefits - conversion focused */}
+        <BenefitsShowcase />
+
+        {/* Comparison - data driven */}
+        <ComparisonSection />
 
         {/* Featured Products */}
         <DiagonalProducts />
 
-        {/* About Section */}
-        <AboutSection />
-
-        {/* Gallery Section */}
-        <Gallery />
+        {/* Social Proof */}
+        <TestimonialsSection />
 
         {/* Contact Section */}
         <ContactSection />
       </main>
 
-      {/* Footer - Single instance */}
+      {/* Footer */}
       <Footer />
     </>
   );

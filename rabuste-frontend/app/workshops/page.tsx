@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import BackgroundPattern from "@/components/BackgroundPattern";
+import DynamicBackground from "@/components/DynamicBackground";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -68,7 +68,7 @@ export default function WorkshopsPage() {
     <>
       <Navbar />
       <div className="min-h-screen relative overflow-hidden" style={{ background: '#000000' }}>
-        <BackgroundPattern />
+        <DynamicBackground />
 
         {/* Content */}
         <div className="relative z-10">

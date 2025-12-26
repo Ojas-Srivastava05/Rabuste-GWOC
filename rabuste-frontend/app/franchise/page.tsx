@@ -447,7 +447,8 @@
 import React, { useState } from 'react';
 import { FileText, Building2, MapPin, User, Mail, Phone, IndianRupee, Users, ArrowRight, CheckCircle2, Zap, Shield, Target } from 'lucide-react';
 import Navbar from "@/components/Navbar";
-import BackgroundPattern from "@/components/BackgroundPattern";
+import DynamicBackground from "@/components/DynamicBackground";
+import Footer from "@/components/sections/footer";
 
 export default function FranchisePage() {
   const [formData, setFormData] = useState({
@@ -528,9 +529,9 @@ export default function FranchisePage() {
   return (
     <>
       <Navbar />
+      <DynamicBackground />
       
-      <div className="min-h-screen" style={{ backgroundColor: '#000000' }}>
-        <BackgroundPattern />
+      <div className="min-h-screen" style={{ backgroundColor: 'transparent' }}>
 
         {/* Hero Header */}
         <div className="relative pt-32 pb-20 px-6 overflow-hidden">
@@ -993,6 +994,7 @@ export default function FranchisePage() {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 }

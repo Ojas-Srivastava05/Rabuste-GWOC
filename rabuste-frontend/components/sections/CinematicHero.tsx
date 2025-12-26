@@ -107,15 +107,27 @@ export default function CinematicHero() {
                 textTransform: 'uppercase',
               }}
             >
-              <span style={{ color: '#FFFEF9' }}>RABUSTE COFFEE</span>
-              <br />
-              <span className="gradient-copper" style={{
-                fontSize: 'clamp(2.5rem, 10vw, 8rem)',
+              <span style={{ 
+                color: '#FFFEF9', 
+                fontSize: 'clamp(3.5rem, 12vw, 10rem)',
+                display: 'block',
               }}>
-                UNAPOLOGETICALLY
+                RABUSTE
               </span>
-              <br />
-              <span style={{ color: '#FFFEF9' }}>BOLD</span>
+              <span style={{ 
+                color: '#FFFEF9', 
+                fontSize: 'clamp(3.5rem, 12vw, 10rem)',
+                display: 'block',
+              }}>
+                COFFEE
+              </span>
+              <span className="gradient-copper" style={{
+                fontSize: 'clamp(2rem, 7vw, 6rem)',
+                display: 'block',
+                marginTop: '0.3em',
+              }}>
+                UNAPOLOGETICALLY BOLD
+              </span>
             </h1>
           </motion.div>
 

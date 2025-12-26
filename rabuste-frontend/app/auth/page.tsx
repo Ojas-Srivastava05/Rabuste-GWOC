@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
-import BackgroundPattern from "@/components/BackgroundPattern";
+import DynamicBackground from "@/components/DynamicBackground";
 import { Coffee, Zap, Shield } from "lucide-react";
 
 const isStrongPassword = (password: string) =>
@@ -73,7 +73,7 @@ export default function AuthPage() {
       <Navbar />
       <div className="relative min-h-screen overflow-hidden" style={{ background: '#000000' }}>
         {/* Background Pattern */}
-        <BackgroundPattern />
+        <DynamicBackground />
 
         {/* Main Layout */}
         <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">

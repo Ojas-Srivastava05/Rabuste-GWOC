@@ -18,17 +18,17 @@ export default function FloatingCart() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => router.push("/cart")}
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-8 right-8 z-[100]"
         style={{
-          background: "linear-gradient(135deg, #926644, #C89B7B)",
-          border: "none",
+          background: "linear-gradient(135deg, #B87333, #CD7F32)",
+          border: "2px solid rgba(255, 255, 255, 0.2)",
           borderRadius: "50%",
-          width: "64px",
-          height: "64px",
-          boxShadow: "0 8px 32px rgba(146, 102, 68, 0.4), 0 0 0 4px rgba(146, 102, 68, 0.1)",
+          width: "72px",
+          height: "72px",
+          boxShadow: "0 10px 40px rgba(184, 115, 51, 0.6), 0 0 0 4px rgba(184, 115, 51, 0.15)",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -36,7 +36,7 @@ export default function FloatingCart() {
           position: "relative",
         }}
       >
-        <ShoppingCart size={28} color="#ffffff" strokeWidth={2.5} />
+        <ShoppingCart size={32} color="#000000" strokeWidth={2.5} />
         
         {/* Badge */}
         <motion.div
@@ -44,17 +44,17 @@ export default function FloatingCart() {
           animate={{ scale: 1 }}
           className="absolute -top-1 -right-1"
           style={{
-            background: "#592720",
-            color: "#ffffff",
+            background: "#000000",
+            color: "#B87333",
             borderRadius: "50%",
-            width: "24px",
-            height: "24px",
+            width: "28px",
+            height: "28px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "0.75rem",
+            fontSize: "0.85rem",
             fontWeight: 700,
-            border: "2px solid #0a0a0a",
+            border: "2px solid #B87333",
           }}
         >
           {itemCount}
@@ -73,9 +73,9 @@ export default function FloatingCart() {
           }}
           style={{
             position: "absolute",
-            inset: -8,
+            inset: -10,
             borderRadius: "50%",
-            border: "2px solid #926644",
+            border: "3px solid #B87333",
             pointerEvents: "none",
           }}
         />
