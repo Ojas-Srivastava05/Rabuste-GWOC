@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: Props) {
     const user = localStorage.getItem("user");
 
     if (!token || !user) {
-      router.push("/auth/login");
+      router.push("/auth");
       return;
     }
 
@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: Props) {
         router.push("/");
       }
     } catch (err) {
-      router.push("/auth/login");
+      router.push("/auth");
     }
   }, [router]);
 
@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: Props) {
           onClick={() => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
-            router.push("/auth/login");
+            router.push("/auth");
           }}
           className="m-4 rounded bg-red-600 py-2 text-sm font-semibold hover:bg-red-700"
         >

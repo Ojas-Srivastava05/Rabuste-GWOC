@@ -296,12 +296,14 @@ export default function AuthPage() {
             font-family: 'Work Sans', sans-serif;
             font-size: 14px;
             letter-spacing: 0.05em;
-            text-transform: uppercase;
+            /* allow user input to keep original case */
+            text-transform: none;
             transition: all 0.3s;
           }
           .auth-input::placeholder {
             color: #8B6F47;
             letter-spacing: 0.1em;
+            text-transform: none;
           }
           .auth-input:focus {
             outline: none;
