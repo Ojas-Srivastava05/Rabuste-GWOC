@@ -112,13 +112,22 @@ router.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
+    // detect admin role (supports either `role === 'admin'` or boolean `isAdmin`)
+    const isAdmin = !!(
+      (user.role && String(user.role).toLowerCase() === "admin") ||
+      user.isAdmin
+    );
+
     res.json({
       message: "Login successful",
       token,
+      // include admin flag and optional redirect URL so the frontend can navigate immediately
+      redirect: isAdmin ? "http://localhost:3000/admin" : undefined,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
+        isAdmin,
       },
     });
   } catch (error) {
