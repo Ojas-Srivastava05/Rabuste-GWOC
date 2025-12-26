@@ -13,6 +13,33 @@ export default function Page() {
 
   return (
     <div className="slider-container">
+      {/* Back / exit button — force navigation + reload like gallery page */}
+      <button
+        id="menu-exit"
+        aria-label="Back to home"
+        onClick={() => window.location.replace("/")}
+        style={{
+          position: "fixed",
+          top: 20,
+          left: 20,
+          zIndex: 2000,
+          width: 44,
+          height: 44,
+          borderRadius: 9999,
+          background: "#c4a574",
+          color: "#000",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 18,
+          boxShadow: "0 6px 18px rgba(0,0,0,.45)",
+          border: "none",
+          cursor: "pointer"
+        }}
+      >
+        ←
+      </button>
+
       <div className="now-showing">Now in Showroom</div>
 
       <div className="accordion-slider">

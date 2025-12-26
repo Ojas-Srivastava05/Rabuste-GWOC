@@ -1,6 +1,6 @@
 import Order from "../models/Order.js";
 import Store from "../models/Store.js";
-import { calculateDistance } from "../utils/distance.util.js";
+import { calculateDistance } from "../utils/distance.utils.js";
 
 /* USER places order */
 export const placeOrder = async (req, res) => {

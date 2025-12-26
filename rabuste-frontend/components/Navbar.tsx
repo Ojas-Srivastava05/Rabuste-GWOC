@@ -24,7 +24,7 @@ export default function Navbar() {
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         {/* LEFT (hidden on small screens) */}
         <div className="hidden md:flex gap-6 flex-1">
-          <NavButton href="#faqs" bg="bg-[#C89B7B]">
+          <NavButton href="/menu" bg="bg-[#C89B7B]">
             Menu
           </NavButton>
           <NavButton href="/gallery" bg="bg-[#E6C9A8]">
@@ -93,7 +93,7 @@ export default function Navbar() {
           <NavButton href="/workshops" bg="bg-[#B57A5A]">
             Workshop
           </NavButton>
-          <NavButton href="#add-venue" bg="bg-[#8B5E3C]">
+          <NavButton href="/franchise" bg="bg-[#8B5E3C]">
             Franchise
           </NavButton>
           <NavButton href="/auth" bg="bg-[#8B5E3C]">
@@ -138,7 +138,7 @@ export default function Navbar() {
               Workshop
             </NavButton>
             <NavButton
-              href="#add-venue"
+              href="/franchise"
               mobile
               onClick={() => setOpen(false)}
               bg="bg-[#8B5E3C]"
