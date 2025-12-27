@@ -14,6 +14,8 @@ export default function AuthPage() {
   const router = useRouter();
   const params = useSearchParams();
   const verified = params.get("verified");
+  const redirect = params.get("redirect");
+
 
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
@@ -55,12 +57,24 @@ export default function AuthPage() {
       if (!res.ok) throw new Error(data.message);
 
       if (isLogin) {
+        // 1. Store JWT
         localStorage.setItem("token", data.token);
-        router.push("/");
+      
+        // 2. Attach cart to user
+        await fetch("/api/cart/attach", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        });
+      
+        // 3. Redirect user
+        router.push(redirect || "/");
       } else {
         setInfo("Check your email to verify your account");
         setForm({ name: "", email: "", password: "" });
       }
+      
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
