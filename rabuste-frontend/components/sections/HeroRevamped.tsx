@@ -1,316 +1,392 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Zap, Award, ArrowRight } from 'lucide-react';
+import { Coffee, Zap, Award } from 'lucide-react';
 
 export default function HeroRevamped() {
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
     <section 
+      ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ 
-        background: 'linear-gradient(135deg, #1A1110 0%, #000000 50%, #1A1110 100%)',
-      }}
     >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 opacity-20">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute top-0 right-0 w-[800px] h-[800px]"
-          style={{
-            background: 'radial-gradient(circle, rgba(255,107,53,0.2) 0%, transparent 70%)',
-          }}
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute bottom-0 left-0 w-[600px] h-[600px]"
-          style={{
-            background: 'radial-gradient(circle, rgba(184,115,51,0.2) 0%, transparent 70%)',
-          }}
-        />
+      {/* Premium Coffee Beans Background with Parallax */}
+      <motion.div 
+        style={{ y }}
+        className="absolute inset-0"
+      >
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/33682396/pexels-photo-33682396.jpeg"
+            alt="Premium dark roasted coffee beans - Photo by indra projects on Pexels"
+            className="w-full h-full object-cover"
+          />
+          {/* Dark overlay for contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/90" />
+          
+          {/* Radial gradient for depth */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.8) 100%)',
+            }}
+          />
+        </div>
+      </motion.div>
+
+      {/* Subtle grain texture overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+        }}
+      />
+
+      {/* Floating particles effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-[#D4A574]"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+            animate={{
+              y: [0, -120, 0],
+              opacity: [0, 0.6, 0],
+            }}
+            transition={{
+              duration: 4 + Math.random() * 3,
+              repeat: Infinity,
+              delay: Math.random() * 3,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
-      <div className="container px-6 py-20 relative z-10">
-        <div className="max-w-7xl mx-auto">
+      {/* Main Content */}
+      <motion.div 
+        style={{ opacity }}
+        className="container px-6 py-20 relative z-10"
+      >
+        <div className="max-w-5xl mx-auto">
           
-          {/* Stats bar */}
+          {/* Elegant Content Card */}
           <motion.div
-            initial={{ opacity: 0, y: -30 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex flex-wrap justify-center gap-8 md:gap-16 mb-12"
-          >
-            {[
-              { icon: <Zap size={28} strokeWidth={2.5} />, value: '2X', label: 'CAFFEINE' },
-              { icon: <Award size={28} strokeWidth={2.5} />, value: '100%', label: 'ROBUSTA' },
-            ].map((stat, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 + i * 0.1, duration: 0.6 }}
-                className="flex items-center gap-4"
-              >
-                <div style={{ color: '#B87333' }}>
-                  {stat.icon}
-                </div>
-                <div>
-                  <div 
-                    style={{ 
-                      fontFamily: 'Bebas Neue, sans-serif',
-                      fontSize: '2rem',
-                      lineHeight: 1,
-                      color: '#FFFEF9',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {stat.value}
-                  </div>
-                  <div 
-                    style={{ 
-                      color: '#D4A574',
-                      fontSize: '0.75rem',
-                      letterSpacing: '0.2em',
-                      fontWeight: 600,
-                    }}
-                  >
-                    {stat.label}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Massive headline */}
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.4 }}
-            className="text-center mb-16"
-          >
-            <h1
-              style={{
-                fontFamily: 'Bebas Neue, sans-serif',
-                fontWeight: 400,
-                lineHeight: 0.8,
-                textTransform: 'uppercase',
-                marginBottom: '0.5em',
-              }}
-            >
-              <motion.span 
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                style={{ 
-                  color: '#FFFEF9', 
-                  fontSize: 'clamp(4rem, 16vw, 14rem)',
-                  display: 'block',
-                }}
-              >
-                RABUSTE
-              </motion.span>
-              
-              <motion.span 
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                className="gradient-text" 
-                style={{
-                  fontSize: 'clamp(4rem, 16vw, 14rem)',
-                  display: 'block',
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                COFFEE
-              </motion.span>
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 0.8 }}
-              style={{
-                fontFamily: 'Bebas Neue, sans-serif',
-                fontSize: 'clamp(1.5rem, 4vw, 3rem)',
-                color: '#D4A574',
-                letterSpacing: '0.15em',
-                marginBottom: '1em',
-              }}
-            >
-              UNAPOLOGETICALLY BOLD
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              style={{
-                fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                color: 'rgba(255, 254, 249, 0.7)',
-                maxWidth: '600px',
-                margin: '0 auto 3em',
-                lineHeight: 1.6,
-                fontWeight: 400,
-              }}
-            >
-              Experience the raw power of premium Robusta. 
-              Twice the caffeine. Zero compromises.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-            >
-              <button
-                onClick={() => router.push('/menu')}
-                className="btn btn-primary group"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
-                  color: '#000000',
-                  padding: '24px 60px',
-                  fontSize: '1.25rem',
-                  fontFamily: 'Bebas Neue, sans-serif',
-                  letterSpacing: '0.15em',
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: '0 10px 40px rgba(184, 115, 51, 0.4)',
-                }}
-              >
-                ORDER NOW
-                <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
-              </button>
-              
-              <button
-                onClick={() => router.push('/menu')}
-                className="btn btn-secondary"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  color: '#FFFEF9',
-                  padding: '24px 60px',
-                  fontSize: '1.25rem',
-                  fontFamily: 'Bebas Neue, sans-serif',
-                  letterSpacing: '0.15em',
-                  border: '3px solid rgba(184, 115, 51, 0.6)',
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(10px)',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                }}
-              >
-                VIEW MENU
-              </button>
-            </motion.div>
-          </motion.div>
-
-          {/* Hero Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.6, duration: 1 }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             className="relative"
-            style={{
-              maxWidth: '1000px',
-              margin: '0 auto',
-            }}
           >
-            <div
+            {/* Decorative top border */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="h-[2px] w-32 mx-auto mb-12"
               style={{
-                position: 'relative',
-                aspectRatio: '16/9',
-                borderRadius: '0',
-                overflow: 'hidden',
-                border: '3px solid rgba(184, 115, 51, 0.3)',
-                boxShadow: '0 30px 90px rgba(0, 0, 0, 0.8), 0 0 60px rgba(184, 115, 51, 0.3)',
+                background: 'linear-gradient(90deg, transparent, #B87333, transparent)',
               }}
-            >
-              <img
-                src="https://pixabay.com/get/gd7b28743502b5f72e709f51953615a9b3d86e7637adc56367e99e56afc344803e6fa8997948fb608b2771828c571f3e5.jpg"
-                alt="Professional coffee cup with steam - Photo by StockSnap on Pixabay"
+            />
+
+            {/* Main Content Container */}
+            <div className="relative">
+              {/* Ambient glow effect */}
+              <div 
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full pointer-events-none"
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
+                  background: 'radial-gradient(circle, rgba(184, 115, 51, 0.15) 0%, transparent 70%)',
+                  filter: 'blur(100px)',
                 }}
               />
-              
-              {/* Overlay gradient */}
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(45deg, rgba(184,115,51,0.15) 0%, transparent 50%, rgba(205,127,50,0.15) 100%)',
-                  mixBlendMode: 'overlay',
-                }}
-              />
+
+              <div className="relative z-10 text-center px-4 md:px-8">
+                {/* Brand Icon */}
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="flex justify-center mb-10"
+                >
+                  <div 
+                    className="relative w-24 h-24 rounded-full flex items-center justify-center"
+                    style={{
+                      background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                      boxShadow: '0 0 60px rgba(184, 115, 51, 0.5), 0 20px 40px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <Coffee size={48} className="text-black" strokeWidth={2.5} />
+                    
+                    {/* Rotating ring animation */}
+                    <motion.div
+                      className="absolute inset-[-8px] rounded-full"
+                      style={{
+                        border: '2px solid rgba(184, 115, 51, 0.3)',
+                      }}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Welcome Eyebrow */}
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.4 }}
+                  className="mb-8"
+                  style={{
+                    color: '#D4A574',
+                    fontSize: '0.813rem',
+                    letterSpacing: '0.3em',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Welcome to Premium Robusta
+                </motion.p>
+
+                {/* Main Brand Title */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.9, delay: 0.6 }}
+                  className="mb-12"
+                >
+                  <h1
+                    style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(4rem, 10vw, 8.5rem)',
+                      lineHeight: 0.9,
+                      letterSpacing: '0.12em',
+                      color: '#FFFEF9',
+                      textTransform: 'uppercase',
+                      textShadow: '0 0 60px rgba(184, 115, 51, 0.3), 0 4px 20px rgba(0,0,0,0.5)',
+                      marginBottom: '0.2em',
+                    }}
+                  >
+                    RABUSTE
+                  </h1>
+                  <h1
+                    style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(4rem, 10vw, 8.5rem)',
+                      lineHeight: 0.9,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 40%, #D4A574 70%, #E8C39E 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      filter: 'drop-shadow(0 0 30px rgba(184, 115, 51, 0.4))',
+                    }}
+                  >
+                    COFFEE
+                  </h1>
+                </motion.div>
+
+                {/* Feature Badges */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.8 }}
+                  className="flex flex-wrap justify-center gap-12 md:gap-20 mb-14"
+                >
+                  {[
+                    { icon: <Zap size={28} strokeWidth={2.5} />, text: '2X CAFFEINE', subtext: 'Double Strength' },
+                    { icon: <Award size={28} strokeWidth={2.5} />, text: '100% ROBUSTA', subtext: 'Premium Beans' },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: 1 + i * 0.15 }}
+                      whileHover={{ scale: 1.08, y: -8 }}
+                      className="flex flex-col items-center gap-4"
+                    >
+                      <div 
+                        className="w-16 h-16 rounded-full flex items-center justify-center relative group"
+                        style={{
+                          background: 'rgba(184, 115, 51, 0.08)',
+                          border: '2px solid rgba(184, 115, 51, 0.3)',
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: '0 8px 32px rgba(184, 115, 51, 0.15)',
+                          transition: 'all 0.3s ease',
+                        }}
+                      >
+                        <div className="text-[#D4A574]">{stat.icon}</div>
+                        
+                        {/* Hover glow */}
+                        <div 
+                          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{
+                            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.2), transparent)',
+                            filter: 'blur(15px)',
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div 
+                          style={{ 
+                            fontFamily: 'Bebas Neue, sans-serif',
+                            fontSize: '1.375rem',
+                            color: '#FFFEF9',
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          {stat.text}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: '0.75rem',
+                            color: 'rgba(212, 165, 116, 0.7)',
+                            letterSpacing: '0.05em',
+                          }}
+                        >
+                          {stat.subtext}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* CTA Button */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 1.2 }}
+                  className="mb-16"
+                >
+                  <motion.button
+                    whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(184, 115, 51, 0.4)' }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => router.push('/menu')}
+                    className="group relative overflow-hidden"
+                    style={{
+                      padding: '20px 60px',
+                      border: '2px solid rgba(184, 115, 51, 0.4)',
+                      background: 'rgba(0, 0, 0, 0.3)',
+                      backdropFilter: 'blur(20px)',
+                      color: '#FFFEF9',
+                      fontSize: '0.875rem',
+                      letterSpacing: '0.25em',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      transition: 'all 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+                      borderRadius: '2px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                    }}
+                  >
+                    <span className="relative z-10">VIEW OUR SELECTION</span>
+                    
+                    {/* Animated gradient on hover */}
+                    <motion.div
+                      className="absolute inset-0"
+                      style={{
+                        background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                        opacity: 0,
+                      }}
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.4 }}
+                    />
+                    
+                    {/* Shine effect */}
+                    <motion.div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+                      }}
+                      animate={{
+                        x: ['-200%', '200%'],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        repeatDelay: 1,
+                      }}
+                    />
+                  </motion.button>
+                </motion.div>
+
+                {/* Tagline Section */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 1.4 }}
+                  className="space-y-6"
+                >
+                  <p
+                    style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
+                      color: '#D4A574',
+                      letterSpacing: '0.15em',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    UNAPOLOGETICALLY BOLD
+                  </p>
+
+                  <div 
+                    className="h-[1px] w-24 mx-auto"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.5), transparent)',
+                    }}
+                  />
+
+                  <p
+                    style={{
+                      fontSize: 'clamp(1rem, 1.8vw, 1.25rem)',
+                      color: 'rgba(255, 254, 249, 0.75)',
+                      maxWidth: '580px',
+                      margin: '0 auto',
+                      lineHeight: 1.7,
+                      fontWeight: 300,
+                    }}
+                  >
+                    Experience the raw power of premium Robusta. 
+                    Twice the caffeine. Zero compromises.
+                  </p>
+                </motion.div>
+              </div>
             </div>
 
-            {/* Floating badge */}
+            {/* Decorative bottom border */}
             <motion.div
-              animate={{
-                y: [0, -10, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.2, delay: 1.6, ease: [0.22, 1, 0.36, 1] }}
+              className="h-[2px] w-32 mx-auto mt-16"
               style={{
-                position: 'absolute',
-                top: '-20px',
-                right: '-20px',
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                padding: '20px 30px',
-                border: '3px solid #000000',
-                boxShadow: '0 10px 40px rgba(184, 115, 51, 0.5)',
+                background: 'linear-gradient(90deg, transparent, #B87333, transparent)',
               }}
-            >
-              <div style={{
-                fontFamily: 'Bebas Neue, sans-serif',
-                fontSize: '2rem',
-                color: '#000000',
-                lineHeight: 1,
-                letterSpacing: '0.05em',
-              }}>
-                15+ YEARS
-              </div>
-              <div style={{
-                fontSize: '0.75rem',
-                color: '#000000',
-                letterSpacing: '0.2em',
-                fontWeight: 700,
-              }}>
-                EXCELLENCE
-              </div>
-            </motion.div>
+            />
           </motion.div>
 
         </div>
-      </div>
+      </motion.div>
+
+      {/* Subtle grid overlay for texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(184, 115, 51, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(184, 115, 51, 0.4) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
     </section>
   );
 }
