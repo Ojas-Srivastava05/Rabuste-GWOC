@@ -1,132 +1,97 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCartStore } from "../store/cartStore";
 
-const menuData = [
-  {
-    category: "Espresso Based",
-    items: [
-      {
-        id: 1,
-        name: "Single Origin Espresso",
-        desc: "Pure intensity with dark chocolate notes",
-        price: 140,
-        image:
-          "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=90",
-      },
-      {
-        id: 2,
-        name: "Double Shot",
-        desc: "Bold and powerful",
-        price: 200,
-        image:
-          "https://images.unsplash.com/photo-1610889556528-9a770e32642f?w=400&q=90",
-      },
-      {
-        id: 3,
-        name: "Cappuccino",
-        desc: "Perfect balance of espresso and foam",
-        price: 160,
-        image:
-          "https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=90",
-      },
-      {
-        id: 4,
-        name: "Flat White",
-        desc: "Velvety microfoam perfection",
-        price: 170,
-        image:
-          "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=90",
-      },
-    ],
-  },
-  {
-    category: "Cold Brew",
-    items: [
-      {
-        id: 5,
-        name: "Cold Brew Reserve",
-        desc: "18-hour slow extraction",
-        price: 220,
-        image:
-          "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=90",
-      },
-      {
-        id: 6,
-        name: "Iced Latte",
-        desc: "Smooth and refreshing",
-        price: 190,
-        image:
-          "https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&q=90",
-      },
-      {
-        id: 7,
-        name: "Nitro Cold Brew",
-        desc: "Nitrogen-infused smoothness",
-        price: 250,
-        image:
-          "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=90",
-      },
-    ],
-  },
-  {
-    category: "Specialty",
-    items: [
-      {
-        id: 8,
-        name: "Affogato",
-        desc: "Espresso meets vanilla gelato",
-        price: 240,
-        image:
-          "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&q=90",
-      },
-      {
-        id: 9,
-        name: "Mocha",
-        desc: "Rich chocolate indulgence",
-        price: 210,
-        image:
-          "https://images.unsplash.com/photo-1578374173703-9c37b1c7738e?w=400&q=90",
-      },
-      {
-        id: 10,
-        name: "Cortado",
-        desc: "Perfectly balanced",
-        price: 170,
-        image:
-          "https://images.unsplash.com/photo-1514066558159-fc8c737ef259?w=400&q=90",
-      },
-    ],
-  },
-];
+// using server-backed menu & cart instead of local store/static data
+
+type MenuItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+};
+
+type CartItem = {
+  menuItem: string;
+  name: string;
+  price: number;
+  quantity: number;
+};
+
+type Cart = {
+  items: CartItem[];
+  totalAmount: number;
+};
+
+// removed static menuData — menu will be fetched from /api/menu
 
 export default function MenuPage() {
   const router = useRouter();
+  // server state
+  const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [cart, setCart] = useState<Cart | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const cartItems = useCartStore((s) => s.items);
-  const addItem = useCartStore((s) => s.addItem);
-  const removeItem = useCartStore((s) => s.removeItem);
+  // fetch menu and cart on mount
+  useEffect(() => {
+    fetchMenu();
+    fetchCart();
+  }, []);
 
-  const getQty = (id: number) =>
-    cartItems.find((i) => i.id === id.toString())?.quantity || 0;
+  async function fetchMenu() {
+    try {
+      const res = await fetch("/api/menu");
+      const data = await res.json();
+      setMenu(data);
+    } catch (err) {
+      console.error("Failed to fetch menu", err);
+    }
+  }
 
-  const totalItems = cartItems.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = cartItems.reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  );
+  async function fetchCart() {
+    try {
+      const res = await fetch("/api/cart");
+      const data = await res.json();
+      setCart(data);
+    } catch (err) {
+      console.error("Failed to fetch cart", err);
+    }
+  }
 
-  const categories = ["All", ...menuData.map((c) => c.category)];
+  async function addToCart(menuItemId: string) {
+    await fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ menuItemId, quantity: 1 }),
+    });
+    fetchCart();
+  }
+
+  // decrement: reuse cart POST with negative quantity
+  async function removeFromCart(menuItemId: string) {
+    await fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ menuItemId, quantity: -1 }),
+    });
+    fetchCart();
+  }
+
+  function getQty(menuItemId: string) {
+    return cart?.items.find((i) => i.menuItem === menuItemId)?.quantity || 0;
+  }
+
+  const totalItems = cart?.items.reduce((s, i) => s + i.quantity, 0) || 0;
+  const totalPrice = cart?.totalAmount || 0;
+
+  const categories = ["All", ...Array.from(new Set(menu.map((m) => m.category)))];
   const filtered =
-    activeCategory === "All"
-      ? menuData
-      : menuData.filter((c) => c.category === activeCategory);
+    activeCategory === "All" ? menu : menu.filter((m) => m.category === activeCategory);
 
   return (
     <div style={{ background: "#0A0A0A", minHeight: "100vh" }}>
@@ -178,63 +143,35 @@ export default function MenuPage() {
         ))}
       </div>
 
-      {/* Items */}
+      {/* Items (rendered from server) */}
       <div className="container px-6 pb-20">
-        {filtered.map((cat) => (
-          <div key={cat.category} className="mb-16">
-            <h2 className="text-3xl gradient-text mb-8">{cat.category}</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((item) => (
+            <div key={item._id} className="elegant-card p-6 menu-item-card">
+              <img src={item.image} className="rounded-sm mb-4" />
+              <h3 className="text-xl mb-2">{item.name}</h3>
+              <p className="text-sm text-[#8B6F47] mb-4">{item.description}</p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cat.items.map((item) => (
-                <div key={item.id} className="elegant-card p-6">
-                  <img src={item.image} className="rounded-sm mb-4" />
-                  <h3 className="text-xl mb-2">{item.name}</h3>
-                  <p className="text-sm text-[#8B6F47] mb-4">{item.desc}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-2xl gradient-text">₹{item.price}</span>
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-2xl gradient-text">
-                      ₹{item.price}
-                    </span>
-
-                    {getQty(item.id) > 0 ? (
-                      <div className="flex items-center gap-3">
-                        <button onClick={() => removeItem(item.id.toString())}>
-                          <Minus size={16} />
-                        </button>
-                        <span>{getQty(item.id)}</span>
-                        <button
-                          onClick={() =>
-                            addItem({
-                              id: item.id.toString(),
-                              name: item.name,
-                              price: item.price,
-                              quantity: 1,
-                            })
-                          }
-                        >
-                          <Plus size={16} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          addItem({
-                            id: item.id.toString(),
-                            name: item.name,
-                            price: item.price,
-                            quantity: 1,
-                          })
-                        }
-                      >
-                        Add
-                      </button>
-                    )}
+                {getQty(item._id) > 0 ? (
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => removeFromCart(item._id)}>
+                      <Minus size={16} />
+                    </button>
+                    <span>{getQty(item._id)}</span>
+                    <button onClick={() => addToCart(item._id)}>
+                      <Plus size={16} />
+                    </button>
                   </div>
-                </div>
-              ))}
+                ) : (
+                  <button onClick={() => addToCart(item._id)}>Add</button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
