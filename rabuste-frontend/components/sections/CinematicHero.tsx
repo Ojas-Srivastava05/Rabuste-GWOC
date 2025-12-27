@@ -12,40 +12,9 @@ export default function CinematicHero() {
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{ 
-        background: 'linear-gradient(180deg, #000000 0%, #0A0A0A 50%, #141414 100%)',
+        background: 'transparent',
       }}
     >
-      {/* Powerful background elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div 
-          className="absolute top-0 right-0 w-[800px] h-[800px]"
-          style={{
-            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.2) 0%, transparent 70%)',
-            filter: 'blur(120px)',
-            animation: 'floatSlow 20s ease-in-out infinite',
-          }}
-        />
-        <div 
-          className="absolute bottom-0 left-0 w-[600px] h-[600px]"
-          style={{
-            background: 'radial-gradient(circle, rgba(115, 54, 53, 0.2) 0%, transparent 70%)',
-            filter: 'blur(120px)',
-            animation: 'floatSlow 25s ease-in-out infinite',
-            animationDelay: '7s',
-          }}
-        />
-      </div>
-
-      {/* Brutal geometric pattern overlay */}
-      <div className="absolute inset-0 opacity-5" style={{
-        backgroundImage: `repeating-linear-gradient(
-          45deg,
-          transparent,
-          transparent 100px,
-          rgba(184, 115, 51, 0.1) 100px,
-          rgba(184, 115, 51, 0.1) 101px
-        )`
-      }} />
 
       <div className="container px-6 py-20 relative z-10">
         <div className="max-w-7xl mx-auto">

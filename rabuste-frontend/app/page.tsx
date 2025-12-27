@@ -23,7 +23,17 @@ export default function Home() {
       {/* Noise overlay */}
       <div className="noise-overlay" />
       
-      <main style={{ background: 'transparent', position: 'relative', zIndex: 1 }}>
+      {/* Signature copper accent line */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-1 pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)',
+          zIndex: 100,
+          boxShadow: '0 0 20px rgba(184, 115, 51, 0.5)',
+        }}
+      />
+      
+      <main style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
         {/* Hero */}
         <CinematicHero />
 

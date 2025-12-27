@@ -31,11 +31,11 @@ export default function Navbar() {
       style={{ 
         fontFamily: "'Work Sans', sans-serif",
         background: scrolled 
-          ? 'rgba(0, 0, 0, 0.98)' 
-          : 'linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(10, 10, 10, 0.95))',
-        backdropFilter: 'blur(20px)',
+          ? 'linear-gradient(180deg, rgba(26, 15, 10, 0.98), rgba(42, 24, 16, 0.95))' 
+          : 'linear-gradient(180deg, rgba(26, 15, 10, 0.96), rgba(42, 24, 16, 0.92))',
+        backdropFilter: 'blur(30px) saturate(180%)',
         borderBottom: scrolled 
-          ? '1px solid rgba(184, 115, 51, 0.3)' 
+          ? '2px solid rgba(184, 115, 51, 0.3)' 
           : '1px solid rgba(184, 115, 51, 0.15)',
         position: 'fixed',
         top: 0,
@@ -43,8 +43,8 @@ export default function Navbar() {
         right: 0,
         zIndex: 1000,
         boxShadow: scrolled 
-          ? '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(184, 115, 51, 0.1)' 
-          : 'none',
+          ? '0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(184, 115, 51, 0.2), inset 0 1px 0 rgba(184, 115, 51, 0.1)' 
+          : '0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 115, 51, 0.05)',
       }}
     >
       {/* Subtle animated gradient background */}
