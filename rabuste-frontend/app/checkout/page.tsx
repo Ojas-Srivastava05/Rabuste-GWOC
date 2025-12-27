@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, ShoppingBag, CheckCircle, Loader2 } from "lucide-react";
+import { CreditCard, ShoppingBag, CheckCircle, Loader2, Package } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -22,15 +22,22 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useState<Cart | null>(null);
   const [paying, setPaying] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCart();
   }, []);
 
   async function fetchCart() {
-    const res = await fetch("/api/cart");
-    const data = await res.json();
-    setCart(data);
+    try {
+      const res = await fetch("/api/cart");
+      const data = await res.json();
+      setCart(data);
+    } catch (error) {
+      console.error("Failed to fetch cart", error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleMockPayment() {
@@ -46,14 +53,50 @@ export default function CheckoutPage() {
     }, 2000);
   }
 
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <DynamicBackground />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="section-label">Loading checkout...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   if (!cart || cart.items.length === 0) {
     return (
       <>
         <Navbar />
         <DynamicBackground />
         <div className="min-h-screen flex items-center justify-center px-6">
-          <div className="text-center">
-            <p className="section-label mb-4">Cart is empty</p>
+          <div className="text-center max-w-2xl">
+            <div 
+              className="w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                border: '2px solid rgba(184, 115, 51, 0.4)',
+              }}
+            >
+              <Package size={60} className="text-[#B87333]" />
+            </div>
+            <h1 
+              className="text-5xl md:text-7xl mb-6"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 0.9,
+                color: '#F5F1E8',
+              }}
+            >
+              EMPTY CART
+            </h1>
+            <p className="text-xl mb-12" style={{ color: '#B87333' }}>
+              Add items to your cart before checking out
+            </p>
             <button onClick={() => router.push("/menu")} className="btn btn-primary">
               GO TO MENU
             </button>
@@ -92,6 +135,10 @@ export default function CheckoutPage() {
             >
               CHECK<span className="gradient-text">OUT</span>
             </h1>
+
+            <p className="text-xl" style={{ color: '#B87333' }}>
+              Complete your order securely
+            </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -121,6 +168,7 @@ export default function CheckoutPage() {
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: '#F5F1E8',
+                          letterSpacing: '0.05em',
                         }}
                       >
                         {item.name}
@@ -191,7 +239,7 @@ export default function CheckoutPage() {
                 </h2>
               </div>
 
-              <p className="text-lg mb-8" style={{ color: '#8B6F47' }}>
+              <p className="text-lg mb-8" style={{ color: '#8B6F47', lineHeight: 1.7 }}>
                 This is a demo checkout. No actual payment will be processed.
               </p>
 
@@ -202,7 +250,6 @@ export default function CheckoutPage() {
                 style={{
                   fontSize: '20px',
                   padding: '24px 50px',
-                  position: 'relative',
                 }}
               >
                 {paying ? (
