@@ -7,14 +7,15 @@ import sendVerificationEmail from "../utils/sendEmail.js";
 
 const router = express.Router();
 
-/* ---------------- PASSWORD VALIDATION ---------------- */
+/* PASSWORD VALIDATION */
+
 const isStrongPassword = (password) => {
   const regex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
   return regex.test(password);
 };
 
-/* ---------------- SIGNUP ---------------- */
+/* SIGNUP (USER ONLY) */
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -42,13 +43,12 @@ router.post("/signup", async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: "user",
       isVerified: false,
       verificationToken,
     });
 
-    console.log("📨 Sending verification email to:", email);
     await sendVerificationEmail(email, verificationToken);
-    console.log("✅ Verification email sent");
 
     res.status(201).json({
       message:
@@ -60,7 +60,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-/* ---------------- EMAIL VERIFICATION ---------------- */
+/* EMAIL VERIFICATION */
 router.get("/verify-email", async (req, res) => {
   try {
     const { token } = req.query;
@@ -78,14 +78,14 @@ router.get("/verify-email", async (req, res) => {
     user.verificationToken = undefined;
     await user.save();
 
-    res.json({ message: "Email verified successfully" });
+    res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
     console.error("❌ Email verification error:", error);
     res.status(500).json({ message: "Email verification failed" });
   }
 });
 
-/* ---------------- LOGIN ---------------- */
+/* LOGIN (ADMIN + USER) */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -95,7 +95,13 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    if (!user.isVerified) {
+    // Normalize admin detection
+    const isAdmin =
+      (user.role && user.role.toLowerCase() === "admin") ||
+      user.isAdmin === true;
+
+    // Enforce email verification ONLY for normal users
+    if (!isAdmin && !user.isVerified) {
       return res.status(403).json({
         message: "Please verify your email before logging in",
       });
@@ -107,26 +113,23 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id },
+      {
+        id: user._id,
+        role: isAdmin ? "admin" : "user",
+        isAdmin,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    // detect admin role (supports either `role === 'admin'` or boolean `isAdmin`)
-    const isAdmin = !!(
-      (user.role && String(user.role).toLowerCase() === "admin") ||
-      user.isAdmin
-    );
-
-    res.json({
+    res.status(200).json({
       message: "Login successful",
       token,
-      // include admin flag and optional redirect URL so the frontend can navigate immediately
-      redirect: isAdmin ? "http://localhost:3000/admin" : undefined,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: isAdmin ? "admin" : "user",
         isAdmin,
       },
     });
