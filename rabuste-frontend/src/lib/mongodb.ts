@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
@@ -21,11 +20,12 @@ export default async function connectDB() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "workshops",
+      dbName: "rabuste", // ✅ FORCE the correct database
+      bufferCommands: false,
     });
   }
 
   cached.conn = await cached.promise;
-  console.log("✅ MongoDB connected");
+  console.log("✅ MongoDB connected to rabuste");
   return cached.conn;
 }
