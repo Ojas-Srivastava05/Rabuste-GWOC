@@ -29,9 +29,9 @@ export default function Footer() {
     <footer 
       className="relative"
       style={{
-        background: 'linear-gradient(180deg, #0A0A0A 0%, #141414 100%)',
-        borderTop: '2px solid rgba(184, 115, 51, 0.2)',
-        color: '#E4D4B7',
+        background: 'linear-gradient(180deg, #000000 0%, #1A1110 100%)',
+        borderTop: '2px solid rgba(184, 115, 51, 0.3)',
+        color: '#F5F1E8',
       }}
     >
       {/* Animated background glow */}
@@ -46,7 +46,7 @@ export default function Footer() {
       <div 
         className="absolute top-0 left-0 right-0 h-px"
         style={{
-          background: 'linear-gradient(90deg, transparent, rgba(201, 168, 106, 0.3), transparent)',
+          background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.3), transparent)',
         }}
       />
 
@@ -63,27 +63,31 @@ export default function Footer() {
             <h2 
               className="text-3xl font-light mb-4"
               style={{
-                fontFamily: 'var(--font-heading)',
-                color: '#F5F1E8',
-                fontWeight: 200,
+                fontFamily: 'Bebas Neue, sans-serif',
+                color: '#FFFEF9',
+                fontWeight: 400,
+                fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
+                letterSpacing: '0.05em',
               }}
             >
-              Rabuste
+              RABUSTE
+              <br />
+              <span style={{ color: '#B87333' }}>COFFEE</span>
             </h2>
             
             <div 
               className="w-16 h-px mb-6"
-              style={{ background: 'linear-gradient(90deg, #C9A86A, transparent)' }}
+              style={{ background: 'linear-gradient(90deg, #B87333, transparent)' }}
             />
             
             <p 
               className="text-sm mb-6"
               style={{
-                color: '#8B6F47',
+                color: 'rgba(255, 254, 249, 0.7)',
                 lineHeight: 1.8,
               }}
             >
-              Where every cup tells a story of passion, craft, and the bold character of premium Robusta.
+              Unapologetically bold. Premium Robusta with 2X caffeine power.
             </p>
             
             {/* Social Links */}
@@ -94,8 +98,8 @@ export default function Footer() {
                   href={social.url}
                   className="w-10 h-10 rounded-sm flex items-center justify-center transition-all duration-300 hover:-translate-y-1"
                   style={{
-                    background: 'rgba(201, 168, 106, 0.05)',
-                    border: '1px solid rgba(201, 168, 106, 0.1)',
+                    background: 'rgba(184, 115, 51, 0.1)',
+                    border: '2px solid rgba(184, 115, 51, 0.3)',
                   }}
                   aria-label={social.name}
                 >
@@ -115,11 +119,13 @@ export default function Footer() {
             <h3 
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
-                color: '#F5F1E8',
-                fontFamily: 'var(--font-accent)',
+                color: '#B87333',
+                fontFamily: 'Bebas Neue, sans-serif',
+                fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                letterSpacing: '0.05em',
               }}
             >
-              Navigate
+              QUICK LINKS
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
@@ -128,7 +134,7 @@ export default function Footer() {
                     href={link.url}
                     className="text-sm inline-block transition-all duration-300 hover:translate-x-2"
                     style={{
-                      color: '#8B6F47',
+                      color: 'rgba(255, 254, 249, 0.7)',
                     }}
                   >
                     {link.name}
@@ -148,28 +154,30 @@ export default function Footer() {
             <h3 
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
-                color: '#FFFEF9',
-                fontFamily: 'var(--font-accent)',
+                color: '#B87333',
+                fontFamily: 'Bebas Neue, sans-serif',
+                fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                letterSpacing: '0.05em',
               }}
             >
-              Contact
+              CONTACT
             </h3>
             <div className="space-y-4">
               {contactInfo.map((contact) => (
                 <div key={contact.label} className="flex items-start gap-3">
-                  <span className="text-lg opacity-40">{contact.icon}</span>
+                  <span className="text-lg" style={{ color: '#B87333' }}>{contact.icon}</span>
                   <div>
                     <div 
                       className="text-xs uppercase tracking-wider mb-1"
                       style={{
-                        color: '#8B6F47',
+                        color: 'rgba(255, 254, 249, 0.6)',
                       }}
                     >
                       {contact.label}
                     </div>
                     <div 
                       className="text-sm"
-                      style={{ color: '#8B6F47' }}
+                      style={{ color: 'rgba(255, 254, 249, 0.8)' }}
                     >
                       {contact.value}
                     </div>
@@ -189,16 +197,18 @@ export default function Footer() {
             <h3 
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
-                color: '#FFFEF9',
-                fontFamily: 'var(--font-accent)',
+                color: '#B87333',
+                fontFamily: 'Bebas Neue, sans-serif',
+                fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                letterSpacing: '0.05em',
               }}
             >
-              Newsletter
+              NEWSLETTER
             </h3>
             <p 
               className="text-sm mb-4"
               style={{
-                color: '#8B6F47',
+                color: 'rgba(255, 254, 249, 0.7)',
                 lineHeight: 1.6,
               }}
             >
@@ -208,19 +218,24 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Your email"
-                className="flex-1 px-4 py-2 rounded-sm text-sm"
+                className="flex-1 px-4 py-2 text-sm"
                 style={{
-                  background: 'rgba(30, 30, 30, 0.6)',
-                  border: '1px solid rgba(201, 168, 106, 0.2)',
-                  color: '#F5F1E8',
+                  background: 'rgba(61, 43, 31, 0.6)',
+                  border: '2px solid rgba(184, 115, 51, 0.3)',
+                  color: '#FFFEF9',
                   outline: 'none',
+                  borderRadius: '0',
                 }}
               />
               <button
-                className="px-4 py-2 rounded-sm text-sm font-light transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 text-sm font-light transition-all duration-300 hover:scale-105"
                 style={{
-                  background: 'linear-gradient(135deg, #8B6F47 0%, #C9A86A 100%)',
-                  color: '#0A0A0A',
+                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                  color: '#000000',
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  letterSpacing: '0.1em',
+                  borderRadius: '0',
+                  border: 'none',
                 }}
               >
                 →
@@ -233,7 +248,7 @@ export default function Footer() {
         <div 
           className="h-px mb-8"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgba(235, 230, 221, 0.1), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.2), transparent)',
           }}
         />
 
@@ -241,9 +256,9 @@ export default function Footer() {
         <div className="flex flex-wrap justify-between items-center gap-4">
           <div 
             className="text-sm"
-            style={{ color: '#8B6F47' }}
+            style={{ color: 'rgba(255, 254, 249, 0.6)' }}
           >
-            © {currentYear} Rabuste Coffee. Crafted with passion.
+            © {currentYear} Rabuste Coffee. Unapologetically Bold.
           </div>
           
           <div className="flex gap-6">
@@ -252,7 +267,7 @@ export default function Footer() {
                 key={item}
                 href="#"
                 className="text-sm transition-colors duration-300"
-                style={{ color: '#8B6F47' }}
+                style={{ color: 'rgba(255, 254, 249, 0.5)' }}
               >
                 {item}
               </a>

@@ -10,146 +10,178 @@ export default function ContactSection() {
 
   const contactInfo = [
     {
-      icon: <MapPin size={20} />,
-      title: 'Visit Us',
+      icon: MapPin,
+      title: 'VISIT US',
       details: ['123 Coffee Street', 'Downtown District', 'City, State 12345'],
+      color: '#B87333',
     },
     {
-      icon: <Phone size={20} />,
-      title: 'Call Us',
+      icon: Phone,
+      title: 'CALL US',
       details: ['+1 (555) 123-4567', 'Mon-Sat: 7AM - 9PM', 'Sunday: 8AM - 8PM'],
+      color: '#CD7F32',
     },
     {
-      icon: <Mail size={20} />,
-      title: 'Email Us',
+      icon: Mail,
+      title: 'EMAIL US',
       details: ['hello@rabuste.com', 'support@rabuste.com', 'Response within 24hrs'],
+      color: '#D4A574',
     },
     {
-      icon: <Clock size={20} />,
-      title: 'Hours',
-      details: ['Mon-Fri: 7:00 AM - 9:00 PM', 'Sat-Sun: 8:00 AM - 10:00 PM', 'Holidays: 9:00 AM - 6:00 PM'],
+      icon: Clock,
+      title: 'HOURS',
+      details: ['Mon-Fri: 7AM - 9PM', 'Sat-Sun: 8AM - 10PM', 'Holidays: 9AM - 6PM'],
+      color: '#B87333',
     },
   ];
 
   return (
     <section
       ref={ref}
-      className="section"
-      style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #000000 100%)' }}
+      className="relative overflow-hidden"
+      style={{ 
+        background: 'linear-gradient(180deg, #000000 0%, #1A1110 100%)',
+        padding: 'clamp(80px, 15vw, 120px) 0',
+      }}
     >
-      
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-12 sm:mb-16"
         >
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <div className="copper-line" />
-            <span className="section-label">
-              CONNECT WITH US
-            </span>
-            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-          </div>
+          <p style={{
+            color: '#B87333',
+            fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+            letterSpacing: '0.3em',
+            fontWeight: 700,
+            marginBottom: '1.5rem',
+          }}>
+            CONNECT WITH US
+          </p>
 
-          <h2 
-            className="mb-6"
-            style={{
-              color: '#FFFEF9',
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 400,
-            }}
-          >
+          <h2 style={{
+            fontFamily: 'Bebas Neue, sans-serif',
+            fontSize: 'clamp(2.5rem, 8vw, 6rem)',
+            lineHeight: 0.9,
+            color: '#FFFEF9',
+          }}>
             VISIT THE
             <br />
-            <span className="gradient-copper">POWERHOUSE</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              POWERHOUSE
+            </span>
           </h2>
         </motion.div>
 
-        {/* Contact Cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {contactInfo.map((info, index) => (
-            <motion.div
-              key={info.title}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -8 }}
-              className="brutal-card p-6"
-            >
-              <div 
-                className="w-10 h-10 rounded-sm flex items-center justify-center mb-4"
+        {/* Contact Cards - Responsive Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-16">
+          {contactInfo.map((info, index) => {
+            const Icon = info.icon;
+            return (
+              <motion.div
+                key={info.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -8, scale: 1.03 }}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(115, 54, 53, 0.2))',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
-                  color: '#B87333',
+                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+                  border: `3px solid ${info.color}40`,
+                  padding: 'clamp(20px, 4vw, 24px)',
+                  position: 'relative',
+                  overflow: 'hidden',
                 }}
               >
-                {info.icon}
-              </div>
-              
-              <h3 
-                className="text-lg mb-3"
-                style={{
-                  color: '#FFFEF9',
-                  fontFamily: 'var(--font-heading)',
-                  fontWeight: 400,
-                  letterSpacing: '0.08em',
-                }}
-              >
-                {info.title}
-              </h3>
-              
-              <div className="space-y-1">
-                {info.details.map((detail, i) => (
-                  <p 
-                    key={i}
-                    className="text-sm"
-                    style={{ 
-                      color: '#8B6F47',
-                    }}
-                  >
-                    {detail}
-                  </p>
-                ))}
-              </div>
-            </motion.div>
-          ))}
+                {/* Icon */}
+                <div style={{
+                  background: info.color,
+                  width: 'clamp(50px, 10vw, 60px)',
+                  height: 'clamp(50px, 10vw, 60px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 'clamp(16px, 3vw, 20px)',
+                }}>
+                  <Icon size={24} color="#000000" strokeWidth={2.5} />
+                </div>
+
+                {/* Title */}
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
+                  color: info.color,
+                  marginBottom: 'clamp(12px, 2.5vw, 16px)',
+                  letterSpacing: '0.05em',
+                }}>
+                  {info.title}
+                </h3>
+
+                {/* Details */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'clamp(6px, 1.5vw, 8px)',
+                }}>
+                  {info.details.map((detail, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        fontSize: 'clamp(0.875rem, 1.8vw, 1rem)',
+                        color: 'rgba(255, 254, 249, 0.7)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {detail}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
-        {/* Map placeholder with premium styling */}
+        {/* Map Placeholder */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="rounded-sm overflow-hidden"
           style={{
-            border: '1px solid rgba(201, 168, 106, 0.15)',
+            background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.6), rgba(26, 17, 16, 0.6))',
+            border: '3px solid rgba(255, 107, 53, 0.3)',
+            height: 'clamp(250px, 40vw, 400px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          <div 
-            className="w-full h-96 flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, #141414 0%, #1E1E1E 100%)',
-            }}
-          >
-            <div className="text-center">
-              <MapPin size={40} color="#C9A86A" className="mx-auto mb-4 opacity-40" />
-              <p 
-                className="text-lg font-light mb-2"
-                style={{ 
-                  color: '#F5F1E8',
-                  fontFamily: 'var(--font-heading)',
-                }}
-              >
-                Map Integration
-              </p>
-              <p style={{ color: '#8B6F47', fontSize: '0.9rem' }}>
-                123 Coffee Street, Downtown District
-              </p>
-            </div>
+          <div style={{
+            textAlign: 'center',
+            padding: '20px',
+          }}>
+            <MapPin size={48} color="#B87333" style={{ margin: '0 auto 16px' }} />
+            <p style={{
+              fontFamily: 'Bebas Neue, sans-serif',
+              fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+              color: '#FFFEF9',
+              letterSpacing: '0.05em',
+            }}>
+              FIND US HERE
+            </p>
+            <p style={{
+              color: 'rgba(255, 254, 249, 0.7)',
+              fontSize: 'clamp(0.875rem, 2vw, 1rem)',
+              marginTop: '8px',
+            }}>
+              Interactive map coming soon
+            </p>
           </div>
         </motion.div>
       </div>

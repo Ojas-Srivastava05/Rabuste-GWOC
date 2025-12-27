@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 
 const testimonials = [
   {
@@ -10,66 +10,87 @@ const testimonials = [
     role: 'Startup Founder',
     image: 'https://i.pravatar.cc/150?u=arjun',
     rating: 5,
-    text: 'Switched from Arabica 3 months ago. The energy boost is real - no more 3 PM crashes. My productivity has literally doubled.',
+    text: 'Switched from Arabica 3 months ago. The energy boost is real - no more 3 PM crashes. Productivity doubled.',
+    color: '#B87333',
   },
   {
     name: 'Priya Sharma',
     role: 'Fitness Coach',
     image: 'https://i.pravatar.cc/150?u=priya',
     rating: 5,
-    text: 'I recommend Rabuste to all my clients. Perfect pre-workout drink. The sustained energy helps them push harder, longer.',
+    text: 'I recommend Rabuste to all my clients. Perfect pre-workout. The sustained energy helps them push harder.',
+    color: '#CD7F32',
   },
   {
     name: 'Vikram Singh',
     role: 'Software Engineer',
     image: 'https://i.pravatar.cc/150?u=vikram',
     rating: 5,
-    text: 'Was skeptical about Robusta. One cup and I was converted. The bold flavor and long-lasting focus are game changers for coding sessions.',
+    text: 'Was skeptical about Robusta. One cup and I was converted. Bold flavor and focus are game changers.',
+    color: '#D4A574',
   },
   {
     name: 'Ananya Reddy',
     role: 'Medical Student',
     image: 'https://i.pravatar.cc/150?u=ananya',
     rating: 5,
-    text: 'Studying for 18+ hours needed something stronger. Rabuste delivers. No jitters, just pure focus. Worth every rupee.',
+    text: 'Studying 18+ hours needed something stronger. Rabuste delivers. No jitters, just pure focus.',
+    color: '#B87333',
   },
 ];
 
 export default function TestimonialsSection() {
   return (
-    <section className="section relative">
-      <div className="container mx-auto px-6">
+    <section 
+      className="relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #000000 0%, #1A1110 50%, #000000 100%)',
+        padding: 'clamp(80px, 15vw, 120px) 0',
+      }}
+    >
+      <div className="container px-4 sm:px-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
         >
-          <div className="inline-flex items-center gap-4 mb-8">
-            <div className="copper-line" />
-            <span className="section-label">REAL RESULTS</span>
-            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-          </div>
+          <p style={{
+            color: '#B87333',
+            fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+            letterSpacing: '0.3em',
+            fontWeight: 700,
+            marginBottom: '1.5rem',
+          }}>
+            REAL RESULTS
+          </p>
 
-          <h2
-            className="text-5xl md:text-7xl mb-6"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 400,
-              lineHeight: 1,
-              color: '#FFFEF9',
-            }}
-          >
+          <h2 style={{
+            fontFamily: 'Bebas Neue, sans-serif',
+            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
+            lineHeight: 0.9,
+            color: '#FFFEF9',
+            marginBottom: '1rem',
+          }}>
             WHAT OUR
             <br />
-            <span className="gradient-copper">CUSTOMERS SAY</span>
+            <span style={{
+              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              CUSTOMERS
+            </span>
+            <br />
+            SAY
           </h2>
         </motion.div>
 
-        {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        {/* Testimonials Grid - Responsive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.name}
@@ -77,52 +98,85 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="brutal-card p-8 hover:scale-105 transition-all duration-300"
+              whileHover={{ scale: 1.03, y: -8 }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+                border: `3px solid ${testimonial.color}40`,
+                padding: 'clamp(24px, 5vw, 32px)',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
             >
+              {/* Quote icon */}
+              <Quote 
+                size={60} 
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  color: `${testimonial.color}20`,
+                }}
+              />
+
               {/* Rating */}
-              <div className="flex gap-1 mb-6">
+              <div style={{
+                display: 'flex',
+                gap: '4px',
+                marginBottom: 'clamp(16px, 3vw, 20px)',
+              }}>
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <Star
                     key={i}
                     size={20}
-                    fill="#B87333"
-                    stroke="#B87333"
+                    fill={testimonial.color}
+                    color={testimonial.color}
                   />
                 ))}
               </div>
 
-              {/* Quote */}
-              <p
-                className="text-lg mb-8 leading-relaxed"
-                style={{ color: '#D4A574' }}
-              >
+              {/* Text */}
+              <p style={{
+                fontSize: 'clamp(1rem, 2vw, 1.125rem)',
+                lineHeight: 1.7,
+                color: 'rgba(255, 254, 249, 0.9)',
+                marginBottom: 'clamp(20px, 4vw, 24px)',
+                position: 'relative',
+                zIndex: 1,
+              }}>
                 "{testimonial.text}"
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-4">
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'clamp(12px, 3vw, 16px)',
+              }}>
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
-                  className="w-14 h-14 rounded-full"
                   style={{
-                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                    width: 'clamp(50px, 10vw, 60px)',
+                    height: 'clamp(50px, 10vw, 60px)',
+                    borderRadius: '50%',
+                    border: `3px solid ${testimonial.color}`,
                   }}
                 />
+                
                 <div>
-                  <div
-                    className="font-bold"
-                    style={{
-                      color: '#FFFEF9',
-                      fontFamily: 'var(--font-heading)',
-                    }}
-                  >
+                  <div style={{
+                    fontFamily: 'Bebas Neue, sans-serif',
+                    fontSize: 'clamp(1.125rem, 2.5vw, 1.375rem)',
+                    color: '#FFFEF9',
+                    letterSpacing: '0.05em',
+                  }}>
                     {testimonial.name}
                   </div>
-                  <div
-                    className="text-sm"
-                    style={{ color: '#8B6F47' }}
-                  >
+                  <div style={{
+                    fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                    color: testimonial.color,
+                    letterSpacing: '0.05em',
+                  }}>
                     {testimonial.role}
                   </div>
                 </div>
@@ -130,40 +184,6 @@ export default function TestimonialsSection() {
             </motion.div>
           ))}
         </div>
-
-        {/* Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto"
-        >
-          {[
-            { value: '50K+', label: 'Happy Customers' },
-            { value: '4.9/5', label: 'Average Rating' },
-            { value: '95%', label: 'Reorder Rate' },
-            { value: '100K+', label: 'Cups Served' },
-          ].map((stat, index) => (
-            <div key={stat.label} className="text-center">
-              <div
-                className="text-4xl md:text-5xl font-bold mb-2"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  color: '#B87333',
-                }}
-              >
-                {stat.value}
-              </div>
-              <div
-                className="text-sm uppercase tracking-wider"
-                style={{ color: '#8B6F47' }}
-              >
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );

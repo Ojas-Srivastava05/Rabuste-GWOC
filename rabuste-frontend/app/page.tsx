@@ -1,15 +1,14 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import CinematicHero from "@/components/sections/CinematicHero";
+import HeroRevamped from "@/components/sections/HeroRevamped";
+import HorizontalScroll from "@/components/sections/HorizontalScroll";
 import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
-import ComparisonSection from "@/components/sections/ComparisonSection";
-import DiagonalProducts from "@/components/sections/DiagonalProducts";
+import CallToAction from "@/components/sections/CallToAction";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
-import DynamicBackground from "@/components/DynamicBackground";
 
 export default function Home() {
   return (
@@ -17,13 +16,10 @@ export default function Home() {
       <Navbar />
       <FloatingCart />
 
-      {/* Dynamic animated background */}
-      <DynamicBackground />
-
       {/* Noise overlay */}
       <div className="noise-overlay" />
       
-      {/* Signature copper accent line */}
+      {/* Premium copper accent line */}
       <div 
         className="fixed top-0 left-0 right-0 h-1 pointer-events-none"
         style={{
@@ -33,23 +29,23 @@ export default function Home() {
         }}
       />
       
-      <main style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
-        {/* Hero */}
-        <CinematicHero />
+      <main style={{ background: '#000000', position: 'relative', zIndex: 2 }}>
+        {/* Hero - Bold & Massive with Animations */}
+        <HeroRevamped />
 
-        {/* Benefits - conversion focused */}
+        {/* Horizontal Scroll Section - UNIQUE EXPERIENCE */}
+        <HorizontalScroll />
+
+        {/* Benefits - Parallax */}
         <BenefitsShowcase />
 
-        {/* Comparison - data driven */}
-        <ComparisonSection />
+        {/* Strong CTA Section */}
+        <CallToAction />
 
-        {/* Featured Products */}
-        <DiagonalProducts />
-
-        {/* Social Proof */}
+        {/* Social Proof - Fully Responsive */}
         <TestimonialsSection />
 
-        {/* Contact Section */}
+        {/* Contact Section - Fully Responsive */}
         <ContactSection />
       </main>
 

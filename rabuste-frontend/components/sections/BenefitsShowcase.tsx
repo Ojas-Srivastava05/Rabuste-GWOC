@@ -1,53 +1,53 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Zap, Brain, Dumbbell, Clock, TrendingUp, Award } from 'lucide-react';
 
 const benefits = [
   {
-    icon: <Zap size={32} />,
-    title: '2X Caffeine Power',
+    icon: Zap,
+    title: '2X CAFFEINE',
     value: '2.7%',
-    comparison: 'vs 1.5% in Arabica',
+    comparison: 'vs 1.5% Arabica',
     desc: 'Double the energy for your day',
     color: '#B87333',
   },
   {
-    icon: <Brain size={32} />,
-    title: 'Enhanced Focus',
-    value: '4-6hrs',
+    icon: Brain,
+    title: 'SHARP FOCUS',
+    value: '4-6HRS',
     comparison: 'sustained energy',
-    desc: 'Stay sharp throughout your workday',
+    desc: 'Stay sharp throughout workday',
     color: '#CD7F32',
   },
   {
-    icon: <Dumbbell size={32} />,
-    title: 'Performance Boost',
+    icon: Dumbbell,
+    title: 'PERFORMANCE',
     value: '+15%',
-    comparison: 'athletic performance',
+    comparison: 'athletic boost',
     desc: 'Perfect pre-workout fuel',
     color: '#D4A574',
   },
   {
-    icon: <Clock size={32} />,
-    title: 'Longer Lasting',
-    value: '6-8hrs',
+    icon: Clock,
+    title: 'LONG LASTING',
+    value: '6-8HRS',
     comparison: 'energy duration',
     desc: 'No mid-day crashes',
     color: '#B87333',
   },
   {
-    icon: <TrendingUp size={32} />,
-    title: 'Metabolism Boost',
+    icon: TrendingUp,
+    title: 'METABOLISM',
     value: '+11%',
     comparison: 'metabolic rate',
     desc: 'Burns more calories naturally',
     color: '#CD7F32',
   },
   {
-    icon: <Award size={32} />,
-    title: 'Antioxidants',
+    icon: Award,
+    title: 'ANTIOXIDANTS',
     value: '7-10%',
     comparison: 'more CGA',
     desc: 'Superior health benefits',
@@ -56,120 +56,172 @@ const benefits = [
 ];
 
 export default function BenefitsShowcase() {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
   return (
-    <section className="section relative overflow-hidden">
-      <div className="container mx-auto px-6">
+    <section 
+      ref={containerRef}
+      className="relative overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, #000000 0%, #1A1110 50%, #000000 100%)',
+        padding: '120px 0',
+      }}
+    >
+      {/* Parallax background */}
+      <motion.div
+        style={{ y }}
+        className="absolute inset-0 opacity-5"
+      >
+        <div
+          style={{
+            backgroundImage: 'url(https://images.pexels.com/photos/669162/pexels-photo-669162.jpeg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            width: '100%',
+            height: '120%',
+          }}
+        />
+      </motion.div>
+
+      <div className="container px-4 sm:px-6 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
         >
-          <div className="inline-flex items-center gap-4 mb-8">
-            <div className="copper-line" />
-            <span className="section-label">WHY ROBUSTA WINS</span>
-            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-          </div>
-
-          <h2
-            className="text-5xl md:text-7xl mb-6"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontWeight: 400,
-              lineHeight: 1,
-              color: '#FFFEF9',
-            }}
-          >
-            SCIENCE-BACKED
-            <br />
-            <span className="gradient-copper">BENEFITS</span>
-          </h2>
-
-          <p
-            className="text-lg md:text-xl max-w-3xl mx-auto"
-            style={{ color: '#B87333', lineHeight: 1.8 }}
-          >
-            Not just coffee. A performance enhancer backed by research.
+          <p style={{
+            color: '#B87333',
+            fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
+            letterSpacing: '0.3em',
+            fontWeight: 700,
+            marginBottom: '1.5rem',
+          }}>
+            WHY ROBUSTA DOMINATES
           </p>
+          
+          <h2 style={{
+            fontFamily: 'Bebas Neue, sans-serif',
+            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
+            lineHeight: 0.9,
+            color: '#FFFEF9',
+            marginBottom: '1rem',
+          }}>
+            SCIENCE
+            <br />
+            <span style={{
+              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              BACKED
+            </span>
+            <br />
+            POWER
+          </h2>
         </motion.div>
 
-        {/* Benefits Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {benefits.map((benefit, index) => (
-            <motion.div
-              key={benefit.title}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="brutal-card p-8 group hover:scale-105 transition-all duration-300"
-            >
-              {/* Icon */}
-              <div
-                className="w-16 h-16 mb-6 flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+        {/* Benefits Grid - Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
+          {benefits.map((benefit, index) => {
+            const Icon = benefit.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05, y: -10 }}
                 style={{
-                  background: `linear-gradient(135deg, ${benefit.color}20, ${benefit.color}10)`,
-                  border: `2px solid ${benefit.color}40`,
-                  color: benefit.color,
+                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+                  border: `3px solid ${benefit.color}40`,
+                  padding: 'clamp(20px, 4vw, 30px)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
                 }}
               >
-                {benefit.icon}
-              </div>
-
-              {/* Title */}
-              <h3
-                className="text-2xl mb-4"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  color: '#D4A574',
-                  fontWeight: 400,
-                }}
-              >
-                {benefit.title}
-              </h3>
-
-              {/* Stats */}
-              <div className="mb-4">
+                {/* Glow effect */}
                 <div
-                  className="text-4xl font-bold mb-1"
                   style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: benefit.color,
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    width: '150px',
+                    height: '150px',
+                    background: `radial-gradient(circle, ${benefit.color}20 0%, transparent 70%)`,
+                    pointerEvents: 'none',
                   }}
-                >
+                />
+
+                {/* Icon */}
+                <div style={{
+                  background: benefit.color,
+                  width: 'clamp(50px, 10vw, 70px)',
+                  height: 'clamp(50px, 10vw, 70px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 'clamp(16px, 3vw, 24px)',
+                }}>
+                  <Icon size={32} color="#000000" strokeWidth={2.5} />
+                </div>
+
+                {/* Value */}
+                <div style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+                  lineHeight: 1,
+                  color: benefit.color,
+                  marginBottom: 'clamp(8px, 2vw, 12px)',
+                }}>
                   {benefit.value}
                 </div>
-                <div
-                  className="text-sm uppercase tracking-wider"
-                  style={{ color: '#8B6F47' }}
-                >
+
+                {/* Comparison */}
+                <div style={{
+                  fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                  color: 'rgba(255, 254, 249, 0.6)',
+                  letterSpacing: '0.05em',
+                  marginBottom: 'clamp(12px, 2.5vw, 16px)',
+                }}>
                   {benefit.comparison}
                 </div>
-              </div>
 
-              {/* Description */}
-              <p style={{ color: '#B87333', lineHeight: 1.6 }}>
-                {benefit.desc}
-              </p>
-            </motion.div>
-          ))}
+                {/* Title */}
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+                  color: '#FFFEF9',
+                  lineHeight: 1.2,
+                  marginBottom: 'clamp(8px, 2vw, 12px)',
+                  letterSpacing: '0.05em',
+                }}>
+                  {benefit.title}
+                </h3>
+
+                {/* Description */}
+                <p style={{
+                  color: 'rgba(255, 254, 249, 0.7)',
+                  fontSize: 'clamp(0.875rem, 1.8vw, 1rem)',
+                  lineHeight: 1.5,
+                }}>
+                  {benefit.desc}
+                </p>
+              </motion.div>
+            );
+          })}
         </div>
-
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <a href="/science" className="btn btn-primary group">
-            SEE THE RESEARCH
-            <span className="transition-transform group-hover:translate-x-2">→</span>
-          </a>
-        </motion.div>
       </div>
     </section>
   );
