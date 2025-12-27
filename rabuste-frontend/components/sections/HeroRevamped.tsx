@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Coffee, Zap, Award } from 'lucide-react';
+import { Zap, Award } from 'lucide-react';
 
 export default function HeroRevamped() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
@@ -16,13 +18,42 @@ export default function HeroRevamped() {
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+  // Trigger elegant load animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section 
       ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
+      {/* Elegant Curtain Reveal Animation */}
+      <motion.div
+        initial={{ scaleY: 1 }}
+        animate={{ scaleY: 0 }}
+        transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'linear-gradient(180deg, #000000 0%, #0a0a0a 100%)',
+          transformOrigin: 'top',
+          zIndex: 100,
+          pointerEvents: 'none',
+        }}
+      />
+
       {/* Premium Coffee Beans Background with Parallax */}
       <motion.div 
+        initial={{ scale: 1.08, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
         style={{ y }}
         className="absolute inset-0"
       >
@@ -58,20 +89,21 @@ export default function HeroRevamped() {
         {[...Array(15)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-[#D4A574]"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
+            initial={{ opacity: 0 }}
+            animate={{ 
               y: [0, -120, 0],
               opacity: [0, 0.6, 0],
             }}
             transition={{
               duration: 4 + Math.random() * 3,
               repeat: Infinity,
-              delay: Math.random() * 3,
+              delay: 1.2 + Math.random() * 2,
               ease: "easeInOut",
+            }}
+            className="absolute w-1 h-1 rounded-full bg-[#D4A574]"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
             }}
           />
         ))}
@@ -79,6 +111,9 @@ export default function HeroRevamped() {
 
       {/* Main Content */}
       <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.8, delay: 0.5 }}
         style={{ opacity }}
         className="container px-6 py-20 relative z-10"
       >
@@ -86,17 +121,17 @@ export default function HeroRevamped() {
           
           {/* Elegant Content Card */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 50 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
             className="relative"
           >
             {/* Decorative top border */}
             <motion.div
               initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="h-[2px] w-32 mx-auto mb-12"
+              animate={{ scaleX: isLoaded ? 1 : 0 }}
+              transition={{ duration: 1.4, delay: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="h-[1px] w-24 mx-auto mb-14"
               style={{
                 background: 'linear-gradient(90deg, transparent, #B87333, transparent)',
               }}
@@ -114,40 +149,12 @@ export default function HeroRevamped() {
               />
 
               <div className="relative z-10 text-center px-4 md:px-8">
-                {/* Brand Icon */}
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.9, delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="flex justify-center mb-10"
-                >
-                  <div 
-                    className="relative w-24 h-24 rounded-full flex items-center justify-center"
-                    style={{
-                      background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                      boxShadow: '0 0 60px rgba(184, 115, 51, 0.5), 0 20px 40px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    <Coffee size={48} className="text-black" strokeWidth={2.5} />
-                    
-                    {/* Rotating ring animation */}
-                    <motion.div
-                      className="absolute inset-[-8px] rounded-full"
-                      style={{
-                        border: '2px solid rgba(184, 115, 51, 0.3)',
-                      }}
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                    />
-                  </div>
-                </motion.div>
-
                 {/* Welcome Eyebrow */}
                 <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.4 }}
-                  className="mb-8"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 30 }}
+                  transition={{ duration: 0.9, delay: 1.1 }}
+                  className="mb-10"
                   style={{
                     color: '#D4A574',
                     fontSize: '0.813rem',
@@ -161,9 +168,9 @@ export default function HeroRevamped() {
 
                 {/* Main Brand Title */}
                 <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.9, delay: 0.6 }}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 50 }}
+                  transition={{ duration: 1.1, delay: 1.3 }}
                   className="mb-12"
                 >
                   <h1
@@ -200,9 +207,9 @@ export default function HeroRevamped() {
 
                 {/* Feature Badges */}
                 <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.8 }}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 40 }}
+                  transition={{ duration: 1, delay: 1.5 }}
                   className="flex flex-wrap justify-center gap-12 md:gap-20 mb-14"
                 >
                   {[
@@ -212,8 +219,8 @@ export default function HeroRevamped() {
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.6, delay: 1 + i * 0.15 }}
+                      animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.8 }}
+                      transition={{ duration: 0.8, delay: 1.6 + i * 0.15 }}
                       whileHover={{ scale: 1.08, y: -8 }}
                       className="flex flex-col items-center gap-4"
                     >
@@ -265,9 +272,9 @@ export default function HeroRevamped() {
 
                 {/* CTA Button */}
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.85 }}
+                  transition={{ duration: 0.9, delay: 1.9 }}
                   className="mb-16"
                 >
                   <motion.button
@@ -324,8 +331,8 @@ export default function HeroRevamped() {
                 {/* Tagline Section */}
                 <motion.div
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1, delay: 1.4 }}
+                  animate={{ opacity: isLoaded ? 1 : 0 }}
+                  transition={{ duration: 1.1, delay: 2.1 }}
                   className="space-y-6"
                 >
                   <p
@@ -367,9 +374,9 @@ export default function HeroRevamped() {
             {/* Decorative bottom border */}
             <motion.div
               initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1.2, delay: 1.6, ease: [0.22, 1, 0.36, 1] }}
-              className="h-[2px] w-32 mx-auto mt-16"
+              animate={{ scaleX: isLoaded ? 1 : 0 }}
+              transition={{ duration: 1.4, delay: 2.3, ease: [0.22, 1, 0.36, 1] }}
+              className="h-[1px] w-24 mx-auto mt-16"
               style={{
                 background: 'linear-gradient(90deg, transparent, #B87333, transparent)',
               }}
