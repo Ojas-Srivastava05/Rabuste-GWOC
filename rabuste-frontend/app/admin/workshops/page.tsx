@@ -1,16 +1,7 @@
 "use client";
 
-import RotatingText from "../../../components/RotatingText";
 import React, { useEffect, useState } from "react";
-import {
-  Calendar,
-  Coffee,
-  Palette,
-  Clock,
-  User,
-  MapPin,
-  X,
-} from "lucide-react";
+import { Clock, User, MapPin, X } from "lucide-react";
 
 /* -------------------- Helpers -------------------- */
 const formatDate = (date: Date) => date.toLocaleDateString("en-CA");
@@ -26,10 +17,6 @@ type Workshop = {
   instructor: string;
   location: string;
   status: "upcoming" | "past";
-};
-
-type NextWorkshop = Workshop & {
-  daysLeft: number;
 };
 
 /* -------------------- Page -------------------- */
@@ -100,7 +87,7 @@ export default function WorkshopsAdminPage() {
     const workshop = getWorkshopForDate(date);
     if (workshop) {
       setSelectedWorkshop(workshop);
-      setEditWorkshop(workshop);
+      setEditWorkshop({ ...workshop });
       setIsEditing(false);
       setIsModalOpen(true);
     }
@@ -112,15 +99,21 @@ export default function WorkshopsAdminPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...newWorkshop,
+        title: newWorkshop.title,
+        category: newWorkshop.category,
+        date: newWorkshop.date,
         time: `${newWorkshop.hour}:${newWorkshop.minute || "00"} ${
           newWorkshop.ampm
         }`,
+        description: newWorkshop.description,
+        instructor: newWorkshop.instructor,
+        location: newWorkshop.location,
       }),
     });
 
     const saved = await res.json();
     setWorkshops((p) => [...p, saved]);
+
     setNewWorkshop({
       title: "",
       category: "coffee",
@@ -136,15 +129,17 @@ export default function WorkshopsAdminPage() {
 
   const handleUpdateWorkshop = async () => {
     if (!editWorkshop) return;
+
     const res = await fetch(`/api/workshops/${editWorkshop._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(editWorkshop),
     });
+
     const updated = await res.json();
-    setWorkshops((p) =>
-      p.map((w) => (w._id === updated._id ? updated : w))
-    );
+
+    setWorkshops((p) => p.map((w) => (w._id === updated._id ? updated : w)));
+
     setSelectedWorkshop(updated);
     setIsEditing(false);
   };
@@ -153,6 +148,7 @@ export default function WorkshopsAdminPage() {
     await fetch(`/api/workshops/${id}`, { method: "DELETE" });
     setWorkshops((p) => p.filter((w) => w._id !== id));
     setIsModalOpen(false);
+    setIsEditing(false);
   };
 
   /* -------------------- UI -------------------- */
@@ -160,32 +156,32 @@ export default function WorkshopsAdminPage() {
     getDaysInMonth(currentMonth);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f2] text-[#2e211a] p-8">
-      {/* Header */}
+    <div className="min-h-screen bg-[#f8f5f2] p-8 text-[#2e211a]">
       <h1 className="text-4xl font-bold mb-10">Admin • Workshops</h1>
 
       {/* Add Workshop */}
-      <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#4a3325]/20 mb-16">
+      <div className="bg-white rounded-2xl p-8 shadow-lg mb-16">
         <h2 className="text-2xl font-semibold mb-6">Add New Workshop</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input
+            className="input"
             placeholder="Title"
             value={newWorkshop.title}
             onChange={(e) =>
               setNewWorkshop({ ...newWorkshop, title: e.target.value })
             }
-            className="input"
           />
+
           <select
+            className="input"
             value={newWorkshop.category}
             onChange={(e) =>
               setNewWorkshop({
                 ...newWorkshop,
-                category: e.target.value as "coffee" | "painting",
+                category: e.target.value as any,
               })
             }
-            className="input"
           >
             <option value="coffee">Coffee</option>
             <option value="painting">Painting</option>
@@ -193,49 +189,82 @@ export default function WorkshopsAdminPage() {
 
           <input
             type="date"
+            className="input"
             value={newWorkshop.date}
             onChange={(e) =>
               setNewWorkshop({ ...newWorkshop, date: e.target.value })
             }
-            className="input"
           />
+
           <input
+            className="input"
             placeholder="Instructor"
             value={newWorkshop.instructor}
             onChange={(e) =>
               setNewWorkshop({ ...newWorkshop, instructor: e.target.value })
             }
+          />
+
+          <div className="flex gap-2">
+            <input
+              className="input"
+              placeholder="HH"
+              value={newWorkshop.hour}
+              onChange={(e) =>
+                setNewWorkshop({ ...newWorkshop, hour: e.target.value })
+              }
+            />
+            <input
+              className="input"
+              placeholder="MM"
+              value={newWorkshop.minute}
+              onChange={(e) =>
+                setNewWorkshop({ ...newWorkshop, minute: e.target.value })
+              }
+            />
+            <select
+              className="input"
+              value={newWorkshop.ampm}
+              onChange={(e) =>
+                setNewWorkshop({ ...newWorkshop, ampm: e.target.value })
+              }
+            >
+              <option>AM</option>
+              <option>PM</option>
+            </select>
+          </div>
+
+          <input
             className="input"
+            placeholder="Location"
+            value={newWorkshop.location}
+            onChange={(e) =>
+              setNewWorkshop({ ...newWorkshop, location: e.target.value })
+            }
           />
         </div>
 
         <textarea
+          className="input mt-4"
           placeholder="Description"
           value={newWorkshop.description}
           onChange={(e) =>
             setNewWorkshop({ ...newWorkshop, description: e.target.value })
           }
-          className="input mt-4"
         />
 
         <button
           onClick={handleAddWorkshop}
-          className="mt-6 bg-[#c68642] hover:bg-[#b57738] text-white px-8 py-3 rounded-xl font-semibold"
+          className="mt-6 bg-[#c68642] text-white px-8 py-3 rounded-xl font-semibold"
         >
           Add Workshop
         </button>
       </div>
 
       {/* Calendar */}
-      <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#4a3325]/20">
+      <div className="bg-white rounded-2xl p-8 shadow-lg">
         <div className="flex justify-between mb-6">
-          <button
-            onClick={() =>
-              setCurrentMonth(
-                new Date(year, month - 1, 1)
-              )
-            }
-          >
+          <button onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}>
             ←
           </button>
           <h2 className="text-2xl font-semibold">
@@ -244,13 +273,7 @@ export default function WorkshopsAdminPage() {
               year: "numeric",
             })}
           </h2>
-          <button
-            onClick={() =>
-              setCurrentMonth(
-                new Date(year, month + 1, 1)
-              )
-            }
-          >
+          <button onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}>
             →
           </button>
         </div>
@@ -271,9 +294,7 @@ export default function WorkshopsAdminPage() {
                 onClick={() => handleDateClick(day)}
                 className={`h-14 rounded-xl flex items-center justify-center cursor-pointer font-semibold
                 ${
-                  workshop
-                    ? "bg-[#3a2618] text-[#fffbd6]"
-                    : "bg-[#f8f5f2] border border-[#4a3325]/20"
+                  workshop ? "bg-[#3a2618] text-white" : "bg-[#f8f5f2] border"
                 }`}
               >
                 {day}
@@ -286,9 +307,12 @@ export default function WorkshopsAdminPage() {
       {/* Modal */}
       {isModalOpen && selectedWorkshop && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-xl relative">
+          <div className="bg-white rounded-2xl p-8 max-w-xl w-full relative">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setIsEditing(false);
+              }}
               className="absolute top-4 right-4"
             >
               <X />
@@ -297,27 +321,79 @@ export default function WorkshopsAdminPage() {
             {isEditing ? (
               <>
                 <input
-                  value={editWorkshop?.title}
+                  className="input mb-3"
+                  value={editWorkshop?.title || ""}
+                  onChange={(e) =>
+                    setEditWorkshop((p) => p && { ...p, title: e.target.value })
+                  }
+                />
+                <input
+                  className="input mb-3"
+                  value={editWorkshop?.time || ""}
+                  onChange={(e) =>
+                    setEditWorkshop((p) => p && { ...p, time: e.target.value })
+                  }
+                />
+                <input
+                  className="input mb-3"
+                  value={editWorkshop?.location || ""}
                   onChange={(e) =>
                     setEditWorkshop(
-                      (p) => p && { ...p, title: e.target.value }
+                      (p) => p && { ...p, location: e.target.value }
                     )
                   }
-                  className="input"
                 />
-                <button
-                  onClick={handleUpdateWorkshop}
-                  className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg"
-                >
-                  Save
-                </button>
+                <input
+                  className="input mb-3"
+                  value={editWorkshop?.instructor || ""}
+                  onChange={(e) =>
+                    setEditWorkshop(
+                      (p) => p && { ...p, instructor: e.target.value }
+                    )
+                  }
+                />
+                <textarea
+                  className="input mb-3"
+                  value={editWorkshop?.description || ""}
+                  onChange={(e) =>
+                    setEditWorkshop(
+                      (p) => p && { ...p, description: e.target.value }
+                    )
+                  }
+                />
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={handleUpdateWorkshop}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-300 px-4 py-2 rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </>
             ) : (
               <>
-                <h3 className="text-2xl font-bold">
-                  {selectedWorkshop.title}
-                </h3>
+                <h3 className="text-2xl font-bold">{selectedWorkshop.title}</h3>
                 <p className="mt-4">{selectedWorkshop.description}</p>
+
+                <div className="mt-4 space-y-2 text-sm">
+                  <p className="flex gap-2 items-center">
+                    <Clock size={16} /> {selectedWorkshop.time}
+                  </p>
+                  <p className="flex gap-2 items-center">
+                    <MapPin size={16} /> {selectedWorkshop.location}
+                  </p>
+                  <p className="flex gap-2 items-center">
+                    <User size={16} /> {selectedWorkshop.instructor}
+                  </p>
+                </div>
+
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => setIsEditing(true)}
@@ -326,9 +402,7 @@ export default function WorkshopsAdminPage() {
                     Modify
                   </button>
                   <button
-                    onClick={() =>
-                      handleDeleteWorkshop(selectedWorkshop._id)
-                    }
+                    onClick={() => handleDeleteWorkshop(selectedWorkshop._id)}
                     className="bg-red-600 text-white px-4 py-2 rounded-lg"
                   >
                     Delete
