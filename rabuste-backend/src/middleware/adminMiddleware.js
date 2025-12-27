@@ -1,20 +1,25 @@
+import jwt from "jsonwebtoken";
+
 export default function adminMiddleware(req, res, next) {
   try {
-    // If authMiddleware runs before this, it should attach req.user
-    // Accept either role === 'admin' or an isAdmin flag for flexibility
-    const user = req.user || null;
+    const authHeader = req.headers.authorization;
 
-    if (!user) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    if (user.role === "admin" || user.isAdmin === true) {
-      return next();
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.role !== "admin" && decoded.isAdmin !== true) {
+      return res.status(403).json({ message: "Admin privileges required" });
     }
 
-    return res.status(403).json({ message: "Admin privileges required" });
+    req.user = decoded; 
+    next();
   } catch (err) {
     console.error("adminMiddleware error:", err);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
