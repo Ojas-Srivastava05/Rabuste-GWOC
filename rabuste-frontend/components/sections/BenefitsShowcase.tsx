@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Zap, Brain, Dumbbell, Clock, TrendingUp, Award } from 'lucide-react';
+import ComparisonSection from './ComparisonSection';
 
 const benefits = [
   {
@@ -128,6 +129,8 @@ export default function BenefitsShowcase() {
             <br />
             POWER
           </h2>
+
+          {/* See research button removed */}
         </motion.div>
 
         {/* Benefits Grid - Responsive */}
@@ -221,6 +224,11 @@ export default function BenefitsShowcase() {
               </motion.div>
             );
           })}
+        </div>
+
+        {/* ComparisonSection anchor - renders the ComparisonSection component so button can scroll to it */}
+        <div id="comparison" className="mt-16">
+          <ComparisonSection />
         </div>
       </div>
     </section>
