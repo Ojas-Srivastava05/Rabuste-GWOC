@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Package, CheckCircle2, Clock, Mail, FileText } from "lucide-react";
 
 interface OrderItem {
   name: string;
@@ -50,66 +51,216 @@ export default function AdminOrdersPage() {
     fetchOrders();
   }, []);
 
+  const pendingOrders = orders.filter((o) => o.status === "pending");
+  const completedOrders = orders.filter((o) => o.status === "completed");
+
   return (
-    <div className="min-h-screen bg-[#1b120a] text-[#f3e9dc] p-6">
-      <h1 className="text-3xl font-bold mb-6 text-[#e6c9a8]">Admin – Orders</h1>
+    <div
+      className="min-h-screen p-8"
+      style={{
+        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
+        color: '#F5F1E8',
+      }}
+    >
+      {/* Header */}
+      <div className="mb-12">
+        <div className="inline-flex items-center gap-4 mb-6">
+          <div className="copper-line" />
+          <span className="section-label">ADMIN PANEL</span>
+          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+        </div>
+        <h1
+          className="text-5xl md:text-7xl"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            lineHeight: 0.9,
+          }}
+        >
+          ORDER <span className="gradient-text">MANAGEMENT</span>
+        </h1>
+      </div>
 
-      <div className="space-y-4">
-        {orders.length === 0 && (
-          <p className="text-[#c9b8a3]">No orders yet.</p>
-        )}
+      {/* Stats */}
+      <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl">
+        <div className="brutal-card p-6">
+          <div className="flex items-center gap-4 mb-3">
+            <Clock size={28} className="text-[#B87333]" />
+            <span className="section-label">PENDING</span>
+          </div>
+          <p
+            className="text-5xl gradient-text"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            {pendingOrders.length}
+          </p>
+        </div>
 
+        <div className="brutal-card p-6">
+          <div className="flex items-center gap-4 mb-3">
+            <CheckCircle2 size={28} className="text-[#6f8f72]" />
+            <span className="section-label">COMPLETED</span>
+          </div>
+          <p
+            className="text-5xl"
+            style={{ fontFamily: 'var(--font-heading)', color: '#6f8f72' }}
+          >
+            {completedOrders.length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-6">
+          <div className="flex items-center gap-4 mb-3">
+            <Package size={28} className="text-[#B87333]" />
+            <span className="section-label">TOTAL</span>
+          </div>
+          <p
+            className="text-5xl gradient-text"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            {orders.length}
+          </p>
+        </div>
+      </div>
+
+      {orders.length === 0 && (
+        <div className="brutal-card p-12 text-center max-w-2xl mx-auto">
+          <Package size={64} className="text-[#B87333] mx-auto mb-6" />
+          <p className="text-xl" style={{ color: '#8B6F47' }}>
+            No orders yet. Orders will appear here once customers place them.
+          </p>
+        </div>
+      )}
+
+      {/* Orders List */}
+      <div className="space-y-6">
         {orders.map((order) => (
           <div
             key={order._id}
-            className="bg-[#2b1d14] p-4 rounded-xl shadow-xl border border-[#3a2618]"
+            className="brutal-card p-8"
+            style={{
+              background:
+                order.status === "pending"
+                  ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(42, 24, 16, 0.8))'
+                  : 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(42, 24, 16, 0.8))',
+            }}
           >
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-[#f0dbc4]">
-                {order.customerName}
-              </h2>
+            <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+              <div>
+                <h2
+                  className="text-3xl mb-2"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#F5F1E8',
+                  }}
+                >
+                  {order.customerName}
+                </h2>
+                <div className="flex items-center gap-2 text-sm" style={{ color: '#8B6F47' }}>
+                  <Mail size={16} />
+                  {order.customerEmail}
+                </div>
+                <div className="text-xs mt-2" style={{ color: '#8B6F47' }}>
+                  {new Date(order.createdAt).toLocaleString()}
+                </div>
+              </div>
 
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  order.status === "pending"
-                    ? "bg-[#c68642] text-[#1b120a]"
-                    : "bg-[#6f8f72] text-[#1b120a]"
-                }`}
+              <div
+                className="px-5 py-2 rounded-full uppercase tracking-widest text-sm font-bold"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  background:
+                    order.status === "pending"
+                      ? 'linear-gradient(135deg, #B87333, #CD7F32)'
+                      : 'rgba(111, 143, 114, 0.3)',
+                  color: order.status === "pending" ? '#000000' : '#6f8f72',
+                  border: order.status === "completed" ? '2px solid #6f8f72' : 'none',
+                }}
               >
-                {order.status.toUpperCase()}
-              </span>
+                {order.status}
+              </div>
             </div>
 
-            <p className="mb-2 text-[#d6c4ae]">Email: {order.customerEmail}</p>
-
-            <div className="mb-2">
-              <p className="font-semibold text-[#e6c9a8]">Items:</p>
-              <ul className="list-disc list-inside text-[#d6c4ae]">
+            {/* Items */}
+            <div className="mb-6">
+              <h3
+                className="text-xl mb-4 flex items-center gap-2"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#B87333',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                <FileText size={20} />
+                ORDER ITEMS
+              </h3>
+              <div className="space-y-3">
                 {order.items.map((item, idx) => (
-                  <li key={idx}>
-                    {item.name} × {item.quantity} = ₹
-                    {item.price * item.quantity}
-                  </li>
+                  <div
+                    key={idx}
+                    className="flex justify-between items-center p-4 rounded-lg"
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.3)',
+                      border: '1px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    <div>
+                      <span className="text-lg" style={{ color: '#F5F1E8' }}>
+                        {item.name}
+                      </span>
+                      <span className="text-sm ml-3" style={{ color: '#8B6F47' }}>
+                        × {item.quantity}
+                      </span>
+                    </div>
+                    <span className="text-xl gradient-text font-bold">
+                      ₹{item.price * item.quantity}
+                    </span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
-
-            <p className="font-semibold text-[#e6c9a8] mb-2">
-              Total: ₹{order.totalAmount}
-            </p>
 
             {order.instructions && (
-              <p className="mt-2 italic text-[#cbb59d]">
-                📝 <strong>Instructions:</strong> {order.instructions}
-              </p>
+              <div
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.1)',
+                  border: '1px solid rgba(184, 115, 51, 0.3)',
+                }}
+              >
+                <p className="text-sm font-bold mb-2 uppercase tracking-wide" style={{ color: '#B87333' }}>
+                  Special Instructions
+                </p>
+                <p style={{ color: '#D4A574' }}>{order.instructions}</p>
+              </div>
             )}
+
+            <div className="flex justify-between items-center pt-6 border-t-2 border-[#B87333]/30">
+              <span
+                className="text-2xl"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#F5F1E8',
+                }}
+              >
+                TOTAL
+              </span>
+              <span
+                className="text-4xl gradient-text"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                ₹{order.totalAmount}
+              </span>
+            </div>
 
             {order.status === "pending" && (
               <button
                 onClick={() => markCompleted(order._id)}
-                className="mt-3 px-4 py-2 bg-[#c68642] text-[#1b120a] font-semibold rounded-md hover:bg-[#a9713a] transition"
+                className="btn btn-primary w-full mt-6"
               >
-                Mark Completed
+                <CheckCircle2 size={20} />
+                MARK AS COMPLETED
               </button>
             )}
           </div>

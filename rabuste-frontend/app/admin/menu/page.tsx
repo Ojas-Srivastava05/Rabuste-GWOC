@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Plus, Trash2, Power, PowerOff, Coffee } from "lucide-react";
 
 type MenuItem = {
   _id: string;
@@ -16,14 +17,12 @@ export default function AdminMenuPage() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // form state
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
 
-  // fetch menu
   useEffect(() => {
     fetchMenu();
   }, []);
@@ -53,18 +52,15 @@ export default function AdminMenuPage() {
       }),
     });
 
-    // reset form
     setName("");
     setDescription("");
     setPrice("");
     setImage("");
     setCategory("");
 
-    // refresh list
     fetchMenu();
   }
 
-  // delete a menu item then refresh list
   async function deleteItem(id: string) {
     await fetch(`/api/menu/${id}`, {
       method: "DELETE",
@@ -72,7 +68,6 @@ export default function AdminMenuPage() {
     fetchMenu();
   }
 
-  // toggle availability flag on a menu item then refresh list
   async function toggleAvailability(id: string, current: boolean) {
     await fetch(`/api/menu/${id}`, {
       method: "PATCH",
@@ -84,177 +79,274 @@ export default function AdminMenuPage() {
 
   return (
     <div
+      className="min-h-screen p-8"
       style={{
-        padding: "32px",
-        background: "#0A0A0A",
-        color: "#FFF",
-        minHeight: "100vh",
+        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
+        color: '#F5F1E8',
       }}
     >
-      <h1>Admin Menu</h1>
-
-      {/* ADD FORM */}
-      <form onSubmit={handleAddItem} style={{ marginBottom: "24px" }}>
-        <h3>Add Menu Item</h3>
-
-        <input
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
+      {/* Header */}
+      <div className="mb-12">
+        <div className="inline-flex items-center gap-4 mb-6">
+          <div className="copper-line" />
+          <span className="section-label">ADMIN PANEL</span>
+          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+        </div>
+        <h1
+          className="text-5xl md:text-7xl"
           style={{
-            width: "100%",
-            padding: "10px 12px",
-            marginBottom: 8,
-            background: "#0F0F0F",
-            color: "#fff",
-            border: "1px solid #2b2b2b",
-            borderRadius: 6,
-          }}
-        />
-        <br />
-
-        <input
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          style={{
-            width: "100%",
-            padding: "10px 12px",
-            marginBottom: 8,
-            background: "#0F0F0F",
-            color: "#fff",
-            border: "1px solid #2b2b2b",
-            borderRadius: 6,
-          }}
-        />
-        <br />
-
-        <input
-          placeholder="Price"
-          type="number"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          required
-          style={{
-            width: "100%",
-            padding: "10px 12px",
-            marginBottom: 8,
-            background: "#0F0F0F",
-            color: "#fff",
-            border: "1px solid #2b2b2b",
-            borderRadius: 6,
-          }}
-        />
-        <br />
-
-        <input
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
-          required
-          style={{
-            width: "100%",
-            padding: "10px 12px",
-            marginBottom: 8,
-            background: "#0F0F0F",
-            color: "#fff",
-            border: "1px solid #2b2b2b",
-            borderRadius: 6,
-          }}
-        />
-        <br />
-
-        <input
-          placeholder="Category (Coffee / Snacks)"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-          style={{
-            width: "100%",
-            padding: "10px 12px",
-            marginBottom: 8,
-            background: "#0F0F0F",
-            color: "#fff",
-            border: "1px solid #2b2b2b",
-            borderRadius: 6,
-          }}
-        />
-        <br />
-        <br />
-
-        <button
-          type="submit"
-          style={{
-            padding: "10px 16px",
-            background: "linear-gradient(135deg,#8B6F47,#C9A86A)",
-            color: "#000",
-            border: "none",
-            borderRadius: 8,
-            cursor: "pointer",
+            fontFamily: 'var(--font-heading)',
+            lineHeight: 0.9,
           }}
         >
-          Add Item
-        </button>
-      </form>
+          MENU <span className="gradient-text">MANAGEMENT</span>
+        </h1>
+      </div>
 
-      {/* MENU LIST */}
-      <h3>Menu Items</h3>
+      {/* Add Form */}
+      <div className="brutal-card p-8 mb-12 max-w-4xl">
+        <h2
+          className="text-3xl mb-8 flex items-center gap-3"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            letterSpacing: '0.1em',
+          }}
+        >
+          <Plus size={32} className="text-[#B87333]" />
+          ADD NEW ITEM
+        </h2>
 
-      {loading && <p>Loading...</p>}
+        <form onSubmit={handleAddItem} className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label
+                className="block text-sm font-bold mb-3 uppercase tracking-wide"
+                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
+              >
+                Item Name *
+              </label>
+              <input
+                placeholder="e.g., Espresso"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+              />
+            </div>
 
-      {!loading && menu.length === 0 && <p>No menu items</p>}
-
-      {!loading &&
-        menu.map((item) => (
-          <div
-            key={item._id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "12px",
-              marginBottom: "8px",
-              opacity: item.isAvailable ? 1 : 0.5,
-            }}
-          >
-            <strong>{item.name}</strong> — ₹{item.price}
-            <br />
-            <small>{item.category}</small>
-            <br />
-            <span>{item.description}</span>
-            <br />
-            <br />
-
-            <button
-              onClick={() => toggleAvailability(item._id, item.isAvailable)}
-              style={{
-                padding: "6px 10px",
-                borderRadius: 6,
-                background: item.isAvailable ? "#4b5563" : "#10b981",
-                color: "#fff",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {item.isAvailable ? "Disable" : "Enable"}
-            </button>
-
-            <button
-              onClick={() => deleteItem(item._id)}
-              style={{
-                marginLeft: "8px",
-                padding: "6px 10px",
-                borderRadius: 6,
-                background: "#111827",
-                color: "salmon",
-                border: "1px solid rgba(255,99,71,0.15)",
-                cursor: "pointer",
-              }}
-            >
-              Delete
-            </button>
+            <div>
+              <label
+                className="block text-sm font-bold mb-3 uppercase tracking-wide"
+                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
+              >
+                Category *
+              </label>
+              <input
+                placeholder="e.g., Coffee, Snacks"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+              />
+            </div>
           </div>
-        ))}
+
+          <div>
+            <label
+              className="block text-sm font-bold mb-3 uppercase tracking-wide"
+              style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
+            >
+              Description *
+            </label>
+            <input
+              placeholder="Brief description of the item"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label
+                className="block text-sm font-bold mb-3 uppercase tracking-wide"
+                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
+              >
+                Price (₹) *
+              </label>
+              <input
+                placeholder="e.g., 150"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-bold mb-3 uppercase tracking-wide"
+                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
+              >
+                Image URL *
+              </label>
+              <input
+                placeholder="https://example.com/image.jpg"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                required
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="btn btn-primary w-full md:w-auto">
+            <Plus size={20} />
+            ADD ITEM TO MENU
+          </button>
+        </form>
+      </div>
+
+      {/* Menu List */}
+      <div>
+        <h2
+          className="text-3xl mb-8 flex items-center gap-3"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            letterSpacing: '0.1em',
+          }}
+        >
+          <Coffee size={32} className="text-[#B87333]" />
+          CURRENT MENU ITEMS
+        </h2>
+
+        {loading && (
+          <div className="text-center py-12">
+            <div className="w-12 h-12 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="section-label">Loading menu...</p>
+          </div>
+        )}
+
+        {!loading && menu.length === 0 && (
+          <div className="brutal-card p-12 text-center">
+            <p className="text-xl" style={{ color: '#8B6F47' }}>No menu items yet. Add your first item above.</p>
+          </div>
+        )}
+
+        {!loading && (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {menu.map((item) => (
+              <div
+                key={item._id}
+                className="brutal-card p-6"
+                style={{
+                  opacity: item.isAvailable ? 1 : 0.6,
+                  position: 'relative',
+                }}
+              >
+                {!item.isAvailable && (
+                  <div
+                    className="absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold uppercase tracking-wide"
+                    style={{
+                      background: 'rgba(220, 38, 38, 0.2)',
+                      border: '2px solid rgba(220, 38, 38, 0.5)',
+                      color: '#FCA5A5',
+                    }}
+                  >
+                    Disabled
+                  </div>
+                )}
+
+                <div className="aspect-square overflow-hidden mb-4 rounded-sm">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div className="mb-1">
+                  <span
+                    className="text-xs uppercase tracking-widest"
+                    style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                  >
+                    {item.category}
+                  </span>
+                </div>
+
+                <h3
+                  className="text-2xl mb-2"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#F5F1E8',
+                  }}
+                >
+                  {item.name}
+                </h3>
+
+                <p className="text-sm mb-4" style={{ color: '#8B6F47' }}>
+                  {item.description}
+                </p>
+
+                <div className="flex justify-between items-center mb-6">
+                  <span
+                    className="text-3xl gradient-text"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                  >
+                    ₹{item.price}
+                  </span>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                    className="flex-1 btn btn-secondary"
+                    style={{
+                      padding: '12px 20px',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    {item.isAvailable ? (
+                      <>
+                        <PowerOff size={16} />
+                        DISABLE
+                      </>
+                    ) : (
+                      <>
+                        <Power size={16} />
+                        ENABLE
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => deleteItem(item._id)}
+                    className="btn"
+                    style={{
+                      padding: '12px 20px',
+                      background: 'rgba(220, 38, 38, 0.2)',
+                      border: '2px solid rgba(220, 38, 38, 0.5)',
+                      color: '#FCA5A5',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Trash2 size={16} />
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

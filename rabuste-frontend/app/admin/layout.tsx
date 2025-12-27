@@ -34,14 +34,33 @@ export default function AdminLayout({ children }: Props) {
   // }, [router]);
 
   return (
-    <div className="flex min-h-screen bg-[#f8f5f2]">
+    <div className="flex min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 100%)' }}>
       {/* SIDEBAR */}
-      <aside className="w-64 bg-[#2e211a] text-[#fffbd6] flex flex-col">
-        <div className="p-6 text-2xl font-bold border-b border-[#fffbd633]">
-          Rabuste Admin
+      <aside
+        className="w-72 flex flex-col"
+        style={{
+          background: 'linear-gradient(180deg, rgba(42, 24, 16, 0.95), rgba(26, 17, 16, 0.95))',
+          borderRight: '2px solid rgba(184, 115, 51, 0.3)',
+        }}
+      >
+        <div
+          className="p-8 border-b-2"
+          style={{ borderColor: 'rgba(184, 115, 51, 0.3)' }}
+        >
+          <h1
+            className="text-3xl mb-2"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: '#F5F1E8',
+              letterSpacing: '0.1em',
+            }}
+          >
+            RABUSTE
+          </h1>
+          <p className="section-label">ADMIN PANEL</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-6 space-y-3">
           <NavLink href="/admin">Dashboard</NavLink>
           <NavLink href="/admin/orders">Orders</NavLink>
           <NavLink href="/admin/menu">Menu</NavLink>
@@ -55,14 +74,23 @@ export default function AdminLayout({ children }: Props) {
             localStorage.removeItem("user");
             router.push("/auth");
           }}
-          className="m-4 rounded bg-red-600 py-2 text-sm font-semibold hover:bg-red-700"
+          className="m-6 btn"
+          style={{
+            background: 'rgba(220, 38, 38, 0.2)',
+            border: '2px solid rgba(220, 38, 38, 0.5)',
+            color: '#FCA5A5',
+            padding: '16px',
+            fontSize: '14px',
+            fontFamily: 'var(--font-heading)',
+            letterSpacing: '0.1em',
+          }}
         >
-          Logout
+          LOGOUT
         </button>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }
@@ -77,7 +105,23 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="block rounded px-4 py-2 text-sm font-medium hover:bg-[#fffbd620]"
+      className="block px-6 py-4 transition-all duration-300 rounded-lg"
+      style={{
+        fontFamily: 'var(--font-heading)',
+        fontSize: '16px',
+        letterSpacing: '0.1em',
+        color: '#F5F1E8',
+        background: 'transparent',
+        border: '2px solid transparent',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'rgba(184, 115, 51, 0.2)';
+        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.4)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.borderColor = 'transparent';
+      }}
     >
       {children}
     </Link>

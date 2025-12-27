@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, Package } from "lucide-react";
+import Navbar from "@/components/Navbar";
+import DynamicBackground from "@/components/DynamicBackground";
+import Footer from "@/components/sections/footer";
 
 type CartItem = {
   menuItem: string;
@@ -37,65 +41,222 @@ export default function CartPage() {
   }
 
   if (loading) {
-    return <p style={{ padding: 24 }}>Loading cart…</p>;
+    return (
+      <>
+        <Navbar />
+        <DynamicBackground />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="section-label">Loading your cart...</p>
+          </div>
+        </div>
+      </>
+    );
   }
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div style={{ padding: 24 }}>
-        <h1>Your Cart</h1>
-        <p>Your cart is empty.</p>
-        <button onClick={() => router.push("/menu")}>
-          Go to Menu
-        </button>
-      </div>
+      <>
+        <Navbar />
+        <DynamicBackground />
+        <div className="min-h-screen flex items-center justify-center px-6">
+          <div className="text-center max-w-2xl">
+            <div 
+              className="w-32 h-32 mx-auto mb-8 rounded-full flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                border: '2px solid rgba(184, 115, 51, 0.4)',
+              }}
+            >
+              <Package size={60} className="text-[#B87333]" />
+            </div>
+            <h1 
+              className="text-5xl md:text-7xl mb-6"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 0.9,
+                color: '#F5F1E8',
+              }}
+            >
+              EMPTY CART
+            </h1>
+            <p className="text-xl mb-12" style={{ color: '#B87333' }}>
+              Your cart is waiting to be filled with bold flavors
+            </p>
+            <button
+              onClick={() => router.push("/menu")}
+              className="btn btn-primary"
+            >
+              EXPLORE MENU
+              <ArrowRight size={20} />
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Your Cart</h1>
-
-      {cart.items.map((item) => (
-        <div
-          key={item.menuItem}
-          style={{
-            borderBottom: "1px solid #ddd",
-            padding: "12px 0",
-          }}
-        >
-          <strong>{item.name}</strong>
-          <div>
-            ₹{item.price} × {item.quantity}
+    <>
+      <Navbar />
+      <DynamicBackground />
+      
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+        <div className="container px-6">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-4 mb-8">
+              <div className="copper-line" />
+              <span className="section-label">YOUR ORDER</span>
+              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+            </div>
+            
+            <h1 
+              className="text-6xl md:text-8xl mb-6"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 0.9,
+                color: '#F5F1E8',
+              }}
+            >
+              SHOPPING <span className="gradient-text">CART</span>
+            </h1>
           </div>
-          <div>Subtotal: ₹{item.price * item.quantity}</div>
+
+          <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Cart Items */}
+            <div className="lg:col-span-2 space-y-6">
+              {cart.items.map((item) => (
+                <div
+                  key={item.menuItem}
+                  className="brutal-card p-6"
+                  style={{
+                    display: 'flex',
+                    gap: '24px',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div className="flex-1">
+                    <h3 
+                      className="text-2xl mb-2"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        color: '#F5F1E8',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {item.name}
+                    </h3>
+                    <div className="flex items-center gap-4 text-lg">
+                      <span className="gradient-text font-bold">₹{item.price}</span>
+                      <span style={{ color: '#8B6F47' }}>×</span>
+                      <span style={{ color: '#B87333' }}>{item.quantity}</span>
+                    </div>
+                  </div>
+
+                  <div 
+                    className="text-2xl font-bold gradient-text"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      minWidth: '120px',
+                      textAlign: 'right',
+                    }}
+                  >
+                    ₹{item.price * item.quantity}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Order Summary */}
+            <div className="lg:col-span-1">
+              <div 
+                className="sticky top-32 brutal-card p-8"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.9), rgba(42, 24, 16, 0.9))',
+                }}
+              >
+                <h2 
+                  className="text-3xl mb-8"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#F5F1E8',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  ORDER SUMMARY
+                </h2>
+
+                <div className="space-y-4 mb-8 pb-8 border-b-2 border-[#B87333]/30">
+                  <div className="flex justify-between items-center">
+                    <span style={{ color: '#8B6F47' }}>Subtotal</span>
+                    <span className="text-xl gradient-text font-bold">₹{cart.totalAmount}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span style={{ color: '#8B6F47' }}>Tax (5%)</span>
+                    <span className="text-xl gradient-text font-bold">₹{Math.round(cart.totalAmount * 0.05)}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center mb-8">
+                  <span 
+                    className="text-2xl"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      color: '#F5F1E8',
+                    }}
+                  >
+                    TOTAL
+                  </span>
+                  <span 
+                    className="text-4xl gradient-text"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                    }}
+                  >
+                    ₹{Math.round(cart.totalAmount * 1.05)}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => {
+                    if (!isLoggedIn()) {
+                      router.push("/auth?redirect=/checkout");
+                    } else {
+                      router.push("/checkout");
+                    }
+                  }}
+                  className="btn btn-primary w-full mb-4"
+                >
+                  PROCEED TO CHECKOUT
+                  <ArrowRight size={20} />
+                </button>
+
+                <button
+                  onClick={async () => {
+                    await fetch("/api/cart", { method: "DELETE" });
+                    window.location.reload();
+                  }}
+                  className="btn btn-secondary w-full"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                  }}
+                >
+                  <Trash2 size={18} />
+                  CLEAR CART
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      ))}
+      </div>
 
-      <h2 style={{ marginTop: 24 }}>
-        Total: ₹{cart.totalAmount}
-      </h2>
-      <button
-  onClick={async () => {
-    await fetch("/api/cart", { method: "DELETE" });
-    window.location.reload();
-  }}
->
-  Clear Cart
-</button>
-
-<button
-  onClick={() => {
-    if (!isLoggedIn()) {
-      router.push("/auth?redirect=/checkout");
-    } else {
-      router.push("/checkout");
-    }
-  }}
->
-  Proceed to Checkout
-</button>
-
-    </div>
+      <Footer />
+    </>
   );
 }
