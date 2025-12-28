@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, CheckCircle2, Package, AlertCircle } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -22,13 +22,345 @@ type Order = {
   createdAt: string;
 };
 
+// Coffee facts database
+const coffeeFacts = [
+  "Coffee beans are actually seeds from coffee cherries! 🍒",
+  "Robusta coffee has almost double the caffeine of Arabica ⚡",
+  "Coffee is the world's 2nd most traded commodity after oil 🌍",
+  "The word 'coffee' comes from the Arabic word 'qahwah' ☕",
+  "A coffee tree can live for over 100 years! 🌳",
+  "Finland consumes the most coffee per capita in the world 🇫🇮",
+  "Coffee was discovered by goats in Ethiopia around 800 AD 🐐",
+  "Espresso means 'pressed out' in Italian 🇮🇹",
+  "Light roast coffee has more caffeine than dark roast ☕",
+  "Coffee stays fresh for only 2 weeks after roasting 📦",
+  "The most expensive coffee comes from animal droppings 💎",
+  "Decaf coffee isn't completely caffeine-free ⚠️",
+  "Coffee can help you burn fat by boosting metabolism 🔥",
+  "The average coffee drinker consumes 3 cups daily 📊",
+  "Instant coffee was invented in 1901 ⚡",
+  "Brazil produces 40% of the world's coffee 🇧🇷",
+  "A coffee tree yields about 1-2 pounds of beans per year 🌱",
+  "Coffee improves physical performance by 11-12% 💪",
+  "Cold brew has 67% less acid than hot coffee 🧊"
+];
+
+// Coffee tips
+const coffeeTips = [
+  "Store coffee beans in an airtight container away from light 💡",
+  "Grind your coffee just before brewing for maximum freshness ⚡",
+  "Use filtered water for the best tasting coffee 💧",
+  "The ideal water temperature for brewing is 195-205°F (90-96°C) 🌡️",
+  "A coffee bloom (initial pour) releases trapped CO2 for better flavor 🌸",
+  "Don't reheat coffee - it breaks down the flavors 🔥",
+  "Drink coffee 30-60 minutes after waking for best effect ⏰",
+  "Add a pinch of salt to reduce bitterness in coffee 🧂",
+  "Clean your coffee maker monthly for best taste 🧽",
+  "Pair dark chocolate with your espresso for luxury 🍫"
+];
+
+// Memory Matching Game
+const MemoryGame = ({ onWin }: { onWin: () => void }) => {
+  const [cards, setCards] = useState<string[]>([]);
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+
+  useEffect(() => {
+    const emojis = ['☕', '🫘', '🥤', '🍩', '🧋', '🥐'];
+    const shuffled = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+    setCards(shuffled);
+  }, []);
+
+  const handleClick = (index: number) => {
+    if (flipped.length === 2 || flipped.includes(index) || matched.includes(index)) return;
+
+    const newFlipped = [...flipped, index];
+    setFlipped(newFlipped);
+
+    if (newFlipped.length === 2) {
+      setMoves(moves + 1);
+      if (cards[newFlipped[0]] === cards[newFlipped[1]]) {
+        setMatched([...matched, ...newFlipped]);
+        setFlipped([]);
+        
+        if (matched.length + 2 === cards.length) {
+          setTimeout(() => onWin(), 500);
+        }
+      } else {
+        setTimeout(() => setFlipped([]), 800);
+      }
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-3">
+        <p className="text-sm" style={{ color: '#B87333' }}>
+          Moves: {moves}
+        </p>
+        <button
+          onClick={() => {
+            const emojis = ['☕', '🫘', '🥤', '🍩', '🧋', '🥐'];
+            const shuffled = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+            setCards(shuffled);
+            setFlipped([]);
+            setMatched([]);
+            setMoves(0);
+          }}
+          className="text-xs px-3 py-1"
+          style={{
+            background: 'rgba(184, 115, 51, 0.2)',
+            border: '1px solid rgba(184, 115, 51, 0.4)',
+            color: '#D4A574',
+          }}
+        >
+          Reset
+        </button>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {cards.map((card, index) => (
+          <motion.button
+            key={index}
+            onClick={() => handleClick(index)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="aspect-square flex items-center justify-center text-3xl"
+            style={{
+              background: flipped.includes(index) || matched.includes(index)
+                ? 'rgba(184, 115, 51, 0.3)'
+                : 'rgba(61, 43, 31, 0.5)',
+              border: '2px solid rgba(184, 115, 51, 0.4)',
+              cursor: matched.includes(index) ? 'default' : 'pointer',
+            }}
+          >
+            {flipped.includes(index) || matched.includes(index) ? card : '?'}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Coffee Trivia Quiz
+const TriviaQuiz = ({ onWin }: { onWin: () => void }) => {
+  const questions = [
+    {
+      q: "Which country is the largest coffee producer?",
+      options: ["Colombia", "Brazil", "Vietnam", "Ethiopia"],
+      correct: 1
+    },
+    {
+      q: "What does 'espresso' mean in Italian?",
+      options: ["Fast coffee", "Strong coffee", "Pressed out", "Dark roast"],
+      correct: 2
+    },
+    {
+      q: "Coffee beans are actually...",
+      options: ["Seeds", "Beans", "Nuts", "Fruits"],
+      correct: 0
+    },
+    {
+      q: "Which has more caffeine?",
+      options: ["Dark roast", "Light roast", "Medium roast", "Same"],
+      correct: 1
+    },
+    {
+      q: "A coffee tree can live for...",
+      options: ["10 years", "50 years", "100+ years", "20 years"],
+      correct: 2
+    }
+  ];
+
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const handleAnswer = (index: number) => {
+    if (answered) return;
+    setSelected(index);
+    setAnswered(true);
+    
+    if (index === questions[currentQ].correct) {
+      setScore(score + 1);
+      if (currentQ === questions.length - 1) {
+        setTimeout(() => onWin(), 1000);
+      }
+    }
+    
+    setTimeout(() => {
+      if (currentQ < questions.length - 1) {
+        setCurrentQ(currentQ + 1);
+        setAnswered(false);
+        setSelected(null);
+      }
+    }, 1500);
+  };
+
+  return (
+    <div>
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-xs" style={{ color: '#8B6F47' }}>
+            Question {currentQ + 1}/{questions.length}
+          </span>
+          <span className="text-xs gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+            Score: {score}
+          </span>
+        </div>
+        <div className="h-1" style={{ background: 'rgba(61, 43, 31, 0.5)' }}>
+          <div
+            className="h-full transition-all duration-300"
+            style={{
+              width: `${((currentQ + 1) / questions.length) * 100}%`,
+              background: 'linear-gradient(90deg, #B87333, #D4A574)',
+            }}
+          />
+        </div>
+      </div>
+
+      <p className="text-sm mb-4" style={{ color: '#F5F1E8' }}>
+        {questions[currentQ].q}
+      </p>
+
+      <div className="space-y-2">
+        {questions[currentQ].options.map((option, index) => (
+          <button
+            key={index}
+            onClick={() => handleAnswer(index)}
+            disabled={answered}
+            className="w-full text-left px-4 py-3 text-sm transition-all"
+            style={{
+              background: answered
+                ? index === questions[currentQ].correct
+                  ? 'rgba(76, 175, 80, 0.3)'
+                  : selected === index
+                  ? 'rgba(244, 67, 54, 0.3)'
+                  : 'rgba(61, 43, 31, 0.5)'
+                : 'rgba(61, 43, 31, 0.5)',
+              border: `1px solid ${
+                answered
+                  ? index === questions[currentQ].correct
+                    ? 'rgba(76, 175, 80, 0.6)'
+                    : selected === index
+                    ? 'rgba(244, 67, 54, 0.6)'
+                    : 'rgba(184, 115, 51, 0.3)'
+                  : 'rgba(184, 115, 51, 0.3)'
+              }`,
+              color: '#F5F1E8',
+              cursor: answered ? 'default' : 'pointer',
+            }}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Coffee Origin Guessing Game
+const OriginGame = ({ onWin }: { onWin: () => void }) => {
+  const coffees = [
+    { name: "Robusta", origins: ["Vietnam", "Brazil", "Indonesia"], correct: 0 },
+    { name: "Arabica", origins: ["Ethiopia", "Colombia", "Yemen"], correct: 0 },
+    { name: "Mocha", origins: ["Yemen", "Brazil", "Vietnam"], correct: 0 },
+    { name: "Java", origins: ["Indonesia", "Ethiopia", "Colombia"], correct: 0 },
+    { name: "Kona", origins: ["Hawaii", "Jamaica", "Kenya"], correct: 0 },
+  ];
+
+  const [current, setCurrent] = useState(0);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(false);
+
+  const handleGuess = (index: number) => {
+    if (answered) return;
+    setAnswered(true);
+    
+    if (index === coffees[current].correct) {
+      setScore(score + 1);
+      if (current === coffees.length - 1) {
+        setTimeout(() => onWin(), 1000);
+      }
+    }
+    
+    setTimeout(() => {
+      if (current < coffees.length - 1) {
+        setCurrent(current + 1);
+        setAnswered(false);
+      }
+    }, 1500);
+  };
+
+  return (
+    <div>
+      <div className="text-center mb-4">
+        <p className="text-xs mb-2" style={{ color: '#8B6F47' }}>
+          {current + 1}/{coffees.length} • Score: {score}
+        </p>
+        <p className="text-lg mb-1 gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+          {coffees[current].name}
+        </p>
+        <p className="text-xs" style={{ color: '#8B6F47' }}>
+          Where does this coffee originate?
+        </p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        {coffees[current].origins.map((origin, index) => (
+          <button
+            key={index}
+            onClick={() => handleGuess(index)}
+            disabled={answered}
+            className="py-3 text-sm transition-all"
+            style={{
+              background: answered && index === coffees[current].correct
+                ? 'rgba(76, 175, 80, 0.3)'
+                : 'rgba(61, 43, 31, 0.5)',
+              border: `2px solid ${
+                answered && index === coffees[current].correct
+                  ? 'rgba(76, 175, 80, 0.6)'
+                  : 'rgba(184, 115, 51, 0.4)'
+              }`,
+              color: '#F5F1E8',
+              fontFamily: 'var(--font-body)',
+            }}
+          >
+            {origin}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function OrderStatusPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentFact, setCurrentFact] = useState(0);
+  const [currentTip, setCurrentTip] = useState(0);
+  const [activeGame, setActiveGame] = useState<'memory' | 'trivia' | 'origin'>('memory');
+  const [gameStats, setGameStats] = useState({ memory: 0, trivia: 0, origin: 0 });
 
   useEffect(() => {
     fetchOrders();
+    
+    // Rotate facts every 10 seconds
+    const factInterval = setInterval(() => {
+      setCurrentFact((prev) => (prev + 1) % coffeeFacts.length);
+    }, 10000);
+
+    // Rotate tips every 12 seconds
+    const tipInterval = setInterval(() => {
+      setCurrentTip((prev) => (prev + 1) % coffeeTips.length);
+    }, 12000);
+
+    return () => {
+      clearInterval(factInterval);
+      clearInterval(tipInterval);
+    };
   }, []);
 
   async function fetchOrders() {
@@ -52,7 +384,6 @@ export default function OrderStatusPage() {
         throw new Error("Failed to fetch orders");
       }
 
-      // ✅ ONLY SHOW PENDING ORDERS
       const pendingOrders = data.filter(
         (order) => order.status === "pending"
       );
@@ -64,6 +395,11 @@ export default function OrderStatusPage() {
       setLoading(false);
     }
   }
+
+  const estimatedTime = (order: Order) => {
+    const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+    return Math.max(10, itemCount * 3); // 3 mins per item, minimum 10 mins
+  };
 
   if (loading) {
     return (
@@ -157,17 +493,17 @@ export default function OrderStatusPage() {
       <DynamicBackground />
       
       <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
-        <div className="container px-6">
+        <div className="container px-4 md:px-6 mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-4 mb-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-4 mb-6">
               <div className="copper-line" />
               <span className="section-label">TRACK YOUR ORDERS</span>
               <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
             </div>
 
             <h1
-              className="text-6xl md:text-8xl mb-6"
+              className="text-5xl md:text-7xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
@@ -176,153 +512,382 @@ export default function OrderStatusPage() {
             >
               YOUR <span className="gradient-text">ORDERS</span>
             </h1>
-            
-            <p 
-              className="text-lg md:text-xl max-w-2xl mx-auto"
-              style={{ 
-                color: '#8B6F47',
-                fontFamily: 'var(--font-body)',
-                lineHeight: 1.7 
-              }}
-            >
-              View and track your active orders
-            </p>
           </div>
 
-          {/* Orders List */}
-          <div className="max-w-4xl mx-auto space-y-8">
-            <AnimatePresence>
-              {orders.map((order, index) => (
-                <motion.div
-                  key={order._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="brutal-card p-8"
-                >
-                  {/* Order Header */}
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-6"
-                    style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.2)' }}
+          <div className="grid lg:grid-cols-5 gap-6">
+            {/* Orders Column - Takes more space */}
+            <div className="lg:col-span-3 space-y-6">
+              <AnimatePresence>
+                {orders.map((order, index) => (
+                  <motion.div
+                    key={order._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="brutal-card p-6"
                   >
-                    <div className="mb-4 md:mb-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <Clock size={20} style={{ color: '#B87333' }} />
-                        <span
-                          className="text-sm"
+                    {/* Order Header */}
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-4"
+                      style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.2)' }}
+                    >
+                      <div className="mb-4 md:mb-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Clock size={20} style={{ color: '#B87333' }} />
+                          <span
+                            className="text-sm"
+                            style={{
+                              color: '#8B6F47',
+                              fontFamily: 'var(--font-body)',
+                            }}
+                          >
+                            Placed {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p
+                          className="text-xs"
                           style={{
                             color: '#8B6F47',
                             fontFamily: 'var(--font-body)',
                           }}
                         >
-                          Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
+                          Order #{order._id.slice(-8).toUpperCase()}
+                        </p>
                       </div>
-                      <p
-                        className="text-xs"
-                        style={{
-                          color: '#8B6F47',
-                          fontFamily: 'var(--font-body)',
-                        }}
-                      >
-                        Order ID: {order._id.slice(-8).toUpperCase()}
-                      </p>
-                    </div>
 
-                    <div
-                      className="inline-flex items-center gap-2 px-4 py-2"
-                      style={{
-                        background: 'rgba(184, 115, 51, 0.2)',
-                        border: '2px solid rgba(184, 115, 51, 0.4)',
-                      }}
-                    >
-                      <AlertCircle size={18} style={{ color: '#B87333' }} />
-                      <span
-                        className="text-sm gradient-text"
-                        style={{
-                          fontFamily: 'var(--font-heading)',
-                          letterSpacing: '0.1em',
-                        }}
-                      >
-                        {order.status.toUpperCase()}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Order Items */}
-                  <div className="space-y-4 mb-6">
-                    {order.items.map((item, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: (index * 0.1) + (i * 0.05) }}
-                        className="flex justify-between items-center pb-4"
-                        style={{
-                          borderBottom: i < order.items.length - 1
-                            ? '1px solid rgba(184, 115, 51, 0.15)'
-                            : 'none',
-                        }}
-                      >
-                        <div className="flex-1">
-                          <h3
-                            className="text-lg mb-1"
+                      <div className="flex items-center gap-4">
+                        <div
+                          className="inline-flex items-center gap-2 px-4 py-2"
+                          style={{
+                            background: 'rgba(255, 183, 77, 0.2)',
+                            border: '2px solid rgba(255, 183, 77, 0.4)',
+                          }}
+                        >
+                          <AlertCircle size={18} style={{ color: '#FFB74D' }} />
+                          <span
+                            className="text-sm"
                             style={{
+                              color: '#FFB74D',
                               fontFamily: 'var(--font-heading)',
-                              color: '#F5F1E8',
-                              letterSpacing: '0.05em',
+                              letterSpacing: '0.1em',
                             }}
                           >
-                            {item.name}
-                          </h3>
+                            PREPARING
+                          </span>
+                        </div>
+                        
+                        <div className="text-right">
+                          <p className="text-xs" style={{ color: '#8B6F47' }}>
+                            Est. time
+                          </p>
                           <p
-                            className="text-sm"
-                            style={{ color: '#8B6F47' }}
+                            className="text-lg gradient-text"
+                            style={{ fontFamily: 'var(--font-heading)' }}
                           >
-                            ₹{item.price} × {item.quantity}
+                            {estimatedTime(order)} min
                           </p>
                         </div>
-                        <div
-                          className="text-xl gradient-text"
-                          style={{ fontFamily: 'var(--font-heading)' }}
-                        >
-                          ₹{item.price * item.quantity}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+                      </div>
+                    </div>
 
-                  {/* Order Total */}
-                  <div
-                    className="flex justify-between items-center pt-6"
-                    style={{ borderTop: '2px solid rgba(184, 115, 51, 0.3)' }}
+                    {/* Order Items */}
+                    <div className="space-y-3 mb-6">
+                      {order.items.map((item, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: (index * 0.1) + (i * 0.05) }}
+                          className="flex justify-between items-center pb-3"
+                          style={{
+                            borderBottom: i < order.items.length - 1
+                              ? '1px solid rgba(184, 115, 51, 0.15)'
+                              : 'none',
+                          }}
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <Coffee size={16} style={{ color: '#B87333' }} />
+                            <div>
+                              <h3
+                                className="text-base"
+                                style={{
+                                  fontFamily: 'var(--font-heading)',
+                                  color: '#F5F1E8',
+                                  letterSpacing: '0.03em',
+                                }}
+                              >
+                                {item.name}
+                              </h3>
+                              <p
+                                className="text-sm"
+                                style={{ color: '#8B6F47' }}
+                              >
+                                ₹{item.price} × {item.quantity}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            className="text-lg gradient-text"
+                            style={{ fontFamily: 'var(--font-heading)' }}
+                          >
+                            ₹{item.price * item.quantity}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Order Total */}
+                    <div
+                      className="flex justify-between items-center pt-4"
+                      style={{ borderTop: '2px solid rgba(184, 115, 51, 0.3)' }}
+                    >
+                      <span
+                        className="text-xl"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#F5F1E8',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        TOTAL
+                      </span>
+                      <span
+                        className="text-2xl gradient-text"
+                        style={{ fontFamily: 'var(--font-heading)' }}
+                      >
+                        ₹{order.totalAmount}
+                      </span>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="mt-6">
+                      <div
+                        className="h-2 overflow-hidden"
+                        style={{
+                          background: 'rgba(61, 43, 31, 0.5)',
+                          border: '1px solid rgba(184, 115, 51, 0.3)',
+                        }}
+                      >
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: "45%" }}
+                          transition={{ duration: 2, ease: "easeInOut" }}
+                          style={{
+                            height: '100%',
+                            background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)',
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs mt-2 text-center" style={{ color: '#8B6F47' }}>
+                        Your order is being prepared with love ❤️
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Engagement Column - Takes remaining space */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Coffee Fact */}
+              <motion.div
+                key={`fact-${currentFact}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="brutal-card p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Sparkles size={24} style={{ color: '#B87333' }} />
+                  <h3
+                    className="text-xl"
+                    style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
                   >
-                    <span
-                      className="text-2xl"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        color: '#F5F1E8',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      TOTAL
+                    DID YOU KNOW?
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#8B6F47' }}>
+                  {coffeeFacts[currentFact]}
+                </p>
+                <button
+                  onClick={() => setCurrentFact((currentFact + 1) % coffeeFacts.length)}
+                  className="mt-4 text-xs px-3 py-1 flex items-center gap-2"
+                  style={{
+                    background: 'rgba(184, 115, 51, 0.2)',
+                    border: '1px solid rgba(184, 115, 51, 0.4)',
+                    color: '#D4A574',
+                  }}
+                >
+                  <RefreshCw size={12} />
+                  Next Fact
+                </button>
+              </motion.div>
+
+              {/* Coffee Tip */}
+              <motion.div
+                key={`tip-${currentTip}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="brutal-card p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Lightbulb size={24} style={{ color: '#FFB74D' }} />
+                  <h3
+                    className="text-xl"
+                    style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
+                  >
+                    PRO TIP
+                  </h3>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#8B6F47' }}>
+                  {coffeeTips[currentTip]}
+                </p>
+                <button
+                  onClick={() => setCurrentTip((currentTip + 1) % coffeeTips.length)}
+                  className="mt-4 text-xs px-3 py-1 flex items-center gap-2"
+                  style={{
+                    background: 'rgba(255, 183, 77, 0.2)',
+                    border: '1px solid rgba(255, 183, 77, 0.4)',
+                    color: '#FFB74D',
+                  }}
+                >
+                  <RefreshCw size={12} />
+                  Next Tip
+                </button>
+              </motion.div>
+
+              {/* Interactive Games Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="brutal-card p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Trophy size={24} style={{ color: '#D4A574' }} />
+                  <h3
+                    className="text-xl"
+                    style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
+                  >
+                    PLAY & WIN
+                  </h3>
+                </div>
+
+                {/* Game Selector */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setActiveGame('memory')}
+                    className="flex-1 py-2 text-xs transition-all"
+                    style={{
+                      background: activeGame === 'memory' ? 'rgba(184, 115, 51, 0.3)' : 'rgba(61, 43, 31, 0.5)',
+                      border: `1px solid ${activeGame === 'memory' ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                      color: activeGame === 'memory' ? '#D4A574' : '#B87333',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    Memory {gameStats.memory > 0 && `(${gameStats.memory})`}
+                  </button>
+                  <button
+                    onClick={() => setActiveGame('trivia')}
+                    className="flex-1 py-2 text-xs transition-all"
+                    style={{
+                      background: activeGame === 'trivia' ? 'rgba(184, 115, 51, 0.3)' : 'rgba(61, 43, 31, 0.5)',
+                      border: `1px solid ${activeGame === 'trivia' ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                      color: activeGame === 'trivia' ? '#D4A574' : '#B87333',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    Trivia {gameStats.trivia > 0 && `(${gameStats.trivia})`}
+                  </button>
+                  <button
+                    onClick={() => setActiveGame('origin')}
+                    className="flex-1 py-2 text-xs transition-all"
+                    style={{
+                      background: activeGame === 'origin' ? 'rgba(184, 115, 51, 0.3)' : 'rgba(61, 43, 31, 0.5)',
+                      border: `1px solid ${activeGame === 'origin' ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                      color: activeGame === 'origin' ? '#D4A574' : '#B87333',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    Origins {gameStats.origin > 0 && `(${gameStats.origin})`}
+                  </button>
+                </div>
+
+                {/* Active Game */}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeGame}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
+                    {activeGame === 'memory' && (
+                      <MemoryGame
+                        onWin={() => setGameStats(prev => ({ ...prev, memory: prev.memory + 1 }))}
+                      />
+                    )}
+                    {activeGame === 'trivia' && (
+                      <TriviaQuiz
+                        onWin={() => setGameStats(prev => ({ ...prev, trivia: prev.trivia + 1 }))}
+                      />
+                    )}
+                    {activeGame === 'origin' && (
+                      <OriginGame
+                        onWin={() => setGameStats(prev => ({ ...prev, origin: prev.origin + 1 }))}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Fun Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="brutal-card p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Heart size={24} style={{ color: '#FF6B6B' }} />
+                  <h3
+                    className="text-xl"
+                    style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
+                  >
+                    YOUR RABUSTE STATS
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm" style={{ color: '#8B6F47' }}>
+                      Active Orders
                     </span>
-                    <span
-                      className="text-3xl gradient-text"
-                      style={{ fontFamily: 'var(--font-heading)' }}
-                    >
-                      ₹{order.totalAmount}
+                    <span className="text-lg gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+                      {orders.length}
                     </span>
                   </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm" style={{ color: '#8B6F47' }}>
+                      Total Items
+                    </span>
+                    <span className="text-lg gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+                      {orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0), 0)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm" style={{ color: '#8B6F47' }}>
+                      Total Wins
+                    </span>
+                    <span className="text-lg gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+                      {gameStats.memory + gameStats.trivia + gameStats.origin}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
