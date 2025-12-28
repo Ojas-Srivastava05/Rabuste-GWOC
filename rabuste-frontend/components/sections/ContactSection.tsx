@@ -110,7 +110,7 @@ export default function ContactSection() {
         </motion.div>
 
         {/* Main Content - Left/Right Split */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+        <div className="grid lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-start">
           
           {/* LEFT SIDE - Large Visual Map/Location */}
           <motion.div
@@ -125,8 +125,8 @@ export default function ContactSection() {
               style={{
                 background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.9), rgba(26, 17, 16, 0.9))',
                 border: '3px solid rgba(184, 115, 51, 0.4)',
-                height: 'clamp(400px, 50vw, 600px)',
-                minHeight: '400px',
+                height: 'clamp(350px, 50vw, 600px)',
+                minHeight: '350px',
               }}
             >
               {/* Map placeholder with centered content */}
@@ -164,11 +164,11 @@ export default function ContactSection() {
                   City, State 12345
                 </p>
 
-                {/* Get Directions Button */}
+              {/* Get Directions Button */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-3 px-8 py-4 transition-all"
+                  className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 transition-all w-full sm:w-auto"
                   style={{
                     background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                     border: 'none',
@@ -226,7 +226,7 @@ export default function ContactSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="mt-6 flex items-center justify-between p-6"
+              className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 sm:p-6"
               style={{
                 background: 'rgba(184, 115, 51, 0.1)',
                 border: '2px solid rgba(184, 115, 51, 0.3)',
@@ -265,7 +265,7 @@ export default function ContactSection() {
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="space-y-6"
+            className="space-y-5 sm:space-y-6"
           >
             {contactInfo.map((info, index) => {
               const Icon = info.icon;

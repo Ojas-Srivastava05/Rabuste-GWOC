@@ -134,7 +134,7 @@ export default function BenefitsShowcase() {
         </motion.div>
 
         {/* Premium Bento Grid Layout */}
-        <div className="grid grid-cols-12 gap-6 lg:gap-8">
+        <div className="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
           
           {/* Large Featured Card - 2X Caffeine (spans 8 cols on desktop) */}
           <motion.div
@@ -147,8 +147,8 @@ export default function BenefitsShowcase() {
             style={{
               background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(26, 17, 16, 0.9))',
               border: '3px solid rgba(184, 115, 51, 0.5)',
-              padding: 'clamp(40px, 6vw, 60px)',
-              minHeight: '400px',
+              padding: 'clamp(24px, 5vw, 60px)',
+              minHeight: 'clamp(350px, 50vw, 400px)',
               cursor: 'pointer',
               backdropFilter: 'blur(10px)',
             }}
@@ -230,7 +230,7 @@ export default function BenefitsShowcase() {
           </motion.div>
 
           {/* Right Column - 2 stacked cards (spans 4 cols on desktop) */}
-          <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-6 lg:gap-8">
+          <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
             {/* Sharp Focus */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
@@ -239,14 +239,14 @@ export default function BenefitsShowcase() {
               viewport={{ once: true }}
               whileHover={{ scale: 1.03 }}
               className="group relative overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
-                border: '3px solid rgba(205, 127, 50, 0.4)',
-                padding: 'clamp(24px, 4vw, 32px)',
+            style={{
+              background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+              border: '3px solid rgba(205, 127, 50, 0.4)',
+              padding: 'clamp(20px, 4vw, 32px)',
                 cursor: 'pointer',
               }}
             >
-              <Brain size={48} color="#CD7F32" strokeWidth={2.5} className="mb-4" />
+              <Brain size={40} color="#CD7F32" strokeWidth={2.5} className="mb-3 sm:mb-4 sm:w-12 sm:h-12" />
               <div style={{
                 fontFamily: 'Bebas Neue, sans-serif',
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
@@ -288,7 +288,7 @@ export default function BenefitsShowcase() {
                 cursor: 'pointer',
               }}
             >
-              <Dumbbell size={48} color="#D4A574" strokeWidth={2.5} className="mb-4" />
+              <Dumbbell size={40} color="#D4A574" strokeWidth={2.5} className="mb-3 sm:mb-4 sm:w-12 sm:h-12" />
               <div style={{
                 fontFamily: 'Bebas Neue, sans-serif',
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
@@ -331,7 +331,7 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Clock size={56} color="#B87333" strokeWidth={2.5} className="mb-6" />
+            <Clock size={44} color="#B87333" strokeWidth={2.5} className="mb-4 sm:mb-6 sm:w-14 sm:h-14" />
             <div style={{
               fontFamily: 'Bebas Neue, sans-serif',
               fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
@@ -372,7 +372,7 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <TrendingUp size={56} color="#CD7F32" strokeWidth={2.5} className="mb-6" />
+            <TrendingUp size={44} color="#CD7F32" strokeWidth={2.5} className="mb-4 sm:mb-6 sm:w-14 sm:h-14" />
             <div style={{
               fontFamily: 'Bebas Neue, sans-serif',
               fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
@@ -413,7 +413,7 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Award size={56} color="#D4A574" strokeWidth={2.5} className="mb-6" />
+            <Award size={44} color="#D4A574" strokeWidth={2.5} className="mb-4 sm:mb-6 sm:w-14 sm:h-14" />
             <div style={{
               fontFamily: 'Bebas Neue, sans-serif',
               fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',

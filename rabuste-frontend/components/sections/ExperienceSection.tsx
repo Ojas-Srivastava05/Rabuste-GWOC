@@ -99,7 +99,7 @@ export default function ExperienceSection() {
         </motion.div>
 
         {/* Experience Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {experiences.map((exp, index) => {
             const Icon = exp.icon;
             return (
@@ -133,14 +133,14 @@ export default function ExperienceSection() {
                     className="mb-6 relative overflow-hidden"
                     style={{
                       background: exp.color,
-                      width: '80px',
-                      height: '80px',
+                      width: 'clamp(60px, 15vw, 80px)',
+                      height: 'clamp(60px, 15vw, 80px)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Icon size={40} color="#000" strokeWidth={2.5} className="relative z-10" />
+                    <Icon size={32} color="#000" strokeWidth={2.5} className="relative z-10 sm:w-10 sm:h-10" />
                     {/* Shine effect on hover */}
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -217,7 +217,7 @@ export default function ExperienceSection() {
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-20 grid lg:grid-cols-2 gap-8"
+          className="mt-16 sm:mt-20 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8"
         >
           <div
             className="relative overflow-hidden"

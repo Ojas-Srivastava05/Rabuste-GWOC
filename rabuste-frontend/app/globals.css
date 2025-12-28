@@ -46,7 +46,7 @@
     color: var(--foreground);
     font-family: var(--font-body);
     overflow-x: hidden;
-    font-size: 16px;
+    font-size: clamp(14px, 3.5vw, 16px);
     line-height: 1.7;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
@@ -168,11 +168,12 @@
   .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
-    padding: 20px 50px;
+    padding: clamp(16px, 4vw, 20px) clamp(32px, 8vw, 50px);
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: 18px;
+    font-size: clamp(16px, 3.5vw, 18px);
     letter-spacing: 0.15em;
     text-transform: uppercase;
     border-radius: 0;
@@ -286,13 +287,38 @@
   scrollbar-color: #B87333 #0A0A0A;
 }
 
-/* Responsive */
+/* Responsive Touch Targets */
+@media (hover: none) and (pointer: coarse) {
+  /* Ensure all interactive elements are at least 44x44px on touch devices */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .section {
+    padding: 60px 16px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .section {
+    padding: 80px 24px;
+  }
+}
+
+/* Prevent horizontal scroll on small devices */
 @media (max-width: 768px) {
-  h1 {
-    font-size: clamp(3rem, 16vw, 6rem);
+  * {
+    max-width: 100%;
   }
   
-  h2 {
-    font-size: clamp(2.5rem, 14vw, 5rem);
+  img {
+    height: auto;
   }
 }

@@ -103,7 +103,7 @@ export default function ProcessSection() {
         </motion.div>
 
         {/* Process Steps */}
-        <div className="space-y-16 lg:space-y-24">
+        <div className="space-y-12 sm:space-y-16 lg:space-y-24">
           {steps.map((step, index) => {
             const Icon = step.icon;
             const isEven = index % 2 === 0;
@@ -114,10 +114,10 @@ export default function ProcessSection() {
                 initial={{ opacity: 0, y: 50 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
-                className={`grid lg:grid-cols-2 gap-8 lg:gap-16 items-center ${isEven ? '' : 'lg:grid-flow-dense'}`}
+                className={`grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-16 items-center ${isEven ? '' : 'lg:grid-flow-dense'}`}
               >
                 {/* Image */}
-                <div className={`relative ${isEven ? '' : 'lg:col-start-2'}`}>
+                <div className={`relative ${isEven ? '' : 'lg:col-start-2'} order-first`}>
                   <div
                     className="relative overflow-hidden"
                     style={{
@@ -161,20 +161,20 @@ export default function ProcessSection() {
                 </div>
 
                 {/* Content */}
-                <div className={isEven ? '' : 'lg:col-start-1 lg:row-start-1'}>
-                  <div className="flex items-center gap-4 mb-6">
+                <div className={`${isEven ? '' : 'lg:col-start-1 lg:row-start-1'} order-last`}>
+                  <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6">
                     <div
                       style={{
                         background: `${step.color}20`,
                         border: `3px solid ${step.color}`,
-                        width: '80px',
-                        height: '80px',
+                        width: 'clamp(60px, 15vw, 80px)',
+                        height: 'clamp(60px, 15vw, 80px)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <Icon size={40} color={step.color} strokeWidth={2.5} />
+                      <Icon size={32} color={step.color} strokeWidth={2.5} className="sm:w-10 sm:h-10" />
                     </div>
 
                     <div

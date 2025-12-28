@@ -41,7 +41,7 @@ export default function CallToAction() {
         {/* LEFT SIDE - POWERFUL GRAPHICS (60%) */}
         <motion.div 
           style={{ scale }}
-          className="relative w-full lg:w-[60%] min-h-[50vh] lg:min-h-screen flex items-center justify-center p-8 lg:p-16"
+          className="relative w-full lg:w-[60%] min-h-[60vh] lg:min-h-screen flex items-center justify-center p-6 sm:p-8 lg:p-16"
         >
           {/* Background Pattern */}
           <div 
@@ -158,7 +158,7 @@ export default function CallToAction() {
         </motion.div>
 
         {/* RIGHT SIDE - PUNCHY TEXT & CTA (40%) */}
-        <div className="relative w-full lg:w-[40%] min-h-[50vh] lg:min-h-screen flex items-center justify-center p-8 lg:p-12 xl:p-16">
+        <div className="relative w-full lg:w-[40%] min-h-[60vh] lg:min-h-screen flex items-center justify-center p-6 sm:p-8 lg:p-12 xl:p-16">
           {/* Copper Gradient Background */}
           <div 
             className="absolute inset-0 opacity-10"
@@ -231,7 +231,7 @@ export default function CallToAction() {
             </p>
 
             {/* Stats */}
-            <div className="flex gap-8 mb-8">
+            <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 mb-8">
               {[
                 { icon: TrendingUp, value: '+15%', label: 'Performance' },
                 { icon: Award, value: '6-8hrs', label: 'Energy' },
@@ -273,7 +273,7 @@ export default function CallToAction() {
               onClick={() => router.push('/menu')}
               whileHover={{ scale: 1.05, x: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="group inline-flex items-center gap-4 px-12 py-6 text-xl lg:text-2xl font-bold transition-all"
+              className="group inline-flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl lg:text-2xl font-bold transition-all w-full sm:w-auto"
               style={{
                 background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
                 color: '#000000',

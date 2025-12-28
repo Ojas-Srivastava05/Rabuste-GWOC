@@ -45,7 +45,7 @@ export default function OurStorySection() {
       }}
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
           
           {/* LEFT - Story Content */}
           <motion.div
@@ -116,7 +116,7 @@ export default function OurStorySection() {
             </div>
 
             {/* Values Grid */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {values.map((value, index) => {
                 const Icon = value.icon;
                 return (
@@ -131,15 +131,15 @@ export default function OurStorySection() {
                       style={{
                         background: `${value.color}20`,
                         border: `2px solid ${value.color}40`,
-                        width: '48px',
-                        height: '48px',
+                        width: 'clamp(40px, 10vw, 48px)',
+                        height: 'clamp(40px, 10vw, 48px)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         flexShrink: 0,
                       }}
                     >
-                      <Icon size={24} color={value.color} strokeWidth={2.5} />
+                      <Icon size={20} color={value.color} strokeWidth={2.5} className="sm:w-6 sm:h-6" />
                     </div>
                     <div>
                       <div style={{
@@ -169,7 +169,7 @@ export default function OurStorySection() {
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
+            className="relative order-first lg:order-last"
           >
             {/* Main Image */}
             <div
