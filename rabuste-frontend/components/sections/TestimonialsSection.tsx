@@ -48,7 +48,7 @@ export default function TestimonialsSection() {
         padding: 'clamp(80px, 15vw, 120px) 0',
       }}
     >
-      <div className="container px-4 sm:px-6">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

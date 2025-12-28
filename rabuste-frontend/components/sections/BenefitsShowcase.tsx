@@ -90,7 +90,7 @@ export default function BenefitsShowcase() {
         />
       </motion.div>
 
-      <div className="container px-4 sm:px-6 relative z-10">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -133,8 +133,8 @@ export default function BenefitsShowcase() {
           {/* See research button removed */}
         </motion.div>
 
-        {/* Benefits Grid - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
+        {/* Benefits Grid - Consistent with homepage */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {benefits.map((benefit, index) => {
             const Icon = benefit.icon;
             return (

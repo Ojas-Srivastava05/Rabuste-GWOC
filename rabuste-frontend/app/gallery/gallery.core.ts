@@ -69,7 +69,7 @@ class PreloaderManager {
       { radius: 35, count: 12 },
       { radius: 50, count: 16 }
     ];
-    const colors = { primary: "#2C1B14", accent: "#A64B23" };
+    const colors = { primary: "#B87333", accent: "#CD7F32" };
     const hexToRgb = (hex) => [
       parseInt(hex.slice(1, 3), 16),
       parseInt(hex.slice(3, 5), 16),
@@ -267,9 +267,9 @@ class FashionGallery {
       ctx.clearRect(0, 0, width, height);
       const time = (Date.now() - startTime) / 1000;
       const muteFactor = 1 - currentAmplitude;
-      const primaryColor = "#2C1B14";
-      const accentColor = "#A64B23";
-      const muteColor = "#D9C4AA";
+      const primaryColor = "#B87333";
+      const accentColor = "#CD7F32";
+      const muteColor = "#D4A574";
       if (!this.soundSystem.enabled && currentAmplitude < 0.01) {
         ctx.fillStyle = muteColor;
         ctx.fillRect(0, centerY, width, 2);
@@ -298,7 +298,7 @@ class FashionGallery {
     animate();
   }
   initImageData() {
-    // Fashion portrait images
+    // Coffee gallery images
     this.fashionImages = [
       "/gallery/img1.jpeg",
       "/gallery/img2.jpeg",
@@ -307,139 +307,139 @@ class FashionGallery {
       "/gallery/img5.jpeg",
     ];
     
-    // Image data for titles and descriptions
+    // Coffee-themed image data
     this.imageData = [
       {
         number: "01",
-        title: "Begin Before You’re Ready",
+        title: "The Rabuste Legacy",
         description:
-          "The work starts when you notice the quiet pull. Breathe once, clear the room inside you, and move one pixel forward."
+          "15 years of crafting the boldest robusta coffee. Born from passion, perfected through dedication, delivered with power."
       },
       {
         number: "02",
-        title: "Negative Space, Positive Signal",
+        title: "Double The Caffeine",
         description:
-          "Leave room around the idea. In the silence, the design answers back and shows you what to remove."
+          "Our robusta beans pack 2.7% caffeine compared to arabica's 1.5%. Experience the difference that real power makes."
       },
       {
         number: "03",
-        title: "Friction Is a Teacher",
+        title: "Premium Bean Selection",
         description:
-          "When the line resists, listen. Constraints are coordinates—plot them, then chart a cleaner route."
+          "Hand-selected robusta beans from the finest plantations. Quality you can taste, energy you can feel, excellence you deserve."
       },
       {
         number: "04",
-        title: "Golden Minute",
+        title: "Artisan Roasting",
         description:
-          "Catch the light while it’s honest. One honest frame beats a hundred almosts."
+          "Small-batch roasting to unlock the full potential of every bean. Precision meets tradition in every cup."
       },
       {
         number: "05",
-        title: "Shadow Carries Form",
+        title: "Bold & Unapologetic",
         description:
-          "The dark reveals the edge. Let contrast articulate what you mean but can’t yet say."
+          "Rich, intense flavor profile with earthy undertones. This isn't your average morning coffee—this is power in a cup."
       },
       {
         number: "06",
-        title: "City Breath",
+        title: "The Power Blend",
         description:
-          "Steel, glass, heartbeat. Edit until the street’s rhythm fits inside a single grid."
+          "Expertly crafted for maximum impact. Smooth yet strong, balanced yet bold. The perfect fuel for your ambitions."
       },
       {
         number: "07",
-        title: "Soft Focus, Sharp Intent",
+        title: "Morning Ritual",
         description:
-          "Blur the noise, not the purpose. What matters remains in crisp relief."
+          "Start your day with purpose. One cup of Rabuste delivers sustained energy that lasts from sunrise to success."
       },
       {
         number: "08",
-        title: "Time-Tested, Future-Ready",
+        title: "Peak Performance",
         description:
-          "Classics survive because they serve. Keep the spine, tune the surface, respect the lineage."
+          "Athletes and professionals trust Rabuste for pre-workout and focus sessions. 15% performance boost, 100% natural caffeine."
       },
       {
         number: "09",
-        title: "Grace Under Revision",
+        title: "Crafted With Care",
         description:
-          "Drafts don’t apologize. They evolve. Let elegance emerge through cuts, not flourishes."
+          "From plantation to cup, every step is monitored for quality. We don't compromise, so you don't have to settle."
       },
       {
         number: "10",
-        title: "Style That Outlasts Seasons",
+        title: "The Copper Standard",
         description:
-          "Trends talk. Principles walk. Build on principles and let trends accessorize."
+          "Our signature copper notes and rich aroma set the standard for premium robusta. Taste the difference quality makes."
       },
       {
         number: "11",
-        title: "Edges and Experiments",
+        title: "Energy That Lasts",
         description:
-          "Push just past comfort. Leave a fingerprint the algorithm can’t fake."
+          "6-8 hours of sustained focus without the crash. Robusta's superior caffeine profile keeps you going strong."
       },
       {
         number: "12",
-        title: "Portrait of Attention",
+        title: "Sustainable Source",
         description:
-          "Form is what you see. Presence is what you feel. Aim for presence."
+          "Ethically sourced beans from sustainable farms. Great coffee shouldn't cost the earth—literally."
       },
       {
         number: "13",
-        title: "Light Speaks First",
+        title: "The Science Of Strength",
         description:
-          "Expose for truth. Shadows are sentences, highlights the punctuation."
+          "Higher antioxidant content, more chlorogenic acid, superior metabolic benefits. Coffee that works as hard as you do."
       },
       {
         number: "14",
-        title: "Contemporary Is a Moving Target",
+        title: "Brewing Excellence",
         description:
-          "Design for now by listening deeper than now. The signal is older than the feed."
+          "Perfect for espresso, French press, or cold brew. Versatile beans that deliver exceptional results every time."
       },
       {
         number: "15",
-        title: "Vision, Then Precision",
+        title: "Customer Obsessed",
         description:
-          "Dream wide, ship tight. Let imagination roam and execution walk in single-point focus."
+          "Thousands of satisfied customers. Real results, real reviews, real coffee. Join the Rabuste revolution today."
       },
       {
         number: "16",
-        title: "Geometry of Poise",
+        title: "Fresh Every Time",
         description:
-          "Angles carry attitude. Align posture, light, and line until the frame breathes."
+          "Roasted to order, delivered fresh to your door. Experience coffee at its absolute peak flavor and potency."
       },
       {
         number: "17",
-        title: "Natural Light, Natural Truth",
+        title: "The Bold Choice",
         description:
-          "Open the window and remove the mask. Authenticity needs less wattage, more honesty."
+          "For those who refuse to settle for mediocre. Rabuste is coffee for people who demand more from life."
       },
       {
         number: "18",
-        title: "Studio: The Controlled Wild",
+        title: "Flavor Profile",
         description:
-          "Dial every knob, then listen for the unscripted moment. Keep the lens ready."
+          "Notes of dark chocolate, toasted nuts, and earthy spices. Complex, sophisticated, unforgettable."
       },
       {
         number: "19",
-        title: "Invent the Angle",
+        title: "Midnight Fuel",
         description:
-          "Rotate the problem ninety degrees. Fresh perspective isn’t luck—it’s a habit."
+          "Late nights made easier. Study sessions, deadlines, hustle—Rabuste keeps you sharp when it matters most."
       },
       {
         number: "20",
-        title: "Editorial Nerve",
+        title: "Premium Packaging",
         description:
-          "Carry yourself like you belong, then earn it with craft. The camera can tell."
+          "Sealed for freshness in our signature copper bags. Quality protection for quality coffee."
       },
       {
         number: "21",
-        title: "Profession Is Practice",
+        title: "Community Driven",
         description:
-          "Repeat the fundamentals until they disappear. Mastery is subtle on purpose."
+          "Join thousands who've upgraded their coffee game. Share your Rabuste moments, inspire others, fuel greatness."
       },
       {
         number: "22",
-        title: "Final Frame, Open Door",
+        title: "Order Your Power",
         description:
-          "Endings are launchpads. Archive the take, thank the light, and start again at one."
+          "Ready to experience the boldest coffee you've ever tasted? Your journey to coffee excellence starts here."
       }
     ];
   }
@@ -1390,21 +1390,23 @@ class FashionGallery {
       card.style.cssText = `
         width: 100%;
         max-width: 520px;
-        background: #0f0f0f;
-        border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        background: linear-gradient(135deg, rgba(26, 17, 16, 0.95), rgba(43, 24, 16, 0.95));
+        border: 2px solid rgba(184, 115, 51, 0.4);
+        border-radius: 0;
+        box-shadow: 0 16px 64px rgba(0,0,0,0.8);
         overflow: hidden;
-        color: #fff;
+        color: #FFFEF9;
+        backdrop-filter: blur(10px);
       `;
       card.innerHTML = `
-        <div style="position:relative;">
+        <div style="position:relative; border-bottom: 2px solid rgba(184, 115, 51, 0.3);">
           <img src="${itemData.imageUrl}" alt="" style="width:100%; height: auto; display:block; object-fit:cover;">
-          <button id="mobile-dialog-close" aria-label="Close" style="position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:999px; background:#c4a574; border:none; cursor:pointer;">✕</button>
+          <button id="mobile-dialog-close" aria-label="Close" style="position:absolute; top:10px; right:10px; width:40px; height:40px; border-radius:0; background:linear-gradient(135deg, #B87333, #CD7F32); border:none; cursor:pointer; color:#000; font-size:20px; font-weight:bold; box-shadow:0 4px 12px rgba(184,115,51,0.4);">✕</button>
         </div>
-        <div style="padding:16px;">
-          <div id="mobile-dialog-number" style="font-size:12px; opacity:0.8; margin-bottom:6px;">${this.imageData[itemData.index % this.imageData.length].number}</div>
-          <h3 id="mobile-dialog-title" style="margin:0 0 8px 0;">${this.imageData[itemData.index % this.imageData.length].title}</h3>
-          <p id="mobile-dialog-desc" style="margin:0; opacity:0.9; line-height:1.4; font-size:14px;">${this.imageData[itemData.index % this.imageData.length].description}</p>
+        <div style="padding:20px;">
+          <div id="mobile-dialog-number" style="font-family:'Work Sans',sans-serif; font-size:12px; color:#B87333; opacity:1; margin-bottom:8px; letter-spacing:0.15em; font-weight:600;">${this.imageData[itemData.index % this.imageData.length].number}</div>
+          <h3 id="mobile-dialog-title" style="font-family:'Bebas Neue',sans-serif; margin:0 0 12px 0; font-size:24px; color:#FFFEF9; letter-spacing:0.05em; text-transform:uppercase;">${this.imageData[itemData.index % this.imageData.length].title}</h3>
+          <p id="mobile-dialog-desc" style="font-family:'Work Sans',sans-serif; margin:0; color:rgba(255,254,249,0.85); line-height:1.6; font-size:14px; font-weight:300;">${this.imageData[itemData.index % this.imageData.length].description}</p>
         </div>
       `;
       overlay.appendChild(card);

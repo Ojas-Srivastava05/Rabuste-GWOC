@@ -1,13 +1,14 @@
-
-  
 @import url("https://fonts.cdnfonts.com/css/thegoodmonolith");
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600;700&display=swap');
+
 #drag-gallery-root {
     position: fixed;
     inset: 0;
-    background: black;
+    background: #0A0A0A;
     overflow: hidden;
     z-index: 0;
   }
+
 @font-face {
   font-family: "PPNeueMontreal";
   src: url("https://assets.codepen.io/7558/PPNeueMontreal-Variable.woff2")
@@ -20,8 +21,13 @@
   --spacing-base: 1rem;
   --spacing-md: 1.5rem;
   --spacing-lg: 2rem;
-  --color-text: #ffffff;
+  --color-text: #FFFEF9;
   --color-text-dim: 0.6;
+  --color-copper: #B87333;
+  --color-bronze: #CD7F32;
+  --color-golden: #D4A574;
+  --color-midnight: #1A1110;
+  --color-espresso: #2B1810;
   --transition-medium: 0.3s ease;
   --font-size-base: 14px;
 }
@@ -34,8 +40,8 @@
 }
 
 body {
-  font-family: "PPNeueMontreal", sans-serif;
-  background: #000;
+  font-family: "Work Sans", sans-serif;
+  background: #0A0A0A;
   overflow: hidden;
   height: 100vh;
   cursor: grab;
@@ -50,7 +56,7 @@ body.zoom-mode {
 }
 
 .preloader-overlay {
-  background: #000;
+  background: #0A0A0A;
 }
 
 /* Header and Footer */
@@ -106,7 +112,7 @@ body.zoom-mode {
 /* Bottom bar */
 .coordinates-section {
   grid-column: 1 / span 3;
-  font-family: "TheGoodMonolith", monospace;
+  font-family: "Work Sans", monospace;
 }
 
 .info-section {
@@ -136,7 +142,7 @@ body.zoom-mode {
   transition: transform var(--transition-medium);
   width: 1.4rem;
   height: 1.4rem;
-  background-color: var(--color-text);
+  background: linear-gradient(135deg, var(--color-copper), var(--color-bronze));
   top: 50%;
 }
 
@@ -148,7 +154,7 @@ body.zoom-mode {
 .circle-2 {
   left: 0.8rem;
   transform: translate(0, -50%);
-  mix-blend-mode: exclusion;
+  mix-blend-mode: screen;
 }
 
 .logo-container:hover .circle-1 {
@@ -165,17 +171,19 @@ body.zoom-mode {
   align-items: center;
   justify-content: center;
   padding: 0 5px;
-  border: 1px solid var(--color-text);
+  border: 1px solid var(--color-copper);
   border-radius: 3px;
   font-size: 12px;
   margin: 0 3px;
   min-width: 20px;
   height: 20px;
+  color: var(--color-copper);
 }
 
 /* Footer text styling */
 .footer p {
-  font-family: "TheGoodMonolith", monospace;
+  font-family: "Work Sans", sans-serif;
+  color: rgba(255, 254, 249, 0.8);
 }
 
 /* Global link styling */
@@ -200,7 +208,7 @@ a::after {
   left: 0;
   width: 0;
   height: 100%;
-  background-color: var(--color-text);
+  background: linear-gradient(135deg, var(--color-copper), var(--color-bronze));
   z-index: -1;
   transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -210,15 +218,15 @@ a:hover::after {
 }
 
 a:hover {
-  color: black;
-  mix-blend-mode: difference;
+  color: #000;
+  mix-blend-mode: normal;
   opacity: 1;
 }
 
 p {
   display: block;
   text-decoration: none;
-  color: #ffffff;
+  color: #FFFEF9;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01rem;
@@ -233,7 +241,9 @@ h3 {
   font-size: 14px;
   margin-bottom: var(--spacing-base);
   font-weight: 600;
-  color: #fff;
+  color: var(--color-copper);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.1em;
 }
 
 .viewport {
@@ -272,6 +282,13 @@ h3 {
   z-index: 1;
   opacity: 1;
   transition: opacity 0.6s ease;
+  border: 2px solid rgba(184, 115, 51, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+}
+
+.grid-item:hover {
+  border-color: rgba(184, 115, 51, 0.6);
+  box-shadow: 0 8px 32px rgba(184, 115, 51, 0.4);
 }
 
 .grid-item.out-of-view {
@@ -313,7 +330,7 @@ h3 {
   position: relative;
   width: 50vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(10, 10, 10, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -325,7 +342,7 @@ h3 {
   position: relative;
   width: 50vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(10, 10, 10, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -373,17 +390,17 @@ h3 {
   position: absolute;
   top: 0;
   left: 0;
-  color: white;
-  font-family: "TheGoodMonolith", monospace;
+  color: var(--color-copper);
+  font-family: "Work Sans", sans-serif;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.5;
   transform: translateY(0px);
   will-change: transform;
   margin: 0;
   padding: 0;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
 }
 
 .image-slide-title {
@@ -400,15 +417,16 @@ h3 {
   top: 0;
   left: 0;
   color: white;
-  font-family: "PPNeueMontreal", sans-serif;
+  font-family: "Bebas Neue", sans-serif;
   font-size: 48px;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
   transform: translateY(0px);
   will-change: transform;
   margin: 0;
   padding: 0;
+  text-transform: uppercase;
 }
 
 .image-slide-description {
@@ -422,11 +440,11 @@ h3 {
 .description-line {
   position: relative;
   display: block;
-  color: rgba(255, 255, 255, 0.8);
-  font-family: "PPNeueMontreal", sans-serif;
+  color: rgba(255, 254, 249, 0.8);
+  font-family: "Work Sans", sans-serif;
   font-size: 16px;
   font-weight: 300;
-  line-height: 1.4;
+  line-height: 1.5;
   transform: translateY(0px);
   will-change: transform;
   margin: 0;
@@ -474,13 +492,13 @@ h3 {
 }
 
 .zoom-target::before {
-  content: "IMAGE TARGET";
-  color: rgba(255, 255, 255, 0.5);
-  font-family: "TheGoodMonolith", monospace;
+  content: "CLICK TO VIEW";
+  color: rgba(184, 115, 51, 0.5);
+  font-family: "Bebas Neue", sans-serif;
   font-size: 0.75em;
   font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
 }
 
 .controls-container {
@@ -503,46 +521,39 @@ h3 {
 }
 
 .percentage-indicator {
-  background-color: #f0f0f0;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 0);
-  background-size: 0.44em 0.44em;
-  background-position: -0.06em -0.06em;
+  background: linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2));
+  border: 1px solid rgba(184, 115, 51, 0.4);
   padding: 0.625em 1.25em;
-  border-radius: 0.25em;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "TheGoodMonolith", monospace;
-  font-size: 0.75em;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 0.875em;
   font-weight: 400;
   text-transform: uppercase;
-  color: #333;
+  color: var(--color-copper);
   min-width: 5em;
   white-space: nowrap;
+  letter-spacing: 0.1em;
 }
 
 .switch {
   display: flex;
   gap: 1.25em;
-  background-color: #222;
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.015) 1px,
-    transparent 0
-  );
-  background-size: 0.44em 0.44em;
-  background-position: -0.06em -0.06em;
+  background: rgba(26, 17, 16, 0.8);
+  border: 1px solid rgba(184, 115, 51, 0.3);
   padding: 0.625em 1.25em;
-  border-radius: 0.25em;
+  border-radius: 0;
   transition: padding 0.3s ease-in-out;
+  backdrop-filter: blur(10px);
 }
 
 .sound-toggle {
-  background-color: #f0f0f0;
-  background-image: radial-gradient(rgba(0, 0, 0, 0.015) 1px, transparent 0);
-  background-size: 0.44em 0.44em;
-  background-position: -0.06em -0.06em;
+  background: linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2));
+  border: 1px solid rgba(184, 115, 51, 0.4);
   padding: 0.5em 0.75em;
-  border-radius: 0.25em;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -550,7 +561,11 @@ h3 {
   transition: all 0.3s ease;
   min-width: 3.75em;
   position: relative;
-  border-color: transparent;
+}
+
+.sound-toggle:hover {
+  background: linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.3));
+  border-color: rgba(184, 115, 51, 0.6);
 }
 
 .sound-wave-canvas {
@@ -572,10 +587,9 @@ h3 {
 .switch-button {
   background: none;
   border: none;
-  border-color: transparent;
-  color: #666;
+  color: rgba(184, 115, 51, 0.6);
   cursor: pointer;
-  font-family: "TheGoodMonolith", monospace;
+  font-family: "Bebas Neue", sans-serif;
   font-size: 0.75em;
   font-weight: 400;
   text-transform: uppercase;
@@ -583,17 +597,22 @@ h3 {
   position: relative;
   transition: all 0.3s ease-in-out;
   white-space: nowrap;
+  letter-spacing: 0.1em;
+}
+
+.switch-button:hover {
+  color: var(--color-copper);
 }
 
 .switch-button-current {
-  color: #f0f0f0;
+  color: var(--color-copper);
 }
 
 .indicator-dot {
   position: absolute;
   width: 5px;
   height: 5px;
-  background-color: #f0f0f0;
+  background: var(--color-copper);
   border-radius: 50%;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
@@ -606,16 +625,15 @@ h3 {
   opacity: 1;
 }
 
-/* Simple 64px white arrow button */
+/* Simple 64px copper arrow button */
 .close-button {
   position: fixed;
   top: 50%;
   right: 20px;
   width: 64px;
   height: 64px;
-  background: none;
+  background: linear-gradient(135deg, var(--color-copper), var(--color-bronze));
   border: none;
-  border-color: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -624,6 +642,8 @@ h3 {
   opacity: 0;
   pointer-events: none;
   transform: translate(40px, -50%);
+  box-shadow: 0 8px 24px rgba(184, 115, 51, 0.4);
+  transition: all 0.3s ease;
 }
 
 .close-button.active {
@@ -631,13 +651,16 @@ h3 {
 }
 
 .close-button:hover {
-  opacity: 0.7;
+  opacity: 1;
+  background: linear-gradient(135deg, var(--color-bronze), var(--color-golden));
+  box-shadow: 0 12px 36px rgba(184, 115, 51, 0.6);
 }
 
 .close-button svg {
-  width: 64px;
-  height: 64px;
+  width: 32px;
+  height: 32px;
   transform: rotate(180deg);
+  color: #000;
 }
 
 /* Scaling image overlay */
@@ -649,6 +672,8 @@ h3 {
   pointer-events: none;
   will-change: transform;
   opacity: 1 !important;
+  border: 2px solid rgba(184, 115, 51, 0.4);
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.8);
 }
 
 .scaling-image-overlay img {
