@@ -193,7 +193,7 @@ export default function CallToAction() {
                 letterSpacing: '0.2em',
                 fontWeight: 700,
               }}>
-                LIMITED TIME
+                OPENING 2025
               </span>
             </motion.div>
 
@@ -205,7 +205,7 @@ export default function CallToAction() {
               color: '#FFFEF9',
               marginBottom: '1.5rem',
             }}>
-              READY TO
+              VISIT
               <br />
               <span style={{
                 background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
@@ -213,10 +213,10 @@ export default function CallToAction() {
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}>
-                DOMINATE
+                RABUSTE
               </span>
               <br />
-              YOUR DAY?
+              COFFEE
             </h2>
 
             <p style={{
@@ -226,8 +226,8 @@ export default function CallToAction() {
               marginBottom: '3rem',
               fontWeight: 300,
             }}>
-              Experience coffee that doesn't just wake you up—it unleashes your potential. 
-              Double the caffeine. Limitless possibilities.
+              Experience bold Robusta coffee in a space where art meets community. 
+              Grab your cup, explore the gallery, join a workshop.
             </p>
 
             {/* Stats */}
@@ -282,7 +282,7 @@ export default function CallToAction() {
                 boxShadow: '0 20px 60px rgba(184, 115, 51, 0.5)',
               }}
             >
-              ORDER NOW
+              EXPLORE MENU
               <ArrowRight 
                 size={32} 
                 className="group-hover:translate-x-2 transition-transform" 
@@ -303,7 +303,7 @@ export default function CallToAction() {
                 letterSpacing: '0.05em',
               }}
             >
-              ★★★★★ Trusted by 10,000+ coffee enthusiasts
+              Coffee • Art • Workshops • Community
             </motion.p>
           </motion.div>
         </div>
