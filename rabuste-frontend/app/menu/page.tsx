@@ -499,67 +499,67 @@ export default function MenuPage() {
 
           {/* Menu Items */}
           {filtered.length > 0 ? (
-            activeCategory === "All" ? (
-              // Show category-separated view for "All"
-              <div className="space-y-12">
-                {categories.filter(c => c !== "All").map((category) => {
-                  const categoryItems = filtered.filter(item => item.category === category);
-                  if (categoryItems.length === 0) return null;
-                  
-                  return (
-                    <motion.div
-                      key={category}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      {/* Category Header */}
-                      <div className="mb-6 text-center">
-                        <div className="inline-flex items-center gap-4">
-                          <div 
-                            className="w-16 h-px"
-                            style={{ background: 'linear-gradient(90deg, transparent, #B87333)' }}
-                          />
-                          <h2
-                            className="text-2xl md:text-4xl"
-                            style={{
-                              fontFamily: 'var(--font-heading)',
-                              color: '#F5F1E8',
-                              letterSpacing: '0.05em',
-                            }}
-                          >
-                            {category}
-                          </h2>
-                          <div 
-                            className="w-16 h-px"
-                            style={{ background: 'linear-gradient(90deg, #B87333, transparent)' }}
-                          />
+            viewMode === "grid" ? (
+              activeCategory === "All" ? (
+                // Show category-separated grid view for "All"
+                <div className="space-y-12">
+                  {categories.filter(c => c !== "All").map((category) => {
+                    const categoryItems = filtered.filter(item => item.category === category);
+                    if (categoryItems.length === 0) return null;
+                    
+                    return (
+                      <motion.div
+                        key={category}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        {/* Category Header */}
+                        <div className="mb-6 text-center">
+                          <div className="inline-flex items-center gap-4">
+                            <div 
+                              className="w-16 h-px"
+                              style={{ background: 'linear-gradient(90deg, transparent, #B87333)' }}
+                            />
+                            <h2
+                              className="text-2xl md:text-4xl"
+                              style={{
+                                fontFamily: 'var(--font-heading)',
+                                color: '#F5F1E8',
+                                letterSpacing: '0.05em',
+                              }}
+                            >
+                              {category}
+                            </h2>
+                            <div 
+                              className="w-16 h-px"
+                              style={{ background: 'linear-gradient(90deg, #B87333, transparent)' }}
+                            />
+                          </div>
+                          <p className="text-xs mt-2" style={{ color: '#8B6F47' }}>
+                            {categoryItems.length} items
+                          </p>
                         </div>
-                        <p className="text-xs mt-2" style={{ color: '#8B6F47' }}>
-                          {categoryItems.length} items
-                        </p>
-                      </div>
 
-                      {/* Category Items Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {categoryItems.map((item, index) => (
-                          <GridMenuItem
-                            key={item._id}
-                            item={item}
-                            quantity={getQty(item._id)}
-                            onAdd={() => addToCart(item._id)}
-                            onRemove={() => removeFromCart(item._id)}
-                            index={index}
-                            flags={getItemFlags(item)}
-                          />
-                        ))}
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            ) : (
-              // Show normal grid/list for specific category
-              viewMode === "grid" ? (
+                        {/* Category Items Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {categoryItems.map((item, index) => (
+                            <GridMenuItem
+                              key={item._id}
+                              item={item}
+                              quantity={getQty(item._id)}
+                              onAdd={() => addToCart(item._id)}
+                              onRemove={() => removeFromCart(item._id)}
+                              index={index}
+                              flags={getItemFlags(item)}
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              ) : (
+                // Show normal grid for specific category
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {filtered.map((item, index) => (
                     <GridMenuItem
@@ -573,21 +573,22 @@ export default function MenuPage() {
                     />
                   ))}
                 </div>
-              ) : (
-                <div className="space-y-3 max-w-4xl mx-auto">
-                  {filtered.map((item, index) => (
-                    <ListMenuItem
-                      key={item._id}
-                      item={item}
-                      quantity={getQty(item._id)}
-                      onAdd={() => addToCart(item._id)}
-                      onRemove={() => removeFromCart(item._id)}
-                      index={index}
-                      flags={getItemFlags(item)}
-                    />
-                  ))}
-                </div>
               )
+            ) : (
+              // List view - works for all categories
+              <div className="space-y-3 max-w-4xl mx-auto">
+                {filtered.map((item, index) => (
+                  <ListMenuItem
+                    key={item._id}
+                    item={item}
+                    quantity={getQty(item._id)}
+                    onAdd={() => addToCart(item._id)}
+                    onRemove={() => removeFromCart(item._id)}
+                    index={index}
+                    flags={getItemFlags(item)}
+                  />
+                ))}
+              </div>
             )
           ) : (
             <motion.div
