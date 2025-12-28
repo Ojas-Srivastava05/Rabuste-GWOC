@@ -61,8 +61,9 @@ export default function Navbar() {
       <div className="flex items-center justify-between max-w-7xl mx-auto relative z-10">
         {/* LEFT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1">
-          <NavButton href="/menu">MENU</NavButton>
-          <NavButton href="/gallery">GALLERY</NavButton>
+          <NavButton href="/franchise">FRANCHISE</NavButton>
+          <NavButton href="/workshops">WORKSHOP</NavButton>
+          <NavButton href="/order-status">ORDERS</NavButton>
         </div>
 
         {/* MOBILE: hamburger on left */}
@@ -129,8 +130,8 @@ export default function Navbar() {
 
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1 justify-end">
-          <NavButton href="/workshops">WORKSHOP</NavButton>
-          <NavButton href="/franchise">FRANCHISE</NavButton>
+          <NavButton href="/menu">MENU</NavButton>
+          <NavButton href="/gallery">GALLERY</NavButton>
           <NavButton href="/auth">LOGIN</NavButton>
         </div>
       </div>
@@ -152,17 +153,20 @@ export default function Navbar() {
           }}
         >
           <div className="flex flex-col gap-3">
+            <NavButton href="/franchise" mobile onClick={() => setOpen(false)}>
+              FRANCHISE
+            </NavButton>
+            <NavButton href="/workshops" mobile onClick={() => setOpen(false)}>
+              WORKSHOP
+            </NavButton>
+            <NavButton href="/order-status" mobile onClick={() => setOpen(false)}>
+              ORDERS
+            </NavButton>
             <NavButton href="/menu" mobile onClick={() => setOpen(false)}>
               MENU
             </NavButton>
             <NavButton href="/gallery" mobile onClick={() => setOpen(false)}>
               GALLERY
-            </NavButton>
-            <NavButton href="/workshops" mobile onClick={() => setOpen(false)}>
-              WORKSHOP
-            </NavButton>
-            <NavButton href="/franchise" mobile onClick={() => setOpen(false)}>
-              FRANCHISE
             </NavButton>
             <NavButton href="/auth" mobile onClick={() => setOpen(false)}>
               LOGIN

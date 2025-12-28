@@ -23,9 +23,24 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
 
   const fetchOrders = async () => {
-    const res = await fetch("/api/orders");
-    const data = await res.json();
-    setOrders(data);
+    const token = localStorage.getItem("token");
+
+const res = await fetch("/api/orders", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+const data = await res.json();
+
+if (!Array.isArray(data)) {
+  console.error("Expected orders array, got:", data);
+  setOrders([]);
+  return;
+}
+
+setOrders(data);
+
   };
 
   const markCompleted = async (orderId: string) => {
