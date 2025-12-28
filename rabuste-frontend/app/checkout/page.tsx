@@ -41,17 +41,47 @@ export default function CheckoutPage() {
   }
 
   async function handleMockPayment() {
+    if (!cart) return;
+  
     setPaying(true);
-
+  
     // simulate payment delay
     setTimeout(async () => {
-      // create order
-      await fetch("/api/order", { method: "POST" });
-
-      // redirect to status page
-      router.push("/order-status");
+      try {
+        const token = localStorage.getItem("token");
+  
+        if (!token) {
+          router.push("/auth?redirect=/checkout");
+          return;
+        }
+  
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // 🔥 REQUIRED
+          },
+          body: JSON.stringify({
+            items: cart.items,
+            totalAmount,
+          }),
+        });
+  
+        if (!res.ok) {
+          throw new Error("Order creation failed");
+        }
+  
+        // redirect to order status page
+        router.push("/order-status");
+      } catch (err) {
+        console.error("Checkout error:", err);
+        alert("Something went wrong while placing your order.");
+      } finally {
+        setPaying(false);
+      }
     }, 2000);
   }
+  
 
   if (loading) {
     return (

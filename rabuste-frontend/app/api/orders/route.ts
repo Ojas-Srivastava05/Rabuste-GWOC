@@ -1,26 +1,47 @@
 import { NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
+
 import connectDB from "@/src/lib/mongodb";
 import Order from "@/src/models/Order";
 
 
+
 export async function POST(req: Request) {
-  await connectDB(); // connect to MongoDB
+  await connectDB();
 
   try {
+    // 🔥 FIX: read header from req
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded: any = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    );
+
+    const userId = decoded.id;
+
     const data = await req.json();
 
-    if (!data.customerName || !data.customerEmail || !data.items?.length) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    if (!data.items?.length || !data.totalAmount) {
+      return NextResponse.json(
+        { error: "Missing order data" },
+        { status: 400 }
+      );
     }
 
     const order = await Order.create({
-  customerName: data.customerName,
-  customerEmail: data.customerEmail,
-  items: data.items,
-  totalAmount: data.totalAmount,
-  instructions: data.instructions,
-});
-
+      userId,
+      customerName: decoded.name || "Customer",
+      customerEmail: decoded.email || "unknown@email",
+      items: data.items,
+      totalAmount: data.totalAmount,
+      instructions: data.instructions,
+    });
 
     return NextResponse.json(order, { status: 201 });
   } catch (err) {
@@ -29,17 +50,33 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+
+
+export async function GET(req: Request) {
   await connectDB();
 
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded: any = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    );
+
+    const userId = decoded.id;
+
+    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
     return NextResponse.json(orders);
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
+
 
 export async function PATCH(req: Request) {
   await connectDB();
