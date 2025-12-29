@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
+import PhoneInput from "@/components/PhoneInput";
 import { Coffee, Zap, Shield } from "lucide-react";
 
 const isStrongPassword = (password: string) =>
@@ -16,11 +17,17 @@ export default function AuthPage() {
   const verified = params.get("verified");
   const redirect = params.get("redirect");
 
-
   const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ 
+    name: "", 
+    email: "", 
+    password: "",
+    phoneCountryCode: "+91",
+    phoneNumber: ""
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [info, setInfo] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -29,13 +36,22 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setPhoneError("");
     setInfo("");
     setLoading(true);
 
-    if (!isLogin && !isStrongPassword(form.password)) {
-      setError("Use 8+ chars with upper, lower, number & symbol");
-      setLoading(false);
-      return;
+    if (!isLogin) {
+      if (!isStrongPassword(form.password)) {
+        setError("Use 8+ chars with upper, lower, number & symbol");
+        setLoading(false);
+        return;
+      }
+
+      if (!form.phoneNumber) {
+        setPhoneError("Phone number is required");
+        setLoading(false);
+        return;
+      }
     }
 
     const endpoint = isLogin
@@ -72,11 +88,23 @@ export default function AuthPage() {
         router.push(redirect || "/");
       } else {
         setInfo("Check your email to verify your account");
-        setForm({ name: "", email: "", password: "" });
+        setForm({ 
+          name: "", 
+          email: "", 
+          password: "",
+          phoneCountryCode: "+91",
+          phoneNumber: ""
+        });
       }
       
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      const errorMessage = err instanceof Error ? err.message : "Something went wrong";
+      // Check if error is phone-related
+      if (errorMessage.toLowerCase().includes("phone")) {
+        setPhoneError(errorMessage);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -239,6 +267,18 @@ export default function AuthPage() {
                 className="auth-input"
               />
 
+              {!isLogin && (
+                <div className="mb-4">
+                  <PhoneInput
+                    value={form.phoneNumber}
+                    countryCode={form.phoneCountryCode}
+                    onCountryChange={(code) => setForm({ ...form, phoneCountryCode: code })}
+                    onNumberChange={(number) => setForm({ ...form, phoneNumber: number })}
+                    error={phoneError}
+                  />
+                </div>
+              )}
+
               <input
                 name="password"
                 type="password"
@@ -281,6 +321,7 @@ export default function AuthPage() {
                   onClick={() => {
                     setIsLogin(!isLogin);
                     setError("");
+                    setPhoneError("");
                     setInfo("");
                   }}
                   className="ml-2 cursor-pointer transition-colors"
@@ -310,7 +351,6 @@ export default function AuthPage() {
             font-family: 'Work Sans', sans-serif;
             font-size: 14px;
             letter-spacing: 0.05em;
-            /* allow user input to keep original case */
             text-transform: none;
             transition: all 0.3s;
           }
