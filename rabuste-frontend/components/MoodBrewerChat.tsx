@@ -117,7 +117,7 @@ export default function MoodBrewerChat() {
       {/* Header */}
       <div className="text-center space-y-1">
         <Coffee className="w-8 h-8 mx-auto text-amber-400" />
-        <h1 className="text-xl font-bold text-white">AI Coffee Barista</h1>
+        <h1 className="text-xl font-bold text-white">Brew AI</h1>
         <p className="text-sm text-zinc-400">
           Perfect cup, intelligently brewed
         </p>
@@ -164,7 +164,7 @@ export default function MoodBrewerChat() {
           ) : (
             <Sparkles className="w-5 h-5" />
           )}
-          {loading ? "Brewing..." : "Ask Barista"}
+          {loading ? "Brewing..." : "Ask Brew AI"}
         </button>
 
         {/* Popup Response */}
