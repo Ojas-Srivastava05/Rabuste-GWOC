@@ -9,14 +9,42 @@ import { useRouter } from "next/navigation";
 /* ---------- MENU META ---------- */
 const MENU_META = {
   moods: [
-    "focused","energetic","sleepy","fresh","light","relaxed",
-    "happy","treat","comfort","stressed","snack","meal",
+    "focused",
+    "energetic",
+    "sleepy",
+    "fresh",
+    "light",
+    "relaxed",
+    "happy",
+    "treat",
+    "comfort",
+    "stressed",
+    "snack",
+    "meal",
   ],
   tastes: [
-    "bold","strong","bitter","refreshing","citrus","fruity",
-    "creamy","sweet","nutty","caramel","chocolatey","dessert",
-    "rich","smooth","balanced","clean","spicy","salty","savory",
-    "plain","herb","buttery",
+    "bold",
+    "strong",
+    "bitter",
+    "refreshing",
+    "citrus",
+    "fruity",
+    "creamy",
+    "sweet",
+    "nutty",
+    "caramel",
+    "chocolatey",
+    "dessert",
+    "rich",
+    "smooth",
+    "balanced",
+    "clean",
+    "spicy",
+    "salty",
+    "savory",
+    "plain",
+    "herb",
+    "buttery",
   ],
   times: ["morning", "afternoon", "evening", "night", "any"],
 };
@@ -28,7 +56,7 @@ type Reply = {
 };
 
 function labelize(value: string) {
-  return value.replace("-", " ").replace(/\b\w/g, c => c.toUpperCase());
+  return value.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function MoodBrewerChat() {
@@ -63,10 +91,13 @@ export default function MoodBrewerChat() {
       setLoading(true);
       setReply(null);
 
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/chat`,
-        { mood, taste, time, temperature: "cold", caffeine: "medium" }
-      );
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+        mood,
+        taste,
+        time,
+        temperature: "cold",
+        caffeine: "medium",
+      });
 
       setReply(res.data);
     } finally {
@@ -87,7 +118,9 @@ export default function MoodBrewerChat() {
       <div className="text-center space-y-1">
         <Coffee className="w-8 h-8 mx-auto text-amber-400" />
         <h1 className="text-xl font-bold text-white">AI Coffee Barista</h1>
-        <p className="text-sm text-zinc-400">Perfect cup, intelligently brewed</p>
+        <p className="text-sm text-zinc-400">
+          Perfect cup, intelligently brewed
+        </p>
       </div>
 
       {/* Mood */}
@@ -103,7 +136,7 @@ export default function MoodBrewerChat() {
       {/* Time */}
       <Section title="Time of day">
         <div className="grid grid-cols-3 gap-2">
-          {MENU_META.times.map(t => (
+          {MENU_META.times.map((t) => (
             <button
               key={t}
               onClick={() => setTime(t)}
@@ -126,7 +159,11 @@ export default function MoodBrewerChat() {
           disabled={loading || !mood || !taste}
           className="w-full bg-amber-400 text-black py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
         >
-          {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+          {loading ? (
+            <Loader2 className="animate-spin w-5 h-5" />
+          ) : (
+            <Sparkles className="w-5 h-5" />
+          )}
           {loading ? "Brewing..." : "Ask Barista"}
         </button>
 
@@ -147,9 +184,13 @@ export default function MoodBrewerChat() {
                 <X className="w-4 h-4 text-white" />
               </button>
 
-              <h3 className="text-lg font-semibold text-amber-400">☕ {reply.recommendation}</h3>
+              <h3 className="text-lg font-semibold text-amber-400">
+                ☕ {reply.recommendation}
+              </h3>
               <p className="text-zinc-300 text-sm mt-1">{reply.reason}</p>
-              {reply.price && <p className="text-white font-medium mt-1">₹{reply.price}</p>}
+              {reply.price && (
+                <p className="text-white font-medium mt-1">₹{reply.price}</p>
+              )}
 
               <button
                 onClick={() => router.push("/menu")}
