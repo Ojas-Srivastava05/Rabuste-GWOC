@@ -12,7 +12,7 @@ import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
-
+import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
 
 
 export default function Home() {
@@ -20,7 +20,7 @@ export default function Home() {
     <>
       <Navbar />
       <FloatingCart />
-     
+      <FloatingMoodBrewer />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
