@@ -91,7 +91,7 @@ export default function MoodBrewerChat() {
       setLoading(true);
       setReply(null);
 
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL_BREWAI}/chat`, {
         mood,
         taste,
         time,
