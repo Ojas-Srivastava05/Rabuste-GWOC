@@ -54,6 +54,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coffee, X } from "lucide-react";
 import MoodBrewerChat from "./MoodBrewerChat";
+import Image from "next/image";
 
 export default function FloatingMoodBrewer() {
   const [open, setOpen] = useState(false);
@@ -85,7 +86,8 @@ export default function FloatingMoodBrewer() {
         onClick={() => setOpen(true)}
         className="fixed bottom-6 left-6 z-50 bg-amber-400 p-4 rounded-full shadow-lg"
       >
-        <Coffee />
+        {/* <Coffee /> */}
+        <Image src="/Rabuste logo.png" alt="bot logo" width={20} height={20}/>
       </button>
 
       {/* Bot Window */}
