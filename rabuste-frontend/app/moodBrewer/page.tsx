@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coffee, Sparkles, Loader2 } from "lucide-react";
 
@@ -22,6 +21,7 @@ const MENU_META = {
     "snack",
     "meal",
   ],
+
   tastes: [
     "bold",
     "strong",
@@ -46,6 +46,7 @@ const MENU_META = {
     "herb",
     "buttery",
   ],
+
   times: ["morning", "afternoon", "evening", "night", "any"],
 };
 
@@ -67,11 +68,7 @@ export default function Chat() {
   const [time, setTime] = useState("evening");
   const [reply, setReply] = useState<Reply | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
-  const router = useRouter();
-
-  /* ---------- Send MoodBrewer Request ---------- */
   async function send() {
     if (!mood || !taste) return;
 
@@ -88,7 +85,6 @@ export default function Chat() {
       });
 
       setReply(res.data);
-      setShowModal(true);
     } catch (err) {
       console.error(err);
     } finally {
@@ -108,9 +104,9 @@ export default function Chat() {
           <div className="flex justify-center">
             <Coffee className="w-8 h-8 text-amber-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Mood Brewer</h1>
+          <h1 className="text-2xl font-bold text-white">AI Coffee Barista</h1>
           <p className="text-sm text-zinc-400">
-            Brew the perfect coffee based on your time, mood, and taste
+            Your perfect cup, intelligently brewed ☕
           </p>
         </div>
 
@@ -161,85 +157,31 @@ export default function Chat() {
           ) : (
             <>
               <Sparkles className="w-5 h-5" />
-              Ask MoodBrewer
+              Ask Barista
             </>
           )}
         </button>
-      </motion.div>
 
-      {/* ---------- POPUP MODAL ---------- */}
-      <AnimatePresence>
-        {showModal && reply && (
-          <>
-            {/* Overlay */}
+        {/* Response */}
+        <AnimatePresence>
+          {reply && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.6 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black z-40"
-              onClick={() => setShowModal(false)}
-            />
-
-            {/* Modal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="fixed inset-0 z-50 flex items-center justify-center px-4"
+              className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2"
             >
-              <div className="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-2xl">
-                <h3 className="text-xl font-bold text-amber-400">
-                  ☕ {reply.recommendation}
-                </h3>
-
-                <p className="text-zinc-300 text-sm">{reply.reason}</p>
-
-                {reply.price && (
-                  <p className="text-white text-lg font-semibold">
-                    ₹{reply.price}
-                  </p>
-                )}
-
-                <div className="flex gap-3 pt-2">
-                  <button
-                    className="flex-1 bg-amber-400 text-black font-semibold py-2 rounded-xl hover:bg-amber-300 transition"
-                    onClick={async () => {
-                      try {
-                        await fetch("/api/cart", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            menuItem: reply.recommendation, // unique id
-                            name: reply.recommendation,
-                            price: reply.price ?? 0,
-                            quantity: 1,
-                          }),
-                        });
-
-                        setShowModal(false);
-                        router.push("/menu"); // 🔹 Redirect to menu page
-                      } catch (err) {
-                        console.error("Failed to add to cart", err);
-                      }
-                    }}
-                  >
-                    Order Now
-                  </button>
-
-                  <button
-                    className="flex-1 border border-zinc-700 text-zinc-300 py-2 rounded-xl hover:border-zinc-500 transition"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
+              <h3 className="text-lg font-semibold text-amber-400">
+                ☕ {reply.recommendation}
+              </h3>
+              <p className="text-zinc-300 text-sm">{reply.reason}</p>
+              {reply.price && (
+                <p className="text-white font-medium">₹{reply.price}</p>
+              )}
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

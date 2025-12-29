@@ -13,11 +13,14 @@ import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
 
+
+
 export default function Home() {
   return (
     <>
       <Navbar />
       <FloatingCart />
+     
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
