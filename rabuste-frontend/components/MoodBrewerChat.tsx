@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Coffee, Sparkles, Loader2, X } from "lucide-react";
@@ -39,6 +39,23 @@ export default function MoodBrewerChat() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        reply &&
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setReply(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [reply]);
+
   async function send() {
     if (!mood || !taste) return;
 
@@ -62,11 +79,14 @@ export default function MoodBrewerChat() {
   }
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-xl p-6 space-y-6 relative flex flex-col">
+    <div
+      ref={containerRef}
+      className="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-xl p-6 space-y-6 relative flex flex-col"
+    >
       {/* Header */}
       <div className="text-center space-y-1">
         <Coffee className="w-8 h-8 mx-auto text-amber-400" />
-        <h1 className="text-xl font-bold text-white">AI Rabuste</h1>
+        <h1 className="text-xl font-bold text-white">AI Coffee Barista</h1>
         <p className="text-sm text-zinc-400">Perfect cup, intelligently brewed</p>
       </div>
 
@@ -107,7 +127,7 @@ export default function MoodBrewerChat() {
           className="w-full bg-amber-400 text-black py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
         >
           {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
-          {loading ? "Brewing..." : "Ask AI Rabuste"}
+          {loading ? "Brewing..." : "Ask Barista"}
         </button>
 
         {/* Popup Response */}
