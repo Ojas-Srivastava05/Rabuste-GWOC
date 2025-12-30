@@ -116,6 +116,7 @@ export default function MenuPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [upsellModal, setUpsellModal] = useState<{ item: MenuItem; suggestions: MenuItem[] } | null>(null);
   const [quickFilter, setQuickFilter] = useState<"all" | "trending" | "bestseller" | "limited">("all");
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMenu();
@@ -133,11 +134,12 @@ export default function MenuPage() {
           const element = document.getElementById(`item-${itemId}`);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Add a highlight effect
-            element.style.boxShadow = '0 0 0 3px rgba(184, 115, 51, 0.8)';
+            // Set highlighted item for premium animation
+            setHighlightedItemId(itemId);
+            // Remove highlight after 4 seconds
             setTimeout(() => {
-              element.style.boxShadow = '';
-            }, 2000);
+              setHighlightedItemId(null);
+            }, 4000);
           }
         }, 500);
       }
@@ -564,7 +566,7 @@ export default function MenuPage() {
 
                         {/* Category Items Grid */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                          {categoryItems.map((item, index) => (
+                           {categoryItems.map((item, index) => (
                             <GridMenuItem
                               key={item._id}
                               item={item}
@@ -573,6 +575,7 @@ export default function MenuPage() {
                               onRemove={() => removeFromCart(item._id)}
                               index={index}
                               flags={getItemFlags(item)}
+                              isHighlighted={highlightedItemId === item._id}
                             />
                           ))}
                         </div>
@@ -592,6 +595,7 @@ export default function MenuPage() {
                       onRemove={() => removeFromCart(item._id)}
                       index={index}
                       flags={getItemFlags(item)}
+                      isHighlighted={highlightedItemId === item._id}
                     />
                   ))}
                 </div>
@@ -608,6 +612,7 @@ export default function MenuPage() {
                     onRemove={() => removeFromCart(item._id)}
                     index={index}
                     flags={getItemFlags(item)}
+                    isHighlighted={highlightedItemId === item._id}
                   />
                 ))}
               </div>
@@ -772,6 +777,7 @@ function GridMenuItem({
   onRemove,
   index,
   flags,
+  isHighlighted,
 }: {
   item: MenuItem;
   quantity: number;
@@ -779,23 +785,70 @@ function GridMenuItem({
   onRemove: () => void;
   index: number;
   flags: any;
+  isHighlighted?: boolean;
 }) {
   return (
     <motion.div
       id={`item-${item._id}`}
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0,
+        scale: isHighlighted ? [1, 1.05, 1.02, 1] : 1,
+      }}
+      transition={{ 
+        delay: index * 0.03,
+        scale: { duration: 0.6, ease: "easeOut" }
+      }}
       whileHover={{ y: -4 }}
       className="group relative"
       style={{
-        background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
-        border: '1px solid rgba(184, 115, 51, 0.2)',
+        ...(isHighlighted ? {
+          backgroundImage: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
+          border: '3px solid transparent',
+          boxShadow: '0 0 0 1px rgba(184, 115, 51, 0.3), 0 0 40px rgba(184, 115, 51, 0.6), 0 0 80px rgba(205, 127, 50, 0.4), 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(184, 115, 51, 0.15)',
+        } : {
+          backgroundImage: 'linear-gradient(135deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
+          border: '1px solid rgba(184, 115, 51, 0.2)',
+        }),
         backdropFilter: 'blur(20px)',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
+        position: 'relative',
       }}
     >
+      {/* Premium Highlight Glow Overlay */}
+      {isHighlighted && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.3, 0.15] }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.4), rgba(184, 115, 51, 0.2), transparent 70%)',
+              zIndex: 1,
+            }}
+          />
+          <motion.div
+            animate={{ 
+              rotate: [0, 360],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{ 
+              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'conic-gradient(from 0deg, transparent, rgba(184, 115, 51, 0.3), transparent, rgba(205, 127, 50, 0.3), transparent)',
+              zIndex: 0,
+            }}
+          />
+        </>
+      )}
       {/* Image */}
       <div className="aspect-[4/3] overflow-hidden relative">
         <img
@@ -945,6 +998,7 @@ function ListMenuItem({
   onRemove,
   index,
   flags,
+  isHighlighted,
 }: {
   item: MenuItem;
   quantity: number;
@@ -952,22 +1006,69 @@ function ListMenuItem({
   onRemove: () => void;
   index: number;
   flags: any;
+  isHighlighted?: boolean;
 }) {
   return (
     <motion.div
       id={`item-${item._id}`}
       initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.03 }}
+      animate={{ 
+        opacity: 1, 
+        x: 0,
+        scale: isHighlighted ? [1, 1.02, 1.01, 1] : 1,
+      }}
+      transition={{ 
+        delay: index * 0.03,
+        scale: { duration: 0.6, ease: "easeOut" }
+      }}
       whileHover={{ x: 4 }}
-      className="group"
+      className="group relative"
       style={{
-        background: 'linear-gradient(90deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
-        border: '1px solid rgba(184, 115, 51, 0.2)',
+        ...(isHighlighted ? {
+          backgroundImage: 'linear-gradient(90deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
+          border: '3px solid transparent',
+          boxShadow: '0 0 0 1px rgba(184, 115, 51, 0.3), 0 0 40px rgba(184, 115, 51, 0.6), 0 0 80px rgba(205, 127, 50, 0.4), 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(184, 115, 51, 0.15)',
+        } : {
+          backgroundImage: 'linear-gradient(90deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
+          border: '1px solid rgba(184, 115, 51, 0.2)',
+        }),
         backdropFilter: 'blur(20px)',
         transition: 'all 0.3s ease',
+        overflow: 'hidden',
       }}
     >
+      {/* Premium Highlight Glow Overlay */}
+      {isHighlighted && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.3, 0.15] }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.4), rgba(184, 115, 51, 0.2), transparent 70%)',
+              zIndex: 1,
+            }}
+          />
+          <motion.div
+            animate={{ 
+              rotate: [0, 360],
+              opacity: [0.3, 0.6, 0.3]
+            }}
+            transition={{ 
+              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'conic-gradient(from 0deg, transparent, rgba(184, 115, 51, 0.3), transparent, rgba(205, 127, 50, 0.3), transparent)',
+              zIndex: 0,
+            }}
+          />
+        </>
+      )}
       <div className="flex gap-4 p-4">
         {/* Image */}
         <div className="w-24 h-24 flex-shrink-0 overflow-hidden relative">
