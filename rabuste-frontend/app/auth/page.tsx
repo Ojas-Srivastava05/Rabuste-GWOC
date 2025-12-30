@@ -7,6 +7,7 @@ import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import PhoneInput from "@/components/PhoneInput";
 import { Coffee, Zap, Shield } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
 const isStrongPassword = (password: string) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
@@ -14,6 +15,8 @@ const isStrongPassword = (password: string) =>
 export default function AuthPage() {
   const router = useRouter();
   const params = useSearchParams();
+  const { login } = useUser();
+  
   const verified = params.get("verified");
   const redirect = params.get("redirect");
 
@@ -73,8 +76,10 @@ export default function AuthPage() {
       if (!res.ok) throw new Error(data.message);
 
       if (isLogin) {
-        // 1. Store JWT
-        localStorage.setItem("token", data.token);
+        // 1. Store JWT and set user in context
+        // Check if this is a direct login (no redirect param means path 1)
+        const isDirectLogin = !redirect;
+        login(data.token, data.user, isDirectLogin);
       
         // 2. Attach cart to user
         await fetch("/api/cart/attach", {

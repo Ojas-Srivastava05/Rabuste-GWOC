@@ -13,14 +13,25 @@ import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
 import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
-
+import WelcomePopup from "@/components/WelcomePopup";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
+  const { user, showWelcomePopup, setShowWelcomePopup } = useUser();
+
   return (
     <>
       <Navbar />
       <FloatingCart />
       <FloatingMoodBrewer />
+
+      {/* Welcome Popup - Only shows after direct login (path 1) */}
+      {showWelcomePopup && user && (
+        <WelcomePopup
+          userName={user.name}
+          onClose={() => setShowWelcomePopup(false)}
+        />
+      )}
 
       {/* Noise overlay */}
       <div className="noise-overlay" />

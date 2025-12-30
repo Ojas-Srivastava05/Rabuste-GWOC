@@ -43,6 +43,7 @@ export default function ExperienceSection() {
 
   return (
     <section
+      id="experience-section"
       ref={ref}
       className="relative overflow-hidden"
       style={{
