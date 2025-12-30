@@ -6,6 +6,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Loader2, X, Brain, Zap, Cpu } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+type MenuItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+};
+
 /* ---------- MENU META ---------- */
 const MENU_META = {
   moods: [
@@ -65,9 +74,24 @@ export default function MoodBrewerChat() {
   const [time, setTime] = useState("evening");
   const [reply, setReply] = useState<Reply | null>(null);
   const [loading, setLoading] = useState(false);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const router = useRouter();
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch menu items on mount
+  useEffect(() => {
+    async function fetchMenu() {
+      try {
+        const res = await fetch('/api/menu');
+        const data = await res.json();
+        setMenuItems(data);
+      } catch (err) {
+        console.error('Failed to fetch menu', err);
+      }
+    }
+    fetchMenu();
+  }, []);
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -107,6 +131,32 @@ export default function MoodBrewerChat() {
 
   function closePopup() {
     setReply(null);
+  }
+
+  function handleOrderNow() {
+    if (!reply || !reply.recommendation) {
+      router.push("/menu");
+      return;
+    }
+
+    // Find the item by name (case-insensitive, flexible matching)
+    const recommendedName = reply.recommendation.toLowerCase().trim();
+    const matchedItem = menuItems.find((item) => {
+      const itemName = item.name.toLowerCase().trim();
+      return (
+        itemName === recommendedName ||
+        itemName.includes(recommendedName) ||
+        recommendedName.includes(itemName)
+      );
+    });
+
+    if (matchedItem) {
+      // Navigate to menu with item highlight
+      router.push(`/menu#item-${matchedItem._id}`);
+    } else {
+      // Fallback to regular menu page
+      router.push("/menu");
+    }
   }
 
   return (
@@ -313,7 +363,7 @@ export default function MoodBrewerChat() {
                 )}
 
                 <button
-                  onClick={() => router.push("/menu")}
+                  onClick={handleOrderNow}
                   className="w-full py-3 font-bold transition-all hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',

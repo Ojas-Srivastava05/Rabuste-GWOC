@@ -48,22 +48,23 @@ export default function ScrollToTop() {
       onClick={handleScrollToTop}
       style={{
         position: "fixed",
-        right: 20,
-        bottom: 20,
-        zIndex: 2147483647,
-        width: 52,
-        height: 52,
+        left: "50%",
+        bottom: 24,
+        transform: "translateX(-50%)",
+        zIndex: 999,
+        width: 48,
+        height: 48,
         borderRadius: 999,
         display: visible ? "flex" : "none",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(180deg, rgba(246,230,220,0.06), rgba(246,230,220,0.04))",
-        border: "1px solid rgba(246,230,220,0.12)",
-        color: "#f6e6dc",
-        backdropFilter: "blur(6px)",
+        background: "rgba(26, 17, 16, 0.95)",
+        border: "2px solid rgba(184, 115, 51, 0.6)",
+        color: "#D4A574",
+        backdropFilter: "blur(10px)",
         cursor: "pointer",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-        transition: "transform 160ms ease, opacity 160ms ease",
+        boxShadow: "0 8px 32px rgba(184, 115, 51, 0.4)",
+        transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
         pointerEvents: "auto",
         willChange: "transform, opacity",
       }}
@@ -72,11 +73,19 @@ export default function ScrollToTop() {
           handleScrollToTop();
         }
       }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateX(-50%) translateY(-4px) scale(1.1)";
+        e.currentTarget.style.boxShadow = "0 12px 40px rgba(184, 115, 51, 0.5)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateX(-50%) translateY(0)";
+        e.currentTarget.style.boxShadow = "0 8px 32px rgba(184, 115, 51, 0.4)";
+      }}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path d="M12 5l-7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M12 5l7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M12 19V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path d="M12 5l-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 5l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M12 19V7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );

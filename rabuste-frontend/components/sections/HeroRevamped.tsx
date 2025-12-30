@@ -9,6 +9,8 @@ export default function HeroRevamped() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [particles, setParticles] = useState<Array<{ left: number; top: number; duration: number; delay: number }>>([]);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -17,6 +19,18 @@ export default function HeroRevamped() {
 
   const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  // Generate particle positions after mount to avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+    const generatedParticles = [...Array(15)].map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 4 + Math.random() * 3,
+      delay: 1.2 + Math.random() * 2,
+    }));
+    setParticles(generatedParticles);
+  }, []);
 
   // Trigger elegant load animation
   useEffect(() => {
@@ -84,30 +98,32 @@ export default function HeroRevamped() {
         }}
       />
 
-      {/* Floating particles effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ 
-              y: [0, -120, 0],
-              opacity: [0, 0.6, 0],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 3,
-              repeat: Infinity,
-              delay: 1.2 + Math.random() * 2,
-              ease: "easeInOut",
-            }}
-            className="absolute w-1 h-1 rounded-full bg-[#D4A574]"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Floating particles effect - only render after mount */}
+      {mounted && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {particles.map((particle, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ 
+                y: [0, -120, 0],
+                opacity: [0, 0.6, 0],
+              }}
+              transition={{
+                duration: particle.duration,
+                repeat: Infinity,
+                delay: particle.delay,
+                ease: "easeInOut",
+              }}
+              className="absolute w-1 h-1 rounded-full bg-[#D4A574]"
+              style={{
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Main Content */}
       <motion.div 
