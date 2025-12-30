@@ -1,85 +1,129 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
+type MenuItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+};
+
+type DisplayItem = MenuItem & {
+  color: string;
+  isBestseller?: boolean;
+  isTrending?: boolean;
+};
+
+// Consistent hash function for flags (same as menu page)
+const hashCode = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+};
+
+// Generate consistent flags based on item name (same as menu page)
+const getItemFlags = (item: MenuItem) => {
+  const hash = hashCode(item.name);
+  const flags: {
+    isBestseller?: boolean;
+    isTrending?: boolean;
+  } = {};
+  
+  // Bestseller (30% of items)
+  if (hash % 10 < 3) {
+    flags.isBestseller = true;
+  }
+  
+  // Trending (20% of items, different from bestsellers)
+  if (hash % 11 < 2 && !flags.isBestseller) {
+    flags.isTrending = true;
+  }
+  
+  return flags;
+};
+
+// Get color for item based on category
+const getItemColor = (category: string, index: number): string => {
+  const colors = ['#B87333', '#CD7F32', '#D4A574'];
+  return colors[index % colors.length];
+};
+
 export default function HorizontalScroll() {
   const router = useRouter();
-  const targetRef = useRef(null);
+  const targetRef = useRef<HTMLElement>(null);
+  const [items, setItems] = useState<DisplayItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  // Only initialize scroll after component mounts
   const { scrollYProgress } = useScroll({
     target: targetRef,
+    offset: ["start start", "end start"],
   });
 
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-83.33%"]);
 
-  const items = [
-    {
-      title: 'SIGNATURE',
-      subtitle: 'ESPRESSO',
-      image: 'https://images.pexels.com/photos/7736770/pexels-photo-7736770.jpeg',
-      attribution: 'Kei Scampa on Pexels',
-      description: 'Pure robusta power. Maximum caffeine. Zero compromise.',
-      price: '₹249',
-      color: '#B87333',
-    },
-    {
-      title: 'DARK',
-      subtitle: 'ROAST',
-      image: 'https://images.pexels.com/photos/11283537/pexels-photo-11283537.jpeg',
-      attribution: 'hello aesthe on Pexels',
-      description: 'Deep, smoky notes with unapologetically bold finish.',
-      price: '₹299',
-      color: '#CD7F32',
-    },
-    {
-      title: 'COLD',
-      subtitle: 'BREW',
-      image: 'https://images.unsplash.com/photo-1607945610157-80d15752e761?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTAwNDR8MHwxfHNlYXJjaHwyNHx8RXNwcmVzc28lMjBjdXAlMjBwb3VyJTIwc2hvdCUyMGFjdGlvbiUyMGRhcmslMjBtb29keSUyMHByb2Zlc3Npb25hbCUyMGRhcmslMjBhY3Rpb258ZW58MHwyfHx8MTc2NjgyNDI3NHww&ixlib=rb-4.1.0&q=85',
-      attribution: 'Kris Gerhard on Unsplash',
-      description: 'Slow-brewed 24 hours. Maximum flavor, zero bitterness.',
-      price: '₹349',
-      color: '#B87333',
-    },
-    {
-      title: 'PREMIUM',
-      subtitle: 'BLEND',
-      image: 'https://pixabay.com/get/gd7b28743502b5f72e709f51953615a9b3d86e7637adc56367e99e56afc344803e6fa8997948fb608b2771828c571f3e5.jpg',
-      attribution: 'StockSnap on Pixabay',
-      description: 'Expertly crafted blend. Balanced and powerful.',
-      price: '₹399',
-      color: '#D4A574',
-    },
-    {
-      title: 'MORNING',
-      subtitle: 'KICK',
-      image: 'https://images.pexels.com/photos/5427150/pexels-photo-5427150.jpeg',
-      attribution: 'Karola G on Pexels',
-      description: 'Start your day right. Maximum energy boost.',
-      price: '₹279',
-      color: '#B87333',
-    },
-    {
-      title: 'INTENSE',
-      subtitle: 'SHOT',
-      image: 'https://pixabay.com/get/g3ffe8791def6c0fec529bb473baf23e47e8f2e1a4e19658edfb942be6c044cddf6a9e888e7bba66f1cbff32f0fea590b.jpg',
-      attribution: 'poedynchuk on Pixabay',
-      description: 'Double shot intensity. For serious coffee lovers.',
-      price: '₹329',
-      color: '#B87333',
-    },
-  ];
+  useEffect(() => {
+    setMounted(true);
+    fetchFeaturedItems();
+  }, []);
 
+  async function fetchFeaturedItems() {
+    try {
+      const res = await fetch('/api/menu');
+      const data: MenuItem[] = await res.json();
+      
+      // Filter for bestsellers and trending items
+      const featured = data
+        .map(item => ({
+          ...item,
+          ...getItemFlags(item),
+        }))
+        .filter(item => item.isBestseller || item.isTrending)
+        .slice(0, 6) // Limit to 6 items
+        .map((item, index) => ({
+          ...item,
+          color: getItemColor(item.category, index),
+        }));
+      
+      setItems(featured);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to fetch featured items', err);
+      setLoading(false);
+    }
+  }
+
+  const handleItemClick = (itemId: string) => {
+    // Navigate to menu page with item ID as hash
+    router.push(`/menu#item-${itemId}`);
+  };
+
+  // Always render the section with ref to avoid hydration issues
   return (
     <section 
       ref={targetRef} 
       className="relative"
       style={{
-        height: '300vh',
+        height: loading || items.length === 0 ? '100vh' : '300vh',
         background: '#000000',
       }}
     >
+      {loading ? (
+        <div className="sticky top-0 h-screen flex items-center justify-center">
+          <p style={{ color: '#B87333', fontSize: '1.125rem' }}>Loading featured items...</p>
+        </div>
+      ) : items.length === 0 ? null : (
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         {/* Header - Fixed */}
         <div 
@@ -127,7 +171,7 @@ export default function HorizontalScroll() {
         >
           {items.map((item, index) => (
             <div
-              key={index}
+              key={item._id}
               className="flex-shrink-0"
               style={{
                 width: 'min(90vw, 500px)',
@@ -149,7 +193,7 @@ export default function HorizontalScroll() {
                   display: 'flex',
                   flexDirection: 'column',
                 }}
-                onClick={() => router.push('/menu')}
+                onClick={() => handleItemClick(item._id)}
               >
                 {/* Image */}
                 <div style={{
@@ -159,7 +203,7 @@ export default function HorizontalScroll() {
                 }}>
                   <img
                     src={item.image}
-                    alt={`${item.title} ${item.subtitle} - Photo by ${item.attribution}`}
+                    alt={item.name}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -174,6 +218,23 @@ export default function HorizontalScroll() {
                     background: `linear-gradient(180deg, transparent 0%, ${item.color}30 100%)`,
                   }} />
 
+                  {/* Badge - Bestseller or Trending */}
+                  {(item.isBestseller || item.isTrending) && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '16px',
+                      left: '16px',
+                      background: item.isBestseller ? '#B87333' : '#CD7F32',
+                      padding: '8px 16px',
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: '0.875rem',
+                      color: '#000000',
+                      letterSpacing: '0.1em',
+                    }}>
+                      {item.isBestseller ? '⭐ BESTSELLER' : '🔥 TRENDING'}
+                    </div>
+                  )}
+
                   {/* Price tag */}
                   <div style={{
                     position: 'absolute',
@@ -186,7 +247,7 @@ export default function HorizontalScroll() {
                     color: '#000000',
                     letterSpacing: '0.05em',
                   }}>
-                    {item.price}
+                    ₹{item.price}
                   </div>
                 </div>
 
@@ -206,10 +267,10 @@ export default function HorizontalScroll() {
                       color: '#FFFEF9',
                       marginBottom: 'clamp(8px, 2vw, 12px)',
                     }}>
-                      {item.title}
+                      {item.name.split(' ')[0]}
                       <br />
                       <span style={{ color: item.color }}>
-                        {item.subtitle}
+                        {item.name.split(' ').slice(1).join(' ')}
                       </span>
                     </h3>
 
@@ -241,6 +302,7 @@ export default function HorizontalScroll() {
           ))}
         </motion.div>
       </div>
+      )}
     </section>
   );
 }

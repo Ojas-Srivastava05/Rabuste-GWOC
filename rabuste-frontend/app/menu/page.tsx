@@ -122,6 +122,28 @@ export default function MenuPage() {
     fetchCart();
   }, []);
 
+  // Handle scrolling to specific item from hash
+  useEffect(() => {
+    if (menu.length > 0 && typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.startsWith('#item-')) {
+        const itemId = hash.replace('#item-', '');
+        // Wait for DOM to render
+        setTimeout(() => {
+          const element = document.getElementById(`item-${itemId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Add a highlight effect
+            element.style.boxShadow = '0 0 0 3px rgba(184, 115, 51, 0.8)';
+            setTimeout(() => {
+              element.style.boxShadow = '';
+            }, 2000);
+          }
+        }, 500);
+      }
+    }
+  }, [menu]);
+
   async function fetchMenu() {
     try {
       const res = await fetch("/api/menu");
@@ -760,6 +782,7 @@ function GridMenuItem({
 }) {
   return (
     <motion.div
+      id={`item-${item._id}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
@@ -932,6 +955,7 @@ function ListMenuItem({
 }) {
   return (
     <motion.div
+      id={`item-${item._id}`}
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.03 }}
