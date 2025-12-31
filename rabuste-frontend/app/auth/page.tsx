@@ -89,8 +89,9 @@ export default function AuthPage() {
           },
         });
       
-        // 3. Redirect user
-        router.push(redirect || "/");
+        // 3. Redirect user (admins go straight to dashboard)
+        const destination = data.user?.role === "admin" ? "/admin" : redirect || "/";
+        router.push(destination);
       } else {
         setInfo("Check your email to verify your account");
         setForm({ 
