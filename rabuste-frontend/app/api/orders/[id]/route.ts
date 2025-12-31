@@ -35,6 +35,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/src/lib/mongodb";
 import Order from "@/src/models/Order";
 import { sendOrderEmail } from "@/src/lib/email";
+import jwt from "jsonwebtoken";
 
 export async function PATCH(
   req: Request,
@@ -43,10 +44,23 @@ export async function PATCH(
   try {
     await connectDB();
 
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+    const isAdmin = decoded.role === "admin" || decoded.isAdmin === true;
+
     const params = await context.params;
     const { id } = params;
 
     const { status } = await req.json();
+
+    if (!isAdmin) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     const updatedOrder = await Order.findByIdAndUpdate(
       id,

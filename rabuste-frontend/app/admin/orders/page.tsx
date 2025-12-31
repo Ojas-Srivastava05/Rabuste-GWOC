@@ -44,9 +44,14 @@ setOrders(data);
   };
 
   const markCompleted = async (orderId: string) => {
+    const token = localStorage.getItem("token");
+
     const res = await fetch(`/api/orders/${orderId}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ status: "completed" }),
     });
 

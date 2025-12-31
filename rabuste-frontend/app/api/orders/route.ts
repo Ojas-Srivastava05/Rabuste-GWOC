@@ -66,10 +66,10 @@ export async function GET(req: Request) {
       token,
       process.env.JWT_SECRET!
     );
+    const isAdmin = decoded.role === "admin" || decoded.isAdmin === true;
+    const query = isAdmin ? {} : { userId: decoded.id };
 
-    const userId = decoded.id;
-
-    const orders = await Order.find({ userId }).sort({ createdAt: -1 });
+    const orders = await Order.find(query).sort({ createdAt: -1 });
     return NextResponse.json(orders);
   } catch (err) {
     console.error(err);
