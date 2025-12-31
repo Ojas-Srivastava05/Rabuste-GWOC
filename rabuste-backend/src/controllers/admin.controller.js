@@ -117,3 +117,33 @@ export const getAdminDashboard = async (req, res) => {
     res.status(500).json({ message: "Admin dashboard error" });
   }
 };
+
+/* GET AI CONFIG */
+export const getAIConfig = async (req, res) => {
+  try {
+    let config = await AIConfig.findOne();
+    if (!config) {
+      config = await AIConfig.create({});
+    }
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch AI config" });
+  }
+};
+
+/* UPDATE AI CONFIG */
+export const updateAIConfig = async (req, res) => {
+  try {
+    const { lowStockLimit, inactiveDays, enableDiscountAI } = req.body;
+
+    const config = await AIConfig.findOneAndUpdate(
+      {},
+      { lowStockLimit, inactiveDays, enableDiscountAI },
+      { new: true, upsert: true }
+    );
+
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update AI config" });
+  }
+};

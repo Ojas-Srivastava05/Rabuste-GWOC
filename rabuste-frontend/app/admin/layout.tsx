@@ -87,6 +87,8 @@ export default function AdminLayout({ children }: Props) {
           <NavLink href="/admin/menu">Menu</NavLink>
           <NavLink href="/admin/workshops">Workshops</NavLink>
           <NavLink href="/admin/users">Users</NavLink>
+          <NavLink href="/admin/ai-settings"> AI Settings</NavLink>
+
         </nav>
 
         <button
