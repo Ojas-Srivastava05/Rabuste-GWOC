@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
 
 type Props = {
@@ -10,6 +11,26 @@ type Props = {
 
 export default function AdminLayout({ children }: Props) {
   const router = useRouter();
+  const { user, isLoading, checkAuth } = useUser();
+
+  // Guard admin routes: require token + admin role
+  useEffect(() => {
+    if (!user) {
+      checkAuth();
+    }
+  }, [user, checkAuth]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!user || user.role !== "admin") {
+      router.replace("/auth?redirect=/admin");
+    }
+  }, [isLoading, user, router]);
+
+  if (isLoading || !user || user.role !== "admin") {
+    return null; // avoid flashing admin UI before redirect
+  }
 
   // useEffect(() => {
   //   // Get token & user from localStorage
