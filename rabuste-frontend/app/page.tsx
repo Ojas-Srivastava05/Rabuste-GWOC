@@ -14,6 +14,7 @@ import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
 import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
 import WelcomePopup from "@/components/WelcomePopup";
+import PersonalizedComboPopup from "@/components/PersonalizedComboPopup";
 import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
@@ -32,6 +33,12 @@ export default function Home() {
           onClose={() => setShowWelcomePopup(false)}
         />
       )}
+
+      {/* Personalized Combo Popup - Always visible at bottom-right */}
+      <PersonalizedComboPopup
+        userName={user?.name}
+        isLoggedIn={!!user}
+      />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
