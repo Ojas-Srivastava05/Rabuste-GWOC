@@ -15,10 +15,13 @@ type MenuItem = {
 };
 
 type CartItem = {
-  menuItem: string;
+  menuItem?: string;
+  artItem?: string;
+  itemType: "menu" | "art";
   name: string;
   price: number;
   quantity: number;
+  image?: string;
 };
 
 type Cart = {
@@ -196,11 +199,11 @@ export default function MenuPage() {
   }
 
   function getQty(menuItemId: string) {
-    return cart?.items.find((i) => i.menuItem === menuItemId)?.quantity || 0;
+    return cart?.items.find((i) => i.itemType === "menu" && i.menuItem === menuItemId)?.quantity || 0;
   }
 
-  const totalItems = cart?.items.reduce((s, i) => s + i.quantity, 0) || 0;
-  const totalPrice = cart?.totalAmount || 0;
+  const totalItems = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + i.quantity, 0) || 0;
+  const totalPrice = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + (i.price * i.quantity), 0) || 0;
 
   const categories = ["All", ...Array.from(new Set(menu.map((m) => m.category)))];
   

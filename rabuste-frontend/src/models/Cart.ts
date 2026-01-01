@@ -5,11 +5,17 @@ const CartItemSchema = new Schema(
     menuItem: {
       type: Schema.Types.ObjectId,
       ref: "Menu",
+      required: function(this: any) {
+        return this.itemType === "menu";
+      },
     },
 
     artItem: {
       type: Schema.Types.ObjectId,
       ref: "Art",
+      required: function(this: any) {
+        return this.itemType === "art";
+      },
     },
 
     itemType: {
