@@ -391,11 +391,8 @@ export default function OrderStatusPage() {
         throw new Error("Failed to fetch orders");
       }
 
-      const pendingOrders = data.filter(
-        (order) => order.status === "pending"
-      );
-
-      setOrders(pendingOrders);
+      // Keep all orders (both pending and completed)
+      setOrders(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -452,6 +449,10 @@ export default function OrderStatusPage() {
     );
   }
 
+  // Separate pending and completed orders
+  const pendingOrders = orders.filter((order) => order.status === "pending");
+  const completedOrders = orders.filter((order) => order.status === "completed");
+
   if (orders.length === 0) {
     return (
       <>
@@ -483,13 +484,13 @@ export default function OrderStatusPage() {
                 letterSpacing: '0.05em',
               }}
             >
-              NO ACTIVE ORDERS
+              NO ORDERS YET
             </h2>
             <p
               className="text-lg mb-8"
               style={{ color: '#8B6F47', lineHeight: 1.7 }}
             >
-              You don't have any pending orders at the moment
+              You don't have any orders at the moment
             </p>
             <button
               onClick={() => router.push("/menu")}
@@ -534,8 +535,26 @@ export default function OrderStatusPage() {
           <div className="grid lg:grid-cols-5 gap-6">
             {/* Orders Column - Takes more space */}
             <div className="lg:col-span-3 space-y-6">
-              <AnimatePresence>
-                {orders.map((order, index) => (
+              {/* Active Orders Section */}
+              {pendingOrders.length > 0 && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="copper-line flex-1" />
+                    <span 
+                      className="text-sm"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        color: '#B87333',
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      ACTIVE ORDERS
+                    </span>
+                    <div className="copper-line flex-1" style={{ transform: 'scaleX(-1)' }} />
+                  </div>
+                  
+                  <AnimatePresence>
+                    {pendingOrders.map((order, index) => (
                   <motion.div
                     key={order._id}
                     initial={{ opacity: 0, y: 20 }}
@@ -748,8 +767,212 @@ export default function OrderStatusPage() {
                       </p>
                     </div>
                   </motion.div>
-                ))}
-              </AnimatePresence>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              {/* Completed Orders Section */}
+              {completedOrders.length > 0 && (
+                <div className="space-y-6 mt-12">
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="flex-1 h-px"
+                      style={{ 
+                        background: 'linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.5), transparent)' 
+                      }}
+                    />
+                    <span 
+                      className="text-sm"
+                      style={{
+                        fontFamily: 'var(--font-heading)',
+                        color: '#4CAF50',
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      COMPLETED ORDERS
+                    </span>
+                    <div 
+                      className="flex-1 h-px"
+                      style={{ 
+                        background: 'linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.5), transparent)',
+                        transform: 'scaleX(-1)' 
+                      }}
+                    />
+                  </div>
+                  
+                  <AnimatePresence>
+                    {completedOrders.map((order, index) => (
+                      <motion.div
+                        key={order._id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="p-6"
+                        style={{
+                          background: 'rgba(76, 175, 80, 0.05)',
+                          border: '2px solid rgba(76, 175, 80, 0.3)',
+                          position: 'relative',
+                        }}
+                      >
+                        {/* Completed Badge */}
+                        <div
+                          className="absolute top-4 right-4 inline-flex items-center gap-2 px-4 py-2"
+                          style={{
+                            background: 'rgba(76, 175, 80, 0.2)',
+                            border: '2px solid rgba(76, 175, 80, 0.5)',
+                          }}
+                        >
+                          <Trophy size={18} style={{ color: '#4CAF50' }} />
+                          <span
+                            className="text-sm"
+                            style={{
+                              color: '#4CAF50',
+                              fontFamily: 'var(--font-heading)',
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            COMPLETED
+                          </span>
+                        </div>
+
+                        {/* Order Header */}
+                        <div className="mb-6 pb-4 pr-32"
+                          style={{ borderBottom: '2px solid rgba(76, 175, 80, 0.2)' }}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            <Clock size={20} style={{ color: '#4CAF50' }} />
+                            <span
+                              className="text-sm"
+                              style={{
+                                color: '#4CAF50',
+                                fontFamily: 'var(--font-body)',
+                              }}
+                            >
+                              Completed on {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </span>
+                          </div>
+                          <p
+                            className="text-xs"
+                            style={{
+                              color: '#8B6F47',
+                              fontFamily: 'var(--font-body)',
+                            }}
+                          >
+                            Order #{order._id.slice(-8).toUpperCase()}
+                          </p>
+                        </div>
+
+                        {/* Order Items */}
+                        <div className="space-y-3 mb-6">
+                          {order.items.map((item, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: (index * 0.1) + (i * 0.05) }}
+                              className="flex justify-between items-center pb-3"
+                              style={{
+                                borderBottom: i < order.items.length - 1
+                                  ? '1px solid rgba(76, 175, 80, 0.15)'
+                                  : 'none',
+                              }}
+                            >
+                              <div className="flex items-center gap-3 flex-1">
+                                {item.itemType === 'art' ? (
+                                  <Sparkles size={16} style={{ color: '#4CAF50' }} />
+                                ) : (
+                                  <Coffee size={16} style={{ color: '#4CAF50' }} />
+                                )}
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h3
+                                      className="text-base"
+                                      style={{
+                                        fontFamily: 'var(--font-heading)',
+                                        color: '#F5F1E8',
+                                        letterSpacing: '0.03em',
+                                      }}
+                                    >
+                                      {item.name}
+                                    </h3>
+                                    {item.itemType === 'art' && (
+                                      <span 
+                                        className="text-xs px-2 py-0.5 uppercase"
+                                        style={{
+                                          background: 'rgba(76, 175, 80, 0.2)',
+                                          color: '#4CAF50',
+                                          border: '1px solid rgba(76, 175, 80, 0.4)',
+                                        }}
+                                      >
+                                        ARTWORK
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p
+                                    className="text-sm"
+                                    style={{ color: '#8B6F47' }}
+                                  >
+                                    ₹{item.price} × {item.quantity}
+                                  </p>
+                                </div>
+                              </div>
+                              <div
+                                className="text-lg"
+                                style={{ 
+                                  fontFamily: 'var(--font-heading)',
+                                  color: '#4CAF50',
+                                }}
+                              >
+                                ₹{item.price * item.quantity}
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+
+                        {/* Order Total */}
+                        <div
+                          className="flex justify-between items-center pt-4"
+                          style={{ borderTop: '2px solid rgba(76, 175, 80, 0.3)' }}
+                        >
+                          <span
+                            className="text-xl"
+                            style={{
+                              fontFamily: 'var(--font-heading)',
+                              color: '#F5F1E8',
+                              letterSpacing: '0.05em',
+                            }}
+                          >
+                            TOTAL
+                          </span>
+                          <span
+                            className="text-2xl"
+                            style={{ 
+                              fontFamily: 'var(--font-heading)',
+                              color: '#4CAF50',
+                            }}
+                          >
+                            ₹{order.totalAmount}
+                          </span>
+                        </div>
+
+                        {/* Thank You Message */}
+                        <div className="mt-6 text-center">
+                          <p className="text-sm" style={{ color: '#8B6F47' }}>
+                            Thank you for your order! ❤️
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              )}
             </div>
 
             {/* Engagement Column - Takes remaining space */}
@@ -926,15 +1149,23 @@ export default function OrderStatusPage() {
                       Active Orders
                     </span>
                     <span className="text-lg gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-                      {orders.length}
+                      {pendingOrders.length}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm" style={{ color: '#8B6F47' }}>
-                      Total Items
+                      Completed Orders
+                    </span>
+                    <span className="text-lg" style={{ fontFamily: 'var(--font-heading)', color: '#4CAF50' }}>
+                      {completedOrders.length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm" style={{ color: '#8B6F47' }}>
+                      Total Items (Active)
                     </span>
                     <span className="text-lg gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-                      {orders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0), 0)}
+                      {pendingOrders.reduce((sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0), 0)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
