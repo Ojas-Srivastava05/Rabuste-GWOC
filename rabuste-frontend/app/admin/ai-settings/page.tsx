@@ -23,16 +23,34 @@ type MenuItem = {
   name: string;
 };
 
+type DiscountSuggestion = {
+  _id: string;
+  name: string;
+  soldLast7Days: number;
+};
+
 export default function AISettingsPage() {
   const [config, setConfig] = useState<AIConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [suggestions, setSuggestions] = useState<DiscountSuggestion[]>([]);
+
+  const getAuthHeaders = () => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const headers: HeadersInit = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return headers;
+  };
 
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const res = await fetch("/api/admin/ai-config");
+        const res = await fetch("/api/admin/ai-config", {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
         if (!res.ok) throw new Error("Failed to fetch AI config");
         const data = await res.json();
 
@@ -64,7 +82,11 @@ export default function AISettingsPage() {
 
     const fetchMenuItems = async () => {
       try {
-        const res = await fetch("/api/admin/menu");
+        const res = await fetch("/api/admin/menu", {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
         if (!res.ok) return;
         const data = await res.json();
         const items = Array.isArray(data) ? data : data?.items;
@@ -83,11 +105,47 @@ export default function AISettingsPage() {
     fetchMenuItems();
   }, [config.enableDiscountAI]);
 
+  useEffect(() => {
+    if (!config.enableDiscountAI) return;
+
+    const fetchSuggestions = async () => {
+      try {
+        const res = await fetch("/api/admin/discount-suggestions", {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const list = Array.isArray(data?.suggestions) ? data.suggestions : [];
+        const parsed: DiscountSuggestion[] = list
+          .filter((s: any) => s && typeof s._id === "string")
+          .map((s: any) => ({
+            _id: s._id,
+            name: String(s.name || ""),
+            soldLast7Days: Number(s.soldLast7Days || 0),
+          }));
+
+        setSuggestions(parsed);
+
+        // Auto-select top suggestion if admin hasn't picked yet
+        if (!config.discountItemId && parsed[0]?._id) {
+          setConfig((prev) => ({ ...prev, discountItemId: parsed[0]._id }));
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    fetchSuggestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config.enableDiscountAI]);
+
   const handleSave = async () => {
     setSaving(true);
     await fetch("/api/admin/ai-config", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...getAuthHeaders() },
       body: JSON.stringify(config),
     });
     setSaving(false);
@@ -151,6 +209,11 @@ export default function AISettingsPage() {
 
       {config.enableDiscountAI && (
         <div className="space-y-4">
+          {suggestions[0]?._id && (
+            <p className="text-sm text-[#6b4a2f]">
+              Suggested (lowest sales last 7 days): <b>{suggestions[0].name}</b> (sold {suggestions[0].soldLast7Days})
+            </p>
+          )}
           <div>
             <label className="block text-sm font-medium mb-1 text-[#6b4a2f]">
               Select Item

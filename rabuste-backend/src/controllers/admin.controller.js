@@ -159,3 +159,44 @@ export const updateAIConfig = async (req, res) => {
     res.status(500).json({ message: "Failed to update AI config" });
   }
 };
+
+/* GET DISCOUNT SUGGESTIONS (last 7 days, sales-based) */
+export const getDiscountSuggestions = async (req, res) => {
+  try {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const [orders, menuItems] = await Promise.all([
+      Order.find({ createdAt: { $gte: since } }).select("items createdAt"),
+      Menu.find().select("name"),
+    ]);
+
+    const soldByItemId = new Map();
+
+    for (const order of orders) {
+      const items = Array.isArray(order.items) ? order.items : [];
+      for (const item of items) {
+        const itemId = item?.itemId;
+        const quantity = Number(item?.quantity ?? 0);
+        if (!itemId) continue;
+        const prev = soldByItemId.get(String(itemId)) ?? 0;
+        soldByItemId.set(String(itemId), prev + (Number.isFinite(quantity) ? quantity : 0));
+      }
+    }
+
+    const suggestions = menuItems
+      .map((m) => {
+        const id = String(m._id);
+        return {
+          _id: id,
+          name: m.name,
+          soldLast7Days: soldByItemId.get(id) ?? 0,
+        };
+      })
+      .sort((a, b) => a.soldLast7Days - b.soldLast7Days)
+      .slice(0, 10);
+
+    res.json({ since, suggestions });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch discount suggestions" });
+  }
+};
