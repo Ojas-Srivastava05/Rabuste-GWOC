@@ -37,6 +37,49 @@ import Order from "@/src/models/Order";
 import { sendOrderEmail } from "@/src/lib/email";
 import jwt from "jsonwebtoken";
 
+export async function GET(
+  req: Request,
+  context: { params: { id: string } }
+) {
+  try {
+    await connectDB();
+
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET!);
+
+    const params = await context.params;
+    const { id } = params;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if user owns this order or is admin
+    const isAdmin = decoded.role === "admin" || decoded.isAdmin === true;
+    if (!isAdmin && order.userId.toString() !== decoded.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json(order);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { error: "Failed to fetch order" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   req: Request,
   context: { params: { id: string } }

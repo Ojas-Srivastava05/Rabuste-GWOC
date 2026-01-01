@@ -11,6 +11,7 @@ type CartItem = {
   name: string;
   price: number;
   quantity: number;
+  itemType?: string;
 };
 
 type Cart = {
@@ -59,7 +60,7 @@ export default function CheckoutPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // 🔥 REQUIRED
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             items: cart.items,
@@ -70,9 +71,18 @@ export default function CheckoutPage() {
         if (!res.ok) {
           throw new Error("Order creation failed");
         }
-  
-        // redirect to order status page
-        router.push("/order-status");
+
+        const orderData = await res.json();
+        
+        // Check if order contains art items
+        const hasArtItems = cart.items.some((item) => item.itemType === 'art');
+        
+        // Redirect to appropriate order status page
+        if (hasArtItems) {
+          router.push(`/art-order-status?orderId=${orderData._id}`);
+        } else {
+          router.push("/order-status");
+        }
       } catch (err) {
         console.error("Checkout error:", err);
         alert("Something went wrong while placing your order.");

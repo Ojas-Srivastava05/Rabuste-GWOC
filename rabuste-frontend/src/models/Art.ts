@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, models, model } from "mongoose";
 
-const artSchema = new mongoose.Schema(
+const ArtSchema = new Schema(
   {
     title: {
       type: String,
@@ -30,7 +30,7 @@ const artSchema = new mongoose.Schema(
       type: [String],
       required: true,
       validate: {
-        validator: function(arr) {
+        validator: function(arr: string[]) {
           return arr && arr.length > 0;
         },
         message: 'At least one image is required'
@@ -73,7 +73,11 @@ const artSchema = new mongoose.Schema(
       min: 0,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export default mongoose.models.Art || mongoose.model("Art", artSchema);
+const Art = models.Art || model("Art", ArtSchema);
+
+export default Art;

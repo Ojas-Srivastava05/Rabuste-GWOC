@@ -168,7 +168,7 @@ export default function Navbar() {
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
           <NavButton href="/menu">MENU</NavButton>
-          <NavButton href="/gallery">GALLERY</NavButton>
+          <NavButton href="/art">GALLERY</NavButton>
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button
@@ -433,7 +433,7 @@ export default function Navbar() {
             <NavButton href="/menu" mobile onClick={() => setOpen(false)}>
               MENU
             </NavButton>
-            <NavButton href="/gallery" mobile onClick={() => setOpen(false)}>
+            <NavButton href="/art" mobile onClick={() => setOpen(false)}>
               GALLERY
             </NavButton>
             

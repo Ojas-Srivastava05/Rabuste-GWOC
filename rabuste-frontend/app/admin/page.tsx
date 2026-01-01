@@ -143,6 +143,14 @@ export default function AdminPage() {
           <span className="text-sm font-medium">Workshops</span>
         </a>
 
+        <a
+          href="/admin/gallery"
+          className="bg-[#3a2618] text-[#fffbd6] px-4 py-3 rounded-md shadow
+                     hover:shadow-md transition"
+        >
+          <span className="text-sm font-medium">Gallery</span>
+        </a>
+
       </div>
     </div>
   );

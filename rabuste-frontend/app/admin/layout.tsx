@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
+import Image from "next/image";
 
 type Props = {
   children: React.ReactNode;
@@ -68,8 +69,30 @@ export default function AdminLayout({ children }: Props) {
           className="p-8 border-b-2"
           style={{ borderColor: 'rgba(184, 115, 51, 0.3)' }}
         >
+          <Link 
+            href="/"
+            className="block mb-4 transition-transform hover:scale-105 duration-300"
+          >
+            <div 
+              className="flex items-center justify-center w-16 h-16 mx-auto cursor-pointer"
+              style={{
+                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                border: '2px solid rgba(184, 115, 51, 0.4)',
+                boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
+              }}
+            >
+              <Image
+                src="/Rabuste logo.png"
+                alt="Rabuste Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+                priority
+              />
+            </div>
+          </Link>
           <h1
-            className="text-3xl mb-2"
+            className="text-3xl mb-2 text-center"
             style={{
               fontFamily: 'var(--font-heading)',
               color: '#F5F1E8',
@@ -78,13 +101,14 @@ export default function AdminLayout({ children }: Props) {
           >
             RABUSTE
           </h1>
-          <p className="section-label">ADMIN PANEL</p>
+          <p className="section-label text-center">ADMIN PANEL</p>
         </div>
 
         <nav className="flex-1 p-6 space-y-3">
           <NavLink href="/admin">Dashboard</NavLink>
           <NavLink href="/admin/orders">Orders</NavLink>
           <NavLink href="/admin/menu">Menu</NavLink>
+          <NavLink href="/admin/gallery">Gallery</NavLink>
           <NavLink href="/admin/workshops">Workshops</NavLink>
           <NavLink href="/admin/users">Users</NavLink>
           <NavLink href="/admin/ai-settings"> AI Settings</NavLink>

@@ -5,6 +5,16 @@ const CartItemSchema = new Schema(
     menuItem: {
       type: Schema.Types.ObjectId,
       ref: "Menu",
+    },
+
+    artItem: {
+      type: Schema.Types.ObjectId,
+      ref: "Art",
+    },
+
+    itemType: {
+      type: String,
+      enum: ["menu", "art"],
       required: true,
     },
 
@@ -22,6 +32,10 @@ const CartItemSchema = new Schema(
       type: Number,
       required: true,
       min: 1,
+    },
+
+    image: {
+      type: String,
     },
   },
   { _id: false }

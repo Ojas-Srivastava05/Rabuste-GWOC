@@ -15,6 +15,18 @@ const OrderSchema = new Schema(
 
     items: [
       {
+        menuItem: {
+          type: Schema.Types.ObjectId,
+          ref: "Menu",
+        },
+        artItem: {
+          type: Schema.Types.ObjectId,
+          ref: "Art",
+        },
+        itemType: {
+          type: String,
+          enum: ["menu", "art"],
+        },
         name: String,
         price: Number,
         quantity: Number,
