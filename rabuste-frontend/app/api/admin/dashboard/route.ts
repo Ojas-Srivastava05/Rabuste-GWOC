@@ -6,14 +6,16 @@ export async function GET(req: Request) {
     const backendURL =
       process.env.BACKEND_URL || "http://localhost:5001";
 
-    // Forward cookies for auth
+    // Forward cookies (if any) and Authorization for auth
     const cookie = req.headers.get("cookie");
+    const authorization = req.headers.get("authorization");
 
     const res = await axios.get(
       `${backendURL}/api/admin/dashboard`,
       {
         headers: {
           Cookie: cookie || "",
+          ...(authorization ? { Authorization: authorization } : {}),
         },
         withCredentials: true,
       }

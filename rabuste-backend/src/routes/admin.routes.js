@@ -14,10 +14,13 @@ router.get("/dashboard",auth,admin,getAdminDashboard);
 import {
   getAIConfig,
   updateAIConfig,
+  getDiscountSuggestions,
 } from "../controllers/admin.controller.js";
 
 router.get("/ai-config",auth,admin,getAIConfig);
 router.patch("/ai-config",auth,admin,updateAIConfig);
+
+router.get("/discount-suggestions", auth, admin, getDiscountSuggestions);
 
 
 
