@@ -121,102 +121,43 @@ export default function ContactSection() {
           >
             {/* Main map container */}
             <div
-              className="relative overflow-hidden"
+              className="relative overflow-hidden rounded-sm"
               style={{
-                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.9), rgba(26, 17, 16, 0.9))',
-                border: '3px solid rgba(184, 115, 51, 0.4)',
+                background: 'rgba(0, 0, 0, 0.3)',
+                border: '2px solid rgba(184, 115, 51, 0.4)',
                 height: 'clamp(350px, 50vw, 600px)',
                 minHeight: '350px',
+                boxShadow: '0 8px 32px rgba(184, 115, 51, 0.2)',
               }}
             >
-              {/* Map placeholder with centered content */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : {}}
-                  transition={{ duration: 0.6, delay: 0.5, type: 'spring' }}
-                  className="mb-8"
-                >
-                  <MapPin size={80} color="#B87333" strokeWidth={2} />
-                </motion.div>
-                
-                <h3 style={{
-                  fontFamily: 'Bebas Neue, sans-serif',
-                  fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-                  color: '#FFFEF9',
-                  letterSpacing: '0.05em',
-                  marginBottom: '1rem',
-                  textAlign: 'center',
-                }}>
-                  FIND US HERE
-                </h3>
-                
-                <p style={{
-                  color: 'rgba(255, 254, 249, 0.8)',
-                  fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                  textAlign: 'center',
-                  maxWidth: '500px',
-                  lineHeight: 1.6,
-                  marginBottom: '2rem',
-                }}>
-                  123 Coffee Street, Downtown District
-                  <br />
-                  City, State 12345
-                </p>
-
-              {/* Get Directions Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 transition-all w-full sm:w-auto"
-                  style={{
-                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                    border: 'none',
-                    color: '#000',
-                    fontFamily: 'Bebas Neue, sans-serif',
-                    fontSize: '1.25rem',
-                    letterSpacing: '0.1em',
-                    cursor: 'pointer',
-                    boxShadow: '0 8px 24px rgba(184, 115, 51, 0.3)',
+              {/* Map iframe */}
+              <div className="absolute inset-0 rounded-sm overflow-hidden">
+                <iframe
+                  title="Rabuste Location"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d232.54830003341274!2d72.77109710957428!3d21.16143814884428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04d00111b19b5%3A0xba45eb84da00c79f!2sRABUSTE!5e0!3m2!1sen!2sin!4v1767290158905!5m2!1sen!2sin"
+                  style={{ 
+                    border: 0, 
+                    width: "100%", 
+                    height: "100%",
+                    display: 'block',
                   }}
-                >
-                  <Send size={20} />
-                  GET DIRECTIONS
-                </motion.button>
-
-                {/* Decorative copper line */}
-                <div className="flex gap-3 mt-8">
-                  {[1, 2, 3].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scaleX: 0 }}
-                      animate={isInView ? { scaleX: 1 } : {}}
-                      transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
-                      style={{
-                        width: '50px',
-                        height: '2px',
-                        background: i === 1 ? '#B87333' : 'rgba(184, 115, 51, 0.3)',
-                      }}
-                    />
-                  ))}
-                </div>
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
               </div>
 
-              {/* Corner accent - top left */}
+              {/* Decorative corner accents - non-blocking */}
               <div 
-                className="absolute top-0 left-0 w-20 h-20"
+                className="absolute top-0 left-0 w-16 h-16 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(135deg, #B87333 50%, transparent 50%)',
-                  opacity: 0.4,
+                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.6) 50%, transparent 50%)',
                 }}
               />
-
-              {/* Corner accent - bottom right */}
               <div 
-                className="absolute bottom-0 right-0 w-24 h-24"
+                className="absolute bottom-0 right-0 w-16 h-16 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(135deg, transparent 50%, #CD7F32 50%)',
-                  opacity: 0.4,
+                  background: 'linear-gradient(135deg, transparent 50%, rgba(205, 127, 50, 0.6) 50%)',
                 }}
               />
             </div>
