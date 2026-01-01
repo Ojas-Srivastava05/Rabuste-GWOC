@@ -7,10 +7,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const getAuthHeaders = () => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const headers: HeadersInit = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return headers;
+  };
+
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await fetch("/api/admin/dashboard");
+        const res = await fetch("/api/admin/dashboard", {
+          headers: {
+            ...getAuthHeaders(),
+          },
+        });
         if (!res.ok) throw new Error("Failed to fetch");
 
         const json = await res.json();
