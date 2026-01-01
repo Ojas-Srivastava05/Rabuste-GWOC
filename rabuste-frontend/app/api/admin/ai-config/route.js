@@ -4,7 +4,7 @@ import axios from "axios";
 export async function GET(req) {
   try {
     const backendURL =
-      process.env.BACKEND_URL || "http://localhost:5000";
+      process.env.BACKEND_URL || "http://localhost:5001";
 
     const cookie = req.headers.get("cookie");
     const authorization = req.headers.get("authorization");
@@ -32,7 +32,7 @@ export async function GET(req) {
 export async function PATCH(req) {
   try {
     const backendURL =
-      process.env.BACKEND_URL || "http://localhost:5000";
+      process.env.BACKEND_URL || "http://localhost:5001";
 
     const cookie = req.headers.get("cookie");
     const authorization = req.headers.get("authorization");
