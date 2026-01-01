@@ -222,6 +222,8 @@ npm start
 
 Backend will run on **http://localhost:5001**
 
+> ⚠️ **IMPORTANT**: The backend server must be running before starting the frontend, otherwise you'll see "Failed to fetch" errors. Always start the backend first!
+
 ---
 
 ### 🎨 Frontend Setup
@@ -258,6 +260,28 @@ npm run dev
 ```
 
 Frontend will run on **http://localhost:3000**
+
+---
+
+### 🚀 Running Both Servers
+
+**For Development:**
+
+Open two terminal windows:
+
+**Terminal 1 - Backend:**
+```bash
+cd rabuste-backend
+npm run dev
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd rabuste-frontend
+npm run dev
+```
+
+Visit **http://localhost:3000** in your browser.
 
 ---
 
@@ -514,6 +538,17 @@ PORT=5002 npm run dev
 
 # Frontend
 npm run dev -- -p 3001
+```
+
+#### Backend Not Running Error
+```
+Error: Failed to fetch
+```
+
+**Solution**: Make sure the backend server is running on port 5001
+```bash
+cd rabuste-backend
+npm run dev
 ```
 
 #### MongoDB Connection Error

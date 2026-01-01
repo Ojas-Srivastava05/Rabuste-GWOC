@@ -64,8 +64,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Auth check failed:", error);
-      localStorage.removeItem("token");
-      setUser(null);
+      // Don't remove token on network errors - backend might be temporarily down
+      // Only clear on actual auth failures
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (!errorMessage.includes("Failed to fetch") && !errorMessage.includes("NetworkError")) {
+        localStorage.removeItem("token");
+        setUser(null);
+      }
     } finally {
       setIsLoading(false);
     }
