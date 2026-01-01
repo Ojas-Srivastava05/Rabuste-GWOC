@@ -147,8 +147,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const taxAmount = Math.round(cart.totalAmount * 0.05);
-  const totalAmount = cart.totalAmount + taxAmount;
+  const totalAmount = cart.totalAmount;
 
   return (
     <>
@@ -225,20 +224,16 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-4 pt-6 border-t-2 border-[#B87333]/30">
-                <div className="flex justify-between items-center text-lg">
-                  <span style={{ color: '#8B6F47' }}>Subtotal</span>
-                  <span className="gradient-text font-bold">₹{cart.totalAmount}</span>
-                </div>
-                <div className="flex justify-between items-center text-lg">
-                  <span style={{ color: '#8B6F47' }}>Tax (5%)</span>
-                  <span className="gradient-text font-bold">₹{taxAmount}</span>
-                </div>
+                <p className="text-sm text-center mb-4" style={{ color: '#8B6F47' }}>
+                  All prices are inclusive of taxes
+                </p>
                 <div className="flex justify-between items-center pt-4 border-t-2 border-[#B87333]/30">
                   <span
                     className="text-3xl"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: '#F5F1E8',
+                      letterSpacing: '0.05em',
                     }}
                   >
                     TOTAL

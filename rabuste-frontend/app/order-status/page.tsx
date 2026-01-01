@@ -12,6 +12,7 @@ type OrderItem = {
   name: string;
   price: number;
   quantity: number;
+  itemType?: "menu" | "art";
 };
 
 type Order = {
@@ -347,6 +348,11 @@ export default function OrderStatusPage() {
   useEffect(() => {
     fetchOrders();
     
+    // Poll for order updates every 5 seconds
+    const orderPollInterval = setInterval(() => {
+      fetchOrders();
+    }, 5000);
+    
     // Rotate facts every 10 seconds
     const factInterval = setInterval(() => {
       setCurrentFact((prev) => (prev + 1) % coffeeFacts.length);
@@ -358,6 +364,7 @@ export default function OrderStatusPage() {
     }, 12000);
 
     return () => {
+      clearInterval(orderPollInterval);
       clearInterval(factInterval);
       clearInterval(tipInterval);
     };
@@ -397,8 +404,18 @@ export default function OrderStatusPage() {
   }
 
   const estimatedTime = (order: Order) => {
-    const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
-    return Math.max(10, itemCount * 3); // 3 mins per item, minimum 10 mins
+    // Only count menu items for prep time
+    const menuItems = order.items.filter(item => item.itemType === 'menu' || !item.itemType);
+    const menuItemCount = menuItems.reduce((sum, item) => sum + item.quantity, 0);
+    return menuItemCount > 0 ? Math.max(10, menuItemCount * 3) : 0; // 3 mins per item, minimum 10 mins
+  };
+
+  const hasArtItems = (order: Order) => {
+    return order.items.some(item => item.itemType === 'art');
+  };
+
+  const hasMenuItems = (order: Order) => {
+    return order.items.some(item => item.itemType === 'menu' || !item.itemType);
   };
 
   if (loading) {
@@ -561,37 +578,62 @@ export default function OrderStatusPage() {
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <div
-                          className="inline-flex items-center gap-2 px-4 py-2"
-                          style={{
-                            background: 'rgba(255, 183, 77, 0.2)',
-                            border: '2px solid rgba(255, 183, 77, 0.4)',
-                          }}
-                        >
-                          <AlertCircle size={18} style={{ color: '#FFB74D' }} />
-                          <span
-                            className="text-sm"
+                        {hasMenuItems(order) && (
+                          <>
+                            <div
+                              className="inline-flex items-center gap-2 px-4 py-2"
+                              style={{
+                                background: 'rgba(255, 183, 77, 0.2)',
+                                border: '2px solid rgba(255, 183, 77, 0.4)',
+                              }}
+                            >
+                              <AlertCircle size={18} style={{ color: '#FFB74D' }} />
+                              <span
+                                className="text-sm"
+                                style={{
+                                  color: '#FFB74D',
+                                  fontFamily: 'var(--font-heading)',
+                                  letterSpacing: '0.1em',
+                                }}
+                              >
+                                PREPARING
+                              </span>
+                            </div>
+                            
+                            <div className="text-right">
+                              <p className="text-xs" style={{ color: '#8B6F47' }}>
+                                Est. time
+                              </p>
+                              <p
+                                className="text-lg gradient-text"
+                                style={{ fontFamily: 'var(--font-heading)' }}
+                              >
+                                {estimatedTime(order)} min
+                              </p>
+                            </div>
+                          </>
+                        )}
+                        {hasArtItems(order) && !hasMenuItems(order) && (
+                          <div
+                            className="inline-flex items-center gap-2 px-4 py-2"
                             style={{
-                              color: '#FFB74D',
-                              fontFamily: 'var(--font-heading)',
-                              letterSpacing: '0.1em',
+                              background: 'rgba(184, 115, 51, 0.2)',
+                              border: '2px solid rgba(184, 115, 51, 0.4)',
                             }}
                           >
-                            PREPARING
-                          </span>
-                        </div>
-                        
-                        <div className="text-right">
-                          <p className="text-xs" style={{ color: '#8B6F47' }}>
-                            Est. time
-                          </p>
-                          <p
-                            className="text-lg gradient-text"
-                            style={{ fontFamily: 'var(--font-heading)' }}
-                          >
-                            {estimatedTime(order)} min
-                          </p>
-                        </div>
+                            <Package size={18} style={{ color: '#B87333' }} />
+                            <span
+                              className="text-sm"
+                              style={{
+                                color: '#B87333',
+                                fontFamily: 'var(--font-heading)',
+                                letterSpacing: '0.1em',
+                              }}
+                            >
+                              READY FOR PICKUP
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -611,18 +653,36 @@ export default function OrderStatusPage() {
                           }}
                         >
                           <div className="flex items-center gap-3 flex-1">
-                            <Coffee size={16} style={{ color: '#B87333' }} />
+                            {item.itemType === 'art' ? (
+                              <Sparkles size={16} style={{ color: '#D4A574' }} />
+                            ) : (
+                              <Coffee size={16} style={{ color: '#B87333' }} />
+                            )}
                             <div>
-                              <h3
-                                className="text-base"
-                                style={{
-                                  fontFamily: 'var(--font-heading)',
-                                  color: '#F5F1E8',
-                                  letterSpacing: '0.03em',
-                                }}
-                              >
-                                {item.name}
-                              </h3>
+                              <div className="flex items-center gap-2">
+                                <h3
+                                  className="text-base"
+                                  style={{
+                                    fontFamily: 'var(--font-heading)',
+                                    color: '#F5F1E8',
+                                    letterSpacing: '0.03em',
+                                  }}
+                                >
+                                  {item.name}
+                                </h3>
+                                {item.itemType === 'art' && (
+                                  <span 
+                                    className="text-xs px-2 py-0.5 uppercase"
+                                    style={{
+                                      background: 'rgba(184, 115, 51, 0.2)',
+                                      color: '#B87333',
+                                      border: '1px solid rgba(184, 115, 51, 0.4)',
+                                    }}
+                                  >
+                                    ARTWORK
+                                  </span>
+                                )}
+                              </div>
                               <p
                                 className="text-sm"
                                 style={{ color: '#8B6F47' }}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import LoadingScreen from "@/components/LoadingScreen";
+import BrewAIPreloader from "@/components/BrewAIPreloader";
 import { UserProvider } from "@/contexts/UserContext";
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default function RootLayout({
         }}
       >
         <UserProvider>
+          <BrewAIPreloader />
           <LoadingScreen />
           <ScrollToTop />
           {children}

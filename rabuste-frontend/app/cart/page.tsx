@@ -8,7 +8,9 @@ import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
 
 type CartItem = {
-  menuItem: string;
+  menuItem?: string;
+  artItem?: string;
+  itemType: "menu" | "art";
   name: string;
   price: number;
   quantity: number;
@@ -128,9 +130,9 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-6">
-              {cart.items.map((item) => (
+              {cart.items.map((item, index) => (
                 <div
-                  key={item.menuItem}
+                  key={item.menuItem || item.artItem || index}
                   className="brutal-card p-6"
                   style={{
                     display: 'flex',
@@ -189,23 +191,19 @@ export default function CartPage() {
                   ORDER SUMMARY
                 </h2>
 
-                <div className="space-y-4 mb-8 pb-8 border-b-2 border-[#B87333]/30">
-                  <div className="flex justify-between items-center">
-                    <span style={{ color: '#8B6F47' }}>Subtotal</span>
-                    <span className="text-xl gradient-text font-bold">₹{cart.totalAmount}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span style={{ color: '#8B6F47' }}>Tax (5%)</span>
-                    <span className="text-xl gradient-text font-bold">₹{Math.round(cart.totalAmount * 0.05)}</span>
-                  </div>
+                <div className="space-y-4 mb-8 pb-6">
+                  <p className="text-sm text-center" style={{ color: '#8B6F47' }}>
+                    All prices are inclusive of taxes
+                  </p>
                 </div>
 
-                <div className="flex justify-between items-center mb-8">
+                <div className="flex justify-between items-center mb-8 pt-6 border-t-2 border-[#B87333]/30">
                   <span 
-                    className="text-2xl"
+                    className="text-3xl"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: '#F5F1E8',
+                      letterSpacing: '0.05em',
                     }}
                   >
                     TOTAL
@@ -216,7 +214,7 @@ export default function CartPage() {
                       fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    ₹{Math.round(cart.totalAmount * 1.05)}
+                    ₹{cart.totalAmount}
                   </span>
                 </div>
 

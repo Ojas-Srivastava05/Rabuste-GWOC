@@ -6,6 +6,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  itemType?: "menu" | "art";
 }
 
 interface Order {
@@ -219,17 +220,56 @@ setOrders(data);
                     key={idx}
                     className="flex justify-between items-center p-4 rounded-lg"
                     style={{
-                      background: 'rgba(0, 0, 0, 0.3)',
-                      border: '1px solid rgba(184, 115, 51, 0.2)',
+                      background: item.itemType === 'art' 
+                        ? 'rgba(184, 115, 51, 0.15)' 
+                        : 'rgba(0, 0, 0, 0.3)',
+                      border: `2px solid ${item.itemType === 'art' 
+                        ? 'rgba(184, 115, 51, 0.4)' 
+                        : 'rgba(184, 115, 51, 0.2)'}`,
                     }}
                   >
-                    <div>
-                      <span className="text-lg" style={{ color: '#F5F1E8' }}>
-                        {item.name}
-                      </span>
-                      <span className="text-sm ml-3" style={{ color: '#8B6F47' }}>
-                        × {item.quantity}
-                      </span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg" style={{ color: '#F5F1E8' }}>
+                          {item.name}
+                        </span>
+                        {item.itemType === 'art' && (
+                          <span 
+                            className="text-xs px-2 py-1 uppercase"
+                            style={{
+                              background: 'rgba(184, 115, 51, 0.3)',
+                              color: '#D4A574',
+                              border: '1px solid rgba(184, 115, 51, 0.5)',
+                              fontFamily: 'var(--font-heading)',
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            🎨 ARTWORK
+                          </span>
+                        )}
+                        {item.itemType === 'menu' && (
+                          <span 
+                            className="text-xs px-2 py-1 uppercase"
+                            style={{
+                              background: 'rgba(139, 111, 71, 0.2)',
+                              color: '#8B6F47',
+                              border: '1px solid rgba(139, 111, 71, 0.4)',
+                              fontFamily: 'var(--font-heading)',
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            ☕ MENU
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-sm" style={{ color: '#8B6F47' }}>
+                        <span>× {item.quantity}</span>
+                        {item.itemType === 'art' && (
+                          <span className="text-xs" style={{ color: '#B87333' }}>
+                            • Ready for pickup
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span className="text-xl gradient-text font-bold">
                       ₹{item.price * item.quantity}
