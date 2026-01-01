@@ -134,11 +134,23 @@ export const getAIConfig = async (req, res) => {
 /* UPDATE AI CONFIG */
 export const updateAIConfig = async (req, res) => {
   try {
-    const { lowStockLimit, inactiveDays, enableDiscountAI } = req.body;
+    const {
+      lowStockLimit,
+      inactiveDays,
+      enableDiscountAI,
+      discountItemId,
+      discountPercent,
+    } = req.body;
 
     const config = await AIConfig.findOneAndUpdate(
       {},
-      { lowStockLimit, inactiveDays, enableDiscountAI },
+      {
+        lowStockLimit,
+        inactiveDays,
+        enableDiscountAI,
+        discountItemId: discountItemId || null,
+        discountPercent,
+      },
       { new: true, upsert: true }
     );
 
