@@ -22,6 +22,7 @@ interface UserContextType {
   setShowWelcomePopup: (show: boolean) => void;
   login: (token: string, userData: User, fromDirectLogin?: boolean) => void;
   logout: () => void;
+  updateUser: (userData: User) => void;
   checkAuth: () => Promise<void>;
 }
 
@@ -81,9 +82,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    // Clear token from localStorage
     localStorage.removeItem("token");
+    
+    // Optional: Clear cart data on logout
+    localStorage.removeItem("cart");
+    
+    // Clear user state
     setUser(null);
+    
+    // Close welcome popup if open
+    setShowWelcomePopup(false);
+    
+    // Redirect to home page
     router.push("/");
+  };
+
+  const updateUser = (userData: User) => {
+    setUser(userData);
   };
 
   return (
@@ -95,6 +111,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         setShowWelcomePopup,
         login,
         logout,
+        updateUser,
         checkAuth,
       }}
     >

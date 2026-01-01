@@ -2,18 +2,26 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import React, { ReactNode, useState, useEffect } from "react";
+import React, { ReactNode, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/contexts/UserContext";
+import { User, LogOut, ShoppingBag, Settings, Edit } from "lucide-react";
 
 type NavButtonProps = {
-  href: string;
+  href?: string;
   children: ReactNode;
   mobile?: boolean;
   onClick?: () => void;
+  isButton?: boolean;
 };
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { user, logout } = useUser();
+  const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +30,35 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showDropdown]);
+
+  const handleLogout = () => {
+    logout();
+    setOpen(false);
+    setShowDropdown(false);
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <nav
@@ -129,10 +166,191 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT (hidden on small screens) */}
-        <div className="hidden md:flex gap-4 flex-1 justify-end">
+        <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
           <NavButton href="/menu">MENU</NavButton>
           <NavButton href="/gallery">GALLERY</NavButton>
-          <NavButton href="/auth">LOGIN</NavButton>
+          {user ? (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="px-4 py-2.5 flex items-center gap-2 border-2 border-[#B87333]/40 text-[#FFFEF9] hover:bg-[#B87333]/20 transition-all duration-300"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  letterSpacing: '0.1em',
+                  fontSize: '12px',
+                }}
+              >
+                <div 
+                  className="w-7 h-7 flex items-center justify-center text-xs font-bold"
+                  style={{
+                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                    color: '#000000',
+                  }}
+                >
+                  {getInitials(user.name)}
+                </div>
+                <span className="uppercase">{user.name.split(' ')[0]}</span>
+                <svg 
+                  className={`w-4 h-4 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showDropdown && (
+                <div 
+                  className="absolute right-0 mt-2 w-72 border-2 border-[#B87333]/40 shadow-2xl"
+                  style={{
+                    background: 'rgba(0, 0, 0, 0.98)',
+                    backdropFilter: 'blur(20px)',
+                  }}
+                >
+                  {/* User Info Section */}
+                  <div className="p-4 border-b border-[#B87333]/20">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div 
+                        className="w-12 h-12 flex items-center justify-center text-lg font-bold"
+                        style={{
+                          background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                          color: '#000000',
+                        }}
+                      >
+                        {getInitials(user.name)}
+                      </div>
+                      <div className="flex-1">
+                        <p 
+                          className="font-medium text-sm mb-1"
+                          style={{ 
+                            color: '#FFFEF9',
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '0.05em',
+                          }}
+                        >
+                          {user.name}
+                        </p>
+                        <p className="text-xs" style={{ color: '#8B6F47' }}>
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    {user.phone && (
+                      <p className="text-xs flex items-center gap-2" style={{ color: '#8B6F47' }}>
+                        <span>📞</span>
+                        {user.phone.fullNumber}
+                      </p>
+                    )}
+                    {user.role && (
+                      <div className="mt-2">
+                        <span 
+                          className="inline-block px-2 py-1 text-xs uppercase"
+                          style={{
+                            background: user.role === 'admin' 
+                              ? 'rgba(184, 115, 51, 0.2)' 
+                              : 'rgba(139, 111, 71, 0.2)',
+                            color: user.role === 'admin' ? '#B87333' : '#8B6F47',
+                            border: `1px solid ${user.role === 'admin' ? '#B87333' : '#8B6F47'}`,
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          {user.role}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Menu Items */}
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        router.push('/profile/edit');
+                        setShowDropdown(false);
+                      }}
+                      className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#B87333]/10 transition-colors text-left"
+                    >
+                      <Edit size={18} style={{ color: '#B87333' }} />
+                      <span 
+                        className="text-sm"
+                        style={{ 
+                          color: '#FFFEF9',
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        EDIT PROFILE
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        router.push('/order-status');
+                        setShowDropdown(false);
+                      }}
+                      className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#B87333]/10 transition-colors text-left"
+                    >
+                      <ShoppingBag size={18} style={{ color: '#B87333' }} />
+                      <span 
+                        className="text-sm"
+                        style={{ 
+                          color: '#FFFEF9',
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        MY ORDERS
+                      </span>
+                    </button>
+
+                    {user.role === 'admin' && (
+                      <button
+                        onClick={() => {
+                          router.push('/admin');
+                          setShowDropdown(false);
+                        }}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#B87333]/10 transition-colors text-left"
+                      >
+                        <Settings size={18} style={{ color: '#B87333' }} />
+                        <span 
+                          className="text-sm"
+                          style={{ 
+                            color: '#FFFEF9',
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '0.05em',
+                          }}
+                        >
+                          ADMIN PANEL
+                        </span>
+                      </button>
+                    )}
+
+                    <div className="my-2 mx-4" style={{ height: '1px', background: 'rgba(184, 115, 51, 0.2)' }} />
+
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-3 flex items-center gap-3 hover:bg-red-950/30 transition-colors text-left"
+                    >
+                      <LogOut size={18} style={{ color: '#ef4444' }} />
+                      <span 
+                        className="text-sm"
+                        style={{ 
+                          color: '#ef4444',
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        LOGOUT
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <NavButton href="/auth">LOGIN</NavButton>
+          )}
         </div>
       </div>
 
@@ -152,7 +370,57 @@ export default function Navbar() {
             backdropFilter: 'blur(20px)',
           }}
         >
+          {/* Mobile User Info */}
+          {user && (
+            <div className="mb-4 pb-4 border-b border-[#B87333]/20">
+              <div className="flex items-center gap-3 mb-2">
+                <div 
+                  className="w-10 h-10 flex items-center justify-center text-sm font-bold"
+                  style={{
+                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                    color: '#000000',
+                  }}
+                >
+                  {getInitials(user.name)}
+                </div>
+                <div className="flex-1">
+                  <p 
+                    className="font-medium text-sm"
+                    style={{ 
+                      color: '#FFFEF9',
+                      fontFamily: 'var(--font-heading)',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    {user.name}
+                  </p>
+                  <p className="text-xs" style={{ color: '#8B6F47' }}>
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+              {user.role && (
+                <span 
+                  className="inline-block px-2 py-1 text-xs uppercase"
+                  style={{
+                    background: user.role === 'admin' 
+                      ? 'rgba(184, 115, 51, 0.2)' 
+                      : 'rgba(139, 111, 71, 0.2)',
+                    color: user.role === 'admin' ? '#B87333' : '#8B6F47',
+                    border: `1px solid ${user.role === 'admin' ? '#B87333' : '#8B6F47'}`,
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  {user.role}
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="flex flex-col gap-3">
+            <NavButton href="/profile/edit" mobile onClick={() => setOpen(false)}>
+              EDIT PROFILE
+            </NavButton>
             <NavButton href="/franchise" mobile onClick={() => setOpen(false)}>
               FRANCHISE
             </NavButton>
@@ -168,9 +436,27 @@ export default function Navbar() {
             <NavButton href="/gallery" mobile onClick={() => setOpen(false)}>
               GALLERY
             </NavButton>
-            <NavButton href="/auth" mobile onClick={() => setOpen(false)}>
-              LOGIN
-            </NavButton>
+            
+            {user ? (
+              <>
+                {user.role === 'admin' && (
+                  <NavButton href="/admin" mobile onClick={() => setOpen(false)}>
+                    ADMIN PANEL
+                  </NavButton>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-5 py-2.5 text-xs tracking-[0.2em] uppercase border border-red-700/50 bg-red-950/30 text-red-400 hover:bg-red-950/50 transition-all duration-300"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  LOGOUT
+                </button>
+              </>
+            ) : (
+              <NavButton href="/auth" mobile onClick={() => setOpen(false)}>
+                LOGIN
+              </NavButton>
+            )}
           </div>
         </div>
       </div>
@@ -194,6 +480,7 @@ function NavButton({
   children,
   mobile = false,
   onClick,
+  isButton = false,
 }: NavButtonProps) {
   const base = `
     px-5 py-2.5
@@ -218,10 +505,21 @@ function NavButton({
     hover:before:translate-y-0
   `;
 
+  if (isButton) {
+    return (
+      <button
+        onClick={onClick}
+        className={`${base} ${hoverStyles} ${mobile ? 'w-full text-center border-[#B87333]/20' : ''}`}
+      >
+        <span className="relative z-10">{children}</span>
+      </button>
+    );
+  }
+
   if (mobile) {
     return (
       <Link
-        href={href}
+        href={href || "#"}
         onClick={(e: any) => {
           onClick?.();
         }}
@@ -234,7 +532,7 @@ function NavButton({
 
   return (
     <Link
-      href={href}
+      href={href || "#"}
       onClick={(e: any) => {
         onClick?.();
       }}
