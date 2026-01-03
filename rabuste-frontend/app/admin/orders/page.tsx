@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Package, CheckCircle2, Clock, Mail, FileText } from "lucide-react";
+import { Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, Loader2 } from "lucide-react";
+import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 
 interface OrderItem {
   name: string;
@@ -18,29 +19,43 @@ interface Order {
   status: "pending" | "completed";
   createdAt: string;
   instructions?: string;
+  userLocation?: {
+    lat: number;
+    lng: number;
+    distance?: number;
+    estimatedTime?: number;
+  };
 }
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [locationPermission, setLocationPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (showRefreshing = false) => {
+    if (showRefreshing) setIsRefreshing(true);
     const token = localStorage.getItem("token");
 
-const res = await fetch("/api/orders", {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
+    const res = await fetch("/api/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-const data = await res.json();
+    const data = await res.json();
 
-if (!Array.isArray(data)) {
-  console.error("Expected orders array, got:", data);
-  setOrders([]);
-  return;
-}
+    if (!Array.isArray(data)) {
+      console.error("Expected orders array, got:", data);
+      setOrders([]);
+      if (showRefreshing) setIsRefreshing(false);
+      return;
+    }
 
-setOrders(data);
+    setOrders(data);
+    if (showRefreshing) {
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
 
   };
 
@@ -70,7 +85,83 @@ setOrders(data);
 
   useEffect(() => {
     fetchOrders();
+    
+    // Set up polling for real-time updates every 10 seconds
+    const pollInterval = setInterval(() => {
+      fetchOrders();
+    }, 10000);
+
+    // Request location permission
+    requestLocationPermission();
+
+    return () => {
+      clearInterval(pollInterval);
+    };
   }, []);
+
+  const requestLocationPermission = async () => {
+    try {
+      await getCurrentLocation();
+      setLocationPermission('granted');
+      setLocationError(null);
+    } catch (error) {
+      const locationError = error as LocationError;
+      
+      // Only log as warning instead of error, since this is expected behavior
+      if (locationError.type === 'permission_denied') {
+        console.warn("Location access denied by user - ETA features will be unavailable");
+      } else {
+        console.warn(`Location unavailable (${locationError.type}): ${locationError.message}`);
+      }
+      
+      setLocationPermission('denied');
+      setLocationError(locationError.message);
+    }
+  };
+
+  const calculateOrderETA = async (order: Order) => {
+    if (locationPermission !== 'granted') return;
+
+    try {
+      const userLocation = await getCurrentLocation();
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        CAFE_LOCATION.lat,
+        CAFE_LOCATION.lng
+      );
+      const estimatedTime = calculateDeliveryTime(distance);
+
+      // Update order with location data
+      setOrders((prevOrders) =>
+        prevOrders.map((o) =>
+          o._id === order._id
+            ? {
+                ...o,
+                userLocation: {
+                  ...userLocation,
+                  distance,
+                  estimatedTime,
+                },
+              }
+            : o
+        )
+      );
+    } catch (error) {
+      console.error("Error calculating ETA:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Calculate ETA for all pending orders when location permission is granted
+    if (locationPermission === 'granted') {
+      orders.filter(o => o.status === 'pending').forEach(order => {
+        if (!order.userLocation) {
+          calculateOrderETA(order);
+        }
+      });
+    }
+  }, [orders, locationPermission]);
 
   const pendingOrders = orders.filter((o) => o.status === "pending");
   const completedOrders = orders.filter((o) => o.status === "completed");
@@ -85,20 +176,81 @@ setOrders(data);
     >
       {/* Header */}
       <div className="mb-12">
-        <div className="inline-flex items-center gap-4 mb-6">
-          <div className="copper-line" />
-          <span className="section-label">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-4 mb-6">
+              <div className="copper-line" />
+              <span className="section-label">ADMIN PANEL</span>
+              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+            </div>
+            <h1
+              className="text-5xl md:text-7xl"
+              style={{
+                fontFamily: 'var(--font-heading)',
+                lineHeight: 0.9,
+              }}
+            >
+              ORDER <span className="gradient-text">MANAGEMENT</span>
+            </h1>
+          </div>
+          <button
+            onClick={() => fetchOrders(true)}
+            disabled={isRefreshing}
+            className="btn btn-primary flex items-center gap-2"
+            style={{ alignSelf: 'flex-start' }}
+          >
+            {isRefreshing ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                REFRESHING...
+              </>
+            ) : (
+              <>
+                <Clock size={20} />
+                REFRESH ORDERS
+              </>
+            )}
+          </button>
         </div>
-        <h1
-          className="text-5xl md:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
-        >
-          ORDER <span className="gradient-text">MANAGEMENT</span>
-        </h1>
+        
+        {/* Location Status Banner */}
+        {locationPermission === 'denied' && (
+          <div
+            className="mt-6 p-4 rounded-lg"
+            style={{
+              background: 'rgba(255, 152, 0, 0.1)',
+              border: '1px solid rgba(255, 152, 0, 0.3)',
+            }}
+          >
+            <div className="flex items-start gap-3">
+              <MapPin size={20} style={{ color: '#FF9800', flexShrink: 0, marginTop: '2px' }} />
+              <div className="flex-1">
+                <p className="text-sm font-semibold mb-1" style={{ color: '#FFB74D' }}>
+                  Location features unavailable
+                </p>
+                <p className="text-xs mb-2" style={{ color: '#FFB74D', opacity: 0.9 }}>
+                  {locationError || 'Enable location to see delivery ETAs and distances.'}
+                </p>
+                <div className="text-xs space-y-1 mb-2" style={{ color: '#FFB74D', opacity: 0.7 }}>
+                  <p>• Check if location services are enabled on your device</p>
+                  <p>• Allow location access in your browser settings</p>
+                  <p>• Try refreshing the page after enabling location</p>
+                </div>
+                <button
+                  onClick={requestLocationPermission}
+                  className="mt-1 text-xs px-3 py-1 rounded transition-all hover:opacity-80"
+                  style={{ 
+                    background: 'rgba(255, 152, 0, 0.2)',
+                    border: '1px solid rgba(255, 152, 0, 0.4)',
+                    color: '#FFB74D' 
+                  }}
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
@@ -166,7 +318,7 @@ setOrders(data);
             }}
           >
             <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
-              <div>
+              <div className="flex-1">
                 <h2
                   className="text-3xl mb-2"
                   style={{
@@ -176,13 +328,35 @@ setOrders(data);
                 >
                   {order.customerName}
                 </h2>
-                <div className="flex items-center gap-2 text-sm" style={{ color: '#8B6F47' }}>
+                <div className="flex items-center gap-2 text-sm mb-1" style={{ color: '#8B6F47' }}>
                   <Mail size={16} />
                   {order.customerEmail}
                 </div>
-                <div className="text-xs mt-2" style={{ color: '#8B6F47' }}>
+                <div className="text-xs" style={{ color: '#8B6F47' }}>
                   {new Date(order.createdAt).toLocaleString()}
                 </div>
+                
+                {/* Location-based ETA */}
+                {order.status === 'pending' && order.userLocation && (
+                  <div className="mt-3 flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2 text-sm" style={{ color: '#B87333' }}>
+                      <Navigation size={16} />
+                      <span>{formatDistance(order.userLocation.distance!)}</span>
+                    </div>
+                    <div
+                      className="px-3 py-1 rounded-full text-xs"
+                      style={{
+                        background: 'rgba(76, 175, 80, 0.2)',
+                        border: '1px solid rgba(76, 175, 80, 0.4)',
+                        color: '#4CAF50',
+                        fontFamily: 'var(--font-heading)',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      ETA: ~{order.userLocation.estimatedTime} min
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div

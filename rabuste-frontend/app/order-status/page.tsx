@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation } from "lucide-react";
+import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -21,6 +22,12 @@ type Order = {
   totalAmount: number;
   status: "pending" | "completed";
   createdAt: string;
+  userLocation?: {
+    lat: number;
+    lng: number;
+    distance?: number;
+    estimatedTime?: number;
+  };
 };
 
 // Coffee facts database
@@ -344,9 +351,12 @@ export default function OrderStatusPage() {
   const [currentTip, setCurrentTip] = useState(0);
   const [activeGame, setActiveGame] = useState<'memory' | 'trivia' | 'origin'>('memory');
   const [gameStats, setGameStats] = useState({ memory: 0, trivia: 0, origin: 0 });
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchOrders();
+    getUserLocation();
     
     // Poll for order updates every 5 seconds
     const orderPollInterval = setInterval(() => {
@@ -370,6 +380,25 @@ export default function OrderStatusPage() {
     };
   }, []);
 
+  async function getUserLocation() {
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      setLocationError(null);
+    } catch (error) {
+      const locationError = error as LocationError;
+      
+      // Only log as warning instead of error, since this is expected behavior
+      if (locationError.type === 'permission_denied') {
+        console.warn("Location access denied by user - delivery ETA features will be unavailable");
+      } else {
+        console.warn(`Location unavailable (${locationError.type}): ${locationError.message}`);
+      }
+      
+      setLocationError(locationError.message || "Location access denied. Enable location to see delivery ETA.");
+    }
+  }
+
   async function fetchOrders() {
     try {
       const token = localStorage.getItem("token");
@@ -391,8 +420,30 @@ export default function OrderStatusPage() {
         throw new Error("Failed to fetch orders");
       }
 
-      // Keep all orders (both pending and completed)
-      setOrders(data);
+      // Keep all orders (both pending and completed) and calculate location data
+      const ordersWithLocation = data.map((order: Order) => {
+        if (order.status === 'pending' && userLocation) {
+          const distance = calculateDistance(
+            userLocation.lat,
+            userLocation.lng,
+            CAFE_LOCATION.lat,
+            CAFE_LOCATION.lng
+          );
+          const estimatedTime = calculateDeliveryTime(distance);
+          
+          return {
+            ...order,
+            userLocation: {
+              ...userLocation,
+              distance,
+              estimatedTime,
+            },
+          };
+        }
+        return order;
+      });
+      
+      setOrders(ordersWithLocation);
     } catch (err) {
       console.error(err);
     } finally {
@@ -401,7 +452,12 @@ export default function OrderStatusPage() {
   }
 
   const estimatedTime = (order: Order) => {
-    // Only count menu items for prep time
+    // Use location-based ETA if available, otherwise use item-based estimate
+    if (order.userLocation?.estimatedTime) {
+      return order.userLocation.estimatedTime;
+    }
+    
+    // Fallback: Only count menu items for prep time
     const menuItems = order.items.filter(item => item.itemType === 'menu' || !item.itemType);
     const menuItemCount = menuItems.reduce((sum, item) => sum + item.quantity, 0);
     return menuItemCount > 0 ? Math.max(10, menuItemCount * 3) : 0; // 3 mins per item, minimum 10 mins
@@ -530,6 +586,46 @@ export default function OrderStatusPage() {
             >
               YOUR <span className="gradient-text">ORDERS</span>
             </h1>
+            
+            {/* Location Status */}
+            {userLocation && (
+              <div className="inline-flex items-center gap-2 mt-2 text-sm" style={{ color: '#B87333' }}>
+                <MapPin size={16} />
+                <span>Delivery location detected</span>
+              </div>
+            )}
+            {locationError && (
+              <div
+                className="inline-block mt-2 px-4 py-2 rounded-lg max-w-md"
+                style={{
+                  background: 'rgba(255, 152, 0, 0.1)',
+                  border: '1px solid rgba(255, 152, 0, 0.3)',
+                }}
+              >
+                <div className="flex items-start gap-2 mb-2">
+                  <AlertCircle size={16} style={{ color: '#FF9800', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <p className="text-xs font-semibold mb-1" style={{ color: '#FFB74D' }}>
+                      Location features unavailable
+                    </p>
+                    <p className="text-xs" style={{ color: '#FFB74D', opacity: 0.8 }}>
+                      {locationError}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={getUserLocation}
+                  className="text-xs px-3 py-1 rounded transition-all hover:opacity-80"
+                  style={{ 
+                    background: 'rgba(255, 152, 0, 0.2)',
+                    border: '1px solid rgba(255, 152, 0, 0.4)',
+                    color: '#FFB74D' 
+                  }}
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="grid lg:grid-cols-5 gap-6">
@@ -596,7 +692,7 @@ export default function OrderStatusPage() {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col items-end gap-2">
                         {hasMenuItems(order) && (
                           <>
                             <div
@@ -621,15 +717,23 @@ export default function OrderStatusPage() {
                             
                             <div className="text-right">
                               <p className="text-xs" style={{ color: '#8B6F47' }}>
-                                Est. time
+                                {order.userLocation ? 'Delivery ETA' : 'Est. time'}
                               </p>
                               <p
                                 className="text-lg gradient-text"
                                 style={{ fontFamily: 'var(--font-heading)' }}
                               >
-                                {estimatedTime(order)} min
+                                ~{estimatedTime(order)} min
                               </p>
                             </div>
+                            
+                            {/* Distance Info */}
+                            {order.userLocation && (
+                              <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                                <Navigation size={14} />
+                                <span>{formatDistance(order.userLocation.distance!)} away</span>
+                              </div>
+                            )}
                           </>
                         )}
                         {hasArtItems(order) && !hasMenuItems(order) && (
