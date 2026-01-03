@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import connectDB from "@/src/lib/mongodb";
 import Order from "@/src/models/Order";
+import User from "@/src/models/Users";
 
 
 
@@ -25,6 +26,12 @@ export async function POST(req: Request) {
 
     const userId = decoded.id;
 
+    // Fetch user data from database
+    const user = await User.findById(userId).select('name email');
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const data = await req.json();
 
     if (!data.items?.length || !data.totalAmount) {
@@ -36,8 +43,8 @@ export async function POST(req: Request) {
 
     const order = await Order.create({
       userId,
-      customerName: decoded.name || "Customer",
-      customerEmail: decoded.email || "unknown@email",
+      customerName: user.name,
+      customerEmail: user.email,
       items: data.items,
       totalAmount: data.totalAmount,
       instructions: data.instructions,
