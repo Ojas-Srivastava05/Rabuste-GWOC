@@ -37,26 +37,39 @@ export default function AdminOrdersPage() {
     if (showRefreshing) setIsRefreshing(true);
     const token = localStorage.getItem("token");
 
-    const res = await fetch("/api/orders", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await fetch("/api/orders", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (!Array.isArray(data)) {
-      console.error("Expected orders array, got:", data);
+      // Check for error response from API
+      if (!res.ok || data.error) {
+        console.error("API error:", data.error || `HTTP ${res.status}`);
+        setOrders([]);
+        if (showRefreshing) setIsRefreshing(false);
+        return;
+      }
+
+      if (!Array.isArray(data)) {
+        console.error("Expected orders array, got:", data);
+        setOrders([]);
+        if (showRefreshing) setIsRefreshing(false);
+        return;
+      }
+
+      setOrders(data);
+      if (showRefreshing) {
+        setTimeout(() => setIsRefreshing(false), 500);
+      }
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
       setOrders([]);
       if (showRefreshing) setIsRefreshing(false);
-      return;
     }
-
-    setOrders(data);
-    if (showRefreshing) {
-      setTimeout(() => setIsRefreshing(false), 500);
-    }
-
   };
 
   const markCompleted = async (orderId: string) => {

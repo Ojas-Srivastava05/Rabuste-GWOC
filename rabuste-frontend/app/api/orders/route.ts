@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/src/lib/mongodb";
 import Order from "@/src/models/Order";
 import User from "@/src/models/Users";
+import { sendOrderConfirmation } from "@/src/lib/email";
 
 
 
@@ -49,6 +50,15 @@ export async function POST(req: Request) {
       totalAmount: data.totalAmount,
       instructions: data.instructions,
     });
+
+    // Send premium order confirmation email (non-blocking)
+    sendOrderConfirmation(user.email, {
+      customerName: user.name,
+      items: order.items,
+      totalAmount: order.totalAmount,
+      instructions: order.instructions,
+      orderId: order._id.toString(),
+    }).catch(err => console.error("Email failed:", err));
 
     return NextResponse.json(order, { status: 201 });
   } catch (err) {

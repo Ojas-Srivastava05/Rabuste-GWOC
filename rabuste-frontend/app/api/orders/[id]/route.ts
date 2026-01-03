@@ -34,7 +34,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/src/lib/mongodb";
 import Order from "@/src/models/Order";
-import { sendOrderEmail } from "@/src/lib/email";
+import { sendOrderReady } from "@/src/lib/email";
 import jwt from "jsonwebtoken";
 
 export async function GET(
@@ -121,15 +121,14 @@ export async function PATCH(
     // ✅ EMAIL SHOULD NOT BREAK STATUS UPDATE
     if (status === "completed") {
       try {
-        await sendOrderEmail(
+        await sendOrderReady(
           updatedOrder.customerEmail,
-          "☕ Your order is ready!",
-          `
-            <h2>Order Completed 🎉</h2>
-            <p>Hi ${updatedOrder.customerName},</p>
-            <p>Your coffee is ready for pickup.</p>
-            <p><strong>Total:</strong> ₹${updatedOrder.totalAmount}</p>
-          `
+          {
+            customerName: updatedOrder.customerName,
+            items: updatedOrder.items,
+            totalAmount: updatedOrder.totalAmount,
+            orderId: updatedOrder._id.toString(),
+          }
         );
       } catch (emailError) {
         console.error("Email failed:", emailError);
