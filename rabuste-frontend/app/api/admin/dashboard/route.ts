@@ -4,7 +4,7 @@ import axios from "axios";
 export async function GET(req: Request) {
   try {
     const backendURL =
-      process.env.BACKEND_URL || "http://localhost:5001";
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
     // Forward cookies (if any) and Authorization for auth
     const cookie = req.headers.get("cookie");
