@@ -1,5 +1,5 @@
-import Order from "../models/Order.js";
-import Store from "../models/Store.js";
+import Order from "../models/order.js";
+import Store from "../models/store.js";
 import { calculateDistance } from "../utils/distance.utils.js";
 
 /* USER places order */

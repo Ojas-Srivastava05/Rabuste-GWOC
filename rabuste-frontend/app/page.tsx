@@ -4,7 +4,6 @@ import Balatro from "@/components/bg";
 import Navbar from "@/components/Navbar";
 import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
-import OurStorySection from "@/components/sections/OurStorySection";
 import ExperienceSection from "@/components/sections/ExperienceSection";
 import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
 import ProcessSection from "@/components/sections/ProcessSection";
@@ -61,9 +60,6 @@ export default function Home() {
 
         {/* Horizontal Scroll Section - UNIQUE EXPERIENCE */}
         <HorizontalScroll />
-
-        {/* Our Story - Café + Art + Community */}
-        <OurStorySection />
 
         {/* Experience - What We Offer */}
         <ExperienceSection />
