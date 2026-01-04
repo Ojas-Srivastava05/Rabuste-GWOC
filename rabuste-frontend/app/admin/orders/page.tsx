@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, Loader2 } from "lucide-react";
+import { Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, Loader2, Ticket } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 
 interface OrderItem {
@@ -16,6 +16,9 @@ interface Order {
   customerEmail: string;
   items: OrderItem[];
   totalAmount: number;
+  couponCode?: string | null;
+  couponDiscount?: number;
+  couponDescription?: string | null;
   status: "pending" | "completed";
   createdAt: string;
   instructions?: string;
@@ -61,6 +64,27 @@ export default function AdminOrdersPage() {
         return;
       }
 
+      // Log orders with coupon information
+      const ordersWithCoupons = data.filter((o: Order) => o.couponCode || o.couponDiscount);
+      if (ordersWithCoupons.length > 0) {
+        console.log('✅ Orders with coupons:', ordersWithCoupons.map((o: Order) => ({
+          id: o._id,
+          customer: o.customerName,
+          couponCode: o.couponCode,
+          couponDiscount: o.couponDiscount,
+          totalAmount: o.totalAmount
+        })));
+      } else {
+        console.log('⚠️ No orders with coupon data found. Checking first 3 orders:', data.slice(0, 3).map((o: Order) => ({
+          id: o._id,
+          customer: o.customerName,
+          couponCode: o.couponCode,
+          couponDiscount: o.couponDiscount,
+          hasCouponCodeField: 'couponCode' in o,
+          hasCouponDiscountField: 'couponDiscount' in o,
+        })));
+      }
+      
       setOrders(data);
       if (showRefreshing) {
         setTimeout(() => setIsRefreshing(false), 500);
@@ -319,7 +343,15 @@ export default function AdminOrdersPage() {
 
       {/* Orders List */}
       <div className="space-y-6">
-        {orders.map((order) => (
+        {orders.map((order) => {
+          // Calculate if coupon was applied using simple math
+          const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          const amountPaid = order.totalAmount;
+          const hasCouponApplied = itemsTotal > amountPaid;
+          const discountAmount = hasCouponApplied ? itemsTotal - amountPaid : 0;
+          const discountPercentage = hasCouponApplied ? Math.round((discountAmount / itemsTotal) * 100) : 0;
+          
+          return (
           <div
             key={order._id}
             className="brutal-card p-8"
@@ -332,15 +364,26 @@ export default function AdminOrdersPage() {
           >
             <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
               <div className="flex-1">
-                <h2
-                  className="text-3xl mb-2"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#F5F1E8',
-                  }}
-                >
-                  {order.customerName}
-                </h2>
+                <div className="flex items-center gap-3 mb-2">
+                  <h2
+                    className="text-3xl"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      color: '#F5F1E8',
+                    }}
+                  >
+                    {order.customerName}
+                  </h2>
+                {/* Inline Coupon Indicator next to name */}
+                  {hasCouponApplied && (
+                    <span
+                      className="text-2xl"
+                      title={`Coupon Applied - ₹${discountAmount} off (${discountPercentage}% discount)`}
+                    >
+                      🎫
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-sm mb-1" style={{ color: '#8B6F47' }}>
                   <Mail size={16} />
                   {order.customerEmail}
@@ -372,19 +415,40 @@ export default function AdminOrdersPage() {
                 )}
               </div>
 
-              <div
-                className="px-5 py-2 rounded-full uppercase tracking-widest text-sm font-bold"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  background:
-                    order.status === "pending"
-                      ? 'linear-gradient(135deg, #B87333, #CD7F32)'
-                      : 'rgba(111, 143, 114, 0.3)',
-                  color: order.status === "pending" ? '#000000' : '#6f8f72',
-                  border: order.status === "completed" ? '2px solid #6f8f72' : 'none',
-                }}
-              >
-                {order.status}
+              {/* Status and Coupon Badges */}
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Coupon Badge - Simple math based */}
+                {hasCouponApplied && (
+                  <div
+                    className="px-4 py-2 rounded-full uppercase tracking-widest text-sm font-bold flex items-center gap-2"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                      color: '#FFFFFF',
+                      border: '2px solid #16A34A',
+                      boxShadow: '0 0 24px rgba(34, 197, 94, 0.6)',
+                    }}
+                  >
+                    <Ticket size={16} />
+                    💰 {discountPercentage}% OFF
+                  </div>
+                )}
+                
+                {/* Status Badge */}
+                <div
+                  className="px-5 py-2 rounded-full uppercase tracking-widest text-sm font-bold"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    background:
+                      order.status === "pending"
+                        ? 'linear-gradient(135deg, #B87333, #CD7F32)'
+                        : 'rgba(111, 143, 114, 0.3)',
+                    color: order.status === "pending" ? '#000000' : '#6f8f72',
+                    border: order.status === "completed" ? '2px solid #6f8f72' : 'none',
+                  }}
+                >
+                  {order.status}
+                </div>
               </div>
             </div>
 
@@ -481,7 +545,58 @@ export default function AdminOrdersPage() {
               </div>
             )}
 
+            {/* Coupon Information - Math-based discount display */}
+            {hasCouponApplied && (
+              <div
+                className="mb-6 p-4 rounded-lg"
+                style={{
+                  background: 'rgba(111, 143, 114, 0.15)',
+                  border: '1px solid rgba(111, 143, 114, 0.4)',
+                }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Ticket size={16} style={{ color: '#6f8f72' }} />
+                  <p className="text-sm font-bold uppercase tracking-wide" style={{ color: '#6f8f72' }}>
+                    Discount Applied
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p style={{ color: '#8DB98D' }}>
+                      Items Total: <span className="font-bold">₹{itemsTotal}</span>
+                    </p>
+                    <p className="font-bold text-lg" style={{ color: '#6f8f72' }}>
+                      {discountPercentage}% OFF
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p style={{ color: '#8DB98D' }}>
+                      Discount Amount:
+                    </p>
+                    <p className="font-bold" style={{ color: '#6f8f72' }}>
+                      - ₹{discountAmount}
+                    </p>
+                  </div>
+                  {order.couponCode && (
+                    <p className="text-sm" style={{ color: '#8DB98D', opacity: 0.9 }}>
+                      Code: <span className="font-bold" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>{order.couponCode}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between items-center pt-6 border-t-2 border-[#B87333]/30">
+              {hasCouponApplied && (
+                <div className="text-sm" style={{ color: '#8DB98D' }}>
+                  <span style={{ textDecoration: 'line-through' }}>₹{itemsTotal}</span>
+                  {' → '}
+                  <span className="font-bold" style={{ color: '#6f8f72' }}>₹{discountAmount} saved</span>
+                </div>
+              )}
+              {!hasCouponApplied && (
+                <span />
+              )}
               <span
                 className="text-2xl"
                 style={{
@@ -511,7 +626,8 @@ export default function AdminOrdersPage() {
               </button>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
