@@ -44,6 +44,15 @@ app.get("/", (req, res) => {
   res.send("Backend running");
 });
 
+// Health check endpoint for backend warming
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime() 
+  });
+});
+
 // routes
 // app.use("/menu", menuRoutes);
 app.use("/api/auth", authRoutes);

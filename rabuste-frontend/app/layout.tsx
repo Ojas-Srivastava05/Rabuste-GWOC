@@ -3,6 +3,7 @@ import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import LoadingScreen from "@/components/LoadingScreen";
 import BrewAIPreloader from "@/components/BrewAIPreloader";
+import BackendWarmer from "@/components/BackendWarmer";
 import { UserProvider } from "@/contexts/UserContext";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <UserProvider>
+          <BackendWarmer />
           <BrewAIPreloader />
           <LoadingScreen />
           <ScrollToTop />
