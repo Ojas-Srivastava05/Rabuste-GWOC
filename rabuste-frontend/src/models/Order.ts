@@ -35,6 +35,24 @@ const OrderSchema = new Schema(
 
     totalAmount: { type: Number, required: true },
 
+    couponCode: {
+      type: String,
+      default: null,
+      required: false,
+    },
+
+    couponDiscount: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
+
+    couponDescription: {
+      type: String,
+      default: null,
+      required: false,
+    },
+
     instructions: {
       type: String,
       default: "",

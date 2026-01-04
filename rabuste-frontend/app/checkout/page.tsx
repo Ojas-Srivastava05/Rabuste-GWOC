@@ -59,18 +59,29 @@ export default function CheckoutPage() {
           return;
         }
   
+        // Prepare order data - ensure all fields are explicitly set
+        const orderPayload = {
+          items: cart.items,
+          totalAmount: cart.discountedTotal || cart.totalAmount,
+          instructions: "",
+          couponCode: cart.couponCode ? String(cart.couponCode).toUpperCase() : null,
+          couponDiscount: cart.couponDiscount ? Number(cart.couponDiscount) : 0,
+        };
+
+        console.log('🛒 Checkout - Sending order:', {
+          totalAmount: orderPayload.totalAmount,
+          hasCoupon: !!orderPayload.couponCode,
+          couponCode: orderPayload.couponCode,
+          couponDiscount: orderPayload.couponDiscount,
+        });
+
         const res = await fetch("/api/orders", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            items: cart.items,
-            totalAmount: cart.discountedTotal || cart.totalAmount,
-            couponCode: cart.couponCode,
-            couponDiscount: cart.couponDiscount,
-          }),
+          body: JSON.stringify(orderPayload),
         });
   
         if (!res.ok) {
