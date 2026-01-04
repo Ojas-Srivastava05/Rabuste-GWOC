@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import SplitText from '@/components/SplitText';
 
 export default function RabusteHero() {
   const [visible, setVisible] = useState(false);
@@ -16,11 +15,7 @@ export default function RabusteHero() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAnimationComplete = () => {
-    console.log('All letters have animated!');
-  };
-
-  const titleStyle = {
+  const titleStyle: React.CSSProperties = {
     color: '#FF7400',
     fontSize: 'clamp(2.5rem, 7vw, 6rem)',
     letterSpacing: '0.3em',
@@ -46,40 +41,12 @@ export default function RabusteHero() {
           }}
         >
           <div style={{ textAlign: 'center', position: 'relative', zIndex: 100 }}>
-            <div style={titleStyle}>
-              <SplitText
-                text="RABUSTE"
-                tag="h1"
-                className="text-center tracking-widest select-none"
-                delay={80}
-                duration={0.5}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 40 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="-100px"
-                textAlign="center"
-                onLetterAnimationComplete={handleAnimationComplete}
-              />
-            </div>
-            <div style={titleStyle}>
-              <SplitText
-                text="COFFEE"
-                tag="h1"
-                className="text-center tracking-widest select-none"
-                delay={80}
-                duration={0.5}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 40 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="-100px"
-                textAlign="center"
-                onLetterAnimationComplete={handleAnimationComplete}
-              />
-            </div>
+            <h1 style={titleStyle} className="text-center tracking-widest select-none">
+              RABUSTE
+            </h1>
+            <h1 style={titleStyle} className="text-center tracking-widest select-none">
+              COFFEE
+            </h1>
           </div>
         </div>
       </div>

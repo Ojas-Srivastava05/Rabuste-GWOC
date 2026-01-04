@@ -297,12 +297,12 @@ export default function VRGallery() {
   /* -------------------------------
      MOUSE DRAG ROTATION
   --------------------------------*/
-  const onMouseDown = (e) => {
+  const onMouseDown = (e: React.MouseEvent) => {
     setDragging(true);
     startX.current = e.clientX;
   };
 
-  const onMouseMove = (e) => {
+  const onMouseMove = (e: React.MouseEvent) => {
     if (!dragging) return;
     const delta = e.clientX - startX.current;
     setRotation((r) => r + delta * 0.25);

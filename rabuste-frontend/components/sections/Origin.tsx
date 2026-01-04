@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 export default function Origin() {
-  const [hoveredStat, setHoveredStat] = useState(null);
+  const [hoveredStat, setHoveredStat] = useState<number | null>(null);
 
   // simple mobile detection
   const [isMobile, setIsMobile] = useState(false);

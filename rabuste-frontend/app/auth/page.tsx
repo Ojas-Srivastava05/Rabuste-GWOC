@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
@@ -12,7 +12,7 @@ import { useUser } from "@/contexts/UserContext";
 const isStrongPassword = (password: string) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
 
-export default function AuthPage() {
+function AuthForm() {
   const router = useRouter();
   const params = useSearchParams();
   const { login } = useUser();
@@ -374,5 +374,17 @@ export default function AuthPage() {
         `}</style>
       </div>
     </>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#000000' }}>
+        <div className="text-center" style={{ color: '#B87333' }}>Loading...</div>
+      </div>
+    }>
+      <AuthForm />
+    </Suspense>
   );
 }

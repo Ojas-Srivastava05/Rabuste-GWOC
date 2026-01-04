@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle2, Package, ArrowRight, Sparkles, Palette, AlertCircle } from "lucide-react";
@@ -25,7 +25,7 @@ type Order = {
   customerEmail: string;
 };
 
-export default function ArtOrderStatusPage() {
+function ArtOrderStatusContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -304,5 +304,24 @@ export default function ArtOrderStatusPage() {
 
       <Footer />
     </>
+  );
+}
+
+export default function ArtOrderStatusPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <Navbar />
+        <DynamicBackground />
+        <div className="min-h-screen flex items-center justify-center" style={{ paddingTop: '100px' }}>
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="section-label">Loading...</p>
+          </div>
+        </div>
+      </>
+    }>
+      <ArtOrderStatusContent />
+    </Suspense>
   );
 }

@@ -12,7 +12,8 @@ export async function requireAdmin() {
   const { headers } = await import("next/headers");
 
   // read raw Cookie header and extract the token (works reliably with Turbopack)
-  const cookieHeader = headers().get("cookie") ?? "";
+  const headersList = await headers();
+  const cookieHeader = headersList.get("cookie") ?? "";
   const match = cookieHeader.match(/(?:^|;\s*)token=([^;]+)/);
   const cookie = match?.[1];
   if (!cookie) return false;
