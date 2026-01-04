@@ -17,6 +17,9 @@ type CartItem = {
 type Cart = {
   items: CartItem[];
   totalAmount: number;
+  couponCode?: string | null;
+  couponDiscount?: number;
+  discountedTotal?: number;
 };
 
 export default function CheckoutPage() {
@@ -64,7 +67,9 @@ export default function CheckoutPage() {
           },
           body: JSON.stringify({
             items: cart.items,
-            totalAmount,
+            totalAmount: cart.discountedTotal || cart.totalAmount,
+            couponCode: cart.couponCode,
+            couponDiscount: cart.couponDiscount,
           }),
         });
   
@@ -147,7 +152,9 @@ export default function CheckoutPage() {
     );
   }
 
-  const totalAmount = cart.totalAmount;
+  const totalAmount = cart.discountedTotal || cart.totalAmount;
+  const subtotal = cart.totalAmount;
+  const discount = cart.couponDiscount || 0;
 
   return (
     <>
@@ -224,9 +231,22 @@ export default function CheckoutPage() {
               </div>
 
               <div className="space-y-4 pt-6 border-t-2 border-[#B87333]/30">
+                <div className="flex justify-between text-base" style={{ color: '#8B6F47' }}>
+                  <span>Subtotal</span>
+                  <span>₹{subtotal}</span>
+                </div>
+                
+                {cart.couponCode && discount > 0 && (
+                  <div className="flex justify-between text-base" style={{ color: '#6f8f72' }}>
+                    <span>Coupon Discount ({cart.couponCode})</span>
+                    <span>- ₹{discount}</span>
+                  </div>
+                )}
+
                 <p className="text-sm text-center mb-4" style={{ color: '#8B6F47' }}>
                   All prices are inclusive of taxes
                 </p>
+                
                 <div className="flex justify-between items-center pt-4 border-t-2 border-[#B87333]/30">
                   <span
                     className="text-3xl"

@@ -23,7 +23,7 @@ export default function ExperienceSection() {
       title: 'ART GALLERY',
       desc: 'Rotating exhibitions from local artists',
       color: '#CD7F32',
-      route: '/gallery',
+      route: '/art',
     },
     {
       icon: Users,

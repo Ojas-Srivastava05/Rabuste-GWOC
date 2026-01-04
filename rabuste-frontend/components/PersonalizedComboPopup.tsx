@@ -49,7 +49,7 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
       title: "Explore Art Gallery",
       description: "Where coffee meets creativity.",
       cta: "View Collection",
-      route: "/gallery",
+      route: "/art",
       color: "#CD7F32",
     },
     {
@@ -76,7 +76,7 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
       title: "Fresh Art Just Dropped",
       description: "Check out this month's featured artists.",
       cta: "View Gallery",
-      route: "/gallery",
+      route: "/art",
       color: "#CD7F32",
     },
     {

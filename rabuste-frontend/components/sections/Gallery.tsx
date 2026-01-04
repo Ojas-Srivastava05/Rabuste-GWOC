@@ -316,7 +316,7 @@ export default function Gallery() {
           </button>
 
           <button
-            onClick={() => router.push('/gallery')}
+            onClick={() => router.push('/art')}
             className="btn btn-primary"
           >
             View Full Gallery
