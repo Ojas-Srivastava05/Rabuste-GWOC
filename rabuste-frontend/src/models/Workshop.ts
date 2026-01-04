@@ -13,6 +13,14 @@ const WorkshopSchema = new Schema(
     description: String,
     instructor: String,
     location: String,
+    capacity: { type: Number, default: 0 },
+    registrations: [
+      {
+        name: String,
+        email: String,
+        registeredAt: { type: Date, default: Date.now },
+      },
+    ],
     status: {
       type: String,
       enum: ["upcoming", "past"],

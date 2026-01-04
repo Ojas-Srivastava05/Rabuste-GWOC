@@ -24,6 +24,8 @@ type Workshop = {
   description: string;
   instructor: string;
   location: string;
+  capacity: number;
+  registrations: Array<{ name: string; email: string; registeredAt: Date }>;
   status: "upcoming" | "past";
 };
 
@@ -31,6 +33,9 @@ export default function WorkshopsPage() {
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
+  const [registrationForm, setRegistrationForm] = useState({ name: "", email: "" });
+  const [registrationMessage, setRegistrationMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -63,6 +68,60 @@ export default function WorkshopsPage() {
 
   const upcomingWorkshops = workshops.filter((w) => w.status === "upcoming");
   const pastWorkshops = workshops.filter((w) => w.status === "past");
+
+  const handleRegister = async () => {
+    if (!selectedWorkshop || !registrationForm.name || !registrationForm.email) {
+      setRegistrationMessage("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/workshops/${selectedWorkshop._id}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(registrationForm),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRegistrationMessage(data.error || "Registration failed");
+        return;
+      }
+
+      setRegistrationMessage("Successfully registered!");
+      setRegistrationForm({ name: "", email: "" });
+      setIsRegistering(false);
+
+      // Refresh workshops to update capacity
+      const workshopsRes = await fetch("/api/workshops");
+      const workshopsData = await workshopsRes.json();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const processed = workshopsData.map((w: Workshop) => {
+        const workshopDate = new Date(w.date);
+        workshopDate.setHours(0, 0, 0, 0);
+        return {
+          ...w,
+          status: workshopDate < today ? "past" : "upcoming",
+        };
+      });
+
+      setWorkshops(processed);
+      const updatedWorkshop = processed.find((w: Workshop) => w._id === selectedWorkshop._id);
+      if (updatedWorkshop) setSelectedWorkshop(updatedWorkshop);
+
+      setTimeout(() => setRegistrationMessage(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setRegistrationMessage("An error occurred. Please try again.");
+    }
+  };
+
+  const isWorkshopFull = (workshop: Workshop) => {
+    return workshop.capacity > 0 && workshop.registrations?.length >= workshop.capacity;
+  };
 
   return (
     <>
@@ -233,6 +292,15 @@ export default function WorkshopsPage() {
                             {workshop.instructor}
                           </span>
                         </div>
+                        {workshop.capacity > 0 && (
+                          <div className="flex items-center gap-3">
+                            <User size={16} style={{ color: '#B87333' }} />
+                            <span className="text-sm" style={{ color: isWorkshopFull(workshop) ? '#ff6b6b' : '#FFFEF9' }}>
+                              {workshop.registrations?.length || 0} / {workshop.capacity} seats
+                              {isWorkshopFull(workshop) && ' (FULL)'}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* CTA */}
@@ -502,6 +570,122 @@ export default function WorkshopsPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Registration Section */}
+                {selectedWorkshop.status === "upcoming" && (
+                  <div
+                    className="mt-8 p-6"
+                    style={{
+                      background: 'rgba(20, 20, 20, 0.6)',
+                      border: '2px solid rgba(184, 115, 51, 0.2)',
+                    }}
+                  >
+                    {isWorkshopFull(selectedWorkshop) ? (
+                      <div className="text-center">
+                        <p
+                          className="text-lg mb-2"
+                          style={{ color: '#ff6b6b', fontFamily: 'var(--font-heading)' }}
+                        >
+                          WORKSHOP IS FULL
+                        </p>
+                        <p style={{ color: '#8B6F47' }}>
+                          All seats have been taken. Please check other workshops.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        {!isRegistering ? (
+                          <button
+                            onClick={() => setIsRegistering(true)}
+                            className="w-full py-4 text-lg uppercase tracking-wider transition-all hover:scale-105"
+                            style={{
+                              background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                              border: '2px solid rgba(184, 115, 51, 0.4)',
+                              color: '#FFFEF9',
+                              fontFamily: 'var(--font-heading)',
+                              fontWeight: 400,
+                            }}
+                          >
+                            REGISTER FOR THIS WORKSHOP
+                          </button>
+                        ) : (
+                          <div>
+                            <h4
+                              className="text-xl mb-4"
+                              style={{
+                                color: '#FFFEF9',
+                                fontFamily: 'var(--font-heading)',
+                              }}
+                            >
+                              REGISTER NOW
+                            </h4>
+                            <div className="space-y-4">
+                              <input
+                                type="text"
+                                placeholder="Your Name"
+                                value={registrationForm.name}
+                                onChange={(e) =>
+                                  setRegistrationForm({ ...registrationForm, name: e.target.value })
+                                }
+                                className="w-full p-3 bg-transparent border-2 border-[#B87333]/40 text-[#FFFEF9] placeholder-[#8B6F47]"
+                                style={{ outline: 'none' }}
+                              />
+                              <input
+                                type="email"
+                                placeholder="Your Email"
+                                value={registrationForm.email}
+                                onChange={(e) =>
+                                  setRegistrationForm({ ...registrationForm, email: e.target.value })
+                                }
+                                className="w-full p-3 bg-transparent border-2 border-[#B87333]/40 text-[#FFFEF9] placeholder-[#8B6F47]"
+                                style={{ outline: 'none' }}
+                              />
+                              {registrationMessage && (
+                                <p
+                                  style={{
+                                    color: registrationMessage.includes('Success') ? '#4ade80' : '#ff6b6b',
+                                  }}
+                                >
+                                  {registrationMessage}
+                                </p>
+                              )}
+                              <div className="flex gap-4">
+                                <button
+                                  onClick={handleRegister}
+                                  className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                                    border: '2px solid rgba(184, 115, 51, 0.4)',
+                                    color: '#FFFEF9',
+                                    fontFamily: 'var(--font-heading)',
+                                  }}
+                                >
+                                  CONFIRM
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setIsRegistering(false);
+                                    setRegistrationForm({ name: "", email: "" });
+                                    setRegistrationMessage("");
+                                  }}
+                                  className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105"
+                                  style={{
+                                    background: 'rgba(139, 111, 71, 0.2)',
+                                    border: '2px solid rgba(139, 111, 71, 0.4)',
+                                    color: '#8B6F47',
+                                    fontFamily: 'var(--font-heading)',
+                                  }}
+                                >
+                                  CANCEL
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           </div>

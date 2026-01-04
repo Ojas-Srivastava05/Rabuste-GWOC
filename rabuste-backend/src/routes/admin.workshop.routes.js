@@ -10,5 +10,6 @@ router.get("/workshops", auth, admin, ws.getAllWorkshops);
 router.get("/workshops/:id", auth, admin, ws.getWorkshopById);
 router.put("/workshops/:id", auth, admin, ws.updateWorkshop);
 router.delete("/workshops/:id", auth, admin, ws.deleteWorkshop);
+router.post("/workshops/:id/register", ws.registerForWorkshop);
 
 export default router;
