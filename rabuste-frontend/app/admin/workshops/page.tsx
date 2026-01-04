@@ -16,6 +16,8 @@ type Workshop = {
   description: string;
   instructor: string;
   location: string;
+  capacity: number;
+  registrations: Array<{ name: string; email: string; registeredAt: Date }>;
   status: "upcoming" | "past";
 };
 
@@ -40,6 +42,7 @@ export default function WorkshopsAdminPage() {
     description: "",
     instructor: "",
     location: "",
+    capacity: 0,
   });
 
   /* -------------------- Fetch -------------------- */
@@ -108,6 +111,7 @@ export default function WorkshopsAdminPage() {
         description: newWorkshop.description,
         instructor: newWorkshop.instructor,
         location: newWorkshop.location,
+        capacity: Number(newWorkshop.capacity),
       }),
     });
 
@@ -124,6 +128,7 @@ export default function WorkshopsAdminPage() {
       description: "",
       instructor: "",
       location: "",
+      capacity: 0,
     });
   };
 
@@ -242,6 +247,17 @@ export default function WorkshopsAdminPage() {
               setNewWorkshop({ ...newWorkshop, location: e.target.value })
             }
           />
+
+          <input
+            type="number"
+            className="input"
+            placeholder="Capacity (0 for unlimited)"
+            value={newWorkshop.capacity}
+            onChange={(e) =>
+              setNewWorkshop({ ...newWorkshop, capacity: Number(e.target.value) })
+            }
+            min="0"
+          />
         </div>
 
         <textarea
@@ -352,6 +368,18 @@ export default function WorkshopsAdminPage() {
                     )
                   }
                 />
+                <input
+                  type="number"
+                  className="input mb-3"
+                  placeholder="Capacity"
+                  value={editWorkshop?.capacity || 0}
+                  onChange={(e) =>
+                    setEditWorkshop(
+                      (p) => p && { ...p, capacity: Number(e.target.value) }
+                    )
+                  }
+                  min="0"
+                />
                 <textarea
                   className="input mb-3"
                   value={editWorkshop?.description || ""}
@@ -392,7 +420,36 @@ export default function WorkshopsAdminPage() {
                   <p className="flex gap-2 items-center">
                     <User size={16} /> {selectedWorkshop.instructor}
                   </p>
+                  <p className="flex gap-2 items-center font-semibold">
+                    <User size={16} /> 
+                    Registrations: {selectedWorkshop.registrations?.length || 0}
+                    {selectedWorkshop.capacity > 0 && ` / ${selectedWorkshop.capacity}`}
+                    {selectedWorkshop.capacity > 0 && 
+                     selectedWorkshop.registrations?.length >= selectedWorkshop.capacity && (
+                      <span className="ml-2 text-red-600">(FULL)</span>
+                    )}
+                  </p>
                 </div>
+
+                {selectedWorkshop.registrations && selectedWorkshop.registrations.length > 0 && (
+                  <div className="mt-6">
+                    <h4 className="font-semibold mb-3">Registered Participants:</h4>
+                    <div className="max-h-60 overflow-y-auto space-y-2">
+                      {selectedWorkshop.registrations.map((reg, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-gray-50 rounded-lg text-sm"
+                        >
+                          <p className="font-medium">{reg.name}</p>
+                          <p className="text-gray-600">{reg.email}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Registered: {new Date(reg.registeredAt).toLocaleString()}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex gap-4 mt-6">
                   <button

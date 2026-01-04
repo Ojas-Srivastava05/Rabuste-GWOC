@@ -49,3 +49,35 @@ export const deleteWorkshop = async (req, res) => {
     res.status(500).json({ message: "Failed to delete workshop" });
   }
 };
+
+export const registerForWorkshop = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
+
+    const workshop = await Workshop.findById(id);
+    if (!workshop) {
+      return res.status(404).json({ message: "Workshop not found" });
+    }
+
+    // Check if capacity is reached
+    if (workshop.capacity > 0 && workshop.registrations.length >= workshop.capacity) {
+      return res.status(400).json({ message: "Workshop is full" });
+    }
+
+    // Check if user already registered
+    const alreadyRegistered = workshop.registrations.some(
+      (reg) => reg.email === email
+    );
+    if (alreadyRegistered) {
+      return res.status(400).json({ message: "Already registered" });
+    }
+
+    workshop.registrations.push({ name, email });
+    await workshop.save();
+
+    res.json({ message: "Registration successful", workshop });
+  } catch {
+    res.status(500).json({ message: "Failed to register" });
+  }
+};

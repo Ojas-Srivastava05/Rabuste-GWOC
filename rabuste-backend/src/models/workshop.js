@@ -11,10 +11,17 @@ const workshopSchema = new mongoose.Schema(
 
     },
    
-    description:String,
-    image:String,
+    description: String,
+    image: String,
     timeSlots: [String],
-    capacity: Number,
+    capacity: { type: Number, default: 0 },
+    registrations: [
+      {
+        name: String,
+        email: String,
+        registeredAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );
