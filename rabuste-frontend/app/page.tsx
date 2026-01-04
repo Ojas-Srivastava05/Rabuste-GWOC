@@ -1,5 +1,6 @@
 "use client";
 
+import Balatro from "@/components/bg";
 import Navbar from "@/components/Navbar";
 import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
@@ -22,6 +23,7 @@ export default function Home() {
 
   return (
     <>
+      <Balatro />
       <Navbar />
       <FloatingCart />
       <FloatingMoodBrewer />
@@ -53,7 +55,7 @@ export default function Home() {
         }}
       />
       
-      <main style={{ background: '#000000', position: 'relative', zIndex: 2 }}>
+      <main style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
         {/* Hero - Bold & Massive with Animations */}
         <HeroRevamped />
 
