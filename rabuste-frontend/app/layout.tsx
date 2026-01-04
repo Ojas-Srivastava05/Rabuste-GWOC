@@ -26,13 +26,7 @@ export default function RootLayout({
       </head>
       <body
         className="antialiased"
-        style={{ 
-          backgroundColor: '#000000', 
-          margin: 0, 
-          padding: 0,
-          fontFamily: "'Work Sans', sans-serif",
-          paddingTop: '80px',
-        }}
+        suppressHydrationWarning
       >
         <UserProvider>
           <BrewAIPreloader />

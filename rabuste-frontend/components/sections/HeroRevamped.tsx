@@ -85,48 +85,65 @@ export default function HeroRevamped() {
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
               className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:space-y-8"
             >
-              <p style={{ color: '#D4A574', fontSize: '0.875rem', letterSpacing: '0.3em', fontWeight: 600, textTransform: 'uppercase' }}>
-                Premium Robusta
+              <div className="space-y-2">
+                <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(4.5rem, 7vw, 7.5rem)', lineHeight: 0.85, letterSpacing: '0.02em', color: '#FFFEF9', fontWeight: 700 }}>RABUSTE</h1>
+                <p style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(1.25rem, 2vw, 1.5rem)', color: '#D4A574', letterSpacing: '0.2em', marginTop: '0.5rem' }}>UNAPOLOGETICALLY BOLD</p>
+              </div>
+
+              <p style={{ fontSize: '1.125rem', color: 'rgba(255, 254, 249, 0.85)', lineHeight: 1.6, maxWidth: '400px' }}>
+                Double the caffeine. Zero compromise. Premium robusta for those who demand more.
               </p>
-
-              <div className="space-y-0">
-                <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(4rem, 6vw, 6.5rem)', lineHeight: 0.85, letterSpacing: '0.05em', color: '#FFFEF9', fontWeight: 700 }}>RABUSTE</h1>
-                <h2 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(2.5rem, 4.5vw, 4rem)', lineHeight: 0.9, letterSpacing: '0.1em', background: 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 400 }}>COFFEE</h2>
-              </div>
-
-              <div className="space-y-3">
-                <p style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.25rem', color: '#D4A574', letterSpacing: '0.15em' }}>UNAPOLOGETICALLY BOLD</p>
-                <p style={{ fontSize: '1rem', color: 'rgba(255, 254, 249, 0.8)', lineHeight: 1.5 }}>Premium Robusta. Double caffeine. Zero compromise.</p>
-              </div>
 
               {/* Feature Badges - Horizontal on desktop */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-6">
-                {[{ icon: <Zap size={18} />, text: '2X CAFFEINE' }, { icon: <Award size={18} />, text: '100% ROBUSTA' }].map((stat, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(184, 115, 51, 0.1)', border: '1px solid rgba(184, 115, 51, 0.3)' }}>
+                {[{ icon: <Zap size={20} />, text: '2X CAFFEINE' }, { icon: <Award size={20} />, text: '100% ROBUSTA' }].map((stat, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(184, 115, 51, 0.15)', border: '2px solid rgba(184, 115, 51, 0.4)' }}>
                       <div className="text-[#D4A574]">{stat.icon}</div>
                     </div>
-                    <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1rem', color: '#FFFEF9', letterSpacing: '0.05em' }}>{stat.text}</span>
+                    <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.125rem', color: '#FFFEF9', letterSpacing: '0.05em' }}>{stat.text}</span>
                   </div>
                 ))}
               </div>
 
-              <button
-                onClick={() => router.push('/menu')}
-                style={{
-                  padding: '16px 45px',
-                  background: 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)',
-                  color: '#000',
-                  fontSize: '0.875rem',
-                  letterSpacing: '0.15em',
-                  fontWeight: 800,
-                  borderRadius: '2px',
-                  textTransform: 'uppercase',
-                  marginTop: '10px'
-                }}
-              >
-                View Selection
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={() => router.push('/menu')}
+                  className="relative overflow-hidden transition-all duration-300"
+                  style={{
+                    padding: '20px 60px',
+                    background: 'transparent',
+                    color: '#D4A574',
+                    fontSize: '1.125rem',
+                    letterSpacing: '0.2em',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    border: '2px solid #B87333',
+                    cursor: 'pointer',
+                    fontFamily: 'Bebas Neue, sans-serif',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)';
+                    e.currentTarget.style.color = '#000000';
+                    e.currentTarget.style.borderColor = '#D4A574';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.color = '#D4A574';
+                    e.currentTarget.style.borderColor = '#B87333';
+                  }}
+                >
+                  Explore Menu
+                </button>
+                {/* Glow effect on hover */}
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(circle at center, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
+                    filter: 'blur(20px)',
+                  }}
+                />
+              </div>
             </motion.div>
           </div>
 

@@ -1,4 +1,13 @@
 @import "tailwindcss";
+
+/* Root body styles */
+body {
+  background-color: #000000;
+  margin: 0;
+  padding: 0;
+  padding-top: 80px;
+  font-family: 'Work Sans', sans-serif;
+}
 @import "tw-animate-css";
 
 @theme inline {
