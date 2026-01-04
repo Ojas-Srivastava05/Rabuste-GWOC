@@ -19,7 +19,7 @@ export default function BackendWarmer() {
         {
           name: 'BrewAI Backend',
           url: process.env.NEXT_PUBLIC_API_URL_BREWAI,
-          endpoint: '/health', // Health check endpoint
+          endpoint: '/', // Root endpoint (no /health available)
         },
       ];
 
@@ -45,7 +45,9 @@ export default function BackendWarmer() {
           clearTimeout(timeoutId);
           const duration = Date.now() - startTime;
 
-          if (response.ok) {
+          // Accept both 200 OK and 404 Not Found as success for warming purposes
+          // (404 still wakes up the server even if endpoint doesn't exist)
+          if (response.ok || response.status === 404) {
             console.log(`✅ ${backend.name} warmed up successfully (${duration}ms)`);
           } else {
             console.log(`⚠️ ${backend.name} responded with status ${response.status} (${duration}ms)`);
