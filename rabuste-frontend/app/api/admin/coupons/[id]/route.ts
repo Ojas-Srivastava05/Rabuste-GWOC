@@ -1,9 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import connectDB from "@/src/lib/mongodb";
 import Coupon from "@/src/models/Coupon";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
@@ -20,7 +23,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     await connectDB();
 
     const body = await req.json();
-    const { id } = await params;
+    const { id } = await context.params;
 
     const coupon = await Coupon.findByIdAndUpdate(
       id,
@@ -39,7 +42,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
@@ -55,7 +61,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
     await connectDB();
 
-    const { id } = await params;
+    const { id } = await context.params;
     const coupon = await Coupon.findByIdAndDelete(id);
 
     if (!coupon) {
