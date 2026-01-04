@@ -30,11 +30,28 @@ app.use((req, res, next) => {
 });
 
 // middleware
+// Allow both localhost (dev) and production frontend URL
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://rabuste-gwoc.vercel.app",
+  process.env.FRONTEND_URL, // Additional production URL from env
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-  origin: ["http://localhost:3000"],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
 }));
 
 app.use(express.json());
