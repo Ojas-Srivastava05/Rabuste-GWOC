@@ -134,6 +134,8 @@ export const getAIConfig = async (req, res) => {
 /* UPDATE AI CONFIG */
 export const updateAIConfig = async (req, res) => {
   try {
+    console.log("Updating AI config with body:", req.body);
+    
     const {
       lowStockLimit,
       inactiveDays,
@@ -141,6 +143,14 @@ export const updateAIConfig = async (req, res) => {
       discountItemId,
       discountPercent,
     } = req.body;
+
+    console.log("Extracted values:", {
+      lowStockLimit,
+      inactiveDays,
+      enableDiscountAI,
+      discountItemId,
+      discountPercent
+    });
 
     const config = await AIConfig.findOneAndUpdate(
       {},
@@ -154,9 +164,11 @@ export const updateAIConfig = async (req, res) => {
       { new: true, upsert: true }
     );
 
+    console.log("Updated config:", config);
     res.json(config);
   } catch (err) {
-    res.status(500).json({ message: "Failed to update AI config" });
+    console.error("Update AI config error:", err);
+    res.status(500).json({ message: "Failed to update AI config", error: err.message });
   }
 };
 

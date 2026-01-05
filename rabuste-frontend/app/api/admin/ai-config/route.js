@@ -3,8 +3,7 @@ import axios from "axios";
 
 export async function GET(req) {
   try {
-    const backendURL =
-      process.env.BACKEND_URL || "http://localhost:5001";
+    const backendURL = "http://localhost:5001";
 
     const cookie = req.headers.get("cookie");
     const authorization = req.headers.get("authorization");
@@ -31,18 +30,33 @@ export async function GET(req) {
 
 export async function PATCH(req) {
   try {
-    const backendURL =
-      process.env.BACKEND_URL || "http://localhost:5001";
+    const backendURL = "http://localhost:5001";
 
     const cookie = req.headers.get("cookie");
     const authorization = req.headers.get("authorization");
-    const body = await req.json();
+    
+    let body;
+    try {
+      body = await req.json();
+      console.log("Frontend API received body:", body);
+    } catch (error) {
+      console.error("Failed to parse request body:", error);
+      body = {};
+    }
+
+    console.log("Forwarding PATCH request to backend:", {
+      backendURL,
+      hasCookie: !!cookie,
+      hasAuth: !!authorization,
+      body
+    });
 
     const res = await axios.patch(
       `${backendURL}/api/admin/ai-config`,
       body,
       {
         headers: {
+          'Content-Type': 'application/json',
           Cookie: cookie || "",
           ...(authorization ? { Authorization: authorization } : {}),
         },
@@ -50,11 +64,27 @@ export async function PATCH(req) {
       }
     );
 
+    console.log("Backend response:", {
+      status: res.status,
+      statusText: res.statusText,
+      data: res.data
+    });
+
     return NextResponse.json(res.data);
   } catch (error) {
+    console.error("AI Config PATCH error:", {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+    
     return NextResponse.json(
-      { message: "Failed to update AI config" },
-      { status: 500 }
+      { 
+        message: error.response?.data?.message || "Failed to update AI config",
+        error: error.message 
+      },
+      { status: error.response?.status || 500 }
     );
   }
 }

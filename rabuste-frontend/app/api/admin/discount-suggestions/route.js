@@ -3,7 +3,7 @@ import axios from "axios";
 
 export async function GET(req) {
   try {
-    const backendURL = process.env.BACKEND_URL || "http://localhost:5001";
+    const backendURL = "http://localhost:5001";
 
     const cookie = req.headers.get("cookie");
     const authorization = req.headers.get("authorization");

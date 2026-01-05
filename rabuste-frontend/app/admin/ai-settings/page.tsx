@@ -151,18 +151,42 @@ export default function AISettingsPage() {
     setSuccess(false);
     
     try {
+      console.log("Saving AI config:", config);
+      
+      // Only send the fields that should be updated, not the entire config object
+      const updateData = {
+        lowStockLimit: config.lowStockLimit,
+        inactiveDays: config.inactiveDays,
+        enableDiscountAI: config.enableDiscountAI,
+        discountItemId: config.discountItemId,
+        discountPercent: config.discountPercent,
+      };
+      
+      console.log("Sending update data:", updateData);
+      
       const res = await fetch("/api/admin/ai-config", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-        body: JSON.stringify(config),
+        body: JSON.stringify(updateData),
       });
       
-      if (!res.ok) throw new Error("Failed to save settings");
+      console.log("Response status:", res.status);
+      console.log("Response ok:", res.ok);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error response:", errorData);
+        throw new Error(errorData.message || `Failed to save (${res.status})`);
+      }
+      
+      const data = await res.json();
+      console.log("Success response:", data);
       
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError("Failed to save AI settings");
+      console.error("Save error:", err);
+      setError(err instanceof Error ? err.message : "Failed to save AI settings");
     } finally {
       setSaving(false);
     }

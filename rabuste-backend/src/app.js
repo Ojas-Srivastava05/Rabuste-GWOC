@@ -26,6 +26,10 @@ app.use("/api/orders", orderRoutes);
 // logger
 app.use((req, res, next) => {
   console.log("➡️", req.method, req.url);
+  if (req.method === 'PATCH' && req.url.includes('/ai-config')) {
+    console.log("Request headers:", req.headers);
+    console.log("Request body before parsing:", req.body);
+  }
   next();
 });
 
@@ -33,6 +37,7 @@ app.use((req, res, next) => {
 // Allow both localhost (dev) and production frontend URL
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://127.0.0.1:54642",
   "https://rabuste-gwoc.vercel.app",
   process.env.FRONTEND_URL, // Additional production URL from env
 ].filter(Boolean); // Remove undefined values
@@ -55,6 +60,14 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Add logging after JSON parser
+app.use((req, res, next) => {
+  if (req.method === 'PATCH' && req.url.includes('/ai-config')) {
+    console.log("Request body after JSON parsing:", req.body);
+  }
+  next();
+});
 
 // test route
 app.get("/", (req, res) => {
