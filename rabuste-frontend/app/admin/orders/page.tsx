@@ -205,36 +205,37 @@ export default function AdminOrdersPage() {
 
   return (
     <div
-      className="min-h-screen p-8"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{
         background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
         color: '#F5F1E8',
       }}
     >
       {/* Header */}
-      <div className="mb-12">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-4 mb-6">
-              <div className="copper-line" />
-              <span className="section-label">ADMIN PANEL</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-            </div>
-            <h1
-              className="text-5xl md:text-7xl"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                lineHeight: 0.9,
-              }}
-            >
-              ORDER <span className="gradient-text">MANAGEMENT</span>
-            </h1>
+      <div className="mb-8 sm:mb-12">
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="inline-flex items-center gap-4 mb-4 sm:mb-6">
+            <div className="copper-line" />
+            <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
+            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
           </div>
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              lineHeight: 0.9,
+            }}
+          >
+            ORDER <span className="gradient-text">MANAGEMENT</span>
+          </h1>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1" />
           <button
             onClick={() => fetchOrders(true)}
             disabled={isRefreshing}
-            className="btn btn-primary flex items-center gap-2"
-            style={{ alignSelf: 'flex-start' }}
+            className="btn btn-primary flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             {isRefreshing ? (
               <>
@@ -291,40 +292,40 @@ export default function AdminOrdersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl">
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <Clock size={28} className="text-[#B87333]" />
-            <span className="section-label">PENDING</span>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 sm:gap-4 mb-3">
+            <Clock size={24} className="text-[#B87333]" />
+            <span className="section-label text-sm">PENDING</span>
           </div>
           <p
-            className="text-5xl gradient-text"
+            className="text-3xl sm:text-5xl gradient-text"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             {pendingOrders.length}
           </p>
         </div>
 
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <CheckCircle2 size={28} className="text-[#6f8f72]" />
-            <span className="section-label">COMPLETED</span>
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 sm:gap-4 mb-3">
+            <CheckCircle2 size={24} className="text-[#6f8f72]" />
+            <span className="section-label text-sm">COMPLETED</span>
           </div>
           <p
-            className="text-5xl"
+            className="text-3xl sm:text-5xl"
             style={{ fontFamily: 'var(--font-heading)', color: '#6f8f72' }}
           >
             {completedOrders.length}
           </p>
         </div>
 
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <Package size={28} className="text-[#B87333]" />
-            <span className="section-label">TOTAL</span>
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 sm:gap-4 mb-3">
+            <Package size={24} className="text-[#B87333]" />
+            <span className="section-label text-sm">TOTAL</span>
           </div>
           <p
-            className="text-5xl gradient-text"
+            className="text-3xl sm:text-5xl gradient-text"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             {orders.length}

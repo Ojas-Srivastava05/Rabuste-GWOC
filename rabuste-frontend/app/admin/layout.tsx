@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu, X } from "lucide-react";
 
 type Props = {
   children: React.ReactNode;
@@ -13,6 +14,7 @@ type Props = {
 export default function AdminLayout({ children }: Props) {
   const router = useRouter();
   const { user, isLoading, checkAuth } = useUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Guard admin routes: require token + admin role
   useEffect(() => {
@@ -57,10 +59,37 @@ export default function AdminLayout({ children }: Props) {
 
   return (
     <div className="flex min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 100%)' }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-lg"
+        style={{
+          background: 'rgba(42, 24, 16, 0.95)',
+          border: '2px solid rgba(184, 115, 51, 0.3)',
+        }}
+      >
+        {sidebarOpen ? (
+          <X size={24} style={{ color: '#F5F1E8' }} />
+        ) : (
+          <Menu size={24} style={{ color: '#F5F1E8' }} />
+        )}
+      </button>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* SIDEBAR */}
       <aside
-        className="w-72 flex flex-col"
+        className={`fixed lg:static inset-y-0 left-0 z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
         style={{
+          width: '288px',
           background: 'linear-gradient(180deg, rgba(42, 24, 16, 0.95), rgba(26, 17, 16, 0.95))',
           borderRight: '2px solid rgba(184, 115, 51, 0.3)',
         }}
@@ -105,14 +134,14 @@ export default function AdminLayout({ children }: Props) {
         </div>
 
         <nav className="flex-1 p-6 space-y-3">
-          <NavLink href="/admin">Dashboard</NavLink>
-          <NavLink href="/admin/orders">Orders</NavLink>
-          <NavLink href="/admin/menu">Menu</NavLink>
-          <NavLink href="/admin/gallery">Gallery</NavLink>
-          <NavLink href="/admin/workshops">Workshops</NavLink>
-          <NavLink href="/admin/coupons">Coupons</NavLink>
-          <NavLink href="/admin/users">Users</NavLink>
-          <NavLink href="/admin/ai-settings"> AI Settings</NavLink>
+          <NavLink href="/admin" onClick={() => setSidebarOpen(false)}>Dashboard</NavLink>
+          <NavLink href="/admin/orders" onClick={() => setSidebarOpen(false)}>Orders</NavLink>
+          <NavLink href="/admin/menu" onClick={() => setSidebarOpen(false)}>Menu</NavLink>
+          <NavLink href="/admin/gallery" onClick={() => setSidebarOpen(false)}>Gallery</NavLink>
+          <NavLink href="/admin/workshops" onClick={() => setSidebarOpen(false)}>Workshops</NavLink>
+          <NavLink href="/admin/coupons" onClick={() => setSidebarOpen(false)}>Coupons</NavLink>
+          <NavLink href="/admin/users" onClick={() => setSidebarOpen(false)}>Users</NavLink>
+          <NavLink href="/admin/ai-settings" onClick={() => setSidebarOpen(false)}> AI Settings</NavLink>
 
         </nav>
 
@@ -138,7 +167,11 @@ export default function AdminLayout({ children }: Props) {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto lg:pl-0 pt-20 lg:pt-0">
+        <div className="p-4 lg:p-8">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
@@ -146,13 +179,16 @@ export default function AdminLayout({ children }: Props) {
 function NavLink({
   href,
   children,
+  onClick,
 }: {
   href: string;
   children: React.ReactNode;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="block px-6 py-4 transition-all duration-300 rounded-lg"
       style={{
         fontFamily: 'var(--font-heading)',

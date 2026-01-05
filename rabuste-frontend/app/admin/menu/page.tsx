@@ -79,21 +79,21 @@ export default function AdminMenuPage() {
 
   return (
     <div
-      className="min-h-screen p-8"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{
         background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
         color: '#F5F1E8',
       }}
     >
       {/* Header */}
-      <div className="mb-12">
-        <div className="inline-flex items-center gap-4 mb-6">
+      <div className="mb-8 sm:mb-12">
+        <div className="inline-flex items-center gap-4 mb-4 sm:mb-6">
           <div className="copper-line" />
-          <span className="section-label">ADMIN PANEL</span>
+          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
           <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
         </div>
         <h1
-          className="text-5xl md:text-7xl"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
           style={{
             fontFamily: 'var(--font-heading)',
             lineHeight: 0.9,
@@ -104,20 +104,20 @@ export default function AdminMenuPage() {
       </div>
 
       {/* Add Form */}
-      <div className="brutal-card p-8 mb-12 max-w-4xl">
+      <div className="brutal-card p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12">
         <h2
-          className="text-3xl mb-8 flex items-center gap-3"
+          className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-3"
           style={{
             fontFamily: 'var(--font-heading)',
             letterSpacing: '0.1em',
           }}
         >
-          <Plus size={32} className="text-[#B87333]" />
+          <Plus size={24} className="text-[#B87333]" />
           ADD NEW ITEM
         </h2>
 
         <form onSubmit={handleAddItem} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label
                 className="block text-sm font-bold mb-3 uppercase tracking-wide"
@@ -130,7 +130,7 @@ export default function AdminMenuPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
               />
             </div>
 
@@ -146,7 +146,7 @@ export default function AdminMenuPage() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
               />
             </div>
           </div>
@@ -163,11 +163,11 @@ export default function AdminMenuPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label
                 className="block text-sm font-bold mb-3 uppercase tracking-wide"
@@ -181,7 +181,7 @@ export default function AdminMenuPage() {
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
               />
             </div>
 
@@ -197,12 +197,12 @@ export default function AdminMenuPage() {
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
                 required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
+                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
               />
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-full md:w-auto">
+          <button type="submit" className="btn btn-primary w-full sm:w-auto">
             <Plus size={20} />
             ADD ITEM TO MENU
           </button>
@@ -212,13 +212,13 @@ export default function AdminMenuPage() {
       {/* Menu List */}
       <div>
         <h2
-          className="text-3xl mb-8 flex items-center gap-3"
+          className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-3"
           style={{
             fontFamily: 'var(--font-heading)',
             letterSpacing: '0.1em',
           }}
         >
-          <Coffee size={32} className="text-[#B87333]" />
+          <Coffee size={24} className="text-[#B87333]" />
           CURRENT MENU ITEMS
         </h2>
 
@@ -230,17 +230,17 @@ export default function AdminMenuPage() {
         )}
 
         {!loading && menu.length === 0 && (
-          <div className="brutal-card p-12 text-center">
-            <p className="text-xl" style={{ color: '#8B6F47' }}>No menu items yet. Add your first item above.</p>
+          <div className="brutal-card p-8 sm:p-12 text-center">
+            <p className="text-base sm:text-xl" style={{ color: '#8B6F47' }}>No menu items yet. Add your first item above.</p>
           </div>
         )}
 
         {!loading && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {menu.map((item) => (
               <div
                 key={item._id}
-                className="brutal-card p-6"
+                className="brutal-card p-4 sm:p-6"
                 style={{
                   opacity: item.isAvailable ? 1 : 0.6,
                   position: 'relative',
@@ -277,7 +277,7 @@ export default function AdminMenuPage() {
                 </div>
 
                 <h3
-                  className="text-2xl mb-2"
+                  className="text-xl sm:text-2xl mb-2"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: '#F5F1E8',
@@ -292,7 +292,7 @@ export default function AdminMenuPage() {
 
                 <div className="flex justify-between items-center mb-6">
                   <span
-                    className="text-3xl gradient-text"
+                    className="text-2xl sm:text-3xl gradient-text"
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
                     ₹{item.price}
@@ -304,8 +304,8 @@ export default function AdminMenuPage() {
                     onClick={() => toggleAvailability(item._id, item.isAvailable)}
                     className="flex-1 btn btn-secondary"
                     style={{
-                      padding: '12px 20px',
-                      fontSize: '14px',
+                      padding: '12px 16px',
+                      fontSize: '12px sm:14px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -329,7 +329,7 @@ export default function AdminMenuPage() {
                     onClick={() => deleteItem(item._id)}
                     className="btn"
                     style={{
-                      padding: '12px 20px',
+                      padding: '12px 16px',
                       background: 'rgba(220, 38, 38, 0.2)',
                       border: '2px solid rgba(220, 38, 38, 0.5)',
                       color: '#FCA5A5',
