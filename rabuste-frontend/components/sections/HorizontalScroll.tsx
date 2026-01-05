@@ -54,7 +54,7 @@ const getItemFlags = (item: MenuItem) => {
 
 // Get color for item based on category
 const getItemColor = (category: string, index: number): string => {
-  const colors = ['#B87333', '#CD7F32', '#D4A574'];
+  const colors = ['#B87333', '#D4A574'];
   return colors[index % colors.length];
 };
 
@@ -182,14 +182,14 @@ export default function HorizontalScroll() {
         {/* Horizontal scrolling container */}
         <motion.div
           style={{ x }}
-          className="flex gap-4 sm:gap-8 px-4 sm:px-6 mt-32 sm:mt-48"
+          className="flex gap-4 sm:gap-8 px-4 sm:px-6 mt-64 sm:mt-72"
         >
           {items.map((item, index) => (
             <div
               key={item._id}
               className="flex-shrink-0"
               style={{
-                width: 'min(90vw, 500px)',
+                width: 'min(85vw, 350px)',
               }}
             >
               <motion.div
@@ -203,8 +203,8 @@ export default function HorizontalScroll() {
                   border: `3px solid ${item.color}`,
                   overflow: 'hidden',
                   cursor: 'pointer',
-                  height: '70vh',
-                  maxHeight: '600px',
+                  height: '420px',
+                  maxHeight: '420px',
                   display: 'flex',
                   flexDirection: 'column',
                 }}
@@ -213,7 +213,7 @@ export default function HorizontalScroll() {
                 {/* Image */}
                 <div style={{
                   position: 'relative',
-                  height: '60%',
+                  height: '55%',
                   overflow: 'hidden',
                 }}>
                   <img
@@ -277,7 +277,7 @@ export default function HorizontalScroll() {
                   <div>
                     <h3 style={{
                       fontFamily: 'Bebas Neue, sans-serif',
-                      fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                      fontSize: 'clamp(1.75rem, 4vw, 2.6rem)',
                       lineHeight: 0.9,
                       color: '#FFFEF9',
                       marginBottom: 'clamp(8px, 2vw, 12px)',
