@@ -80,8 +80,23 @@ export default function HorizontalScroll() {
 
   async function fetchFeaturedItems() {
     try {
+      // Use frontend API route
       const res = await fetch('/api/menu');
-      const data: MenuItem[] = await res.json();
+      
+      if (!res.ok) {
+        console.error('Menu API error:', res.status, res.statusText);
+        setLoading(false);
+        return;
+      }
+      
+      const data = await res.json();
+      
+      // Check if data is an array
+      if (!Array.isArray(data)) {
+        console.error('Invalid response from menu API:', data);
+        setLoading(false);
+        return;
+      }
       
       // Filter for bestsellers and trending items
       const featured = data
