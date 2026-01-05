@@ -62,52 +62,54 @@ export default function AdminLayout({ children }: Props) {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
         style={{
-          background: 'rgba(42, 24, 16, 0.95)',
+          background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.9), rgba(205, 127, 50, 0.9))',
           border: '2px solid rgba(184, 115, 51, 0.3)',
+          boxShadow: '0 4px 20px rgba(184, 115, 51, 0.4)',
         }}
       >
         {sidebarOpen ? (
-          <X size={24} style={{ color: '#F5F1E8' }} />
+          <X size={24} style={{ color: '#1A1110' }} />
         ) : (
-          <Menu size={24} style={{ color: '#F5F1E8' }} />
+          <Menu size={24} style={{ color: '#1A1110' }} />
         )}
       </button>
 
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${
+        className={`fixed lg:static inset-y-0 left-0 z-40 flex flex-col transform transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
         style={{
           width: '288px',
-          background: 'linear-gradient(180deg, rgba(42, 24, 16, 0.95), rgba(26, 17, 16, 0.95))',
-          borderRight: '2px solid rgba(184, 115, 51, 0.3)',
+          background: 'linear-gradient(180deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
+          borderRight: '2px solid rgba(184, 115, 51, 0.2)',
+          boxShadow: sidebarOpen ? '4px 0 24px rgba(0, 0, 0, 0.3)' : 'none',
         }}
       >
         <div
           className="p-8 border-b-2"
-          style={{ borderColor: 'rgba(184, 115, 51, 0.3)' }}
+          style={{ borderColor: 'rgba(184, 115, 51, 0.2)' }}
         >
           <Link 
             href="/"
-            className="block mb-4 transition-transform hover:scale-105 duration-300"
+            className="block mb-4 transition-all duration-300 hover:scale-105"
           >
             <div 
-              className="flex items-center justify-center w-16 h-16 mx-auto cursor-pointer"
+              className="flex items-center justify-center w-16 h-16 mx-auto cursor-pointer rounded-xl"
               style={{
                 background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
                 border: '2px solid rgba(184, 115, 51, 0.4)',
-                boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
+                boxShadow: '0 8px 24px rgba(184, 115, 51, 0.5)',
               }}
             >
               <Image
@@ -126,11 +128,12 @@ export default function AdminLayout({ children }: Props) {
               fontFamily: 'var(--font-heading)',
               color: '#F5F1E8',
               letterSpacing: '0.1em',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
             }}
           >
             RABUSTE
           </h1>
-          <p className="section-label text-center">ADMIN PANEL</p>
+          <p className="section-label text-center text-sm" style={{ opacity: 0.8 }}>ADMIN PANEL</p>
         </div>
 
         <nav className="flex-1 p-6 space-y-3">
@@ -151,15 +154,27 @@ export default function AdminLayout({ children }: Props) {
             localStorage.removeItem("user");
             router.push("/auth");
           }}
-          className="m-6 btn"
+          className="m-6 btn transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg"
           style={{
-            background: 'rgba(220, 38, 38, 0.2)',
-            border: '2px solid rgba(220, 38, 38, 0.5)',
+            background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.3))',
+            border: '2px solid rgba(220, 38, 38, 0.4)',
             color: '#FCA5A5',
             padding: '16px',
             fontSize: '14px',
             fontFamily: 'var(--font-heading)',
             letterSpacing: '0.1em',
+            borderRadius: '12px',
+            boxShadow: '0 4px 16px rgba(220, 38, 38, 0.3)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.4))';
+            e.currentTarget.style.borderColor = 'rgba(220, 38, 38, 0.6)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(220, 38, 38, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.3))';
+            e.currentTarget.style.borderColor = 'rgba(220, 38, 38, 0.4)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(220, 38, 38, 0.3)';
           }}
         >
           LOGOUT
@@ -189,25 +204,30 @@ function NavLink({
     <Link
       href={href}
       onClick={onClick}
-      className="block px-6 py-4 transition-all duration-300 rounded-lg"
+      className="group block px-6 py-4 transition-all duration-300 rounded-xl relative overflow-hidden"
       style={{
         fontFamily: 'var(--font-heading)',
-        fontSize: '16px',
+        fontSize: '15px',
         letterSpacing: '0.1em',
         color: '#F5F1E8',
         background: 'transparent',
         border: '2px solid transparent',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(184, 115, 51, 0.2)';
-        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.4)';
+        e.currentTarget.style.background = 'rgba(184, 115, 51, 0.15)';
+        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)';
+        e.currentTarget.style.transform = 'translateX(4px)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = 'transparent';
         e.currentTarget.style.borderColor = 'transparent';
+        e.currentTarget.style.transform = 'translateX(0)';
       }}
     >
-      {children}
+      <span className="relative z-10 flex items-center gap-3">
+        <span className="w-2 h-2 rounded-full bg-[#B87333] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {children}
+      </span>
     </Link>
   );
 }
