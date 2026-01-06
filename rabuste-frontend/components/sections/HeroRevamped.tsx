@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { Zap, Award } from 'lucide-react';
+import { Zap, Award, Brain, Sparkles } from 'lucide-react';
 import Balatro from '../bg';
 
 export default function HeroRevamped() {
@@ -108,6 +108,120 @@ export default function HeroRevamped() {
                   </div>
                 ))}
               </div>
+
+              {/* AI Feature Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1.2 }}
+                className="relative group cursor-pointer"
+                onClick={() => {
+                  // Scroll down to trigger the BrewAI button
+                  window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+                }}
+              >
+                <div
+                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
+                  style={{
+                    padding: '16px 28px',
+                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                    border: '2px solid rgba(184, 115, 51, 0.5)',
+                    backdropFilter: 'blur(10px)',
+                  }}
+                >
+                  {/* Shimmer Effect */}
+                  <motion.div
+                    className="absolute inset-0"
+                    animate={{
+                      x: ['-100%', '200%'],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                    style={{
+                      background: 'linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent)',
+                      width: '50%',
+                    }}
+                  />
+
+                  <div className="flex items-center gap-3 relative z-10">
+                    <motion.div
+                      animate={{
+                        rotate: [0, 360],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: 'linear',
+                      }}
+                    >
+                      <Brain size={22} style={{ color: '#D4A574' }} />
+                    </motion.div>
+                    <span
+                      style={{
+                        fontFamily: 'Bebas Neue, sans-serif',
+                        fontSize: '1rem',
+                        color: '#FFFEF9',
+                        letterSpacing: '0.15em',
+                      }}
+                    >
+                      AI-POWERED RECOMMENDATIONS
+                    </span>
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.5, 1, 0.5],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                      }}
+                    >
+                      <Sparkles size={18} style={{ color: '#CD7F32' }} />
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Hover Tooltip - Positioned Above */}
+                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.95)',
+                      border: '2px solid rgba(184, 115, 51, 0.6)',
+                      padding: '10px 20px',
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#D4A574',
+                        margin: 0,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Click to discover our AI brew assistant
+                    </p>
+                  </div>
+                  {/* Arrow pointing down */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: '-6px',
+                      transform: 'translateX(-50%)',
+                      width: '0',
+                      height: '0',
+                      borderLeft: '6px solid transparent',
+                      borderRight: '6px solid transparent',
+                      borderTop: '6px solid rgba(184, 115, 51, 0.6)',
+                    }}
+                  />
+                </div>
+              </motion.div>
 
               <div className="relative group">
                 <button

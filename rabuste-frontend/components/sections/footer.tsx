@@ -27,11 +27,12 @@ export default function Footer() {
 
   return (
     <footer 
-      className="relative"
+      className="relative z-30"
       style={{
         background: 'linear-gradient(180deg, #000000 0%, #1A1110 100%)',
         borderTop: '2px solid rgba(184, 115, 51, 0.3)',
         color: '#F5F1E8',
+        marginTop: '0',
       }}
     >
       {/* Animated background glow */}

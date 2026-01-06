@@ -5,7 +5,7 @@ import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
 import ExperienceSection from "@/components/sections/ExperienceSection";
 import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
-import ProcessSection from "@/components/sections/ProcessSection";
+import ProcessSectionRevamped from "@/components/sections/ProcessSectionRevamped";
 import CallToAction from "@/components/sections/CallToAction";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import ContactSection from "@/components/sections/ContactSection";
@@ -65,8 +65,9 @@ export default function Home() {
         {/* Benefits - Science Backed Power */}
         <BenefitsShowcase />
 
-        {/* Process - Bean to Cup Journey */}
-        <ProcessSection />
+
+        {/* Process - Bean to Cup Journey (Revamped) */}
+        <ProcessSectionRevamped />
 
         {/* Strong CTA Section - Visit Us */}
         <CallToAction />
