@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Zap, Award } from 'lucide-react';
+import Balatro from '../bg';
 
 export default function HeroRevamped() {
   const router = useRouter();
@@ -28,6 +29,8 @@ export default function HeroRevamped() {
       className="relative h-screen flex items-center justify-center overflow-hidden"
       style={{ background: 'transparent' }}
     >
+      {/* Balatro Background Effect */}
+      <Balatro />
       {/* Curtain Reveal */}
       <motion.div
         initial={{ scaleY: 1 }}

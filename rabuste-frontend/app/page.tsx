@@ -1,6 +1,5 @@
 "use client";
 
-import Balatro from "@/components/bg";
 import Navbar from "@/components/Navbar";
 import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
@@ -22,7 +21,6 @@ export default function Home() {
 
   return (
     <>
-      <Balatro />
       <Navbar />
       <FloatingCart />
       <FloatingMoodBrewer />

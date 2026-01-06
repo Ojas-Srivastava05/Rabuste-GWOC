@@ -45,7 +45,7 @@ export default function ExperienceSection() {
     <section
       id="experience-section"
       ref={ref}
-      className="relative overflow-hidden"
+      className="relative overflow-hidden z-20"
       style={{
         background: 'linear-gradient(180deg, #0a0a0a 0%, #1A1110 100%)',
         padding: 'clamp(100px, 15vw, 160px) 0',

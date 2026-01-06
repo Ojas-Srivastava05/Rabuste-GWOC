@@ -128,7 +128,7 @@ export default function HorizontalScroll() {
   return (
     <section 
       ref={targetRef} 
-      className="relative"
+      className="relative z-20"
       style={{
         height: loading || items.length === 0 ? '100vh' : '300vh',
         background: '#000000',
