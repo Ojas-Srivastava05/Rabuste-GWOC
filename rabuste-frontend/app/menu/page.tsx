@@ -266,7 +266,7 @@ export default function MenuPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-4 md:px-6">
           {/* Header */}
           <div className="text-center mb-12">

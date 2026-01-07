@@ -89,15 +89,17 @@ export default function FranchisePage() {
       <Navbar />
       <DynamicBackground />
       
-      <div className="min-h-screen" style={{ backgroundColor: 'transparent' }}>
+      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
 
         {/* Hero Header */}
-        <div className="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div className="relative pt-40 pb-20 px-6 overflow-hidden">
           <div className="max-w-6xl mx-auto text-center relative z-10">
             <div className="inline-flex items-center gap-4 mb-8">
-              <div className="copper-line" />
-              <span className="section-label">EXPANSION OPPORTUNITY</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                EXPANSION OPPORTUNITY
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </div>
             
             <h1 
@@ -106,6 +108,7 @@ export default function FranchisePage() {
                 fontFamily: 'var(--font-heading)',
                 fontWeight: 400,
                 lineHeight: 0.9,
+                letterSpacing: '0.05em',
               }}
             >
               <span style={{ color: '#FFFEF9' }}>BUILD AN</span>
@@ -154,8 +157,8 @@ export default function FranchisePage() {
                 <FileText className="w-9 h-9 text-white" />
               </div>
               <div>
-                <h2 className="plantation-header text-4xl md:text-5xl mb-3" style={{ color: '#D4A574', textAlign: 'left' }}>
-                  Franchise Overview
+                <h2 className="text-4xl md:text-5xl mb-3" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  FRANCHISE OVERVIEW
                 </h2>
                 <p className="text-zinc-300 text-lg">
                   Everything you need to know about partnering with Rabuste Coffee
@@ -170,12 +173,12 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
                     <IndianRupee className="w-7 h-7 text-amber-600" />
                   </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Investment Range
+                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    INVESTMENT RANGE
                   </h3>
                 </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  ₹25 - 50 Lakhs
+                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  ₹25 - 50 LAKHS
                 </p>
                 <p className="text-zinc-400">Including setup, equipment, and initial inventory</p>
               </div>
@@ -185,12 +188,12 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
                     <Building2 className="w-7 h-7 text-amber-600" />
                   </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Space Requirements
+                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    SPACE REQUIREMENTS
                   </h3>
                 </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  800 - 1200 sq.ft
+                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  800 - 1200 SQ.FT
                 </p>
                 <p className="text-zinc-400">Prime location with high footfall preferred</p>
               </div>
@@ -200,12 +203,12 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
                     <Users className="w-7 h-7 text-amber-600" />
                   </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Training & Support
+                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    TRAINING & SUPPORT
                   </h3>
                 </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  2-Week Program
+                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  2-WEEK PROGRAM
                 </p>
                 <p className="text-zinc-400">Ongoing operational and marketing support</p>
               </div>
@@ -215,12 +218,12 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
                     <CheckCircle2 className="w-7 h-7 text-amber-600" />
                   </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Franchise Term
+                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    FRANCHISE TERM
                   </h3>
                 </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                  5 Years
+                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  5 YEARS
                 </p>
                 <p className="text-zinc-400">Renewable with exclusive territory rights</p>
               </div>
@@ -228,8 +231,8 @@ export default function FranchisePage() {
 
             {/* Benefits List */}
             <div className="bg-gradient-to-br from-amber-950/30 to-zinc-950/30 border-2 border-amber-900/30 rounded-2xl p-10 mb-10">
-              <h3 className="plantation-header text-3xl mb-8" style={{ color: '#D4A574', textAlign: 'left' }}>
-                What You Get
+              <h3 className="text-3xl mb-8" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                WHAT YOU GET
               </h3>
               <div className="grid md:grid-cols-2 gap-5">
                 {[
@@ -254,7 +257,7 @@ export default function FranchisePage() {
             <button
               onClick={openFranchisePDF}
               className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] group uppercase tracking-widest text-lg"
-              style={{ fontFamily: 'Montserrat, sans-serif' }}
+              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
             >
               <FileText className="w-7 h-7 group-hover:rotate-12 transition-transform" />
               View Complete Terms & Conditions
@@ -269,13 +272,13 @@ export default function FranchisePage() {
             <div className="text-center mb-14">
               <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-950/30 border border-amber-800/40 rounded-full mb-8">
                 <Mail className="w-5 h-5 text-amber-600" />
-                <span className="text-amber-600 text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Get Started
+                <span className="text-amber-600 text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.15em' }}>
+                  GET STARTED
                 </span>
               </div>
               
-              <h2 className="plantation-header text-5xl md:text-6xl mb-6" style={{ color: '#D4A574' }}>
-                Franchise Enquiry
+              <h2 className="text-5xl md:text-6xl mb-6" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                FRANCHISE ENQUIRY
               </h2>
               <p className="text-zinc-300 text-lg max-w-2xl mx-auto">
                 Fill in your details and we'll get back to you within 2-3 business days
@@ -289,15 +292,15 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl">
                     <User className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Personal Information
+                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    PERSONAL INFORMATION
                   </h3>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Full Name <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      FULL NAME <span className="text-amber-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -311,8 +314,8 @@ export default function FranchisePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Email Address <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      EMAIL ADDRESS <span className="text-amber-600">*</span>
                     </label>
                     <input
                       type="email"
@@ -326,8 +329,8 @@ export default function FranchisePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Phone Number <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      PHONE NUMBER <span className="text-amber-600">*</span>
                     </label>
                     <input
                       type="tel"
@@ -341,8 +344,8 @@ export default function FranchisePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Applying As <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      APPLYING AS <span className="text-amber-600">*</span>
                     </label>
                     <select
                       name="organizationType"
@@ -359,8 +362,8 @@ export default function FranchisePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                    Organization/Company Name
+                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                    ORGANIZATION/COMPANY NAME
                   </label>
                   <input
                     type="text"
@@ -379,15 +382,15 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl">
                     <MapPin className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Location Details
+                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    LOCATION DETAILS
                   </h3>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      City <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      CITY <span className="text-amber-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -401,8 +404,8 @@ export default function FranchisePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      State <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      STATE <span className="text-amber-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -417,8 +420,8 @@ export default function FranchisePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                    Preferred Location/Area <span className="text-amber-600">*</span>
+                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                    PREFERRED LOCATION/AREA <span className="text-amber-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -438,15 +441,15 @@ export default function FranchisePage() {
                   <div className="bg-amber-900/30 p-3 rounded-xl">
                     <Building2 className="w-6 h-6 text-amber-600" />
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'Montserrat, sans-serif' }}>
-                    Business Details
+                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                    BUSINESS DETAILS
                   </h3>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Investment Capacity <span className="text-amber-600">*</span>
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      INVESTMENT CAPACITY <span className="text-amber-600">*</span>
                     </label>
                     <select
                       name="investmentCapacity"
@@ -463,8 +466,8 @@ export default function FranchisePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                      Previous Business Experience
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      PREVIOUS BUSINESS EXPERIENCE
                     </label>
                     <select
                       name="experience"
@@ -482,8 +485,8 @@ export default function FranchisePage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                    Additional Message
+                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                    ADDITIONAL MESSAGE
                   </label>
                   <textarea
                     name="message"
@@ -502,7 +505,7 @@ export default function FranchisePage() {
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] disabled:hover:scale-100 group uppercase tracking-widest text-lg"
-                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
                 >
                   {isSubmitting ? (
                     <>
@@ -531,8 +534,8 @@ export default function FranchisePage() {
                       <div>
                         <p className={`font-bold text-xl mb-2 uppercase tracking-wide ${
                           submitStatus.type === 'success' ? 'text-green-300' : 'text-red-300'
-                        }`} style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                          {submitStatus.type === 'success' ? 'Enquiry Submitted!' : 'Submission Failed'}
+                        }`} style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                          {submitStatus.type === 'success' ? 'ENQUIRY SUBMITTED!' : 'SUBMISSION FAILED'}
                         </p>
                         <p className={`text-base ${submitStatus.type === 'success' ? 'text-green-200' : 'text-red-200'}`}>
                           {submitStatus.message}

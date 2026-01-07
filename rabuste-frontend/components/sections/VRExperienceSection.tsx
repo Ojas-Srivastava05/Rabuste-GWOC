@@ -62,33 +62,15 @@ export default function VRExperienceSection() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-12 lg:mb-16"
         >
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div 
-              style={{
-                width: '50px',
-                height: '2px',
-                background: 'linear-gradient(90deg, transparent, #B87333)',
-              }}
-            />
-            <div className="flex items-center gap-2">
-              <Zap style={{ width: 16, height: 16, color: '#B87333' }} />
-              <span style={{
-                color: '#B87333',
-                fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
-                letterSpacing: '0.3em',
-                fontWeight: 700,
-              }}>
-                EXPLORE VIRTUALLY
-              </span>
-            </div>
-            <div 
-              style={{
-                width: '50px',
-                height: '2px',
-                background: 'linear-gradient(90deg, #B87333, transparent)',
-              }}
-            />
-          </div>
+          <p style={{
+            color: '#B87333',
+            fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+            letterSpacing: '0.3em',
+            fontWeight: 700,
+            marginBottom: '1.5rem',
+          }}>
+            EXPLORE VIRTUALLY
+          </p>
 
           <h2 style={{
             fontFamily: 'Bebas Neue, sans-serif',

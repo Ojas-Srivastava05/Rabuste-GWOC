@@ -25,11 +25,15 @@ export default function ComparisonSection() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-4 mb-8">
-            <div className="copper-line" />
-            <span className="section-label">THE TRUTH</span>
-            <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-          </div>
+          <p style={{
+            color: '#B87333',
+            fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+            letterSpacing: '0.3em',
+            fontWeight: 700,
+            marginBottom: '1.5rem',
+          }}>
+            THE TRUTH
+          </p>
 
           <h2
             className="text-5xl md:text-7xl mb-6"
@@ -38,11 +42,12 @@ export default function ComparisonSection() {
               fontWeight: 400,
               lineHeight: 1,
               color: '#FFFEF9',
+              letterSpacing: '0.05em',
             }}
           >
             ROBUSTA VS
             <br />
-            <span style={{ color: '#8B6F47' }}>ARABICA</span>
+            <span style={{ color: '#B87333' }}>ARABICA</span>
           </h2>
 
           <p

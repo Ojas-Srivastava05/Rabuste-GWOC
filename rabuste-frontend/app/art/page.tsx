@@ -161,7 +161,7 @@ export default function ArtGalleryPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen relative" style={{ paddingTop: '100px', paddingBottom: '60px' }}>
+      <div className="min-h-screen relative" style={{ paddingTop: '100px', paddingBottom: '60px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         {/* Premium Gradient Overlays */}
         <div 
           className="fixed inset-0 pointer-events-none"

@@ -566,22 +566,26 @@ export default function OrderStatusPage() {
       <Navbar />
       <DynamicBackground />
       
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-4 md:px-6 mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-4 mb-6">
-              <div className="copper-line" />
-              <span className="section-label">TRACK YOUR ORDERS</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                TRACK YOUR ORDERS
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </div>
 
             <h1
               className="text-5xl md:text-7xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
+                fontWeight: 400,
                 lineHeight: 0.9,
-                color: '#F5F1E8',
+                color: '#FFFEF9',
+                letterSpacing: '0.05em',
               }}
             >
               YOUR <span className="gradient-text">ORDERS</span>

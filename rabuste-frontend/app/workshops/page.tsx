@@ -256,7 +256,7 @@ export default function WorkshopsPage() {
     <>
       <Navbar />
       
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+      <div className="min-h-screen" style={{ paddingTop: '140px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-6 max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -276,11 +276,12 @@ export default function WorkshopsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl mb-4"
+              className="text-5xl md:text-7xl lg:text-8xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
-                color: '#F5F1E8',
+                color: '#FFFEF9',
+                letterSpacing: '0.05em',
               }}
             >
               WORKSHOPS
@@ -289,8 +290,8 @@ export default function WorkshopsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg"
-              style={{ color: '#B87333' }}
+              className="text-lg md:text-xl"
+              style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}
             >
               Discover hands-on experiences in coffee and art
             </motion.p>
@@ -317,7 +318,7 @@ export default function WorkshopsPage() {
                     background: viewMode === "calendar" ? 'linear-gradient(135deg, #B87333, #CD7F32)' : 'transparent',
                     color: viewMode === "calendar" ? '#000' : '#B87333',
                     fontFamily: 'var(--font-heading)',
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.1em',
                   }}
                 >
@@ -331,7 +332,7 @@ export default function WorkshopsPage() {
                     background: viewMode === "list" ? 'linear-gradient(135deg, #B87333, #CD7F32)' : 'transparent',
                     color: viewMode === "list" ? '#000' : '#B87333',
                     fontFamily: 'var(--font-heading)',
-                    fontSize: '0.9rem',
+                    fontSize: '0.85rem',
                     letterSpacing: '0.1em',
                   }}
                 >
@@ -400,7 +401,7 @@ export default function WorkshopsPage() {
                 }}
               >
                 <div className="mb-4">
-                  <h3 className="text-lg mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
+                  <h3 className="text-base mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.1em' }}>
                     SELECT DATE
                   </h3>
                   <div className="h-px bg-gradient-to-r from-[#B87333] to-transparent" />
@@ -416,7 +417,7 @@ export default function WorkshopsPage() {
                     <ChevronLeft size={18} />
                   </button>
                   
-                  <h4 className="text-base" style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8', letterSpacing: '0.05em' }}>
+                  <h4 className="text-sm md:text-base" style={{ fontFamily: 'var(--font-heading)', color: '#FFFEF9', letterSpacing: '0.1em' }}>
                     {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
                   </h4>
                   
@@ -516,7 +517,7 @@ export default function WorkshopsPage() {
                 }}
               >
                 <div className="mb-6 sticky top-0 z-10 pb-4" style={{ background: 'linear-gradient(180deg, #1A1110 90%, transparent)' }}>
-                  <h3 className="text-2xl" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
+                  <h3 className="text-xl md:text-2xl" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.1em' }}>
                     {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}
                   </h3>
                   <p className="text-sm mt-1" style={{ color: '#8B6F47' }}>
@@ -588,12 +589,12 @@ export default function WorkshopsPage() {
                           </div>
 
                           <h4 
-                            className="text-2xl mb-2"
+                            className="text-xl md:text-2xl mb-2"
                             style={{
                               fontFamily: 'var(--font-heading)',
                               color: '#FFFEF9',
                               lineHeight: 1.1,
-                              letterSpacing: '0.02em',
+                              letterSpacing: '0.05em',
                             }}
                           >
                             {workshop.title}
@@ -661,7 +662,7 @@ export default function WorkshopsPage() {
                                 border: '2px solid rgba(184, 115, 51, 0.4)',
                                 color: '#B87333',
                                 fontFamily: 'var(--font-heading)',
-                                fontSize: '0.9rem',
+                                fontSize: '0.75rem',
                                 letterSpacing: '0.1em',
                               }}
                             >
@@ -678,7 +679,7 @@ export default function WorkshopsPage() {
                                   border: `2px solid ${isFull ? 'rgba(139, 111, 71, 0.5)' : 'rgba(184, 115, 51, 0.6)'}`,
                                   color: isFull ? '#8B6F47' : '#000',
                                   fontFamily: 'var(--font-heading)',
-                                  fontSize: '0.9rem',
+                                  fontSize: '0.75rem',
                                   letterSpacing: '0.1em',
                                   cursor: isFull ? 'not-allowed' : 'pointer',
                                 }}
@@ -775,11 +776,12 @@ export default function WorkshopsPage() {
                     {/* Content */}
                     <div className="p-6">
                       <h4 
-                        className="text-2xl mb-2"
+                        className="text-xl md:text-2xl mb-2"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: '#FFFEF9',
-                          lineHeight: 1,
+                          lineHeight: 1.1,
+                          letterSpacing: '0.02em',
                         }}
                       >
                         {workshop.title}
@@ -882,10 +884,12 @@ export default function WorkshopsPage() {
                 </div>
 
                 <h3
-                  className="text-4xl md:text-5xl mb-6"
+                  className="text-3xl md:text-4xl mb-6"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: '#FFFEF9',
+                    letterSpacing: '0.05em',
+                    lineHeight: 1.1,
                   }}
                 >
                   {selectedWorkshop.title}
@@ -1029,10 +1033,11 @@ export default function WorkshopsPage() {
                       ) : (
                         <div>
                           <h4
-                            className="text-xl mb-4"
+                            className="text-lg mb-4"
                             style={{
                               color: '#FFFEF9',
                               fontFamily: 'var(--font-heading)',
+                              letterSpacing: '0.1em',
                             }}
                           >
                             REGISTER NOW
@@ -1182,7 +1187,7 @@ export default function WorkshopsPage() {
               {/* Success Message */}
               <div className="text-center mb-6">
                 <h3
-                  className="text-2xl md:text-3xl mb-3"
+                  className="text-xl md:text-2xl mb-3"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: '#FFFEF9',

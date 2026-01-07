@@ -26,8 +26,8 @@ export default function HeroRevamped() {
   return (
     <section 
       ref={containerRef}
-      className="relative h-screen flex items-center justify-center overflow-hidden"
-      style={{ background: 'transparent' }}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ background: 'transparent', paddingTop: '80px' }}
     >
       {/* Balatro Background Effect */}
       <Balatro />
@@ -51,15 +51,15 @@ export default function HeroRevamped() {
         className="relative z-10 w-full flex justify-center items-center"
       >
         {/* INNER WRAPPER - This is the "Box" that holds both parts centered together */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 xl:gap-20 max-w-[1200px] px-6">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-20 max-w-[1200px] px-6 w-full">
           
           {/* CONTAINER 1: THE LOGO/CUP */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center justify-center">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -20 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
-              className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] lg:w-[450px] lg:h-[450px]"
+              className="relative w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px]"
             >
               <div
                 aria-label="Rabuste Coffee"
@@ -81,19 +81,19 @@ export default function HeroRevamped() {
           </div>
 
           {/* CONTAINER 2: THE CONTENT */}
-          <div className="flex-shrink-0 max-w-[500px]">
+          <div className="flex-shrink-0 max-w-[500px] w-full">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : 20 }}
               transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.6 }}
               className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:space-y-8"
             >
-              <div className="space-y-2">
-                <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(4.5rem, 7vw, 7.5rem)', lineHeight: 0.85, letterSpacing: '0.02em', color: '#FFFEF9', fontWeight: 700 }}>RABUSTE</h1>
-                <p style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 'clamp(1.25rem, 2vw, 1.5rem)', color: '#D4A574', letterSpacing: '0.2em', marginTop: '0.5rem' }}>UNAPOLOGETICALLY BOLD</p>
+              <div className="space-y-3">
+                <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(4rem, 10vw, 7rem)', lineHeight: 0.9, letterSpacing: '0.05em', color: '#FFFEF9', fontWeight: 400 }}>RABUSTE</h1>
+                <p style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1rem, 2vw, 1.25rem)', color: '#D4A574', letterSpacing: '0.2em', marginTop: '0.5rem' }}>UNAPOLOGETICALLY BOLD</p>
               </div>
 
-              <p style={{ fontSize: '1.125rem', color: 'rgba(255, 254, 249, 0.85)', lineHeight: 1.6, maxWidth: '400px' }}>
+              <p style={{ fontSize: '1.125rem', color: 'rgba(255, 254, 249, 0.85)', lineHeight: 1.6, maxWidth: '420px' }}>
                 Double the caffeine. Zero compromise. Premium robusta for those who demand more.
               </p>
 
@@ -104,7 +104,7 @@ export default function HeroRevamped() {
                     <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(184, 115, 51, 0.15)', border: '2px solid rgba(184, 115, 51, 0.4)' }}>
                       <div className="text-[#D4A574]">{stat.icon}</div>
                     </div>
-                    <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.125rem', color: '#FFFEF9', letterSpacing: '0.05em' }}>{stat.text}</span>
+                    <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', color: '#FFFEF9', letterSpacing: '0.1em' }}>{stat.text}</span>
                   </div>
                 ))}
               </div>
@@ -163,10 +163,10 @@ export default function HeroRevamped() {
                       </motion.div>
                       <span
                         style={{
-                          fontFamily: 'Bebas Neue, sans-serif',
-                          fontSize: '1rem',
+                          fontFamily: 'var(--font-heading)',
+                          fontSize: '0.9rem',
                           color: '#FFFEF9',
-                          letterSpacing: '0.15em',
+                          letterSpacing: '0.1em',
                         }}
                       >
                         AI-POWERED RECOMMENDATIONS
@@ -240,7 +240,7 @@ export default function HeroRevamped() {
                       textTransform: 'uppercase',
                       border: '2px solid rgba(184, 115, 51, 0.5)',
                       cursor: 'pointer',
-                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontFamily: 'var(--font-heading)',
                       backdropFilter: 'blur(10px)',
                     }}
                     onMouseEnter={(e) => {
