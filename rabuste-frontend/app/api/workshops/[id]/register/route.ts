@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Workshop from "@/src/models/Workshop";
 import connectDB from "@/src/lib/mongodb";
+import { sendWorkshopRegistrationEmail } from "@/src/lib/email";
 
 export async function POST(
   req: Request,
@@ -62,6 +63,21 @@ export async function POST(
 
     workshop.registrations.push({ name, email, registeredAt: new Date() });
     await workshop.save();
+
+    // Send workshop registration confirmation email (non-blocking)
+    sendWorkshopRegistrationEmail(email, {
+      userName: name,
+      workshopTitle: workshop.title,
+      date: workshop.date,
+      time: workshop.time || workshop.timeSlots?.[0] || "TBA",
+      location: workshop.location || "Rabuste Café",
+      instructor: workshop.instructor,
+      category: workshop.category,
+      description: workshop.description,
+    }).catch(err => {
+      console.error("Failed to send workshop registration email:", err);
+      // Don't fail the registration if email fails
+    });
 
     return NextResponse.json({
       message: "Registration successful",

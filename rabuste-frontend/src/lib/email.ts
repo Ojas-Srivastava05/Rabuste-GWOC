@@ -450,3 +450,190 @@ export async function sendWelcomeEmail(
   const html = generateWelcomeEmail(userName, to);
   await sendOrderEmail(to, "🚀 Welcome to the Bold Side", html);
 }
+
+// Workshop Registration Email Template
+export const generateWorkshopRegistrationEmail = (registration: {
+  userName: string;
+  workshopTitle: string;
+  date: string;
+  time: string;
+  location: string;
+  instructor: string;
+  category: string;
+  description?: string;
+}) => {
+  const formattedDate = new Date(registration.date).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const content = `
+    <div style="text-align: center; margin-bottom: 35px;">
+      <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.bronze} 100%); border-radius: 30px; margin-bottom: 25px;">
+        <span style="font-size: 42px;">✨</span>
+      </div>
+      <h2 style="margin: 0 0 15px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.golden} 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1;">
+        REGISTRATION CONFIRMED
+      </h2>
+      <p style="margin: 0; font-size: 16px; color: ${BRAND_COLORS.cream}; line-height: 1.6;">
+        Hey <strong style="color: ${BRAND_COLORS.golden};">${registration.userName}</strong>, you're all set for an incredible workshop experience!
+      </p>
+    </div>
+
+    <!-- Workshop Badge -->
+    <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1)); border: 2px solid ${BRAND_COLORS.copper}; border-radius: 12px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 0 40px rgba(184, 115, 51, 0.3);">
+      <p style="margin: 0 0 15px; font-size: 11px; letter-spacing: 0.2em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 700;">
+        ${registration.category.toUpperCase()} WORKSHOP
+      </p>
+      <h3 style="margin: 0 0 20px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 36px; font-weight: 400; color: ${BRAND_COLORS.warmWhite}; line-height: 1.1; letter-spacing: 0.03em;">
+        ${registration.workshopTitle}
+      </h3>
+      ${registration.description ? `
+      <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; opacity: 0.9; line-height: 1.6; padding: 0 20px;">
+        ${registration.description}
+      </p>
+      ` : ''}
+    </div>
+
+    <!-- Workshop Details -->
+    <div style="margin-bottom: 30px;">
+      <p style="margin: 0 0 20px; font-size: 13px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600; text-align: center;">
+        📅 WORKSHOP DETAILS
+      </p>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border: 1px solid rgba(184, 115, 51, 0.2); border-radius: 8px; overflow: hidden;">
+        <tr>
+          <td style="padding: 20px; border-bottom: 1px solid rgba(184, 115, 51, 0.1); background: rgba(245, 241, 232, 0.02);">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="width: 30%; padding-right: 15px;">
+                  <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
+                    📆 DATE
+                  </p>
+                </td>
+                <td>
+                  <p style="margin: 0; font-size: 15px; color: ${BRAND_COLORS.warmWhite}; font-weight: 600;">
+                    ${formattedDate}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px; border-bottom: 1px solid rgba(184, 115, 51, 0.1); background: rgba(245, 241, 232, 0.02);">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="width: 30%; padding-right: 15px;">
+                  <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
+                    ⏰ TIME
+                  </p>
+                </td>
+                <td>
+                  <p style="margin: 0; font-size: 15px; color: ${BRAND_COLORS.warmWhite}; font-weight: 600;">
+                    ${registration.time}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px; border-bottom: 1px solid rgba(184, 115, 51, 0.1); background: rgba(245, 241, 232, 0.02);">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="width: 30%; padding-right: 15px;">
+                  <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
+                    📍 LOCATION
+                  </p>
+                </td>
+                <td>
+                  <p style="margin: 0; font-size: 15px; color: ${BRAND_COLORS.warmWhite}; font-weight: 600;">
+                    ${registration.location}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 20px; background: rgba(245, 241, 232, 0.02);">
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                <td style="width: 30%; padding-right: 15px;">
+                  <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
+                    👨‍🏫 INSTRUCTOR
+                  </p>
+                </td>
+                <td>
+                  <p style="margin: 0; font-size: 15px; color: ${BRAND_COLORS.warmWhite}; font-weight: 600;">
+                    ${registration.instructor}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- What to Bring -->
+    <div style="background: rgba(26, 17, 16, 0.6); border-left: 4px solid ${BRAND_COLORS.golden}; padding: 25px; margin-bottom: 30px; border-radius: 4px;">
+      <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
+        ⚡ WHAT TO BRING
+      </p>
+      <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 2;">
+        <li>Arrive 10 minutes early to check in</li>
+        <li>Bring your creativity and enthusiasm</li>
+        <li>All materials and supplies will be provided</li>
+        <li>Wear comfortable clothing you don't mind getting a little messy</li>
+      </ul>
+    </div>
+
+    <!-- Premium Experience Note -->
+    <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, rgba(184, 115, 51, 0.1), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.2); border-radius: 8px; margin-bottom: 30px;">
+      <p style="margin: 0 0 12px; font-size: 12px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
+        ✨ PREMIUM WORKSHOP EXPERIENCE
+      </p>
+      <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.6; opacity: 0.9;">
+        ${registration.category === 'coffee' 
+          ? 'Master the art of bold coffee brewing with our expert baristas. Learn techniques used in our AI-optimized brewing system and discover the secrets behind our 2X caffeine power.'
+          : 'Unleash your creativity in this hands-on painting workshop. Explore bold techniques and vibrant expressions in a supportive, inspiring environment.'
+        }
+      </p>
+    </div>
+
+    <!-- Important Reminder -->
+    <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.3); border-radius: 8px; padding: 25px; margin-top: 35px;">
+      <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
+        📌 IMPORTANT REMINDER
+      </p>
+      <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.7;">
+        This confirmation email is your ticket to the workshop. If you need to cancel or have any questions, please reply to this email or contact us at least 24 hours before the event. We're excited to see you there!
+      </p>
+    </div>
+
+    <!-- Thank You -->
+    <div style="text-align: center; margin-top: 35px; padding-top: 30px; border-top: 1px solid rgba(184, 115, 51, 0.2);">
+      <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.cream};">
+        Thank you for joining us!
+      </p>
+      <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.7; line-height: 1.6;">
+        Get ready for an unapologetically bold learning experience.<br>
+        <strong style="color: ${BRAND_COLORS.copper};">See you at the workshop! ✨</strong>
+      </p>
+    </div>
+  `;
+
+  return getEmailTemplate(content);
+};
+
+// Send Workshop Registration Email
+export async function sendWorkshopRegistrationEmail(
+  to: string,
+  registration: Parameters<typeof generateWorkshopRegistrationEmail>[0]
+) {
+  const html = generateWorkshopRegistrationEmail(registration);
+  await sendOrderEmail(to, "✨ Workshop Registration Confirmed", html);
+}
