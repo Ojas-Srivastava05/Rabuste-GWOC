@@ -317,12 +317,16 @@ export default function MoodBrewerChat() {
               
               {/* Close Button */}
               <button
-                onClick={closePopup}
-                className="absolute top-3 right-3 p-1.5 transition-all hover:scale-110 z-10"
-                style={{
-                  background: 'rgba(184, 115, 51, 0.2)',
-                  border: '1px solid rgba(184, 115, 51, 0.4)',
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closePopup();
                 }}
+                className="absolute top-3 right-3 p-1.5 rounded-lg transition-all hover:scale-110 z-50"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.3)',
+                  border: '2px solid rgba(184, 115, 51, 0.6)',
+                }}
+                aria-label="Close recommendation"
               >
                 <X className="w-4 h-4" style={{ color: '#D4A574' }} />
               </button>

@@ -346,7 +346,7 @@ export default function WorkshopsPage() {
 
           {/* Calendar View */}
           {viewMode === "calendar" && (
-            <div className="grid lg:grid-cols-[1fr,2fr] gap-8">
+            <div className="grid md:grid-cols-[320px,1fr] gap-6">
               {/* Calendar Section */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
