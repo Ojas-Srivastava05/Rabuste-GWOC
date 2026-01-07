@@ -66,10 +66,10 @@ export default function Navbar() {
         scrolled ? 'py-3' : 'py-5'
       }`}
       style={{ 
-        fontFamily: "'Work Sans', sans-serif",
+        fontFamily: 'var(--font-heading)',
         background: scrolled 
-          ? 'linear-gradient(180deg, rgba(26, 15, 10, 0.98), rgba(42, 24, 16, 0.95))' 
-          : 'linear-gradient(180deg, rgba(26, 15, 10, 0.96), rgba(42, 24, 16, 0.92))',
+          ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.98), rgba(26, 17, 16, 0.95))' 
+          : 'linear-gradient(180deg, rgba(0, 0, 0, 0.92), rgba(26, 17, 16, 0.88))',
         backdropFilter: 'blur(30px) saturate(180%)',
         borderBottom: scrolled 
           ? '2px solid rgba(184, 115, 51, 0.3)' 
@@ -484,13 +484,12 @@ function NavButton({
 }: NavButtonProps) {
   const base = `
     px-5 py-2.5
-    font-medium
     text-[#FFFEF9]
     border border-transparent
     transition-all duration-300
     inline-flex items-center justify-center
-    text-xs
-    tracking-[0.2em]
+    text-sm
+    tracking-[0.1em]
     uppercase
     relative
     overflow-hidden
