@@ -162,7 +162,7 @@ export default function MoodBrewerChat() {
   return (
     <div
       ref={containerRef}
-      className="rounded-2xl p-6 space-y-6 relative flex flex-col overflow-hidden"
+      className="rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col overflow-hidden"
       style={{
         background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.95) 0%, rgba(42, 24, 16, 0.9) 100%)',
         border: '2px solid rgba(184, 115, 51, 0.4)',
@@ -188,11 +188,11 @@ export default function MoodBrewerChat() {
               background: 'radial-gradient(circle, #D4A574, #B87333)',
             }}
           />
-          <Brain className="w-12 h-12 mx-auto relative" style={{ color: '#D4A574', strokeWidth: 1.5 }} />
+          <Brain className="w-10 h-10 sm:w-12 sm:h-12 mx-auto relative" style={{ color: '#D4A574', strokeWidth: 1.5 }} />
         </div>
         <div>
           <h1 
-            className="text-3xl font-bold mb-1" 
+            className="text-2xl sm:text-3xl font-bold mb-1" 
             style={{ 
               fontFamily: 'var(--font-heading)', 
               background: 'linear-gradient(135deg, #D4A574 0%, #CD7F32 50%, #B87333 100%)',
@@ -206,8 +206,8 @@ export default function MoodBrewerChat() {
             BREW AI
           </h1>
           <div className="flex items-center justify-center gap-2">
-            <Cpu size={12} style={{ color: '#B87333' }} />
-            <p className="text-xs uppercase tracking-widest" style={{ color: '#B87333', fontWeight: 600 }}>
+            <Cpu size={10} className="sm:w-3 sm:h-3" style={{ color: '#B87333' }} />
+            <p className="text-[0.65rem] sm:text-xs uppercase tracking-widest" style={{ color: '#B87333', fontWeight: 600 }}>
               Intelligent Brewing Assistant
             </p>
           </div>
@@ -226,12 +226,12 @@ export default function MoodBrewerChat() {
 
       {/* Time */}
       <Section title="Time of day" number="03">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
           {MENU_META.times.map((t) => (
             <button
               key={t}
               onClick={() => setTime(t)}
-              className="py-3 text-xs font-bold uppercase tracking-wider transition-all hover:scale-105"
+              className="py-2 sm:py-3 text-[0.65rem] sm:text-xs font-bold uppercase tracking-wider transition-all hover:scale-105"
               style={{
                 background: time === t 
                   ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.3))' 
@@ -299,7 +299,7 @@ export default function MoodBrewerChat() {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="absolute bottom-16 left-1/2 -translate-x-1/2 w-[340px] p-6 shadow-lg z-50 overflow-hidden"
+              className="absolute bottom-16 sm:bottom-20 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] sm:w-[340px] p-4 sm:p-6 shadow-lg z-50 overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.98), rgba(42, 24, 16, 0.95))',
                 border: '2px solid rgba(184, 115, 51, 0.5)',
@@ -328,10 +328,10 @@ export default function MoodBrewerChat() {
               </button>
 
               <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-3">
-                  <Sparkles size={22} style={{ color: '#D4A574' }} fill="#D4A574" />
+                <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                  <Sparkles size={18} className="sm:w-[22px] sm:h-[22px]" style={{ color: '#D4A574' }} fill="#D4A574" />
                   <h3 
-                    className="text-xl font-bold"
+                    className="text-lg sm:text-xl font-bold"
                     style={{ 
                       fontFamily: 'var(--font-heading)',
                       background: 'linear-gradient(135deg, #D4A574 0%, #CD7F32 100%)',
@@ -344,19 +344,19 @@ export default function MoodBrewerChat() {
                     {reply.recommendation}
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: '#D4A574' }}>
+                <p className="text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4" style={{ color: '#D4A574' }}>
                   {reply.reason}
                 </p>
                 {reply.price && (
                   <div 
-                    className="inline-block px-4 py-2 mb-4"
+                    className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 mb-3 sm:mb-4"
                     style={{ 
                       background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.3))',
                       border: '2px solid rgba(184, 115, 51, 0.5)',
                       boxShadow: 'inset 0 1px 0 rgba(212, 165, 116, 0.3)',
                     }}
                   >
-                    <span className="text-lg font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <span className="text-base sm:text-lg font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
                       ₹{reply.price}
                     </span>
                   </div>
@@ -364,13 +364,13 @@ export default function MoodBrewerChat() {
 
                 <button
                   onClick={handleOrderNow}
-                  className="w-full py-3 font-bold transition-all hover:scale-[1.02]"
+                  className="w-full py-2.5 sm:py-3 font-bold transition-all hover:scale-[1.02]"
                   style={{
                     background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
                     color: '#000',
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '0.12em',
-                    fontSize: '14px',
+                    fontSize: '13px',
                     boxShadow: '0 10px 40px rgba(184, 115, 51, 0.5), inset 0 1px 0 rgba(212, 165, 116, 0.5)',
                   }}
                 >

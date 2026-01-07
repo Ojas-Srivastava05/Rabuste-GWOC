@@ -5,6 +5,7 @@ import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
 import ExperienceSection from "@/components/sections/ExperienceSection";
 import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
+import VRExperienceSection from "@/components/sections/VRExperienceSection";
 import ProcessSectionRevamped from "@/components/sections/ProcessSectionRevamped";
 import CallToAction from "@/components/sections/CallToAction";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
@@ -65,6 +66,8 @@ export default function Home() {
         {/* Benefits - Science Backed Power */}
         <BenefitsShowcase />
 
+        {/* VR/AR Experience - Virtual Exploration */}
+        <VRExperienceSection />
 
         {/* Process - Bean to Cup Journey (Revamped) */}
         <ProcessSectionRevamped />

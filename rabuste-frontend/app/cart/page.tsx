@@ -128,6 +128,49 @@ export default function CartPage() {
     }
   }
 
+  async function updateQuantity(itemId: string, itemType: "menu" | "art", newQuantity: number) {
+    if (newQuantity < 1) return;
+
+    try {
+      const res = await fetch("/api/cart", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId,
+          itemType,
+          quantity: newQuantity,
+        }),
+      });
+
+      if (res.ok) {
+        const updatedCart = await res.json();
+        setCart(updatedCart);
+      }
+    } catch (error) {
+      console.error("Failed to update quantity", error);
+    }
+  }
+
+  async function removeItem(itemId: string, itemType: "menu" | "art") {
+    try {
+      const res = await fetch("/api/cart/item", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId,
+          itemType,
+        }),
+      });
+
+      if (res.ok) {
+        const updatedCart = await res.json();
+        setCart(updatedCart);
+      }
+    } catch (error) {
+      console.error("Failed to remove item", error);
+    }
+  }
+
   if (loading) {
     return (
       <>
@@ -220,39 +263,105 @@ export default function CartPage() {
                 <div
                   key={item.menuItem || item.artItem || index}
                   className="brutal-card p-6"
-                  style={{
-                    display: 'flex',
-                    gap: '24px',
-                    alignItems: 'center',
-                  }}
                 >
-                  <div className="flex-1">
-                    <h3 
-                      className="text-2xl mb-2"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        color: '#F5F1E8',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {item.name}
-                    </h3>
-                    <div className="flex items-center gap-4 text-lg">
-                      <span className="gradient-text font-bold">₹{item.price}</span>
-                      <span style={{ color: '#8B6F47' }}>×</span>
-                      <span style={{ color: '#B87333' }}>{item.quantity}</span>
+                  <div className="flex flex-col md:flex-row gap-6 md:items-center">
+                    <div className="flex-1">
+                      <h3 
+                        className="text-2xl mb-2"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#F5F1E8',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        {item.name}
+                      </h3>
+                      <div className="flex items-center gap-4 text-lg mb-4 md:mb-0">
+                        <span className="gradient-text font-bold">₹{item.price}</span>
+                        <span style={{ color: '#8B6F47' }}>each</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div 
-                    className="text-2xl font-bold gradient-text"
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      minWidth: '120px',
-                      textAlign: 'right',
-                    }}
-                  >
-                    ₹{item.price * item.quantity}
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const itemId = item.menuItem || item.artItem;
+                            if (itemId) {
+                              updateQuantity(itemId, item.itemType, item.quantity - 1);
+                            }
+                          }}
+                          disabled={item.quantity <= 1}
+                          className="p-2 transition-all hover:scale-110"
+                          style={{
+                            background: 'rgba(184, 115, 51, 0.2)',
+                            border: '1px solid rgba(184, 115, 51, 0.4)',
+                            cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer',
+                            opacity: item.quantity <= 1 ? 0.5 : 1,
+                          }}
+                        >
+                          <Minus size={18} style={{ color: '#B87333' }} />
+                        </button>
+                        
+                        <div
+                          className="px-6 py-2 text-lg font-bold"
+                          style={{
+                            background: 'rgba(26, 17, 16, 0.6)',
+                            border: '2px solid rgba(184, 115, 51, 0.3)',
+                            color: '#F5F1E8',
+                            minWidth: '60px',
+                            textAlign: 'center',
+                            fontFamily: 'var(--font-heading)',
+                          }}
+                        >
+                          {item.quantity}
+                        </div>
+                        
+                        <button
+                          onClick={() => {
+                            const itemId = item.menuItem || item.artItem;
+                            if (itemId) {
+                              updateQuantity(itemId, item.itemType, item.quantity + 1);
+                            }
+                          }}
+                          className="p-2 transition-all hover:scale-110"
+                          style={{
+                            background: 'rgba(184, 115, 51, 0.2)',
+                            border: '1px solid rgba(184, 115, 51, 0.4)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Plus size={18} style={{ color: '#B87333' }} />
+                        </button>
+                      </div>
+
+                      <div 
+                        className="text-2xl font-bold gradient-text"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          minWidth: '120px',
+                          textAlign: 'right',
+                        }}
+                      >
+                        ₹{item.price * item.quantity}
+                      </div>
+
+                      <button
+                        onClick={() => removeItem(
+                          item.menuItem || item.artItem || '',
+                          item.itemType
+                        )}
+                        className="p-2 transition-all hover:scale-110"
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.2)',
+                          border: '1px solid rgba(239, 68, 68, 0.4)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Trash2 size={18} style={{ color: '#ef4444' }} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

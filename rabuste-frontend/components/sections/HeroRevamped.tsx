@@ -226,18 +226,19 @@ export default function HeroRevamped() {
               <div className="relative group">
                 <button
                   onClick={() => router.push('/menu')}
-                  className="relative overflow-hidden transition-all duration-300"
+                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
                   style={{
-                    padding: '20px 60px',
-                    background: 'transparent',
-                    color: '#D4A574',
-                    fontSize: '1.125rem',
-                    letterSpacing: '0.2em',
-                    fontWeight: 800,
+                    padding: '16px 28px',
+                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                    color: '#FFFEF9',
+                    fontSize: '1rem',
+                    letterSpacing: '0.15em',
+                    fontWeight: 600,
                     textTransform: 'uppercase',
-                    border: '2px solid #B87333',
+                    border: '2px solid rgba(184, 115, 51, 0.5)',
                     cursor: 'pointer',
                     fontFamily: 'Bebas Neue, sans-serif',
+                    backdropFilter: 'blur(10px)',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)';
@@ -245,9 +246,9 @@ export default function HeroRevamped() {
                     e.currentTarget.style.borderColor = '#D4A574';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#D4A574';
-                    e.currentTarget.style.borderColor = '#B87333';
+                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))';
+                    e.currentTarget.style.color = '#FFFEF9';
+                    e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)';
                   }}
                 >
                   Explore Menu
