@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import PhoneInput from "@/components/PhoneInput";
-import { Coffee, Zap, Shield } from "lucide-react";
+import { Coffee, Zap, Shield, Eye, EyeOff } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
 const isStrongPassword = (password: string) =>
@@ -32,6 +32,7 @@ function AuthForm() {
   const [error, setError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [info, setInfo] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -76,12 +77,9 @@ function AuthForm() {
       if (!res.ok) throw new Error(data.message);
 
       if (isLogin) {
-        // 1. Store JWT and set user in context
-        // Check if this is a direct login (no redirect param means path 1)
         const isDirectLogin = !redirect;
         login(data.token, data.user, isDirectLogin);
       
-        // 2. Attach cart to user
         await fetch("/api/cart/attach", {
           method: "POST",
           headers: {
@@ -89,7 +87,6 @@ function AuthForm() {
           },
         });
       
-        // 3. Redirect user (admins go straight to dashboard)
         const destination = data.user?.role === "admin" ? "/admin" : redirect || "/";
         router.push(destination);
       } else {
@@ -105,7 +102,6 @@ function AuthForm() {
       
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong";
-      // Check if error is phone-related
       if (errorMessage.toLowerCase().includes("phone")) {
         setPhoneError(errorMessage);
       } else {
@@ -120,10 +116,8 @@ function AuthForm() {
     <>
       <Navbar />
       <div className="relative min-h-screen overflow-hidden" style={{ background: '#000000' }}>
-        {/* Background Pattern */}
         <DynamicBackground />
 
-        {/* Main Layout */}
         <div className="relative z-10 min-h-screen flex items-center justify-center px-6 py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 w-full max-w-6xl">
 
@@ -285,15 +279,35 @@ function AuthForm() {
                 </div>
               )}
 
-              <input
-                name="password"
-                type="password"
-                placeholder="PASSWORD"
-                required
-                value={form.password}
-                onChange={handleChange}
-                className="auth-input"
-              />
+              <div className="relative mb-4">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="PASSWORD"
+                  required
+                  value={form.password}
+                  onChange={handleChange}
+                  className="auth-input pr-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ 
+                    color: showPassword ? '#B87333' : '#8B6F47',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
 
               {!isLogin && (
                 <p className="text-xs mb-4" style={{ color: '#8B6F47' }}>
@@ -329,6 +343,7 @@ function AuthForm() {
                     setError("");
                     setPhoneError("");
                     setInfo("");
+                    setShowPassword(false);
                   }}
                   className="ml-2 cursor-pointer transition-colors"
                   style={{ 
@@ -350,7 +365,6 @@ function AuthForm() {
           .auth-input {
             width: 100%;
             padding: 16px;
-            margin-bottom: 16px;
             background: rgba(20, 20, 20, 0.8);
             border: 2px solid rgba(184, 115, 51, 0.2);
             color: #FFFEF9;

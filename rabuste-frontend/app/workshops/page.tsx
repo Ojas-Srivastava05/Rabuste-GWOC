@@ -385,37 +385,39 @@ export default function WorkshopsPage() {
 
           {/* Calendar View */}
           {viewMode === "calendar" && (
-            <div className="grid md:grid-cols-[320px,1fr] gap-6">
-              {/* Calendar Section */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Calendar Section - Left Half */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-xl h-fit"
+                className="p-6 rounded-xl sticky top-32"
                 style={{
                   background: 'rgba(61, 43, 31, 0.6)',
                   border: '2px solid rgba(184, 115, 51, 0.4)',
+                  height: 'fit-content',
+                  maxHeight: 'calc(100vh - 180px)',
                 }}
               >
-                <div className="mb-6">
-                  <h3 className="text-xl mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
+                <div className="mb-4">
+                  <h3 className="text-lg mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
                     SELECT DATE
                   </h3>
                   <div className="h-px bg-gradient-to-r from-[#B87333] to-transparent" />
                 </div>
 
                 {/* Month Navigation */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <button
                     onClick={goToPreviousMonth}
                     className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
                     style={{ color: '#B87333' }}
                   >
-                    <ChevronLeft size={20} />
+                    <ChevronLeft size={18} />
                   </button>
                   
-                  <h4 className="text-xl" style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8', letterSpacing: '0.05em' }}>
-                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  <h4 className="text-base" style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8', letterSpacing: '0.05em' }}>
+                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
                   </h4>
                   
                   <button
@@ -423,25 +425,25 @@ export default function WorkshopsPage() {
                     className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
                     style={{ color: '#B87333' }}
                   >
-                    <ChevronRight size={20} />
+                    <ChevronRight size={18} />
                   </button>
                 </div>
 
                 {/* Week Days */}
-                <div className="grid grid-cols-7 gap-2 mb-2">
+                <div className="grid grid-cols-7 gap-1 mb-2">
                   {weekDays.map((day) => (
                     <div
                       key={day}
-                      className="text-center text-xs py-2"
+                      className="text-center text-[10px] py-1"
                       style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
                     >
-                      {day}
+                      {day.slice(0, 1)}
                     </div>
                   ))}
                 </div>
 
                 {/* Calendar Days */}
-                <div className="grid grid-cols-7 gap-2">
+                <div className="grid grid-cols-7 gap-1">
                   {days.map((day, index) => {
                     if (day === null) {
                       return <div key={`empty-${index}`} />;
@@ -456,10 +458,10 @@ export default function WorkshopsPage() {
                     return (
                       <motion.button
                         key={day}
-                        whileHover={{ scale: 1.1 }}
+                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDateClick(day)}
-                        className="aspect-square flex items-center justify-center rounded-lg relative transition-all"
+                        className="aspect-square flex items-center justify-center rounded-md relative transition-all text-sm"
                         style={{
                           background: isSelected 
                             ? 'linear-gradient(135deg, #B87333, #CD7F32)'
@@ -470,16 +472,17 @@ export default function WorkshopsPage() {
                             ? '2px solid #D4A574'
                             : isToday
                             ? '2px solid rgba(184, 115, 51, 0.6)'
-                            : '2px solid transparent',
+                            : '1px solid rgba(184, 115, 51, 0.1)',
                           color: isSelected ? '#000' : '#F5F1E8',
                           fontFamily: 'var(--font-heading)',
                           cursor: 'pointer',
+                          fontSize: '0.875rem',
                         }}
                       >
                         {day}
                         {hasWorkshop && !isSelected && (
                           <div 
-                            className="absolute bottom-1 w-1 h-1 rounded-full"
+                            className="absolute bottom-0.5 w-1 h-1 rounded-full"
                             style={{ background: '#B87333' }}
                           />
                         )}
@@ -487,18 +490,38 @@ export default function WorkshopsPage() {
                     );
                   })}
                 </div>
+                
+                {/* Legend */}
+                <div className="mt-6 pt-4 border-t border-[#B87333]/20 space-y-2">
+                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                    <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
+                    <span>Has workshops</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                    <div className="w-3 h-3 rounded-full" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
+                    <span>Today</span>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* Events Section */}
+              {/* Events Section - Right Half */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
+                className="lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto lg:pr-2"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#B87333 transparent',
+                }}
               >
-                <div className="mb-6">
+                <div className="mb-6 sticky top-0 z-10 pb-4" style={{ background: 'linear-gradient(180deg, #1A1110 90%, transparent)' }}>
                   <h3 className="text-2xl" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
-                    EVENTS ON {selectedDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}
+                    {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}
                   </h3>
+                  <p className="text-sm mt-1" style={{ color: '#8B6F47' }}>
+                    {workshopsOnSelectedDate.length} {workshopsOnSelectedDate.length === 1 ? 'workshop' : 'workshops'} scheduled
+                  </p>
                 </div>
 
                 {workshopsOnSelectedDate.length === 0 ? (
@@ -510,12 +533,15 @@ export default function WorkshopsPage() {
                     }}
                   >
                     <Calendar size={48} className="mx-auto mb-4" style={{ color: '#8B6F47' }} />
-                    <p className="text-lg" style={{ color: '#8B6F47' }}>
-                      No workshops scheduled for this date
+                    <p className="text-lg mb-2" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                      No workshops scheduled
+                    </p>
+                    <p className="text-sm" style={{ color: '#8B6F47' }}>
+                      Select another date to view available workshops
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {workshopsOnSelectedDate.map((workshop) => {
                       const isFull = isWorkshopFull(workshop);
                       const isPast = workshop.status === "past";
@@ -523,9 +549,9 @@ export default function WorkshopsPage() {
                       return (
                         <motion.div
                           key={workshop._id}
-                          initial={{ opacity: 0, y: 20 }}
+                          initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-8 rounded-xl cursor-pointer transition-all hover:shadow-2xl"
+                          className="p-6 rounded-xl cursor-pointer transition-all hover:border-[#D4A574]"
                           onClick={() => {
                             if (!isPast) {
                               setSelectedWorkshop(workshop);
@@ -539,48 +565,49 @@ export default function WorkshopsPage() {
                           }}
                         >
                           {/* Category Badge */}
-                          <div className="flex items-center gap-2 mb-4">
+                          <div className="flex items-center gap-2 mb-3">
                             <div 
-                              className="px-4 py-2 rounded-full flex items-center gap-2"
+                              className="px-3 py-1.5 rounded-full flex items-center gap-2"
                               style={{ background: 'rgba(184, 115, 51, 0.3)' }}
                             >
-                              {workshop.category === "coffee" ? <Coffee size={16} /> : <Palette size={16} />}
+                              {workshop.category === "coffee" ? <Coffee size={14} /> : <Palette size={14} />}
                               <span className="text-xs uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
                                 {workshop.category}
                               </span>
                             </div>
                             {isFull && (
                               <div 
-                                className="px-4 py-2 rounded-full"
+                                className="px-3 py-1.5 rounded-full"
                                 style={{ background: 'rgba(255, 107, 107, 0.2)', color: '#ff6b6b' }}
                               >
                                 <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
-                                  FULLY BOOKED
+                                  FULL
                                 </span>
                               </div>
                             )}
                           </div>
 
                           <h4 
-                            className="text-3xl mb-3"
+                            className="text-2xl mb-2"
                             style={{
                               fontFamily: 'var(--font-heading)',
                               color: '#FFFEF9',
-                              lineHeight: 1,
+                              lineHeight: 1.1,
+                              letterSpacing: '0.02em',
                             }}
                           >
                             {workshop.title}
                           </h4>
 
                           <p 
-                            className="mb-6 text-base leading-relaxed"
-                            style={{ color: 'rgba(255, 254, 249, 0.8)' }}
+                            className="mb-4 text-sm leading-relaxed line-clamp-2"
+                            style={{ color: 'rgba(255, 254, 249, 0.7)' }}
                           >
                             {workshop.description}
                           </p>
 
                           {/* Details Grid */}
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                          <div className="grid grid-cols-2 gap-3 mb-4">
                             <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <Calendar size={14} style={{ color: '#B87333' }} />

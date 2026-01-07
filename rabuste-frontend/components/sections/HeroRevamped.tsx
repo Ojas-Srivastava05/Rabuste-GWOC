@@ -109,158 +109,162 @@ export default function HeroRevamped() {
                 ))}
               </div>
 
-              {/* AI Feature Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1.2 }}
-                className="relative group cursor-pointer"
-                onClick={() => {
-                  // Scroll down to trigger the BrewAI button
-                  window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-                }}
-              >
-                <div
-                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
-                  style={{
-                    padding: '16px 28px',
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
-                    border: '2px solid rgba(184, 115, 51, 0.5)',
-                    backdropFilter: 'blur(10px)',
+              {/* CTA Buttons Container - Symmetric Layout */}
+              <div className="flex flex-col gap-4 w-full max-w-[420px]">
+                {/* AI Feature Badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 1.2 }}
+                  className="relative group cursor-pointer w-full"
+                  onClick={() => {
+                    // Scroll down to trigger the BrewAI button
+                    window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
                   }}
                 >
-                  {/* Shimmer Effect */}
-                  <motion.div
-                    className="absolute inset-0"
-                    animate={{
-                      x: ['-100%', '200%'],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
+                  <div
+                    className="relative overflow-hidden transition-all duration-300 hover:scale-105 w-full"
                     style={{
-                      background: 'linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent)',
-                      width: '50%',
+                      padding: '16px 28px',
+                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                      border: '2px solid rgba(184, 115, 51, 0.5)',
+                      backdropFilter: 'blur(10px)',
                     }}
-                  />
-
-                  <div className="flex items-center gap-3 relative z-10">
+                  >
+                    {/* Shimmer Effect */}
                     <motion.div
+                      className="absolute inset-0"
                       animate={{
-                        rotate: [0, 360],
+                        x: ['-100%', '200%'],
                       }}
                       transition={{
-                        duration: 4,
+                        duration: 3,
                         repeat: Infinity,
                         ease: 'linear',
                       }}
-                    >
-                      <Brain size={22} style={{ color: '#D4A574' }} />
-                    </motion.div>
-                    <span
                       style={{
-                        fontFamily: 'Bebas Neue, sans-serif',
-                        fontSize: '1rem',
-                        color: '#FFFEF9',
-                        letterSpacing: '0.15em',
+                        background: 'linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.3), transparent)',
+                        width: '50%',
                       }}
-                    >
-                      AI-POWERED RECOMMENDATIONS
-                    </span>
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                      }}
-                    >
-                      <Sparkles size={18} style={{ color: '#CD7F32' }} />
-                    </motion.div>
-                  </div>
-                </div>
+                    />
 
-                {/* Hover Tooltip - Positioned Above */}
-                <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div
+                    <div className="flex items-center justify-center gap-3 relative z-10">
+                      <motion.div
+                        animate={{
+                          rotate: [0, 360],
+                        }}
+                        transition={{
+                          duration: 4,
+                          repeat: Infinity,
+                          ease: 'linear',
+                        }}
+                      >
+                        <Brain size={22} style={{ color: '#D4A574' }} />
+                      </motion.div>
+                      <span
+                        style={{
+                          fontFamily: 'Bebas Neue, sans-serif',
+                          fontSize: '1rem',
+                          color: '#FFFEF9',
+                          letterSpacing: '0.15em',
+                        }}
+                      >
+                        AI-POWERED RECOMMENDATIONS
+                      </span>
+                      <motion.div
+                        animate={{
+                          scale: [1, 1.2, 1],
+                          opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                        }}
+                      >
+                        <Sparkles size={18} style={{ color: '#CD7F32' }} />
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  {/* Hover Tooltip - Positioned Above */}
+                  <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 pointer-events-none whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div
+                      style={{
+                        background: 'rgba(0, 0, 0, 0.95)',
+                        border: '2px solid rgba(184, 115, 51, 0.6)',
+                        padding: '10px 20px',
+                        backdropFilter: 'blur(10px)',
+                        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: '0.875rem',
+                          color: '#D4A574',
+                          margin: 0,
+                          fontWeight: 500,
+                        }}
+                      >
+                        Click to discover our AI brew assistant
+                      </p>
+                    </div>
+                    {/* Arrow pointing down */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        bottom: '-6px',
+                        transform: 'translateX(-50%)',
+                        width: '0',
+                        height: '0',
+                        borderLeft: '6px solid transparent',
+                        borderRight: '6px solid transparent',
+                        borderTop: '6px solid rgba(184, 115, 51, 0.6)',
+                      }}
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Explore Menu Button */}
+                <div className="relative group w-full">
+                  <button
+                    onClick={() => router.push('/menu')}
+                    className="relative overflow-hidden transition-all duration-300 hover:scale-105 w-full"
                     style={{
-                      background: 'rgba(0, 0, 0, 0.95)',
-                      border: '2px solid rgba(184, 115, 51, 0.6)',
-                      padding: '10px 20px',
+                      padding: '16px 28px',
+                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                      color: '#FFFEF9',
+                      fontSize: '1rem',
+                      letterSpacing: '0.15em',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      border: '2px solid rgba(184, 115, 51, 0.5)',
+                      cursor: 'pointer',
+                      fontFamily: 'Bebas Neue, sans-serif',
                       backdropFilter: 'blur(10px)',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.6)',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)';
+                      e.currentTarget.style.color = '#000000';
+                      e.currentTarget.style.borderColor = '#D4A574';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))';
+                      e.currentTarget.style.color = '#FFFEF9';
+                      e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)';
                     }}
                   >
-                    <p
-                      style={{
-                        fontSize: '0.875rem',
-                        color: '#D4A574',
-                        margin: 0,
-                        fontWeight: 500,
-                      }}
-                    >
-                      Click to discover our AI brew assistant
-                    </p>
-                  </div>
-                  {/* Arrow pointing down */}
-                  <div
+                    Explore Menu
+                  </button>
+                  {/* Glow effect on hover */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                     style={{
-                      position: 'absolute',
-                      left: '50%',
-                      bottom: '-6px',
-                      transform: 'translateX(-50%)',
-                      width: '0',
-                      height: '0',
-                      borderLeft: '6px solid transparent',
-                      borderRight: '6px solid transparent',
-                      borderTop: '6px solid rgba(184, 115, 51, 0.6)',
+                      background: 'radial-gradient(circle at center, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
+                      filter: 'blur(20px)',
                     }}
                   />
                 </div>
-              </motion.div>
-
-              <div className="relative group">
-                <button
-                  onClick={() => router.push('/menu')}
-                  className="relative overflow-hidden transition-all duration-300 hover:scale-105"
-                  style={{
-                    padding: '16px 28px',
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
-                    color: '#FFFEF9',
-                    fontSize: '1rem',
-                    letterSpacing: '0.15em',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    border: '2px solid rgba(184, 115, 51, 0.5)',
-                    cursor: 'pointer',
-                    fontFamily: 'Bebas Neue, sans-serif',
-                    backdropFilter: 'blur(10px)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #D4A574 100%)';
-                    e.currentTarget.style.color = '#000000';
-                    e.currentTarget.style.borderColor = '#D4A574';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))';
-                    e.currentTarget.style.color = '#FFFEF9';
-                    e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)';
-                  }}
-                >
-                  Explore Menu
-                </button>
-                {/* Glow effect on hover */}
-                <div 
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(circle at center, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
-                    filter: 'blur(20px)',
-                  }}
-                />
               </div>
             </motion.div>
           </div>

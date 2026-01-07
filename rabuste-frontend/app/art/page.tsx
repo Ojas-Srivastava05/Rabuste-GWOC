@@ -180,54 +180,31 @@ export default function ArtGalleryPage() {
             className="mb-16 text-center relative"
           >
             {/* Decorative Lines */}
-            <div className="flex items-center justify-center gap-6 mb-6">
-              <motion.div 
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="h-px w-24 bg-gradient-to-r from-transparent via-[#B87333] to-transparent"
-              />
-              <motion.span 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5 }}
-                className="text-xs tracking-[0.3em] uppercase"
-                style={{ color: '#B87333', fontWeight: 700 }}
-              >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-4 mb-6"
+            >
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
                 CURATED COLLECTION
-              </motion.span>
-              <motion.div 
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="h-px w-24 bg-gradient-to-l from-transparent via-[#B87333] to-transparent"
-              />
-            </div>
-
-            <h1
-              className="text-6xl md:text-8xl mb-6 relative inline-block"
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-6xl md:text-8xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
                 color: '#F5F1E8',
-                letterSpacing: '-0.02em',
               }}
             >
-              <span className="block mb-2">THE</span>
-              <span className="gradient-text text-7xl md:text-9xl">GALLERY</span>
-              
-              {/* Premium Underline */}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.7, duration: 1 }}
-                className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 h-1 w-32"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, #B87333, #CD7F32, #B87333, transparent)',
-                  boxShadow: '0 0 20px rgba(184, 115, 51, 0.5)',
-                }}
-              />
-            </h1>
+              THE <span className="gradient-text">GALLERY</span>
+            </motion.h1>
 
             <motion.p 
               initial={{ opacity: 0, y: 20 }}

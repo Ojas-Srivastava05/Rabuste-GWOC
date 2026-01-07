@@ -266,28 +266,45 @@ export default function MenuPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: '100px', paddingBottom: '60px' }}>
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
         <div className="container px-4 md:px-6">
-          {/* Compact Header */}
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h1
-              className="text-4xl md:text-6xl mb-3 text-center"
+          {/* Header */}
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-4 mb-6"
+            >
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                EXPLORE FLAVORS
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-6xl md:text-8xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
-                lineHeight: 1,
+                lineHeight: 0.9,
                 color: '#F5F1E8',
               }}
             >
               <span className="gradient-text">MENU</span>
-            </h1>
-            <p className="text-center text-sm" style={{ color: '#8B6F47' }}>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg"
+              style={{ color: '#B87333' }}
+            >
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available
-            </p>
-          </motion.div>
+            </motion.p>
+          </div>
 
           {/* Search and Filter Bar */}
           <motion.div 
