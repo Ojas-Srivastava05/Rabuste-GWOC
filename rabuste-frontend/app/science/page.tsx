@@ -40,7 +40,7 @@ export default function SciencePage() {
       <Navbar />
       <DynamicBackground />
       
-      <div style={{ background: 'transparent', minHeight: '100vh', paddingTop: '100px' }}>
+      <div style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)', minHeight: '100vh', paddingTop: '100px' }}>
         <div className="container mx-auto px-6 py-20 relative z-10">
           {/* Back Button */}
           <motion.button
@@ -62,9 +62,11 @@ export default function SciencePage() {
             className="text-center mb-20"
           >
             <div className="inline-flex items-center gap-4 mb-8">
-              <div className="copper-line" />
-              <span className="section-label">RESEARCH & DATA</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                RESEARCH & DATA
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </div>
 
             <h1
@@ -74,6 +76,7 @@ export default function SciencePage() {
                 fontWeight: 400,
                 lineHeight: 1,
                 color: '#FFFEF9',
+                letterSpacing: '0.05em',
               }}
             >
               THE SCIENCE

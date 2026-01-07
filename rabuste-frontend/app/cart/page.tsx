@@ -262,15 +262,17 @@ export default function CartPage() {
     <>
       <Navbar />
       <DynamicBackground />
-      
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px' }}>
+
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-6">
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-4 mb-8">
-              <div className="copper-line" />
-              <span className="section-label">YOUR ORDER</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                YOUR ORDER
+              </span>
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </div>
             
             <h1 

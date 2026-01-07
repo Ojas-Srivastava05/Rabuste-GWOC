@@ -2,14 +2,15 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Instagram, Facebook, Twitter, Phone, Mail, MapPin, Clock } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
-    { name: 'Instagram', icon: '📷', url: '#' },
-    { name: 'Facebook', icon: '👤', url: '#' },
-    { name: 'Twitter', icon: '🐦', url: '#' }
+    { name: 'Instagram', Icon: Instagram, url: '#' },
+    { name: 'Facebook', Icon: Facebook, url: '#' },
+    { name: 'Twitter', Icon: Twitter, url: '#' }
   ];
 
   const quickLinks = [
@@ -20,9 +21,15 @@ export default function Footer() {
   ];
 
   const contactInfo = [
-    { label: 'Phone', value: '+91 123 456 7890', icon: '📞' },
-    { label: 'Email', value: 'hello@rabuste.com', icon: '✉️' },
-    { label: 'Address', value: 'Jodhpur, Rajasthan', icon: '📍' }
+    { label: 'Phone', value: '+91 123 456 7890', Icon: Phone },
+    { label: 'Email', value: 'hello@rabuste.com', Icon: Mail },
+    { label: 'Address', value: 'Jodhpur, Rajasthan', Icon: MapPin }
+  ];
+
+  const hours = [
+    { day: 'Monday - Friday', time: '7:00 AM - 10:00 PM' },
+    { day: 'Saturday', time: '8:00 AM - 11:00 PM' },
+    { day: 'Sunday', time: '8:00 AM - 9:00 PM' },
   ];
 
   return (
@@ -64,7 +71,7 @@ export default function Footer() {
             <h2 
               className="text-3xl font-light mb-4"
               style={{
-                fontFamily: 'Bebas Neue, sans-serif',
+                fontFamily: 'var(--font-heading)',
                 color: '#FFFEF9',
                 fontWeight: 400,
                 fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
@@ -93,18 +100,18 @@ export default function Footer() {
             
             {/* Social Links */}
             <div className="flex gap-3">
-              {socialLinks.map((social) => (
+              {socialLinks.map(({ name, Icon, url }) => (
                 <a
-                  key={social.name}
-                  href={social.url}
-                  className="w-10 h-10 rounded-sm flex items-center justify-center transition-all duration-300 hover:-translate-y-1"
+                  key={name}
+                  href={url}
+                  className="w-10 h-10 flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:border-[#B87333]"
                   style={{
                     background: 'rgba(184, 115, 51, 0.1)',
                     border: '2px solid rgba(184, 115, 51, 0.3)',
                   }}
-                  aria-label={social.name}
+                  aria-label={name}
                 >
-                  {social.icon}
+                  <Icon size={18} style={{ color: '#B87333' }} />
                 </a>
               ))}
             </div>
@@ -121,7 +128,7 @@ export default function Footer() {
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
                 color: '#B87333',
-                fontFamily: 'Bebas Neue, sans-serif',
+                fontFamily: 'var(--font-heading)',
                 fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
                 letterSpacing: '0.05em',
               }}
@@ -133,7 +140,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <a
                     href={link.url}
-                    className="text-sm inline-block transition-all duration-300 hover:translate-x-2"
+                    className="text-sm inline-block transition-all duration-300 hover:translate-x-2 hover:text-[#B87333]"
                     style={{
                       color: 'rgba(255, 254, 249, 0.7)',
                     }}
@@ -156,7 +163,7 @@ export default function Footer() {
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
                 color: '#B87333',
-                fontFamily: 'Bebas Neue, sans-serif',
+                fontFamily: 'var(--font-heading)',
                 fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
                 letterSpacing: '0.05em',
               }}
@@ -164,9 +171,9 @@ export default function Footer() {
               CONTACT
             </h3>
             <div className="space-y-4">
-              {contactInfo.map((contact) => (
-                <div key={contact.label} className="flex items-start gap-3">
-                  <span className="text-lg" style={{ color: '#B87333' }}>{contact.icon}</span>
+              {contactInfo.map(({ label, value, Icon }) => (
+                <div key={label} className="flex items-start gap-3">
+                  <Icon size={18} style={{ color: '#B87333', marginTop: '2px' }} />
                   <div>
                     <div 
                       className="text-xs uppercase tracking-wider mb-1"
@@ -174,13 +181,13 @@ export default function Footer() {
                         color: 'rgba(255, 254, 249, 0.6)',
                       }}
                     >
-                      {contact.label}
+                      {label}
                     </div>
                     <div 
                       className="text-sm"
                       style={{ color: 'rgba(255, 254, 249, 0.8)' }}
                     >
-                      {contact.value}
+                      {value}
                     </div>
                   </div>
                 </div>
@@ -188,7 +195,7 @@ export default function Footer() {
             </div>
           </motion.div>
 
-          {/* Newsletter */}
+          {/* Hours */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -199,48 +206,35 @@ export default function Footer() {
               className="text-sm uppercase tracking-[0.2em] font-light mb-6"
               style={{
                 color: '#B87333',
-                fontFamily: 'Bebas Neue, sans-serif',
+                fontFamily: 'var(--font-heading)',
                 fontSize: 'clamp(1.25rem, 3vw, 1.5rem)',
                 letterSpacing: '0.05em',
               }}
             >
-              NEWSLETTER
+              HOURS
             </h3>
-            <p 
-              className="text-sm mb-4"
-              style={{
-                color: 'rgba(255, 254, 249, 0.7)',
-                lineHeight: 1.6,
-              }}
-            >
-              Subscribe for exclusive offers and updates.
-            </p>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-4 py-2 text-sm"
-                style={{
-                  background: 'rgba(61, 43, 31, 0.6)',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
-                  color: '#FFFEF9',
-                  outline: 'none',
-                  borderRadius: '0',
-                }}
-              />
-              <button
-                className="px-4 py-2 text-sm font-light transition-all duration-300 hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                  color: '#000000',
-                  fontFamily: 'Bebas Neue, sans-serif',
-                  letterSpacing: '0.1em',
-                  borderRadius: '0',
-                  border: 'none',
-                }}
-              >
-                →
-              </button>
+            <div className="space-y-4">
+              {hours.map(({ day, time }) => (
+                <div key={day} className="flex items-start gap-3">
+                  <Clock size={18} style={{ color: '#B87333', marginTop: '2px' }} />
+                  <div>
+                    <div 
+                      className="text-xs uppercase tracking-wider mb-1"
+                      style={{
+                        color: 'rgba(255, 254, 249, 0.6)',
+                      }}
+                    >
+                      {day}
+                    </div>
+                    <div 
+                      className="text-sm"
+                      style={{ color: 'rgba(255, 254, 249, 0.8)' }}
+                    >
+                      {time}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -267,7 +261,7 @@ export default function Footer() {
               <a
                 key={item}
                 href="#"
-                className="text-sm transition-colors duration-300"
+                className="text-sm transition-colors duration-300 hover:text-[#B87333]"
                 style={{ color: 'rgba(255, 254, 249, 0.5)' }}
               >
                 {item}

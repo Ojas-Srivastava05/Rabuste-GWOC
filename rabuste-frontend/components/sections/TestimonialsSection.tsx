@@ -55,7 +55,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-12 sm:mb-20"
+          className="text-center mb-16"
         >
           <p style={{
             color: '#B87333',
@@ -68,11 +68,12 @@ export default function TestimonialsSection() {
           </p>
 
           <h2 style={{
-            fontFamily: 'Bebas Neue, sans-serif',
+            fontFamily: 'var(--font-heading)',
             fontSize: 'clamp(2.5rem, 8vw, 7rem)',
             lineHeight: 0.9,
             color: '#FFFEF9',
             marginBottom: '1rem',
+            letterSpacing: '0.05em',
           }}>
             WHAT OUR
             <br />
@@ -89,93 +90,91 @@ export default function TestimonialsSection() {
           </h2>
         </motion.div>
 
-        {/* Testimonials Grid - Responsive */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
+        {/* Testimonials Grid - Sleeker Design */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={testimonial.name}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.03, y: -8 }}
+              whileHover={{ y: -4 }}
+              className="group relative"
               style={{
-                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
-                border: `3px solid ${testimonial.color}40`,
-                padding: 'clamp(24px, 5vw, 32px)',
-                position: 'relative',
-                overflow: 'hidden',
+                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.6), rgba(42, 24, 16, 0.5))',
+                border: `1px solid ${testimonial.color}30`,
+                padding: 'clamp(20px, 4vw, 28px)',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
               }}
             >
-              {/* Quote icon */}
-              <Quote 
-                size={60} 
+              {/* Subtle Corner Accent */}
+              <div 
+                className="absolute top-0 left-0 w-12 h-12 opacity-20"
                 style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  color: `${testimonial.color}20`,
+                  background: `linear-gradient(135deg, ${testimonial.color}, transparent)`,
                 }}
               />
 
-              {/* Rating */}
-              <div style={{
-                display: 'flex',
-                gap: '4px',
-                marginBottom: 'clamp(16px, 3vw, 20px)',
-              }}>
+              {/* Quote Icon - Smaller and Subtle */}
+              <Quote 
+                size={32} 
+                className="absolute top-4 right-4 opacity-10"
+                style={{ color: testimonial.color }}
+              />
+
+              {/* Rating - Compact */}
+              <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
                   <Star
                     key={i}
-                    size={20}
+                    size={14}
                     fill={testimonial.color}
                     color={testimonial.color}
                   />
                 ))}
               </div>
 
-              {/* Text */}
+              {/* Text - More readable spacing */}
               <p style={{
-                fontSize: 'clamp(1rem, 2vw, 1.125rem)',
+                fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
                 lineHeight: 1.7,
-                color: 'rgba(255, 254, 249, 0.9)',
-                marginBottom: 'clamp(20px, 4vw, 24px)',
+                color: 'rgba(255, 254, 249, 0.85)',
+                marginBottom: '20px',
                 position: 'relative',
                 zIndex: 1,
               }}>
                 "{testimonial.text}"
               </p>
 
-              {/* Author */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'clamp(12px, 3vw, 16px)',
-              }}>
+              {/* Author - Horizontal Layout, Compact */}
+              <div className="flex items-center gap-3 pt-4 border-t border-[rgba(184,115,51,0.15)]">
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
                   style={{
-                    width: 'clamp(50px, 10vw, 60px)',
-                    height: 'clamp(50px, 10vw, 60px)',
+                    width: '40px',
+                    height: '40px',
                     borderRadius: '50%',
-                    border: `3px solid ${testimonial.color}`,
+                    border: `2px solid ${testimonial.color}`,
                   }}
                 />
                 
                 <div>
                   <div style={{
-                    fontFamily: 'Bebas Neue, sans-serif',
-                    fontSize: 'clamp(1.125rem, 2.5vw, 1.375rem)',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: 'clamp(1rem, 2vw, 1.125rem)',
                     color: '#FFFEF9',
-                    letterSpacing: '0.05em',
+                    letterSpacing: '0.03em',
+                    lineHeight: 1.2,
                   }}>
                     {testimonial.name}
                   </div>
                   <div style={{
-                    fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                    fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)',
                     color: testimonial.color,
-                    letterSpacing: '0.05em',
+                    letterSpacing: '0.03em',
                   }}>
                     {testimonial.role}
                   </div>
