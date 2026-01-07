@@ -100,7 +100,7 @@ export default function Navbar() {
         <div className="hidden md:flex gap-4 flex-1">
           <NavButton href="/franchise">FRANCHISE</NavButton>
           <NavButton href="/workshops">WORKSHOP</NavButton>
-          <NavButton href="/order-status">ORDERS</NavButton>
+          <NavButton href="/order-status">MY ORDERS</NavButton>
         </div>
 
         {/* MOBILE: hamburger on left */}

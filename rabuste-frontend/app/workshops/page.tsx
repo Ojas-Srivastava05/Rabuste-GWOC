@@ -1,8 +1,8 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import React, { useEffect, useState, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   Calendar,
   Coffee,
@@ -12,10 +12,12 @@ import {
   MapPin,
   X,
   ArrowRight,
-  Sparkles,
-  Timer,
+  Search,
+  Filter,
   ChevronLeft,
   ChevronRight,
+  CalendarCheck,
+  List,
 } from "lucide-react";
 
 type Workshop = {
@@ -28,6 +30,7 @@ type Workshop = {
   instructor: string;
   location: string;
   capacity: number;
+  price?: number;
   registrations: Array<{ name: string; email: string; registeredAt: Date }>;
   status: "upcoming" | "past";
 };
@@ -39,10 +42,11 @@ export default function WorkshopsPage() {
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [registrationForm, setRegistrationForm] = useState({ name: "", email: "" });
   const [registrationMessage, setRegistrationMessage] = useState<string>("");
-  const [nextWorkshop, setNextWorkshop] = useState<Workshop | null>(null);
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [activeTimelineIndex, setActiveTimelineIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -64,12 +68,6 @@ export default function WorkshopsPage() {
         });
 
         setWorkshops(processed);
-        
-        // Set next workshop
-        const upcoming = processed.filter((w: Workshop) => w.status === "upcoming");
-        if (upcoming.length > 0) {
-          setNextWorkshop(upcoming[0]);
-        }
       } catch (err) {
         console.error(err);
       }
@@ -77,57 +75,6 @@ export default function WorkshopsPage() {
 
     fetchWorkshops();
   }, []);
-
-  // Countdown timer for next workshop
-  useEffect(() => {
-    if (!nextWorkshop) return;
-
-    const updateCountdown = () => {
-      const now = new Date();
-      const workshopDate = new Date(nextWorkshop.date);
-      const diff = workshopDate.getTime() - now.getTime();
-
-      if (diff <= 0) {
-        setTimeLeft("Event Started");
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-      if (days > 0) {
-        setTimeLeft(`${days}d ${hours}h ${minutes}m`);
-      } else {
-        setTimeLeft(`${hours}h ${minutes}m`);
-      }
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 60000); // Update every minute
-
-    return () => clearInterval(interval);
-  }, [nextWorkshop]);
-
-  // Scroll tracking for timeline
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container || workshops.length === 0) return;
-
-    const handleScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      const scrollWidth = container.scrollWidth - container.clientWidth;
-      const scrollProgress = scrollWidth > 0 ? scrollLeft / scrollWidth : 0;
-      const newIndex = Math.round(scrollProgress * Math.max(0, workshops.length - 1));
-      setActiveTimelineIndex(newIndex);
-    };
-
-    container.addEventListener("scroll", handleScroll);
-    return () => container.removeEventListener("scroll", handleScroll);
-  }, [workshops.length]);
-
-  const upcomingWorkshops = workshops.filter((w) => w.status === "upcoming");
-  const pastWorkshops = workshops.filter((w) => w.status === "past");
 
   const handleRegister = async () => {
     if (!selectedWorkshop || !registrationForm.name || !registrationForm.email) {
@@ -153,7 +100,6 @@ export default function WorkshopsPage() {
       setRegistrationForm({ name: "", email: "" });
       setIsRegistering(false);
 
-      // Refresh workshops
       const workshopsRes = await fetch("/api/workshops");
       const workshopsData = await workshopsRes.json();
       const today = new Date();
@@ -183,684 +129,633 @@ export default function WorkshopsPage() {
     return workshop.capacity > 0 && workshop.registrations?.length >= workshop.capacity;
   };
 
-  const scrollTimeline = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return;
-    const scrollAmount = 400;
-    const newScrollLeft = scrollContainerRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
-    scrollContainerRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  // Filter workshops
+  const filteredWorkshops = workshops.filter((workshop) => {
+    const matchesSearch = workshop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      workshop.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === "all" || workshop.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Get workshops for selected date
+  const workshopsOnSelectedDate = filteredWorkshops.filter((workshop) => {
+    const workshopDate = new Date(workshop.date);
+    return (
+      workshopDate.getDate() === selectedDate.getDate() &&
+      workshopDate.getMonth() === selectedDate.getMonth() &&
+      workshopDate.getFullYear() === selectedDate.getFullYear()
+    );
+  });
+
+  // Calendar helpers
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+
+    const days: (number | null)[] = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i);
+    }
+    
+    return days;
   };
 
-  // Group workshops by month for timeline dots
-  const timelineMonths = React.useMemo(() => {
-    const months = new Map<string, number>();
-    workshops.forEach((w, idx) => {
-      const date = new Date(w.date);
-      const key = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-      if (!months.has(key)) {
-        months.set(key, idx);
-      }
+  const hasWorkshopOnDate = (day: number) => {
+    return workshops.some((workshop) => {
+      const workshopDate = new Date(workshop.date);
+      return (
+        workshopDate.getDate() === day &&
+        workshopDate.getMonth() === currentMonth.getMonth() &&
+        workshopDate.getFullYear() === currentMonth.getFullYear()
+      );
     });
-    return Array.from(months.entries());
-  }, [workshops]);
+  };
 
-  if (workshops.length === 0) {
+  const isSelectedDate = (day: number) => {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex items-center justify-center" style={{ background: '#000000' }}>
-          <div className="text-center">
-            <Coffee size={64} className="mx-auto mb-6" style={{ color: '#B87333', opacity: 0.5 }} />
-            <p style={{ color: '#B87333', fontSize: '1.25rem' }}>Loading workshops...</p>
-          </div>
-        </div>
-      </>
+      day === selectedDate.getDate() &&
+      currentMonth.getMonth() === selectedDate.getMonth() &&
+      currentMonth.getFullYear() === selectedDate.getFullYear()
     );
-  }
+  };
+
+  const handleDateClick = (day: number) => {
+    const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    setSelectedDate(newDate);
+  };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
+
+  const days = getDaysInMonth(currentMonth);
+  const weekDays = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen relative overflow-hidden" style={{ background: '#000000' }}>
-        {/* Animated Background */}
-        <div
-          className="fixed inset-0 pointer-events-none opacity-20"
-          style={{
-            background: `radial-gradient(circle at ${50 + activeTimelineIndex * 5}% 50%, rgba(184, 115, 51, 0.15) 0%, transparent 60%)`,
-            transition: 'background 1s ease',
-          }}
-        />
-
-        <div className="relative z-10 pt-32 pb-20">
-          {/* Hero Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-16 px-6"
-          >
+      
+      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+        <div className="container px-6 max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
             <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-4 mb-6"
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 3, repeat: Infinity }}
             >
-              <Sparkles size={20} style={{ color: '#B87333' }} />
-              <span
-                style={{
-                  color: '#B87333',
-                  fontSize: '0.875rem',
-                  letterSpacing: '0.3em',
-                  fontWeight: 700,
-                }}
-              >
-                POWER EXPERIENCES
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+                LEARN & CREATE
               </span>
-              <Sparkles size={20} style={{ color: '#B87333' }} />
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </motion.div>
-
-            <h1
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-6xl md:text-8xl mb-4"
               style={{
-                fontFamily: 'Bebas Neue, sans-serif',
-                fontSize: 'clamp(3rem, 10vw, 7rem)',
+                fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
-                color: '#FFFEF9',
-                marginBottom: '1rem',
+                color: '#F5F1E8',
               }}
             >
-              <span
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                RABUSTE
-              </span>{' '}
               WORKSHOPS
-            </h1>
-
-            <p
-              style={{
-                fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                color: 'rgba(255, 254, 249, 0.7)',
-                maxWidth: '600px',
-                margin: '0 auto',
-              }}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-lg"
+              style={{ color: '#B87333' }}
             >
-              Master the art of bold coffee. Experience premium learning.
-            </p>
-          </motion.div>
+              Discover hands-on experiences in coffee and art
+            </motion.p>
+          </div>
 
-          {/* NEXT WORKSHOP - Living Card */}
-          {nextWorkshop && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="max-w-5xl mx-auto mb-20 px-6"
-            >
-              <div
-                className="relative overflow-hidden group cursor-pointer"
-                onClick={() => {
-                  setSelectedWorkshop(nextWorkshop);
-                  setIsModalOpen(true);
-                }}
-                style={{
-                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(26, 17, 16, 0.95))',
-                  border: '3px solid rgba(184, 115, 51, 0.8)',
-                  backdropFilter: 'blur(20px)',
-                  padding: 'clamp(2rem, 4vw, 3rem)',
-                  boxShadow: '0 20px 80px rgba(184, 115, 51, 0.4), 0 0 60px rgba(184, 115, 51, 0.2)',
-                }}
-              >
-                {/* Breathing Animation */}
-                <motion.div
-                  className="absolute inset-0 pointer-events-none"
-                  animate={{
-                    opacity: [0.2, 0.4, 0.2],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
+          {/* View Toggle & Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mb-8 p-6 rounded-xl"
+            style={{
+              background: 'rgba(61, 43, 31, 0.4)',
+              border: '2px solid rgba(184, 115, 51, 0.3)',
+            }}
+          >
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              {/* View Toggle */}
+              <div className="flex gap-2 p-1 rounded-lg" style={{ background: 'rgba(26, 17, 16, 0.6)' }}>
+                <button
+                  onClick={() => setViewMode("calendar")}
+                  className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
                   style={{
-                    background: 'radial-gradient(circle at 50% 50%, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
+                    background: viewMode === "calendar" ? 'linear-gradient(135deg, #B87333, #CD7F32)' : 'transparent',
+                    color: viewMode === "calendar" ? '#000' : '#B87333',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.1em',
                   }}
-                />
-
-                <div className="relative z-10">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="uppercase text-xs tracking-[0.3em]"
-                        style={{ color: '#CD7F32', fontFamily: 'Bebas Neue, sans-serif' }}
-                      >
-                        NEXT EXPERIENCE
-                      </span>
-                      <motion.div
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        <Timer size={20} style={{ color: '#D4A574' }} />
-                      </motion.div>
-                    </div>
-
-                    {/* Live Countdown */}
-                    <motion.div
-                      className="flex items-center gap-3 px-6 py-3"
-                      style={{
-                        background: 'rgba(184, 115, 51, 0.2)',
-                        border: '2px solid rgba(184, 115, 51, 0.5)',
-                      }}
-                      animate={{
-                        boxShadow: [
-                          '0 0 20px rgba(184, 115, 51, 0.3)',
-                          '0 0 40px rgba(184, 115, 51, 0.6)',
-                          '0 0 20px rgba(184, 115, 51, 0.3)',
-                        ],
-                      }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    >
-                      <Clock size={18} style={{ color: '#D4A574' }} />
-                      <span
-                        style={{
-                          fontFamily: 'Bebas Neue, sans-serif',
-                          fontSize: '1.125rem',
-                          color: '#FFFEF9',
-                          letterSpacing: '0.1em',
-                        }}
-                      >
-                        {timeLeft}
-                      </span>
-                    </motion.div>
-                  </div>
-
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Left: Info */}
-                    <div>
-                      <div className="flex items-center gap-3 mb-4">
-                        <div
-                          className="w-14 h-14 flex items-center justify-center"
-                          style={{
-                            background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
-                            border: '2px solid rgba(184, 115, 51, 0.6)',
-                          }}
-                        >
-                          {nextWorkshop.category === "coffee" ? (
-                            <Coffee size={28} style={{ color: '#D4A574' }} />
-                          ) : (
-                            <Palette size={28} style={{ color: '#D4A574' }} />
-                          )}
-                        </div>
-                        <span
-                          className="uppercase text-sm tracking-[0.2em]"
-                          style={{ color: '#B87333', fontFamily: 'Bebas Neue, sans-serif' }}
-                        >
-                          {nextWorkshop.category} WORKSHOP
-                        </span>
-                      </div>
-
-                      <h2
-                        className="text-4xl md:text-5xl mb-4"
-                        style={{
-                          fontFamily: 'Bebas Neue, sans-serif',
-                          color: '#FFFEF9',
-                          lineHeight: 0.95,
-                        }}
-                      >
-                        {nextWorkshop.title}
-                      </h2>
-
-                      <p
-                        className="text-base mb-6"
-                        style={{ color: 'rgba(255, 254, 249, 0.8)', lineHeight: 1.7 }}
-                      >
-                        {nextWorkshop.description}
-                      </p>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div
-                          className="p-4"
-                          style={{
-                            background: 'rgba(20, 20, 20, 0.6)',
-                            border: '2px solid rgba(184, 115, 51, 0.3)',
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar size={16} style={{ color: '#B87333' }} />
-                            <span className="text-xs uppercase tracking-wider" style={{ color: '#8B6F47' }}>
-                              Date
-                            </span>
-                          </div>
-                          <p className="text-sm" style={{ color: '#FFFEF9' }}>
-                            {new Date(nextWorkshop.date).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                            })}
-                          </p>
-                        </div>
-
-                        <div
-                          className="p-4"
-                          style={{
-                            background: 'rgba(20, 20, 20, 0.6)',
-                            border: '2px solid rgba(184, 115, 51, 0.3)',
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <Clock size={16} style={{ color: '#B87333' }} />
-                            <span className="text-xs uppercase tracking-wider" style={{ color: '#8B6F47' }}>
-                              Time
-                            </span>
-                          </div>
-                          <p className="text-sm" style={{ color: '#FFFEF9' }}>
-                            {nextWorkshop.time}
-                          </p>
-                        </div>
-
-                        <div
-                          className="p-4"
-                          style={{
-                            background: 'rgba(20, 20, 20, 0.6)',
-                            border: '2px solid rgba(184, 115, 51, 0.3)',
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <User size={16} style={{ color: '#B87333' }} />
-                            <span className="text-xs uppercase tracking-wider" style={{ color: '#8B6F47' }}>
-                              Instructor
-                            </span>
-                          </div>
-                          <p className="text-sm" style={{ color: '#FFFEF9' }}>
-                            {nextWorkshop.instructor}
-                          </p>
-                        </div>
-
-                        <div
-                          className="p-4"
-                          style={{
-                            background: 'rgba(20, 20, 20, 0.6)',
-                            border: '2px solid rgba(184, 115, 51, 0.3)',
-                          }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <MapPin size={16} style={{ color: '#B87333' }} />
-                            <span className="text-xs uppercase tracking-wider" style={{ color: '#8B6F47' }}>
-                              Location
-                            </span>
-                          </div>
-                          <p className="text-sm" style={{ color: '#FFFEF9' }}>
-                            {nextWorkshop.location}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right: CTA */}
-                    <div className="flex flex-col justify-center">
-                      <div
-                        className="p-8 text-center"
-                        style={{
-                          background: 'rgba(20, 20, 20, 0.8)',
-                          border: '2px solid rgba(184, 115, 51, 0.4)',
-                        }}
-                      >
-                        {nextWorkshop.capacity > 0 && (
-                          <div className="mb-6">
-                            <p
-                              className="text-3xl mb-2"
-                              style={{
-                                fontFamily: 'Bebas Neue, sans-serif',
-                                color: isWorkshopFull(nextWorkshop) ? '#ff6b6b' : '#D4A574',
-                              }}
-                            >
-                              {nextWorkshop.capacity - (nextWorkshop.registrations?.length || 0)}
-                            </p>
-                            <p className="text-sm uppercase tracking-wider" style={{ color: '#8B6F47' }}>
-                              Seats Remaining
-                            </p>
-                          </div>
-                        )}
-
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className="w-full py-4 flex items-center justify-center gap-3 transition-all"
-                          style={{
-                            background: isWorkshopFull(nextWorkshop)
-                              ? 'rgba(139, 111, 71, 0.3)'
-                              : 'linear-gradient(135deg, #B87333, #CD7F32)',
-                            border: `2px solid ${isWorkshopFull(nextWorkshop) ? 'rgba(139, 111, 71, 0.5)' : 'rgba(184, 115, 51, 0.6)'}`,
-                            color: isWorkshopFull(nextWorkshop) ? '#8B6F47' : '#000',
-                            fontFamily: 'Bebas Neue, sans-serif',
-                            fontSize: '1.25rem',
-                            letterSpacing: '0.15em',
-                            cursor: isWorkshopFull(nextWorkshop) ? 'not-allowed' : 'pointer',
-                          }}
-                          disabled={isWorkshopFull(nextWorkshop)}
-                        >
-                          {isWorkshopFull(nextWorkshop) ? 'FULLY BOOKED' : 'REGISTER NOW'}
-                          {!isWorkshopFull(nextWorkshop) && <ArrowRight size={20} />}
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                >
+                  <CalendarCheck size={18} />
+                  CALENDAR VIEW
+                </button>
+                <button
+                  onClick={() => setViewMode("list")}
+                  className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
+                  style={{
+                    background: viewMode === "list" ? 'linear-gradient(135deg, #B87333, #CD7F32)' : 'transparent',
+                    color: viewMode === "list" ? '#000' : '#B87333',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  <List size={18} />
+                  LIST VIEW
+                </button>
               </div>
-            </motion.div>
-          )}
 
-          {/* Timeline Navigation */}
-          {timelineMonths.length > 1 && (
-            <div className="max-w-7xl mx-auto mb-8 px-6">
-              <div className="flex items-center justify-center gap-8">
-                {timelineMonths.map(([month, idx], i) => (
-                  <motion.div
-                    key={month}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex flex-col items-center cursor-pointer"
-                    onClick={() => {
-                      const container = scrollContainerRef.current;
-                      if (container) {
-                        const cardWidth = 450;
-                        container.scrollTo({ left: idx * cardWidth, behavior: 'smooth' });
-                      }
+              {/* Search & Filters */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <div className="relative flex-1 md:min-w-[300px]">
+                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#B87333' }} />
+                  <input
+                    type="text"
+                    placeholder="Search events, cities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 rounded-lg outline-none transition-all"
+                    style={{
+                      background: 'rgba(26, 17, 16, 0.8)',
+                      border: '2px solid rgba(184, 115, 51, 0.3)',
+                      color: '#F5F1E8',
+                    }}
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <button className="p-3 rounded-lg transition-all hover:scale-105" style={{ background: 'rgba(26, 17, 16, 0.8)', border: '2px solid rgba(184, 115, 51, 0.3)', color: '#B87333' }}>
+                    <Filter size={18} />
+                  </button>
+                  
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="px-4 py-3 rounded-lg outline-none cursor-pointer"
+                    style={{
+                      background: 'rgba(26, 17, 16, 0.8)',
+                      border: '2px solid rgba(184, 115, 51, 0.3)',
+                      color: '#F5F1E8',
+                      fontFamily: 'var(--font-body)',
                     }}
                   >
-                    <div
-                      className="w-3 h-3 rounded-full mb-2 transition-all"
-                      style={{
-                        background: i <= Math.floor(activeTimelineIndex / (workshops.length / timelineMonths.length))
-                          ? '#B87333'
-                          : 'rgba(184, 115, 51, 0.3)',
-                        boxShadow: i === Math.floor(activeTimelineIndex / (workshops.length / timelineMonths.length))
-                          ? '0 0 20px rgba(184, 115, 51, 0.8)'
-                          : 'none',
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontFamily: 'Bebas Neue, sans-serif',
-                        fontSize: '0.875rem',
-                        color: i <= Math.floor(activeTimelineIndex / (workshops.length / timelineMonths.length))
-                          ? '#D4A574'
-                          : 'rgba(184, 115, 51, 0.5)',
-                        letterSpacing: '0.1em',
-                      }}
-                    >
-                      {month}
-                    </span>
-                  </motion.div>
-                ))}
+                    <option value="all">All Categories</option>
+                    <option value="coffee">Coffee</option>
+                    <option value="painting">Painting</option>
+                  </select>
+                </div>
               </div>
             </div>
-          )}
+          </motion.div>
 
-          {/* Horizontal Timeline Ribbon */}
-          <div className="relative max-w-7xl mx-auto mb-20">
-            {/* Navigation Arrows */}
-            <button
-              onClick={() => scrollTimeline('left')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-3 transition-all hover:scale-110"
-              style={{
-                background: 'rgba(0, 0, 0, 0.8)',
-                border: '2px solid rgba(184, 115, 51, 0.6)',
-                color: '#D4A574',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <ChevronLeft size={24} />
-            </button>
+          {/* Calendar View */}
+          {viewMode === "calendar" && (
+            <div className="grid lg:grid-cols-[1fr,2fr] gap-8">
+              {/* Calendar Section */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+                className="p-6 rounded-xl h-fit"
+                style={{
+                  background: 'rgba(61, 43, 31, 0.6)',
+                  border: '2px solid rgba(184, 115, 51, 0.4)',
+                }}
+              >
+                <div className="mb-6">
+                  <h3 className="text-xl mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
+                    SELECT DATE
+                  </h3>
+                  <div className="h-px bg-gradient-to-r from-[#B87333] to-transparent" />
+                </div>
 
-            <button
-              onClick={() => scrollTimeline('right')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-3 transition-all hover:scale-110"
-              style={{
-                background: 'rgba(0, 0, 0, 0.8)',
-                border: '2px solid rgba(184, 115, 51, 0.6)',
-                color: '#D4A574',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <ChevronRight size={24} />
-            </button>
+                {/* Month Navigation */}
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={goToPreviousMonth}
+                    className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
+                    style={{ color: '#B87333' }}
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+                  
+                  <h4 className="text-xl" style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8', letterSpacing: '0.05em' }}>
+                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                  </h4>
+                  
+                  <button
+                    onClick={goToNextMonth}
+                    className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
+                    style={{ color: '#B87333' }}
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
 
-            {/* Scrollable Container */}
-            <div
-              ref={scrollContainerRef}
-              className="overflow-x-auto overflow-y-visible scrollbar-hide snap-x snap-mandatory px-6"
-              style={{
-                scrollBehavior: 'smooth',
-                WebkitOverflowScrolling: 'touch',
-              }}
-            >
-              <div className="flex gap-6 py-12 min-w-max">
-                {workshops.map((workshop, index) => {
-                  const isPast = workshop.status === "past";
-                  const isFull = isWorkshopFull(workshop);
-                  const isActive = activeTimelineIndex === index;
-
-                  return (
-                    <motion.div
-                      key={workshop._id}
-                      className="snap-center flex-shrink-0"
-                      style={{ width: '420px' }}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: index * 0.05 }}
+                {/* Week Days */}
+                <div className="grid grid-cols-7 gap-2 mb-2">
+                  {weekDays.map((day) => (
+                    <div
+                      key={day}
+                      className="text-center text-xs py-2"
+                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
                     >
-                      <motion.div
-                        className="relative h-full cursor-pointer"
-                        animate={{
-                          scale: isActive ? 1.05 : 0.95,
-                          opacity: isPast ? 0.5 : 1,
-                        }}
-                        whileHover={{ y: -12 }}
-                        transition={{ duration: 0.4 }}
-                        onClick={() => {
-                          if (!isPast) {
-                            setSelectedWorkshop(workshop);
-                            setIsModalOpen(true);
-                          }
-                        }}
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Days */}
+                <div className="grid grid-cols-7 gap-2">
+                  {days.map((day, index) => {
+                    if (day === null) {
+                      return <div key={`empty-${index}`} />;
+                    }
+
+                    const hasWorkshop = hasWorkshopOnDate(day);
+                    const isSelected = isSelectedDate(day);
+                    const isToday = day === new Date().getDate() && 
+                      currentMonth.getMonth() === new Date().getMonth() &&
+                      currentMonth.getFullYear() === new Date().getFullYear();
+
+                    return (
+                      <motion.button
+                        key={day}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleDateClick(day)}
+                        className="aspect-square flex items-center justify-center rounded-lg relative transition-all"
                         style={{
-                          background: isPast
-                            ? 'linear-gradient(135deg, rgba(61, 43, 31, 0.4), rgba(26, 17, 16, 0.4))'
-                            : 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(26, 17, 16, 0.95))',
-                          border: `3px solid ${
-                            isPast
-                              ? 'rgba(139, 111, 71, 0.3)'
-                              : isActive
-                              ? 'rgba(184, 115, 51, 0.8)'
-                              : 'rgba(184, 115, 51, 0.5)'
-                          }`,
-                          backdropFilter: 'blur(20px)',
-                          boxShadow: isActive && !isPast
-                            ? '0 20px 60px rgba(184, 115, 51, 0.4), 0 0 40px rgba(184, 115, 51, 0.2)'
-                            : '0 8px 32px rgba(0, 0, 0, 0.6)',
+                          background: isSelected 
+                            ? 'linear-gradient(135deg, #B87333, #CD7F32)'
+                            : hasWorkshop 
+                            ? 'rgba(184, 115, 51, 0.2)' 
+                            : 'transparent',
+                          border: isSelected 
+                            ? '2px solid #D4A574'
+                            : isToday
+                            ? '2px solid rgba(184, 115, 51, 0.6)'
+                            : '2px solid transparent',
+                          color: isSelected ? '#000' : '#F5F1E8',
+                          fontFamily: 'var(--font-heading)',
+                          cursor: 'pointer',
                         }}
                       >
-                        {/* Active Glow */}
-                        {isActive && !isPast && (
-                          <motion.div
-                            className="absolute inset-0 pointer-events-none"
-                            animate={{
-                              opacity: [0.3, 0.6, 0.3],
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                            }}
-                            style={{
-                              background: 'radial-gradient(circle at 50% 0%, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
-                              filter: 'blur(20px)',
-                            }}
+                        {day}
+                        {hasWorkshop && !isSelected && (
+                          <div 
+                            className="absolute bottom-1 w-1 h-1 rounded-full"
+                            style={{ background: '#B87333' }}
                           />
                         )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </motion.div>
 
-                        {/* Image Section */}
-                        <div className="relative h-56 overflow-hidden">
-                          <img
-                            src={
-                              workshop.category === 'coffee'
-                                ? 'https://images.pexels.com/photos/3889742/pexels-photo-3889742.jpeg'
-                                : 'https://images.pexels.com/photos/1445457/pexels-photo-1445457.jpeg'
+              {/* Events Section */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="mb-6">
+                  <h3 className="text-2xl" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.05em' }}>
+                    EVENTS ON {selectedDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}
+                  </h3>
+                </div>
+
+                {workshopsOnSelectedDate.length === 0 ? (
+                  <div 
+                    className="p-12 rounded-xl text-center"
+                    style={{
+                      background: 'rgba(61, 43, 31, 0.4)',
+                      border: '2px dashed rgba(184, 115, 51, 0.3)',
+                    }}
+                  >
+                    <Calendar size={48} className="mx-auto mb-4" style={{ color: '#8B6F47' }} />
+                    <p className="text-lg" style={{ color: '#8B6F47' }}>
+                      No workshops scheduled for this date
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {workshopsOnSelectedDate.map((workshop) => {
+                      const isFull = isWorkshopFull(workshop);
+                      const isPast = workshop.status === "past";
+
+                      return (
+                        <motion.div
+                          key={workshop._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-8 rounded-xl cursor-pointer transition-all hover:shadow-2xl"
+                          onClick={() => {
+                            if (!isPast) {
+                              setSelectedWorkshop(workshop);
+                              setIsModalOpen(true);
                             }
-                            alt={workshop.title}
-                            className="w-full h-full object-cover"
-                            style={{
-                              filter: isPast ? 'grayscale(80%)' : 'none',
-                            }}
-                          />
-
-                          {/* Gradient Overlay */}
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              background: `linear-gradient(180deg, transparent 0%, ${
-                                isPast ? 'rgba(139, 111, 71, 0.8)' : 'rgba(184, 115, 51, 0.6)'
-                              } 100%)`,
-                            }}
-                          />
-
-                          {/* Status Badge */}
-                          <div
-                            className="absolute top-4 left-4 px-4 py-2 flex items-center gap-2"
-                            style={{
-                              background: isPast ? 'rgba(139, 111, 71, 0.9)' : 'rgba(184, 115, 51, 0.9)',
-                              backdropFilter: 'blur(10px)',
-                            }}
-                          >
-                            {workshop.category === 'coffee' ? <Coffee size={18} /> : <Palette size={18} />}
-                            <span
-                              style={{
-                                fontFamily: 'Bebas Neue, sans-serif',
-                                fontSize: '0.875rem',
-                                color: '#000',
-                                letterSpacing: '0.1em',
-                              }}
+                          }}
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+                            border: '2px solid rgba(184, 115, 51, 0.5)',
+                            opacity: isPast ? 0.6 : 1,
+                          }}
+                        >
+                          {/* Category Badge */}
+                          <div className="flex items-center gap-2 mb-4">
+                            <div 
+                              className="px-4 py-2 rounded-full flex items-center gap-2"
+                              style={{ background: 'rgba(184, 115, 51, 0.3)' }}
                             >
-                              {isPast ? 'PAST' : workshop.category.toUpperCase()}
-                            </span>
-                          </div>
-
-                          {/* Date Tag */}
-                          <div
-                            className="absolute top-4 right-4 px-4 py-2"
-                            style={{
-                              background: 'rgba(0, 0, 0, 0.9)',
-                              backdropFilter: 'blur(10px)',
-                            }}
-                          >
-                            <p
-                              style={{
-                                fontFamily: 'Bebas Neue, sans-serif',
-                                fontSize: '1.5rem',
-                                color: isPast ? '#8B6F47' : '#D4A574',
-                                lineHeight: 1,
-                              }}
-                            >
-                              {new Date(workshop.date).getDate()}
-                            </p>
-                            <p
-                              style={{
-                                fontSize: '0.75rem',
-                                color: isPast ? '#6B5B47' : '#B87333',
-                                letterSpacing: '0.1em',
-                              }}
-                            >
-                              {new Date(workshop.date).toLocaleDateString('en-US', { month: 'short' })}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-6">
-                          <h3
-                            style={{
-                              fontFamily: 'Bebas Neue, sans-serif',
-                              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                              color: isPast ? '#8B6F47' : '#FFFEF9',
-                              marginBottom: '0.75rem',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {workshop.title}
-                          </h3>
-
-                          <p
-                            className="mb-4 line-clamp-2"
-                            style={{
-                              fontSize: '0.875rem',
-                              color: isPast ? 'rgba(139, 111, 71, 0.8)' : 'rgba(255, 254, 249, 0.8)',
-                              lineHeight: 1.6,
-                            }}
-                          >
-                            {workshop.description}
-                          </p>
-
-                          {/* Details */}
-                          <div className="space-y-2 mb-4">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Clock size={16} style={{ color: isPast ? '#6B5B47' : '#B87333' }} />
-                              <span style={{ color: isPast ? '#8B6F47' : '#FFFEF9' }}>{workshop.time}</span>
+                              {workshop.category === "coffee" ? <Coffee size={16} /> : <Palette size={16} />}
+                              <span className="text-xs uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+                                {workshop.category}
+                              </span>
                             </div>
-                            <div className="flex items-center gap-2 text-sm">
-                              <User size={16} style={{ color: isPast ? '#6B5B47' : '#B87333' }} />
-                              <span style={{ color: isPast ? '#8B6F47' : '#FFFEF9' }}>{workshop.instructor}</span>
-                            </div>
-                            {workshop.capacity > 0 && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <User size={16} style={{ color: isFull ? '#ff6b6b' : isPast ? '#6B5B47' : '#B87333' }} />
-                                <span style={{ color: isFull ? '#ff6b6b' : isPast ? '#8B6F47' : '#FFFEF9' }}>
-                                  {workshop.registrations?.length || 0} / {workshop.capacity} seats
-                                  {isFull && ' (FULL)'}
+                            {isFull && (
+                              <div 
+                                className="px-4 py-2 rounded-full"
+                                style={{ background: 'rgba(255, 107, 107, 0.2)', color: '#ff6b6b' }}
+                              >
+                                <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
+                                  FULLY BOOKED
                                 </span>
                               </div>
                             )}
                           </div>
 
-                          {/* CTA */}
-                          {!isPast && (
-                            <div
-                              className="flex items-center gap-2 text-sm transition-all group-hover:gap-4"
+                          <h4 
+                            className="text-3xl mb-3"
+                            style={{
+                              fontFamily: 'var(--font-heading)',
+                              color: '#FFFEF9',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {workshop.title}
+                          </h4>
+
+                          <p 
+                            className="mb-6 text-base leading-relaxed"
+                            style={{ color: 'rgba(255, 254, 249, 0.8)' }}
+                          >
+                            {workshop.description}
+                          </p>
+
+                          {/* Details Grid */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Calendar size={14} style={{ color: '#B87333' }} />
+                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Date</span>
+                              </div>
+                              <p className="text-sm" style={{ color: '#FFFEF9' }}>
+                                {new Date(workshop.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </p>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Clock size={14} style={{ color: '#B87333' }} />
+                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Time</span>
+                              </div>
+                              <p className="text-sm" style={{ color: '#FFFEF9' }}>{workshop.time}</p>
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <MapPin size={14} style={{ color: '#B87333' }} />
+                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Location</span>
+                              </div>
+                              <p className="text-sm" style={{ color: '#FFFEF9' }}>{workshop.location}</p>
+                            </div>
+
+                            {workshop.price && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Price</span>
+                                </div>
+                                <p className="text-sm font-bold" style={{ color: '#D4A574' }}>₹{workshop.price}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 mb-6">
+                            <User size={14} style={{ color: '#B87333' }} />
+                            <span className="text-sm" style={{ color: '#FFFEF9' }}>
+                              <span style={{ color: '#8B6F47' }}>Instructor:</span> {workshop.instructor}
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-3">
+                            <button
+                              className="flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                               style={{
+                                background: 'rgba(26, 17, 16, 0.8)',
+                                border: '2px solid rgba(184, 115, 51, 0.4)',
                                 color: '#B87333',
-                                fontFamily: 'Bebas Neue, sans-serif',
+                                fontFamily: 'var(--font-heading)',
+                                fontSize: '0.9rem',
                                 letterSpacing: '0.1em',
                               }}
                             >
-                              VIEW DETAILS
-                              <ArrowRight size={16} />
-                            </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                              <CalendarCheck size={18} />
+                              ADD TO CALENDAR
+                            </button>
+                            
+                            {!isPast && (
+                              <button
+                                disabled={isFull}
+                                className="flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
+                                style={{
+                                  background: isFull ? 'rgba(139, 111, 71, 0.3)' : 'linear-gradient(135deg, #B87333, #CD7F32)',
+                                  border: `2px solid ${isFull ? 'rgba(139, 111, 71, 0.5)' : 'rgba(184, 115, 51, 0.6)'}`,
+                                  color: isFull ? '#8B6F47' : '#000',
+                                  fontFamily: 'var(--font-heading)',
+                                  fontSize: '0.9rem',
+                                  letterSpacing: '0.1em',
+                                  cursor: isFull ? 'not-allowed' : 'pointer',
+                                }}
+                              >
+                                {isFull ? 'FULLY BOOKED' : 'BOOK NOW'}
+                                {!isFull && <ArrowRight size={18} />}
+                              </button>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </motion.div>
             </div>
-          </div>
+          )}
 
-          {/* Scroll Hint */}
-          <motion.div
-            className="text-center"
-            animate={{ opacity: [1, 0.5, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <p
-              style={{
-                color: '#B87333',
-                fontSize: '0.875rem',
-                letterSpacing: '0.2em',
-              }}
+          {/* List View */}
+          {viewMode === "list" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              ← SWIPE TO EXPLORE MORE →
-            </p>
-          </motion.div>
+              {filteredWorkshops.map((workshop, index) => {
+                const isFull = isWorkshopFull(workshop);
+                const isPast = workshop.status === "past";
+
+                return (
+                  <motion.div
+                    key={workshop._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-2xl"
+                    onClick={() => {
+                      if (!isPast) {
+                        setSelectedWorkshop(workshop);
+                        setIsModalOpen(true);
+                      }
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
+                      border: '2px solid rgba(184, 115, 51, 0.5)',
+                      opacity: isPast ? 0.6 : 1,
+                    }}
+                  >
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={
+                          workshop.category === 'coffee'
+                            ? 'https://images.pexels.com/photos/3889742/pexels-photo-3889742.jpeg'
+                            : 'https://images.pexels.com/photos/1445457/pexels-photo-1445457.jpeg'
+                        }
+                        alt={workshop.title}
+                        className="w-full h-full object-cover"
+                        style={{ filter: isPast ? 'grayscale(80%)' : 'none' }}
+                      />
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: 'linear-gradient(180deg, transparent 0%, rgba(26, 17, 16, 0.8) 100%)',
+                        }}
+                      />
+                      
+                      {/* Badge */}
+                      <div 
+                        className="absolute top-4 left-4 px-3 py-1 rounded-full flex items-center gap-2"
+                        style={{ background: 'rgba(184, 115, 51, 0.9)' }}
+                      >
+                        {workshop.category === 'coffee' ? <Coffee size={14} /> : <Palette size={14} />}
+                        <span className="text-xs uppercase" style={{ color: '#000', fontFamily: 'var(--font-heading)' }}>
+                          {workshop.category}
+                        </span>
+                      </div>
+                      
+                      {/* Date */}
+                      <div 
+                        className="absolute top-4 right-4 px-3 py-2 rounded-lg"
+                        style={{ background: 'rgba(0, 0, 0, 0.9)' }}
+                      >
+                        <p className="text-lg leading-none" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+                          {new Date(workshop.date).getDate()}
+                        </p>
+                        <p className="text-xs" style={{ color: '#B87333' }}>
+                          {new Date(workshop.date).toLocaleDateString('en-US', { month: 'short' })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h4 
+                        className="text-2xl mb-2"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#FFFEF9',
+                          lineHeight: 1,
+                        }}
+                      >
+                        {workshop.title}
+                      </h4>
+
+                      <p 
+                        className="mb-4 text-sm line-clamp-2"
+                        style={{ color: 'rgba(255, 254, 249, 0.7)' }}
+                      >
+                        {workshop.description}
+                      </p>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock size={14} style={{ color: '#B87333' }} />
+                          <span style={{ color: '#FFFEF9' }}>{workshop.time}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <User size={14} style={{ color: '#B87333' }} />
+                          <span style={{ color: '#FFFEF9' }}>{workshop.instructor}</span>
+                        </div>
+                        {workshop.capacity > 0 && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <span style={{ color: isFull ? '#ff6b6b' : '#FFFEF9' }}>
+                              {workshop.registrations?.length || 0} / {workshop.capacity} seats
+                              {isFull && ' (FULL)'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {!isPast && (
+                        <div 
+                          className="flex items-center gap-2 text-sm"
+                          style={{
+                            color: '#B87333',
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          VIEW DETAILS
+                          <ArrowRight size={16} />
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
         </div>
 
         {/* Registration Modal */}
@@ -873,7 +768,7 @@ export default function WorkshopsPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-3xl p-10 relative max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-3xl p-10 relative max-h-[90vh] overflow-y-auto rounded-xl"
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
@@ -883,7 +778,7 @@ export default function WorkshopsPage() {
             >
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-6 right-6 p-2 hover:bg-white/10 transition-all"
+                className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-lg transition-all"
                 style={{ color: '#B87333' }}
               >
                 <X size={24} />
@@ -892,9 +787,9 @@ export default function WorkshopsPage() {
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-6">
                   <div
-                    className="w-14 h-14 flex items-center justify-center"
+                    className="w-14 h-14 flex items-center justify-center rounded-lg"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
+                      background: 'rgba(184, 115, 51, 0.2)',
                       border: '2px solid rgba(184, 115, 51, 0.4)',
                       color: '#B87333',
                     }}
@@ -905,7 +800,7 @@ export default function WorkshopsPage() {
                     className="text-xs uppercase tracking-[0.2em]"
                     style={{
                       color: '#B87333',
-                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontFamily: 'var(--font-heading)',
                     }}
                   >
                     {selectedWorkshop.category} WORKSHOP
@@ -915,7 +810,7 @@ export default function WorkshopsPage() {
                 <h3
                   className="text-4xl md:text-5xl mb-6"
                   style={{
-                    fontFamily: 'Bebas Neue, sans-serif',
+                    fontFamily: 'var(--font-heading)',
                     color: '#FFFEF9',
                   }}
                 >
@@ -932,7 +827,7 @@ export default function WorkshopsPage() {
 
               <div className="grid md:grid-cols-2 gap-6 mb-8">
                 <div
-                  className="p-6"
+                  className="p-6 rounded-lg"
                   style={{
                     background: 'rgba(20, 20, 20, 0.6)',
                     border: '2px solid rgba(184, 115, 51, 0.2)',
@@ -942,7 +837,7 @@ export default function WorkshopsPage() {
                     <Calendar size={20} style={{ color: '#B87333' }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'Bebas Neue, sans-serif' }}
+                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
                     >
                       DATE
                     </span>
@@ -958,7 +853,7 @@ export default function WorkshopsPage() {
                 </div>
 
                 <div
-                  className="p-6"
+                  className="p-6 rounded-lg"
                   style={{
                     background: 'rgba(20, 20, 20, 0.6)',
                     border: '2px solid rgba(184, 115, 51, 0.2)',
@@ -968,7 +863,7 @@ export default function WorkshopsPage() {
                     <Clock size={20} style={{ color: '#B87333' }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'Bebas Neue, sans-serif' }}
+                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
                     >
                       TIME
                     </span>
@@ -979,7 +874,7 @@ export default function WorkshopsPage() {
                 </div>
 
                 <div
-                  className="p-6"
+                  className="p-6 rounded-lg"
                   style={{
                     background: 'rgba(20, 20, 20, 0.6)',
                     border: '2px solid rgba(184, 115, 51, 0.2)',
@@ -989,7 +884,7 @@ export default function WorkshopsPage() {
                     <User size={20} style={{ color: '#B87333' }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'Bebas Neue, sans-serif' }}
+                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
                     >
                       INSTRUCTOR
                     </span>
@@ -1000,7 +895,7 @@ export default function WorkshopsPage() {
                 </div>
 
                 <div
-                  className="p-6"
+                  className="p-6 rounded-lg"
                   style={{
                     background: 'rgba(20, 20, 20, 0.6)',
                     border: '2px solid rgba(184, 115, 51, 0.2)',
@@ -1010,7 +905,7 @@ export default function WorkshopsPage() {
                     <MapPin size={20} style={{ color: '#B87333' }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'Bebas Neue, sans-serif' }}
+                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
                     >
                       LOCATION
                     </span>
@@ -1024,7 +919,7 @@ export default function WorkshopsPage() {
               {/* Registration Section */}
               {selectedWorkshop.status === "upcoming" && (
                 <div
-                  className="p-6"
+                  className="p-6 rounded-lg"
                   style={{
                     background: 'rgba(20, 20, 20, 0.6)',
                     border: '2px solid rgba(184, 115, 51, 0.2)',
@@ -1034,7 +929,7 @@ export default function WorkshopsPage() {
                     <div className="text-center">
                       <p
                         className="text-lg mb-2"
-                        style={{ color: '#ff6b6b', fontFamily: 'Bebas Neue, sans-serif' }}
+                        style={{ color: '#ff6b6b', fontFamily: 'var(--font-heading)' }}
                       >
                         WORKSHOP IS FULL
                       </p>
@@ -1047,12 +942,12 @@ export default function WorkshopsPage() {
                       {!isRegistering ? (
                         <button
                           onClick={() => setIsRegistering(true)}
-                          className="w-full py-4 text-lg uppercase tracking-wider transition-all hover:scale-105"
+                          className="w-full py-4 text-lg uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                           style={{
                             background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                             border: '2px solid rgba(184, 115, 51, 0.4)',
                             color: '#000',
-                            fontFamily: 'Bebas Neue, sans-serif',
+                            fontFamily: 'var(--font-heading)',
                           }}
                         >
                           REGISTER FOR THIS WORKSHOP
@@ -1063,7 +958,7 @@ export default function WorkshopsPage() {
                             className="text-xl mb-4"
                             style={{
                               color: '#FFFEF9',
-                              fontFamily: 'Bebas Neue, sans-serif',
+                              fontFamily: 'var(--font-heading)',
                             }}
                           >
                             REGISTER NOW
@@ -1076,8 +971,8 @@ export default function WorkshopsPage() {
                               onChange={(e) =>
                                 setRegistrationForm({ ...registrationForm, name: e.target.value })
                               }
-                              className="w-full p-3 bg-transparent border-2 border-[#B87333]/40 text-[#FFFEF9] placeholder-[#8B6F47]"
-                              style={{ outline: 'none' }}
+                              className="w-full p-3 bg-transparent rounded-lg text-[#FFFEF9] placeholder-[#8B6F47] outline-none"
+                              style={{ border: '2px solid rgba(184, 115, 51, 0.4)' }}
                             />
                             <input
                               type="email"
@@ -1086,8 +981,8 @@ export default function WorkshopsPage() {
                               onChange={(e) =>
                                 setRegistrationForm({ ...registrationForm, email: e.target.value })
                               }
-                              className="w-full p-3 bg-transparent border-2 border-[#B87333]/40 text-[#FFFEF9] placeholder-[#8B6F47]"
-                              style={{ outline: 'none' }}
+                              className="w-full p-3 bg-transparent rounded-lg text-[#FFFEF9] placeholder-[#8B6F47] outline-none"
+                              style={{ border: '2px solid rgba(184, 115, 51, 0.4)' }}
                             />
                             {registrationMessage && (
                               <p
@@ -1101,12 +996,12 @@ export default function WorkshopsPage() {
                             <div className="flex gap-4">
                               <button
                                 onClick={handleRegister}
-                                className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105"
+                                className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                                 style={{
                                   background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                                   border: '2px solid rgba(184, 115, 51, 0.4)',
                                   color: '#000',
-                                  fontFamily: 'Bebas Neue, sans-serif',
+                                  fontFamily: 'var(--font-heading)',
                                 }}
                               >
                                 CONFIRM
@@ -1117,12 +1012,12 @@ export default function WorkshopsPage() {
                                   setRegistrationForm({ name: "", email: "" });
                                   setRegistrationMessage("");
                                 }}
-                                className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105"
+                                className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                                 style={{
                                   background: 'rgba(139, 111, 71, 0.2)',
                                   border: '2px solid rgba(139, 111, 71, 0.4)',
                                   color: '#8B6F47',
-                                  fontFamily: 'Bebas Neue, sans-serif',
+                                  fontFamily: 'var(--font-heading)',
                                 }}
                               >
                                 CANCEL
@@ -1138,17 +1033,6 @@ export default function WorkshopsPage() {
             </motion.div>
           </div>
         )}
-
-        {/* Hide scrollbar */}
-        <style jsx global>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        `}</style>
       </div>
     </>
   );

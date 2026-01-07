@@ -132,19 +132,44 @@ export default function CartPage() {
     if (newQuantity < 1) return;
 
     try {
-      const res = await fetch("/api/cart", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          itemId,
-          itemType,
-          quantity: newQuantity,
-        }),
-      });
-
-      if (res.ok) {
-        const updatedCart = await res.json();
-        setCart(updatedCart);
+      // Use POST with the difference in quantity
+      const currentItem = cart?.items.find(
+        item => (item.menuItem || item.artItem) === itemId && item.itemType === itemType
+      );
+      
+      if (!currentItem) return;
+      
+      const quantityChange = newQuantity - currentItem.quantity;
+      
+      // For menu items
+      if (itemType === "menu") {
+        const res = await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            menuItemId: itemId,
+            quantity: quantityChange,
+          }),
+        });
+        
+        if (res.ok) {
+          await fetchCart();
+        }
+      }
+      // For art items
+      else if (itemType === "art") {
+        const res = await fetch("/api/cart/art", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            artItemId: itemId,
+            quantity: quantityChange,
+          }),
+        });
+        
+        if (res.ok) {
+          await fetchCart();
+        }
       }
     } catch (error) {
       console.error("Failed to update quantity", error);
@@ -284,7 +309,7 @@ export default function CartPage() {
 
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <button
                           onClick={() => {
                             const itemId = item.menuItem || item.artItem;
@@ -293,26 +318,30 @@ export default function CartPage() {
                             }
                           }}
                           disabled={item.quantity <= 1}
-                          className="p-2 transition-all hover:scale-110"
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg"
                           style={{
-                            background: 'rgba(184, 115, 51, 0.2)',
-                            border: '1px solid rgba(184, 115, 51, 0.4)',
+                            background: item.quantity <= 1 
+                              ? 'rgba(139, 111, 71, 0.2)' 
+                              : 'linear-gradient(135deg, #B87333, #CD7F32)',
+                            border: `2px solid ${item.quantity <= 1 ? 'rgba(139, 111, 71, 0.3)' : 'rgba(184, 115, 51, 0.6)'}`,
                             cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer',
                             opacity: item.quantity <= 1 ? 0.5 : 1,
+                            boxShadow: item.quantity > 1 ? '0 4px 12px rgba(184, 115, 51, 0.3)' : 'none',
                           }}
                         >
-                          <Minus size={18} style={{ color: '#B87333' }} />
+                          <Minus size={20} style={{ color: item.quantity <= 1 ? '#8B6F47' : '#000', fontWeight: 'bold' }} />
                         </button>
                         
                         <div
-                          className="px-6 py-2 text-lg font-bold"
+                          className="px-6 py-2 text-xl font-bold rounded-lg"
                           style={{
                             background: 'rgba(26, 17, 16, 0.6)',
-                            border: '2px solid rgba(184, 115, 51, 0.3)',
+                            border: '2px solid rgba(184, 115, 51, 0.4)',
                             color: '#F5F1E8',
-                            minWidth: '60px',
+                            minWidth: '70px',
                             textAlign: 'center',
                             fontFamily: 'var(--font-heading)',
+                            letterSpacing: '0.05em',
                           }}
                         >
                           {item.quantity}
@@ -325,14 +354,15 @@ export default function CartPage() {
                               updateQuantity(itemId, item.itemType, item.quantity + 1);
                             }
                           }}
-                          className="p-2 transition-all hover:scale-110"
+                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg"
                           style={{
-                            background: 'rgba(184, 115, 51, 0.2)',
-                            border: '1px solid rgba(184, 115, 51, 0.4)',
+                            background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                            border: '2px solid rgba(184, 115, 51, 0.6)',
                             cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
                           }}
                         >
-                          <Plus size={18} style={{ color: '#B87333' }} />
+                          <Plus size={20} style={{ color: '#000', fontWeight: 'bold' }} />
                         </button>
                       </div>
 
