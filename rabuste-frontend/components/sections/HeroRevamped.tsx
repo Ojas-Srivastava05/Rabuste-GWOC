@@ -297,25 +297,8 @@ export default function HeroRevamped() {
             className="relative flex items-center justify-center order-1 lg:order-2"
           >
             {/* Glow Effect Behind Logo */}
-            <div 
-              className="absolute inset-0 opacity-60"
-              style={{
-                background: 'radial-gradient(circle, rgba(184, 115, 51, 0.3) 0%, transparent 70%)',
-                filter: 'blur(60px)',
-              }}
-            />
             
             {/* Rotating Ring */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="absolute w-[350px] h-[350px] sm:w-[450px] sm:h-[450px]"
-              style={{
-                border: '1px solid rgba(184, 115, 51, 0.2)',
-                borderRadius: '50%',
-              }}
-            />
-
             {/* Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
