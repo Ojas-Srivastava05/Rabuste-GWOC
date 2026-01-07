@@ -77,6 +77,45 @@ export default function WorkshopsPage() {
     fetchWorkshops();
   }, []);
 
+  const handleAddToCalendar = (workshop: Workshop) => {
+    // Format date and time for Google Calendar
+    const workshopDate = new Date(workshop.date);
+    const [hours, minutes] = workshop.time.split(':').map(num => parseInt(num));
+    
+    // Set start time
+    const startTime = new Date(workshopDate);
+    startTime.setHours(hours, minutes, 0);
+    
+    // Set end time (assuming 2 hour duration)
+    const endTime = new Date(startTime);
+    endTime.setHours(startTime.getHours() + 2);
+    
+    // Format dates for Google Calendar (YYYYMMDDTHHmmss)
+    const formatGoogleDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hour = String(date.getHours()).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      const second = String(date.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hour}${minute}${second}`;
+    };
+    
+    const startDateFormatted = formatGoogleDate(startTime);
+    const endDateFormatted = formatGoogleDate(endTime);
+    
+    // Build Google Calendar URL
+    const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
+    googleCalendarUrl.searchParams.append('action', 'TEMPLATE');
+    googleCalendarUrl.searchParams.append('text', workshop.title);
+    googleCalendarUrl.searchParams.append('dates', `${startDateFormatted}/${endDateFormatted}`);
+    googleCalendarUrl.searchParams.append('details', `${workshop.description}\n\nInstructor: ${workshop.instructor}`);
+    googleCalendarUrl.searchParams.append('location', workshop.location);
+    
+    
+    window.open(googleCalendarUrl.toString(), '_blank');
+  };
+
   const handleRegister = async () => {
     if (!selectedWorkshop || !registrationForm.name || !registrationForm.email) {
       setRegistrationMessage("Please fill in all fields");
@@ -588,6 +627,7 @@ export default function WorkshopsPage() {
                           {/* Action Buttons */}
                           <div className="flex gap-3">
                             <button
+                              onClick={() => handleAddToCalendar(workshop)}
                               className="flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                               style={{
                                 background: 'rgba(26, 17, 16, 0.8)',
