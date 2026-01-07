@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type MenuItem = {
@@ -120,10 +120,18 @@ export default function MenuPage() {
   const [upsellModal, setUpsellModal] = useState<{ item: MenuItem; suggestions: MenuItem[] } | null>(null);
   const [quickFilter, setQuickFilter] = useState<"all" | "trending" | "bestseller" | "limited">("all");
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const [addedToast, setAddedToast] = useState<{ show: boolean; itemName: string }>({ show: false, itemName: '' });
+  const [additionCount, setAdditionCount] = useState(0);
 
   useEffect(() => {
     fetchMenu();
     fetchCart();
+    
+    // Load addition count from session storage
+    const count = sessionStorage.getItem('additionCount');
+    if (count) {
+      setAdditionCount(parseInt(count, 10));
+    }
   }, []);
 
   // Handle scrolling to specific item from hash
@@ -177,15 +185,33 @@ export default function MenuPage() {
     });
     fetchCart();
     
-    // Show upsell suggestions after adding to cart
-    if (showUpsell) {
-      const item = menu.find(i => i._id === menuItemId);
-      if (item) {
+    const item = menu.find(i => i._id === menuItemId);
+    
+    // Check user preference for upselling
+    const disableUpsell = localStorage.getItem('disableUpsell') === 'true';
+    
+    if (showUpsell && !disableUpsell && item) {
+      // Increment addition count
+      const newCount = additionCount + 1;
+      setAdditionCount(newCount);
+      sessionStorage.setItem('additionCount', newCount.toString());
+      
+      // Only show upsell modal every 3rd addition
+      if (newCount % 3 === 0) {
         const suggestions = getUpsellSuggestions(item, menu);
         if (suggestions.length > 0) {
           setUpsellModal({ item, suggestions });
+          return;
         }
       }
+    }
+    
+    // Show subtle success toast for all other additions
+    if (item) {
+      setAddedToast({ show: true, itemName: item.name });
+      setTimeout(() => {
+        setAddedToast({ show: false, itemName: '' });
+      }, 2000);
     }
   }
 
@@ -637,6 +663,30 @@ export default function MenuPage() {
         </div>
       </div>
 
+          {/* Success Toast */}
+      <AnimatePresence>
+        {addedToast.show && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed top-24 right-6 z-[100] flex items-center gap-3 px-6 py-4 pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
+              border: '2px solid rgba(111, 143, 114, 0.6)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
+              maxWidth: '400px',
+            }}
+          >
+            <CheckCircle size={20} style={{ color: '#6f8f72' }} />
+            <p style={{ color: '#F5F1E8', fontFamily: 'var(--font-body)' }}>
+              <strong className="gradient-text">{addedToast.itemName}</strong> added to cart
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
           {/* Upsell Modal */}
       <AnimatePresence>
         {upsellModal && (
@@ -660,14 +710,22 @@ export default function MenuPage() {
                 backdropFilter: 'blur(20px)',
               }}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <TrendingUp size={24} style={{ color: '#B87333' }} />
-                <h3
-                  className="text-2xl"
-                  style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <TrendingUp size={24} style={{ color: '#B87333' }} />
+                  <h3
+                    className="text-2xl"
+                    style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}
+                  >
+                    COMPLETE YOUR ORDER
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setUpsellModal(null)}
+                  className="text-[#8B6F47] hover:text-[#B87333] transition-colors"
                 >
-                  COMPLETE YOUR ORDER
-                </h3>
+                  <X size={24} />
+                </button>
               </div>
 
               <p className="text-sm mb-6" style={{ color: '#8B6F47' }}>
@@ -750,18 +808,35 @@ export default function MenuPage() {
                 })}
               </div>
 
-              <button
-                onClick={() => setUpsellModal(null)}
-                className="w-full py-3"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                  color: '#000',
-                  fontFamily: 'var(--font-heading)',
-                  letterSpacing: '0.1em',
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    localStorage.setItem('disableUpsell', 'true');
+                    setUpsellModal(null);
+                  }}
+                  className="flex-1 py-3 text-sm"
+                  style={{
+                    background: 'rgba(139, 111, 71, 0.2)',
+                    border: '1px solid rgba(139, 111, 71, 0.4)',
+                    color: '#8B6F47',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  Don't show again
+                </button>
+                <button
+                  onClick={() => setUpsellModal(null)}
+                  className="flex-1 py-3"
+                  style={{
+                    background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+                    color: '#000',
+                    fontFamily: 'var(--font-heading)',
+                    letterSpacing: '0.1em',
                 }}
               >
                 CONTINUE
               </button>
+              </div>
             </motion.div>
           </motion.div>
         )}

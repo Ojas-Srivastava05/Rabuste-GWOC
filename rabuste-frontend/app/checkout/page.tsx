@@ -90,6 +90,13 @@ export default function CheckoutPage() {
 
         const orderData = await res.json();
         
+        // Clear the cart after successful order
+        try {
+          await fetch("/api/cart", { method: "DELETE" });
+        } catch (clearError) {
+          console.error("Failed to clear cart:", clearError);
+        }
+        
         // Check if order contains art items
         const hasArtItems = cart.items.some((item) => item.itemType === 'art');
         

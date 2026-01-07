@@ -129,7 +129,11 @@ export default function CartPage() {
   }
 
   async function updateQuantity(itemId: string, itemType: "menu" | "art", newQuantity: number) {
-    if (newQuantity < 1) return;
+    // If new quantity is 0 or less, remove the item
+    if (newQuantity < 1) {
+      await removeItem(itemId, itemType);
+      return;
+    }
 
     try {
       // Use POST with the difference in quantity
@@ -158,7 +162,7 @@ export default function CartPage() {
       }
       // For art items
       else if (itemType === "art") {
-        const res = await fetch("/api/cart/art", {
+        const res = await fetch("/api/cart", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -317,19 +321,15 @@ export default function CartPage() {
                               updateQuantity(itemId, item.itemType, item.quantity - 1);
                             }
                           }}
-                          disabled={item.quantity <= 1}
                           className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg"
                           style={{
-                            background: item.quantity <= 1 
-                              ? 'rgba(139, 111, 71, 0.2)' 
-                              : 'linear-gradient(135deg, #B87333, #CD7F32)',
-                            border: `2px solid ${item.quantity <= 1 ? 'rgba(139, 111, 71, 0.3)' : 'rgba(184, 115, 51, 0.6)'}`,
-                            cursor: item.quantity <= 1 ? 'not-allowed' : 'pointer',
-                            opacity: item.quantity <= 1 ? 0.5 : 1,
-                            boxShadow: item.quantity > 1 ? '0 4px 12px rgba(184, 115, 51, 0.3)' : 'none',
+                            background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                            border: '2px solid rgba(184, 115, 51, 0.6)',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
                           }}
                         >
-                          <Minus size={20} style={{ color: item.quantity <= 1 ? '#8B6F47' : '#000', fontWeight: 'bold' }} />
+                          <Minus size={20} style={{ color: '#000', fontWeight: 'bold' }} />
                         </button>
                         
                         <div

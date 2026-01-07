@@ -62,7 +62,7 @@ const getEmailTemplate = (content: string) => `
             <td style="padding: 0 40px 30px; text-align: center;">
               <div style="display: inline-block; padding: 8px 20px; background: rgba(184, 115, 51, 0.15); border: 1px solid ${BRAND_COLORS.copper}; border-radius: 20px;">
                 <span style="font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.golden}; font-weight: 700; text-transform: uppercase;">
-                  ⚡ AI-POWERED EXPERIENCE
+                  AI-POWERED EXPERIENCE
                 </span>
               </div>
             </td>
@@ -133,7 +133,7 @@ export const generateOrderConfirmationEmail = (order: {
                 ${item.name}
               </p>
               <p style="margin: 0; font-size: 12px; color: ${BRAND_COLORS.copper}; text-transform: uppercase; letter-spacing: 0.1em;">
-                ${item.itemType === 'menu' ? '☕ Menu Item' : '🎨 Art Piece'}
+                ${item.itemType === 'menu' ? 'Menu Item' : 'Art Piece'}
               </p>
             </td>
             <td style="width: 15%; text-align: center; font-size: 14px; color: ${BRAND_COLORS.cream};">
@@ -150,9 +150,6 @@ export const generateOrderConfirmationEmail = (order: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.bronze} 100%); border-radius: 30px; margin-bottom: 25px;">
-        <span style="font-size: 32px;">🎉</span>
-      </div>
       <h2 style="margin: 0 0 15px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 42px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; color: ${BRAND_COLORS.warmWhite}; line-height: 1.1;">
         ORDER CONFIRMED
       </h2>
@@ -199,7 +196,7 @@ export const generateOrderConfirmationEmail = (order: {
     <!-- Special Instructions -->
     <div style="background: rgba(26, 17, 16, 0.6); border-left: 3px solid ${BRAND_COLORS.copper}; padding: 20px; margin-bottom: 30px; border-radius: 4px;">
       <p style="margin: 0 0 10px; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-        📝 SPECIAL INSTRUCTIONS
+        SPECIAL INSTRUCTIONS
       </p>
       <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.6; font-style: italic;">
         "${order.instructions}"
@@ -210,7 +207,7 @@ export const generateOrderConfirmationEmail = (order: {
     <!-- Next Steps -->
     <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.3); border-radius: 8px; padding: 25px; margin-top: 35px;">
       <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
-        ⚡ What's Next?
+        What's Next?
       </p>
       <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.7;">
         Our AI-powered system is optimizing your brew for maximum boldness. We'll notify you the moment your order is ready for pickup. Get ready for an unapologetically intense experience!
@@ -242,9 +239,6 @@ export const generateOrderReadyEmail = (order: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.bronze} 100%); border-radius: 30px; margin-bottom: 25px; animation: pulse 2s infinite;">
-        <span style="font-size: 42px;">🔥</span>
-      </div>
       <h2 style="margin: 0 0 15px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.golden} 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1;">
         IT'S BREW TIME!
       </h2>
@@ -256,7 +250,7 @@ export const generateOrderReadyEmail = (order: {
     <!-- Order Ready Card -->
     <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1)); border: 2px solid ${BRAND_COLORS.copper}; border-radius: 12px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 0 40px rgba(184, 115, 51, 0.3);">
       <p style="margin: 0 0 15px; font-size: 13px; letter-spacing: 0.2em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 700;">
-        ⚡ STATUS: READY FOR PICKUP
+        STATUS: READY FOR PICKUP
       </p>
       <p style="margin: 0 0 10px; font-family: 'Courier New', monospace; font-size: 16px; color: ${BRAND_COLORS.cream}; opacity: 0.8;">
         Order #${order.orderId.slice(-8).toUpperCase()}
@@ -274,7 +268,7 @@ export const generateOrderReadyEmail = (order: {
     <!-- Pickup Instructions -->
     <div style="background: rgba(26, 17, 16, 0.6); border-left: 4px solid ${BRAND_COLORS.golden}; padding: 25px; margin-bottom: 30px; border-radius: 4px;">
       <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
-        ☕ PICKUP READY
+        PICKUP READY
       </p>
       <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 2;">
         <li>Head to the counter and show this email or your order ID</li>
@@ -286,7 +280,7 @@ export const generateOrderReadyEmail = (order: {
     <!-- AI Optimization Note -->
     <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, rgba(184, 115, 51, 0.1), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.2); border-radius: 8px; margin-bottom: 30px;">
       <p style="margin: 0 0 12px; font-size: 12px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-        ⚡ AI-OPTIMIZED BREW
+        AI-OPTIMIZED BREW
       </p>
       <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.6; opacity: 0.9;">
         Your order has been crafted using our AI-powered brewing system for peak flavor intensity and 2X caffeine delivery. Bold doesn't compromise.
@@ -310,7 +304,7 @@ export const generateOrderReadyEmail = (order: {
       </p>
       <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.7; line-height: 1.6;">
         Every cup is a statement. Every sip is unapologetically bold.<br>
-        <strong style="color: ${BRAND_COLORS.copper};">See you soon! 🔥</strong>
+        <strong style="color: ${BRAND_COLORS.copper};">See you soon!</strong>
       </p>
     </div>
   `;
@@ -322,9 +316,6 @@ export const generateOrderReadyEmail = (order: {
 export const generateWelcomeEmail = (userName: string, userEmail: string) => {
   const content = `
     <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.bronze} 100%); border-radius: 30px; margin-bottom: 25px;">
-        <span style="font-size: 42px;">🚀</span>
-      </div>
       <h2 style="margin: 0 0 15px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.golden} 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1;">
         WELCOME TO RABUSTE
       </h2>
@@ -340,7 +331,7 @@ export const generateWelcomeEmail = (userName: string, userEmail: string) => {
       </p>
       <div style="text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
         <p style="margin: 0; font-size: 13px; letter-spacing: 0.2em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 700;">
-          ⚡ YOUR COFFEE, REIMAGINED
+          YOUR COFFEE, REIMAGINED
         </p>
       </div>
     </div>
@@ -354,7 +345,7 @@ export const generateWelcomeEmail = (userName: string, userEmail: string) => {
         <tr>
           <td style="padding: 20px; background: rgba(245, 241, 232, 0.02); border-left: 3px solid ${BRAND_COLORS.copper}; margin-bottom: 15px;">
             <p style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${BRAND_COLORS.golden};">
-              🔥 2X Caffeine Power
+              2X Caffeine Power
             </p>
             <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.8; line-height: 1.6;">
               Premium Robusta beans scientifically proven to deliver double the energy
@@ -364,7 +355,7 @@ export const generateWelcomeEmail = (userName: string, userEmail: string) => {
         <tr>
           <td style="padding: 20px; background: rgba(245, 241, 232, 0.02); border-left: 3px solid ${BRAND_COLORS.bronze}; margin-bottom: 15px;">
             <p style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${BRAND_COLORS.golden};">
-              ⚡ AI-Optimized Brewing
+              AI-Optimized Brewing
             </p>
             <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.8; line-height: 1.6;">
               Every cup crafted to perfection using cutting-edge technology
@@ -374,7 +365,7 @@ export const generateWelcomeEmail = (userName: string, userEmail: string) => {
         <tr>
           <td style="padding: 20px; background: rgba(245, 241, 232, 0.02); border-left: 3px solid ${BRAND_COLORS.golden};">
             <p style="margin: 0 0 8px; font-size: 16px; font-weight: 700; color: ${BRAND_COLORS.golden};">
-              🎨 Coffee + Art + Community
+              Coffee + Art + Community
             </p>
             <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.8; line-height: 1.6;">
               More than coffee—it's a lifestyle, a statement, an experience
@@ -419,7 +410,7 @@ export async function sendOrderEmail(
   html: string
 ) {
   await transporter.sendMail({
-    from: `"Rabuste - Unapologetically Bold ⚡" <${process.env.EMAIL_USER}>`,
+    from: `"Rabuste - Unapologetically Bold" <${process.env.EMAIL_USER}>`,
     to,
     subject: `${subject} | Rabuste`,
     html,
@@ -432,7 +423,7 @@ export async function sendOrderConfirmation(
   order: Parameters<typeof generateOrderConfirmationEmail>[0]
 ) {
   const html = generateOrderConfirmationEmail(order);
-  await sendOrderEmail(to, "🔥 Order Confirmed", html);
+  await sendOrderEmail(to, "Order Confirmed", html);
 }
 
 export async function sendOrderReady(
@@ -440,7 +431,7 @@ export async function sendOrderReady(
   order: Parameters<typeof generateOrderReadyEmail>[0]
 ) {
   const html = generateOrderReadyEmail(order);
-  await sendOrderEmail(to, "⚡ Your Order is Ready", html);
+  await sendOrderEmail(to, "Your Order is Ready", html);
 }
 
 export async function sendWelcomeEmail(
@@ -448,7 +439,7 @@ export async function sendWelcomeEmail(
   userName: string
 ) {
   const html = generateWelcomeEmail(userName, to);
-  await sendOrderEmail(to, "🚀 Welcome to the Bold Side", html);
+  await sendOrderEmail(to, "Welcome to the Bold Side", html);
 }
 
 // Workshop Registration Email Template
@@ -471,9 +462,6 @@ export const generateWorkshopRegistrationEmail = (registration: {
 
   const content = `
     <div style="text-align: center; margin-bottom: 35px;">
-      <div style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.bronze} 100%); border-radius: 30px; margin-bottom: 25px;">
-        <span style="font-size: 42px;">✨</span>
-      </div>
       <h2 style="margin: 0 0 15px; font-family: 'Bebas Neue', Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; background: linear-gradient(135deg, ${BRAND_COLORS.copper} 0%, ${BRAND_COLORS.golden} 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1;">
         REGISTRATION CONFIRMED
       </h2>
@@ -500,7 +488,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
     <!-- Workshop Details -->
     <div style="margin-bottom: 30px;">
       <p style="margin: 0 0 20px; font-size: 13px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600; text-align: center;">
-        📅 WORKSHOP DETAILS
+        WORKSHOP DETAILS
       </p>
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="border: 1px solid rgba(184, 115, 51, 0.2); border-radius: 8px; overflow: hidden;">
         <tr>
@@ -509,7 +497,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
               <tr>
                 <td style="width: 30%; padding-right: 15px;">
                   <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-                    📆 DATE
+                    DATE
                   </p>
                 </td>
                 <td>
@@ -527,7 +515,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
               <tr>
                 <td style="width: 30%; padding-right: 15px;">
                   <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-                    ⏰ TIME
+                    TIME
                   </p>
                 </td>
                 <td>
@@ -545,7 +533,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
               <tr>
                 <td style="width: 30%; padding-right: 15px;">
                   <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-                    📍 LOCATION
+                    LOCATION
                   </p>
                 </td>
                 <td>
@@ -563,7 +551,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
               <tr>
                 <td style="width: 30%; padding-right: 15px;">
                   <p style="margin: 0; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-                    👨‍🏫 INSTRUCTOR
+                    INSTRUCTOR
                   </p>
                 </td>
                 <td>
@@ -581,7 +569,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
     <!-- What to Bring -->
     <div style="background: rgba(26, 17, 16, 0.6); border-left: 4px solid ${BRAND_COLORS.golden}; padding: 25px; margin-bottom: 30px; border-radius: 4px;">
       <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
-        ⚡ WHAT TO BRING
+        WHAT TO BRING
       </p>
       <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 2;">
         <li>Arrive 10 minutes early to check in</li>
@@ -594,7 +582,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
     <!-- Premium Experience Note -->
     <div style="text-align: center; padding: 25px; background: linear-gradient(135deg, rgba(184, 115, 51, 0.1), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.2); border-radius: 8px; margin-bottom: 30px;">
       <p style="margin: 0 0 12px; font-size: 12px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">
-        ✨ PREMIUM WORKSHOP EXPERIENCE
+        PREMIUM WORKSHOP EXPERIENCE
       </p>
       <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.6; opacity: 0.9;">
         ${registration.category === 'coffee' 
@@ -607,7 +595,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
     <!-- Important Reminder -->
     <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(205, 127, 50, 0.05)); border: 1px solid rgba(184, 115, 51, 0.3); border-radius: 8px; padding: 25px; margin-top: 35px;">
       <p style="margin: 0 0 15px; font-size: 15px; font-weight: 700; color: ${BRAND_COLORS.golden}; text-transform: uppercase; letter-spacing: 0.1em;">
-        📌 IMPORTANT REMINDER
+        IMPORTANT REMINDER
       </p>
       <p style="margin: 0; font-size: 14px; color: ${BRAND_COLORS.cream}; line-height: 1.7;">
         This confirmation email is your ticket to the workshop. If you need to cancel or have any questions, please reply to this email or contact us at least 24 hours before the event. We're excited to see you there!
@@ -621,7 +609,7 @@ export const generateWorkshopRegistrationEmail = (registration: {
       </p>
       <p style="margin: 0; font-size: 13px; color: ${BRAND_COLORS.cream}; opacity: 0.7; line-height: 1.6;">
         Get ready for an unapologetically bold learning experience.<br>
-        <strong style="color: ${BRAND_COLORS.copper};">See you at the workshop! ✨</strong>
+        <strong style="color: ${BRAND_COLORS.copper};">See you at the workshop!</strong>
       </p>
     </div>
   `;
@@ -635,5 +623,5 @@ export async function sendWorkshopRegistrationEmail(
   registration: Parameters<typeof generateWorkshopRegistrationEmail>[0]
 ) {
   const html = generateWorkshopRegistrationEmail(registration);
-  await sendOrderEmail(to, "✨ Workshop Registration Confirmed", html);
+  await sendOrderEmail(to, "Workshop Registration Confirmed", html);
 }

@@ -59,16 +59,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid menu item" }, { status: 400 });
     }
 
-    const existingItem = cart.items.find(
+    // Find existing item by ID or by name (for merging duplicates)
+    const existingItemById = cart.items.find(
       (item: any) => item.itemType === "menu" && item.menuItem?.toString() === menuItemId
     );
 
+    const existingItemByName = cart.items.find(
+      (item: any) => item.itemType === "menu" && item.name === menuItem.name
+    );
+
+    const existingItem = existingItemById || existingItemByName;
+
     if (existingItem) {
       existingItem.quantity += quantity;
+      // Update the menuItem reference to the current one
+      existingItem.menuItem = menuItem._id;
     
       if (existingItem.quantity <= 0) {
         cart.items = cart.items.filter(
-          (item: any) => !(item.itemType === "menu" && item.menuItem?.toString() === menuItemId)
+          (item: any) => item !== existingItem
         );
       }
     } else if (quantity > 0) {
@@ -90,16 +99,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid art item" }, { status: 400 });
     }
 
-    const existingItem = cart.items.find(
+    // Find existing item by ID or by name (for merging duplicates)
+    const existingItemById = cart.items.find(
       (item: any) => item.itemType === "art" && item.artItem?.toString() === artItemId
     );
 
+    const existingItemByName = cart.items.find(
+      (item: any) => item.itemType === "art" && item.name === artItem.title
+    );
+
+    const existingItem = existingItemById || existingItemByName;
+
     if (existingItem) {
       existingItem.quantity += quantity;
+      // Update the artItem reference to the current one
+      existingItem.artItem = artItem._id;
     
       if (existingItem.quantity <= 0) {
         cart.items = cart.items.filter(
-          (item: any) => !(item.itemType === "art" && item.artItem?.toString() === artItemId)
+          (item: any) => item !== existingItem
         );
       }
     } else if (quantity > 0) {
