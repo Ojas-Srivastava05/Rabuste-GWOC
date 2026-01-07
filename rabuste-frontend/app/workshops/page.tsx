@@ -42,10 +42,11 @@ export default function WorkshopsPage() {
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [registrationForm, setRegistrationForm] = useState({ name: "", email: "" });
   const [registrationMessage, setRegistrationMessage] = useState<string>("");
-  const [nextWorkshop, setNextWorkshop] = useState<Workshop | null>(null);
-  const [timeLeft, setTimeLeft] = useState<string>("");
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [activeTimelineIndex, setActiveTimelineIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -95,11 +96,9 @@ export default function WorkshopsPage() {
         return;
       }
 
-      // Show success popup
-      setShowSuccessPopup(true);
+      setRegistrationMessage("Successfully registered!");
       setRegistrationForm({ name: "", email: "" });
       setIsRegistering(false);
-      setIsModalOpen(false);
 
       const workshopsRes = await fetch("/api/workshops");
       const workshopsData = await workshopsRes.json();
@@ -119,11 +118,7 @@ export default function WorkshopsPage() {
       const updatedWorkshop = processed.find((w: Workshop) => w._id === selectedWorkshop._id);
       if (updatedWorkshop) setSelectedWorkshop(updatedWorkshop);
 
-      // Auto-close success popup after 5 seconds
-      setTimeout(() => {
-        setShowSuccessPopup(false);
-        setRegistrationMessage("");
-      }, 5000);
+      setTimeout(() => setRegistrationMessage(""), 3000);
     } catch (err) {
       console.error(err);
       setRegistrationMessage("An error occurred. Please try again.");
@@ -1038,17 +1033,6 @@ export default function WorkshopsPage() {
             </motion.div>
           </div>
         )}
-
-        {/* Hide scrollbar */}
-        <style jsx global>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        `}</style>
       </div>
     </>
   );
