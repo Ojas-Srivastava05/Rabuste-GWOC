@@ -13,6 +13,8 @@ const workshopSchema = new mongoose.Schema(
    
     description: String,
     image: String,
+    time: String,
+    location: String,
     timeSlots: [String],
     capacity: { type: Number, default: 0 },
     registrations: [

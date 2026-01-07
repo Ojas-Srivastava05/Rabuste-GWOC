@@ -1,4 +1,5 @@
 import Workshop from "../models/workshop.js";
+import sendWorkshopRegistrationEmail from "../utils/sendWorkshopEmail.js";
 
 export const addWorkshop = async (req, res) => {
   try {
@@ -75,6 +76,21 @@ export const registerForWorkshop = async (req, res) => {
 
     workshop.registrations.push({ name, email });
     await workshop.save();
+
+    // Send confirmation email
+    try {
+      await sendWorkshopRegistrationEmail(email, name, {
+        title: workshop.title,
+        date: workshop.date,
+        time: workshop.timeSlots?.[0] || "TBA",
+        location: workshop.location || "TBA",
+        instructor: workshop.instructor,
+        category: workshop.category
+      });
+    } catch (emailError) {
+      console.error("Failed to send confirmation email:", emailError);
+      // Don't fail the registration if email fails
+    }
 
     res.json({ message: "Registration successful", workshop });
   } catch {

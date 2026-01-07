@@ -39,6 +39,7 @@ export default function WorkshopsPage() {
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [registrationForm, setRegistrationForm] = useState({ name: "", email: "" });
   const [registrationMessage, setRegistrationMessage] = useState<string>("");
+  const [showSuccessPopup, setShowSuccessPopup] = useState<boolean>(false);
   const [nextWorkshop, setNextWorkshop] = useState<Workshop | null>(null);
   const [timeLeft, setTimeLeft] = useState<string>("");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -149,9 +150,11 @@ export default function WorkshopsPage() {
         return;
       }
 
-      setRegistrationMessage("Successfully registered!");
+      // Show success popup
+      setShowSuccessPopup(true);
       setRegistrationForm({ name: "", email: "" });
       setIsRegistering(false);
+      setIsModalOpen(false);
 
       // Refresh workshops
       const workshopsRes = await fetch("/api/workshops");
@@ -172,7 +175,11 @@ export default function WorkshopsPage() {
       const updatedWorkshop = processed.find((w: Workshop) => w._id === selectedWorkshop._id);
       if (updatedWorkshop) setSelectedWorkshop(updatedWorkshop);
 
-      setTimeout(() => setRegistrationMessage(""), 3000);
+      // Auto-close success popup after 5 seconds
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+        setRegistrationMessage("");
+      }, 5000);
     } catch (err) {
       console.error(err);
       setRegistrationMessage("An error occurred. Please try again.");
@@ -1137,6 +1144,195 @@ export default function WorkshopsPage() {
               )}
             </motion.div>
           </div>
+        )}
+
+        {/* Success Popup */}
+        {showSuccessPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
+            onClick={() => setShowSuccessPopup(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="w-full max-w-md p-8 relative"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
+                border: '3px solid rgba(184, 115, 51, 0.8)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 20px 80px rgba(184, 115, 51, 0.4), 0 0 60px rgba(184, 115, 51, 0.3)',
+              }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowSuccessPopup(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-white/10 transition-all"
+                style={{ color: '#B87333' }}
+              >
+                <X size={20} />
+              </button>
+
+              {/* Success Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="flex justify-center mb-6"
+              >
+                <div
+                  className="w-20 h-20 flex items-center justify-center"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
+                    border: '3px solid rgba(184, 115, 51, 0.8)',
+                    borderRadius: '50%',
+                  }}
+                >
+                  <motion.div
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                  >
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#4ade80"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <motion.path
+                        d="M20 6L9 17l-5-5"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
+                      />
+                    </svg>
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Success Message */}
+              <div className="text-center mb-6">
+                <h3
+                  className="text-2xl md:text-3xl mb-3"
+                  style={{
+                    fontFamily: 'Bebas Neue, sans-serif',
+                    color: '#FFFEF9',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  REGISTRATION SUCCESSFUL!
+                </h3>
+                <p
+                  className="text-base mb-4"
+                  style={{
+                    color: 'rgba(255, 254, 249, 0.8)',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  You've successfully registered for the workshop!
+                </p>
+              </div>
+
+              {/* Email Confirmation Note */}
+              <div
+                className="p-4 mb-6"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.1)',
+                  border: '2px solid rgba(184, 115, 51, 0.3)',
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <Sparkles size={20} style={{ color: '#D4A574', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <p
+                      className="text-sm mb-1"
+                      style={{
+                        color: '#D4A574',
+                        fontWeight: 600,
+                      }}
+                    >
+                      Check your email
+                    </p>
+                    <p
+                      className="text-sm"
+                      style={{
+                        color: 'rgba(255, 254, 249, 0.7)',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      A confirmation email with workshop details has been sent to your email address.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Workshop Details if available */}
+              {selectedWorkshop && (
+                <div
+                  className="p-4 mb-6"
+                  style={{
+                    background: 'rgba(20, 20, 20, 0.6)',
+                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                  }}
+                >
+                  <p
+                    className="text-xs uppercase tracking-wider mb-2"
+                    style={{
+                      color: '#8B6F47',
+                      fontFamily: 'Bebas Neue, sans-serif',
+                    }}
+                  >
+                    Workshop
+                  </p>
+                  <p
+                    className="text-lg mb-1"
+                    style={{
+                      color: '#FFFEF9',
+                      fontFamily: 'Bebas Neue, sans-serif',
+                    }}
+                  >
+                    {selectedWorkshop.title}
+                  </p>
+                  <p
+                    className="text-sm"
+                    style={{
+                      color: 'rgba(255, 254, 249, 0.7)',
+                    }}
+                  >
+                    {new Date(selectedWorkshop.date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })} • {selectedWorkshop.time}
+                  </p>
+                </div>
+              )}
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowSuccessPopup(false)}
+                className="w-full py-3 text-center transition-all hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                  border: '2px solid rgba(184, 115, 51, 0.6)',
+                  color: '#000',
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: '1rem',
+                  letterSpacing: '0.15em',
+                }}
+              >
+                CLOSE
+              </button>
+            </motion.div>
+          </motion.div>
         )}
 
         {/* Hide scrollbar */}
