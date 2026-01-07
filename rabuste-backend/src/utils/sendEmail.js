@@ -9,7 +9,7 @@ const sendEmail = async (email, token) => {
     },
   });
 
-  const verifyUrl = `http://localhost:3000/verify-email?token=${token}`;
+const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
 
   await transporter.sendMail({
     from: `"Rabuste" <${process.env.EMAIL_USER}>`,
