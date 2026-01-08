@@ -15,6 +15,8 @@ import adminWorkshopRoutes from "./routes/admin.workshop.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import aiDiscountRoutes from "./routes/ai-discount.js";
 
+import paymentRoutes from "./routes/payment.routes.js";
+
 // middleware
 // Allow both localhost (dev) and production frontend URL
 const allowedOrigins = [
@@ -79,3 +81,5 @@ app.use("/api/admin", adminWorkshopRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/ai-discount", aiDiscountRoutes);
 export default app; 
+
+app.use("/api/payment", paymentRoutes);
