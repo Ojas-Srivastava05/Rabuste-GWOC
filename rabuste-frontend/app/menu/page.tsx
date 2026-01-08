@@ -740,7 +740,7 @@ export default function MenuPage() {
               maxWidth: '400px',
             }}
           >
-            <CheckCircle size={20} style={{ color: '#6f8f72' }} />
+            <CheckCircle size={20} style={{ color: '#5E7D4C' }} />
             <p style={{ color: '#F5F1E8', fontFamily: 'var(--font-body)' }}>
               <strong className="gradient-text">{addedToast.itemName}</strong> added to cart
             </p>

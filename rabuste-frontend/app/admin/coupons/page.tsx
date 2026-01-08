@@ -199,12 +199,12 @@ export default function AdminCouponsPage() {
 
         <div className="brutal-card p-6">
           <div className="flex items-center gap-4 mb-3">
-            <Check size={28} className="text-[#6f8f72]" />
+            <Check size={28} className="text-[#5E7D4C]" />
             <span className="section-label">ACTIVE</span>
           </div>
           <p
             className="text-5xl"
-            style={{ fontFamily: 'var(--font-heading)', color: '#6f8f72' }}
+            style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}
           >
             {coupons.filter(c => c.isActive).length}
           </p>
@@ -258,10 +258,10 @@ export default function AdminCouponsPage() {
                       className="px-4 py-1 flex items-center gap-2"
                       style={{
                         background: coupon.isActive && !isExpired
-                          ? 'rgba(111, 143, 114, 0.3)'
+                          ? 'rgba(94, 125, 76, 0.3)'
                           : 'rgba(139, 111, 71, 0.3)',
-                        border: `2px solid ${coupon.isActive && !isExpired ? '#6f8f72' : '#8B6F47'}`,
-                        color: coupon.isActive && !isExpired ? '#6f8f72' : '#8B6F47',
+                        border: `2px solid ${coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47'}`,
+                        color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47',
                       }}
                     >
                       <Percent size={16} />

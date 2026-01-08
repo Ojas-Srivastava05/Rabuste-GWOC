@@ -334,16 +334,16 @@ export default function AdminOrdersPage() {
         <button 
           onClick={() => handleFilterClick('completed')}
           className={`brutal-card p-4 sm:p-6 cursor-pointer transition-all hover:scale-105 ${
-            activeFilter === 'completed' ? 'ring-2 ring-[#6f8f72] shadow-lg shadow-[#6f8f72]/50' : ''
+            activeFilter === 'completed' ? 'ring-2 ring-[#5E7D4C] shadow-lg shadow-[#5E7D4C]/50' : ''
           }`}
         >
           <div className="flex items-center gap-3 sm:gap-4 mb-3">
-            <CheckCircle2 size={24} className="text-[#6f8f72]" />
+            <CheckCircle2 size={24} className="text-[#5E7D4C]" />
             <span className="section-label text-sm">COMPLETED</span>
           </div>
           <p
             className="text-3xl sm:text-5xl"
-            style={{ fontFamily: 'var(--font-heading)', color: '#6f8f72' }}
+            style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}
           >
             {completedOrders.length}
           </p>
@@ -449,9 +449,9 @@ export default function AdminOrdersPage() {
                     <div
                       className="px-3 py-1 rounded-full text-xs"
                       style={{
-                        background: 'rgba(76, 175, 80, 0.2)',
-                        border: '1px solid rgba(76, 175, 80, 0.4)',
-                        color: '#4CAF50',
+                        background: 'rgba(94, 125, 76, 0.2)',
+                        border: '1px solid rgba(94, 125, 76, 0.4)',
+                        color: '#5E7D4C',
                         fontFamily: 'var(--font-heading)',
                         letterSpacing: '0.05em',
                       }}
@@ -489,9 +489,9 @@ export default function AdminOrdersPage() {
                     background:
                       order.status === "pending"
                         ? 'linear-gradient(135deg, #B87333, #CD7F32)'
-                        : 'rgba(111, 143, 114, 0.3)',
-                    color: order.status === "pending" ? '#000000' : '#6f8f72',
-                    border: order.status === "completed" ? '2px solid #6f8f72' : 'none',
+                        : 'rgba(94, 125, 76, 0.3)',
+                    color: order.status === "pending" ? '#000000' : '#5E7D4C',
+                    border: order.status === "completed" ? '2px solid #5E7D4C' : 'none',
                   }}
                 >
                   {order.status}
@@ -597,13 +597,13 @@ export default function AdminOrdersPage() {
               <div
                 className="mb-6 p-4 rounded-lg"
                 style={{
-                  background: 'rgba(111, 143, 114, 0.15)',
-                  border: '1px solid rgba(111, 143, 114, 0.4)',
+                  background: 'rgba(94, 125, 76, 0.15)',
+                  border: '1px solid rgba(94, 125, 76, 0.4)',
                 }}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <Ticket size={16} style={{ color: '#6f8f72' }} />
-                  <p className="text-sm font-bold uppercase tracking-wide" style={{ color: '#6f8f72' }}>
+                  <Ticket size={16} style={{ color: '#5E7D4C' }} />
+                  <p className="text-sm font-bold uppercase tracking-wide" style={{ color: '#5E7D4C' }}>
                     Discount Applied
                   </p>
                 </div>
@@ -612,7 +612,7 @@ export default function AdminOrdersPage() {
                     <p style={{ color: '#8DB98D' }}>
                       Items Total: <span className="font-bold">₹{itemsTotal}</span>
                     </p>
-                    <p className="font-bold text-lg" style={{ color: '#6f8f72' }}>
+                    <p className="font-bold text-lg" style={{ color: '#5E7D4C' }}>
                       {discountPercentage}% OFF
                     </p>
                   </div>
@@ -620,7 +620,7 @@ export default function AdminOrdersPage() {
                     <p style={{ color: '#8DB98D' }}>
                       Discount Amount:
                     </p>
-                    <p className="font-bold" style={{ color: '#6f8f72' }}>
+                    <p className="font-bold" style={{ color: '#5E7D4C' }}>
                       - ₹{discountAmount}
                     </p>
                   </div>
@@ -638,7 +638,7 @@ export default function AdminOrdersPage() {
                 <div className="text-sm" style={{ color: '#8DB98D' }}>
                   <span style={{ textDecoration: 'line-through' }}>₹{itemsTotal}</span>
                   {' → '}
-                  <span className="font-bold" style={{ color: '#6f8f72' }}>₹{discountAmount} saved</span>
+                  <span className="font-bold" style={{ color: '#5E7D4C' }}>₹{discountAmount} saved</span>
                 </div>
               )}
               {!hasCouponApplied && (

@@ -242,7 +242,7 @@ const TriviaQuiz = ({ onWin }: { onWin: () => void }) => {
             style={{
               background: answered
                 ? index === questions[currentQ].correct
-                  ? 'rgba(76, 175, 80, 0.3)'
+                  ? 'rgba(94, 125, 76, 0.3)'
                   : selected === index
                   ? 'rgba(244, 67, 54, 0.3)'
                   : 'rgba(61, 43, 31, 0.5)'
@@ -250,7 +250,7 @@ const TriviaQuiz = ({ onWin }: { onWin: () => void }) => {
               border: `1px solid ${
                 answered
                   ? index === questions[currentQ].correct
-                    ? 'rgba(76, 175, 80, 0.6)'
+                    ? 'rgba(94, 125, 76, 0.6)'
                     : selected === index
                     ? 'rgba(244, 67, 54, 0.6)'
                     : 'rgba(184, 115, 51, 0.3)'
@@ -324,11 +324,11 @@ const OriginGame = ({ onWin }: { onWin: () => void }) => {
             className="py-3 text-sm transition-all"
             style={{
               background: answered && index === coffees[current].correct
-                ? 'rgba(76, 175, 80, 0.3)'
+                ? 'rgba(94, 125, 76, 0.3)'
                 : 'rgba(61, 43, 31, 0.5)',
               border: `2px solid ${
                 answered && index === coffees[current].correct
-                  ? 'rgba(76, 175, 80, 0.6)'
+                  ? 'rgba(94, 125, 76, 0.6)'
                   : 'rgba(184, 115, 51, 0.4)'
               }`,
               color: '#F5F1E8',
@@ -887,14 +887,14 @@ export default function OrderStatusPage() {
                     <div 
                       className="flex-1 h-px"
                       style={{ 
-                        background: 'linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.5), transparent)' 
+                        background: 'linear-gradient(90deg, transparent, rgba(94, 125, 76, 0.5), transparent)' 
                       }}
                     />
                     <span 
                       className="text-sm"
                       style={{
                         fontFamily: 'var(--font-heading)',
-                        color: '#4CAF50',
+                        color: '#5E7D4C',
                         letterSpacing: '0.1em',
                       }}
                     >
@@ -903,7 +903,7 @@ export default function OrderStatusPage() {
                     <div 
                       className="flex-1 h-px"
                       style={{ 
-                        background: 'linear-gradient(90deg, transparent, rgba(76, 175, 80, 0.5), transparent)',
+                        background: 'linear-gradient(90deg, transparent, rgba(94, 125, 76, 0.5), transparent)',
                         transform: 'scaleX(-1)' 
                       }}
                     />
@@ -919,8 +919,8 @@ export default function OrderStatusPage() {
                         transition={{ delay: index * 0.1 }}
                         className="p-6"
                         style={{
-                          background: 'rgba(76, 175, 80, 0.05)',
-                          border: '2px solid rgba(76, 175, 80, 0.3)',
+                          background: 'rgba(94, 125, 76, 0.05)',
+                          border: '2px solid rgba(94, 125, 76, 0.3)',
                           position: 'relative',
                         }}
                       >
@@ -928,15 +928,15 @@ export default function OrderStatusPage() {
                         <div
                           className="absolute top-4 right-4 inline-flex items-center gap-2 px-4 py-2"
                           style={{
-                            background: 'rgba(76, 175, 80, 0.2)',
-                            border: '2px solid rgba(76, 175, 80, 0.5)',
+                            background: 'rgba(94, 125, 76, 0.2)',
+                            border: '2px solid rgba(94, 125, 76, 0.5)',
                           }}
                         >
-                          <Trophy size={18} style={{ color: '#4CAF50' }} />
+                          <Trophy size={18} style={{ color: '#5E7D4C' }} />
                           <span
                             className="text-sm"
                             style={{
-                              color: '#4CAF50',
+                              color: '#5E7D4C',
                               fontFamily: 'var(--font-heading)',
                               letterSpacing: '0.1em',
                             }}
@@ -947,14 +947,14 @@ export default function OrderStatusPage() {
 
                         {/* Order Header */}
                         <div className="mb-6 pb-4 pr-32"
-                          style={{ borderBottom: '2px solid rgba(76, 175, 80, 0.2)' }}
+                          style={{ borderBottom: '2px solid rgba(94, 125, 76, 0.2)' }}
                         >
                           <div className="flex items-center gap-3 mb-2">
-                            <Clock size={20} style={{ color: '#4CAF50' }} />
+                            <Clock size={20} style={{ color: '#5E7D4C' }} />
                             <span
                               className="text-sm"
                               style={{
-                                color: '#4CAF50',
+                                color: '#5E7D4C',
                                 fontFamily: 'var(--font-body)',
                               }}
                             >
@@ -988,15 +988,15 @@ export default function OrderStatusPage() {
                               className="flex justify-between items-center pb-3"
                               style={{
                                 borderBottom: i < order.items.length - 1
-                                  ? '1px solid rgba(76, 175, 80, 0.15)'
+                                  ? '1px solid rgba(94, 125, 76, 0.15)'
                                   : 'none',
                               }}
                             >
                               <div className="flex items-center gap-3 flex-1">
                                 {item.itemType === 'art' ? (
-                                  <Sparkles size={16} style={{ color: '#4CAF50' }} />
+                                  <Sparkles size={16} style={{ color: '#5E7D4C' }} />
                                 ) : (
-                                  <Coffee size={16} style={{ color: '#4CAF50' }} />
+                                  <Coffee size={16} style={{ color: '#5E7D4C' }} />
                                 )}
                                 <div>
                                   <div className="flex items-center gap-2">
@@ -1014,9 +1014,9 @@ export default function OrderStatusPage() {
                                       <span 
                                         className="text-xs px-2 py-0.5 uppercase"
                                         style={{
-                                          background: 'rgba(76, 175, 80, 0.2)',
-                                          color: '#4CAF50',
-                                          border: '1px solid rgba(76, 175, 80, 0.4)',
+                                          background: 'rgba(94, 125, 76, 0.2)',
+                                          color: '#5E7D4C',
+                                          border: '1px solid rgba(94, 125, 76, 0.4)',
                                         }}
                                       >
                                         ARTWORK
@@ -1035,7 +1035,7 @@ export default function OrderStatusPage() {
                                 className="text-lg"
                                 style={{ 
                                   fontFamily: 'var(--font-heading)',
-                                  color: '#4CAF50',
+                                  color: '#5E7D4C',
                                 }}
                               >
                                 ₹{item.price * item.quantity}
@@ -1047,7 +1047,7 @@ export default function OrderStatusPage() {
                         {/* Order Total */}
                         <div
                           className="flex justify-between items-center pt-4"
-                          style={{ borderTop: '2px solid rgba(76, 175, 80, 0.3)' }}
+                          style={{ borderTop: '2px solid rgba(94, 125, 76, 0.3)' }}
                         >
                           <span
                             className="text-xl"
@@ -1063,7 +1063,7 @@ export default function OrderStatusPage() {
                             className="text-2xl"
                             style={{ 
                               fontFamily: 'var(--font-heading)',
-                              color: '#4CAF50',
+                              color: '#5E7D4C',
                             }}
                           >
                             ₹{order.totalAmount}
@@ -1264,7 +1264,7 @@ export default function OrderStatusPage() {
                     <span className="text-sm" style={{ color: '#8B6F47' }}>
                       Completed Orders
                     </span>
-                    <span className="text-lg" style={{ fontFamily: 'var(--font-heading)', color: '#4CAF50' }}>
+                    <span className="text-lg" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
                       {completedOrders.length}
                     </span>
                   </div>

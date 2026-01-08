@@ -441,9 +441,9 @@ export default function CartPage() {
                       }}
                     >
                       <div className="flex items-center gap-3">
-                        <CheckCircle size={20} style={{ color: '#6f8f72' }} />
+                        <CheckCircle size={20} style={{ color: '#5E7D4C' }} />
                         <div>
-                          <p style={{ color: '#6f8f72', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                          <p style={{ color: '#5E7D4C', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                             {cart.couponCode}
                           </p>
                           <p className="text-xs" style={{ color: '#8B6F47' }}>
@@ -490,7 +490,7 @@ export default function CartPage() {
                   )}
 
                   {couponSuccess && (
-                    <p className="text-sm mt-2" style={{ color: '#6f8f72' }}>
+                    <p className="text-sm mt-2" style={{ color: '#5E7D4C' }}>
                       {couponSuccess}
                     </p>
                   )}
@@ -504,7 +504,7 @@ export default function CartPage() {
                   </div>
                   
                   {cart.couponCode && cart.couponDiscount && cart.couponDiscount > 0 && (
-                    <div className="flex justify-between text-base" style={{ color: '#6f8f72' }}>
+                    <div className="flex justify-between text-base" style={{ color: '#5E7D4C' }}>
                       <span>Coupon Discount ({cart.couponCode})</span>
                       <span>- ₹{cart.couponDiscount}</span>
                     </div>
