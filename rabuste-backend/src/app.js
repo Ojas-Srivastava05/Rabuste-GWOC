@@ -7,7 +7,7 @@ import protectedRoutes from "./routes/protected.js";
 
 // import menuRoutes from "./routes/menu.js";
 const app = express();
-import franchiseRoutes from "./routes/franchise.js";
+// import franchiseRoutes from "./routes/franchise.js";
 import adminRoutes from "./routes/admin.routes.js";
 import adminMenuRoutes from "./routes/admin.menu.routes.js";
 // import adminArtworkRoutes from "./routes/admin.artwork.routes.js";
@@ -74,7 +74,7 @@ app.get("/health", (req, res) => {
 // app.use("/menu", menuRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
-app.use("/api/franchise", franchiseRoutes);
+// app.use("/api/franchise", franchiseRoutes);
 app.use("/api/admin",adminRoutes);
 app.use("/api/admin",adminMenuRoutes);
 // app.use("/api/admin", adminArtworkRoutes);
