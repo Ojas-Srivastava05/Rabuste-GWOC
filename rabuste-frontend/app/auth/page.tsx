@@ -59,8 +59,9 @@ function AuthForm() {
     }
 
     const endpoint = isLogin
-      ? `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`
-      : `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`;
+    ? "/api/auth/login"
+    : "/api/auth/signup";
+
 
     try {
       const res = await fetch(endpoint, {
@@ -90,14 +91,7 @@ function AuthForm() {
         const destination = data.user?.role === "admin" ? "/admin" : redirect || "/";
         router.push(destination);
       } else {
-        setInfo("Check your email to verify your account");
-        setForm({ 
-          name: "", 
-          email: "", 
-          password: "",
-          phoneCountryCode: "+91",
-          phoneNumber: ""
-        });
+        router.push(`/verify?email=${encodeURIComponent(form.email)}`);
       }
       
     } catch (err: unknown) {
