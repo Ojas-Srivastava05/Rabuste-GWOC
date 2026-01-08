@@ -22,8 +22,9 @@ import paymentRoutes from "./routes/payment.routes.js";
 const allowedOrigins = [
   "http://localhost:3000",
   "http://127.0.0.1:54642",
-  "https://rabuste-gwoc.vercel.app",
-  process.env.FRONTEND_URL, // Additional production URL from env
+  "https://rabuste-coffee-gwoc.vercel.app",
+  process.env.FRONTEND_URL,
+  'https://*.vercel.app', // Additional production URL from env
 ].filter(Boolean); // Remove undefined values
 
 app.use(cors({
