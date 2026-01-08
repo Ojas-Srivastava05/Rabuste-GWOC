@@ -65,7 +65,9 @@ export const createRazorpayOrder = async (amount: number): Promise<RazorpayOrder
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create Razorpay order');
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Razorpay order creation failed:', errorData);
+      throw new Error(errorData.error || errorData.details || 'Failed to create Razorpay order');
     }
 
     return await response.json();
