@@ -18,6 +18,12 @@ const orderSchema=new mongoose.Schema(
       lng:Number,
     },
     price:{type:Number,required:true},
+    totalAmount:{type:Number},
+    instructions: String,
+    couponCode: String,
+    couponDiscount: Number,
+    paymentId: String,
+    paymentStatus: String,
     assignedStoreId:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"Store",
