@@ -14,25 +14,6 @@ import adminMenuRoutes from "./routes/admin.menu.routes.js";
 import adminWorkshopRoutes from "./routes/admin.workshop.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 
-
-
-app.use("/api/admin",adminRoutes);
-app.use("/api/admin",adminMenuRoutes);
-app.use("/api/admin", adminMenuRoutes);
-// app.use("/api/admin", adminArtworkRoutes);
-app.use("/api/admin", adminWorkshopRoutes);
-app.use("/api/orders", orderRoutes);
-
-// logger
-app.use((req, res, next) => {
-  console.log("➡️", req.method, req.url);
-  if (req.method === 'PATCH' && req.url.includes('/ai-config')) {
-    console.log("Request headers:", req.headers);
-    console.log("Request body before parsing:", req.body);
-  }
-  next();
-});
-
 // middleware
 // Allow both localhost (dev) and production frontend URL
 const allowedOrigins = [
@@ -61,10 +42,12 @@ app.use(cors({
 
 app.use(express.json());
 
-// Add logging after JSON parser
+// logger
 app.use((req, res, next) => {
+  console.log("➡️", req.method, req.url);
   if (req.method === 'PATCH' && req.url.includes('/ai-config')) {
-    console.log("Request body after JSON parsing:", req.body);
+    console.log("Request headers:", req.headers);
+    console.log("Request body:", req.body);
   }
   next();
 });
@@ -88,4 +71,9 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
 app.use("/api/franchise", franchiseRoutes);
+app.use("/api/admin",adminRoutes);
+app.use("/api/admin",adminMenuRoutes);
+// app.use("/api/admin", adminArtworkRoutes);
+app.use("/api/admin", adminWorkshopRoutes);
+app.use("/api/orders", orderRoutes);
 export default app; 
