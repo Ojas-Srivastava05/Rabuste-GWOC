@@ -350,14 +350,23 @@ export default function AISettingsPage() {
               {config.enableDiscountAI && (
                 <div className="space-y-4">
                   {/* Suggestions */}
-                  {suggestions[0]?._id && (
-                    <div className="p-3 rounded-lg bg-gradient-to-r from-[#B87333]/10 to-[#CD7F32]/10 border border-[#B87333]/30">
-                      <p className="text-sm font-medium mb-1" style={{ color: '#B87333' }}>
-                        <span style={{ color: '#B87333' }}>📊</span> Suggested for discount:
+                  {suggestions.length > 0 && suggestions[0]?._id && (
+                    <div className="p-4 rounded-lg bg-gradient-to-r from-[#B87333]/10 to-[#CD7F32]/10 border border-[#B87333]/30">
+                      <p className="text-sm font-medium mb-2" style={{ color: '#B87333' }}>
+                        <span style={{ color: '#B87333' }}>📊</span> AI Discount Suggestions (Items with low recent sales):
                       </p>
-                      <p className="text-sm">
-                        <b>{suggestions[0].name}</b> (sold {suggestions[0].soldLast7Days} in last 7 days)
-                      </p>
+                      <div className="space-y-2">
+                        {suggestions.slice(0, 3).map((suggestion, index) => (
+                          <div key={suggestion._id} className="flex justify-between items-center text-sm">
+                            <span className="font-medium text-[#F5F1E8]">
+                              {index + 1}. {suggestion.name}
+                            </span>
+                            <span className="text-[#8B6F47]">
+                              {suggestion.soldLast7Days} sold (7 days)
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 
@@ -383,6 +392,18 @@ export default function AISettingsPage() {
                         </option>
                       ))}
                     </select>
+                    
+                    {/* Show currently selected item */}
+                    {config.discountItemId && (
+                      <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-[#B87333]/20 to-[#CD7F32]/20 border border-[#B87333]/30">
+                        <p className="text-sm font-medium" style={{ color: '#B87333' }}>
+                          <span style={{ color: '#B87333' }}>🎯</span> Currently offering {config.discountPercent}% discount on:
+                        </p>
+                        <p className="text-sm font-bold text-[#F5F1E8] mt-1">
+                          {menuItems.find(item => item._id === config.discountItemId)?.name || 'Unknown Item'}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Discount Percent */}

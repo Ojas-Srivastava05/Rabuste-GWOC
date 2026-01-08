@@ -13,6 +13,7 @@ import adminMenuRoutes from "./routes/admin.menu.routes.js";
 // import adminArtworkRoutes from "./routes/admin.artwork.routes.js";
 import adminWorkshopRoutes from "./routes/admin.workshop.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import aiDiscountRoutes from "./routes/ai-discount.js";
 
 // middleware
 // Allow both localhost (dev) and production frontend URL
@@ -76,4 +77,5 @@ app.use("/api/admin",adminMenuRoutes);
 // app.use("/api/admin", adminArtworkRoutes);
 app.use("/api/admin", adminWorkshopRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/ai-discount", aiDiscountRoutes);
 export default app; 

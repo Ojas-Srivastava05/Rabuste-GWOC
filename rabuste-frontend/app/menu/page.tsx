@@ -112,6 +112,9 @@ export default function MenuPage() {
   const router = useRouter();
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
+  const [aiDiscount, setAiDiscount] = useState<{ enableDiscountAI: boolean; discountItemId: string | null; discountPercent: number }>(
+    { enableDiscountAI: false, discountItemId: null, discountPercent: 0 }
+  );
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -126,6 +129,7 @@ export default function MenuPage() {
   useEffect(() => {
     fetchMenu();
     fetchCart();
+    fetchAIDiscount();
     
     // Load addition count from session storage
     const count = sessionStorage.getItem('additionCount');
@@ -174,6 +178,16 @@ export default function MenuPage() {
       setCart(data);
     } catch (err) {
       console.error("Failed to fetch cart", err);
+    }
+  }
+
+  async function fetchAIDiscount() {
+    try {
+      const res = await fetch("/api/ai-discount");
+      const data = await res.json();
+      setAiDiscount(data);
+    } catch (err) {
+      console.error("Failed to fetch AI discount", err);
     }
   }
 
@@ -226,6 +240,24 @@ export default function MenuPage() {
 
   function getQty(menuItemId: string) {
     return cart?.items.find((i) => i.itemType === "menu" && i.menuItem === menuItemId)?.quantity || 0;
+  }
+
+  // AI Discount helper functions
+  function hasAIDiscount(itemId: string): boolean {
+    return aiDiscount.enableDiscountAI && 
+           aiDiscount.discountItemId === itemId && 
+           aiDiscount.discountPercent > 0;
+  }
+
+  function getDiscountedPrice(item: MenuItem): number {
+    if (hasAIDiscount(item._id)) {
+      return item.price * (1 - aiDiscount.discountPercent / 100);
+    }
+    return item.price;
+  }
+
+  function getOriginalPrice(item: MenuItem): number {
+    return item.price;
   }
 
   const totalItems = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + i.quantity, 0) || 0;
@@ -622,6 +654,10 @@ export default function MenuPage() {
                               index={index}
                               flags={getItemFlags(item)}
                               isHighlighted={highlightedItemId === item._id}
+                              hasAIDiscount={hasAIDiscount(item._id)}
+                              discountedPrice={getDiscountedPrice(item)}
+                              originalPrice={getOriginalPrice(item)}
+                              discountPercent={aiDiscount.discountPercent}
                             />
                           ))}
                         </div>
@@ -642,6 +678,10 @@ export default function MenuPage() {
                       index={index}
                       flags={getItemFlags(item)}
                       isHighlighted={highlightedItemId === item._id}
+                      hasAIDiscount={hasAIDiscount(item._id)}
+                      discountedPrice={getDiscountedPrice(item)}
+                      originalPrice={getOriginalPrice(item)}
+                      discountPercent={aiDiscount.discountPercent}
                     />
                   ))}
                 </div>
@@ -659,6 +699,10 @@ export default function MenuPage() {
                     index={index}
                     flags={getItemFlags(item)}
                     isHighlighted={highlightedItemId === item._id}
+                    hasAIDiscount={hasAIDiscount(item._id)}
+                    discountedPrice={getDiscountedPrice(item)}
+                    originalPrice={getOriginalPrice(item)}
+                    discountPercent={aiDiscount.discountPercent}
                   />
                 ))}
               </div>
@@ -873,6 +917,10 @@ function GridMenuItem({
   index,
   flags,
   isHighlighted,
+  hasAIDiscount,
+  discountedPrice,
+  originalPrice,
+  discountPercent,
 }: {
   item: MenuItem;
   quantity: number;
@@ -881,6 +929,10 @@ function GridMenuItem({
   index: number;
   flags: any;
   isHighlighted?: boolean;
+  hasAIDiscount?: boolean;
+  discountedPrice?: number;
+  originalPrice?: number;
+  discountPercent?: number;
 }) {
   return (
     <motion.div
@@ -954,6 +1006,20 @@ function GridMenuItem({
         
         {/* Top Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {hasAIDiscount && (
+            <div
+              className="px-2 py-1 text-xs flex items-center gap-1"
+              style={{
+                background: 'rgba(76, 175, 80, 0.95)',
+                color: '#000',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '10px',
+                letterSpacing: '0.1em',
+              }}
+            >
+              🤖 {discountPercent}% OFF
+            </div>
+          )}
           {flags.isBestseller && (
             <div
               className="px-2 py-1 text-xs flex items-center gap-1"
@@ -1036,12 +1102,31 @@ function GridMenuItem({
 
         {/* Price and Action */}
         <div className="flex justify-between items-center">
-          <span
-            className="text-xl gradient-text"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            ₹{item.price}
-          </span>
+          <div className="flex flex-col">
+            {hasAIDiscount ? (
+              <>
+                <span
+                  className="text-xl gradient-text"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  ₹{Math.round(discountedPrice || 0)}
+                </span>
+                <span
+                  className="text-sm line-through opacity-60"
+                  style={{ color: '#8B6F47' }}
+                >
+                  ₹{originalPrice}
+                </span>
+              </>
+            ) : (
+              <span
+                className="text-xl gradient-text"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                ₹{item.price}
+              </span>
+            )}
+          </div>
 
           {quantity > 0 ? (
             <div
@@ -1094,6 +1179,10 @@ function ListMenuItem({
   index,
   flags,
   isHighlighted,
+  hasAIDiscount,
+  discountedPrice,
+  originalPrice,
+  discountPercent,
 }: {
   item: MenuItem;
   quantity: number;
@@ -1102,6 +1191,10 @@ function ListMenuItem({
   index: number;
   flags: any;
   isHighlighted?: boolean;
+  hasAIDiscount?: boolean;
+  discountedPrice?: number;
+  originalPrice?: number;
+  discountPercent?: number;
 }) {
   return (
     <motion.div
@@ -1249,12 +1342,39 @@ function ListMenuItem({
               </div>
             </div>
 
-            <span
-              className="text-xl gradient-text flex-shrink-0"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              ₹{item.price}
-            </span>
+            <div className="flex-shrink-0 text-right">
+              {hasAIDiscount ? (
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-sm line-through opacity-70"
+                      style={{ color: '#8B6F47' }}
+                    >
+                      ₹{originalPrice}
+                    </span>
+                    <span
+                      className="text-xs px-2 py-0.5 bg-green-600 text-white rounded-full"
+                      style={{ fontSize: '10px' }}
+                    >
+                      {discountPercent}% OFF
+                    </span>
+                  </div>
+                  <span
+                    className="text-xl gradient-text"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                  >
+                    ₹{discountedPrice}
+                  </span>
+                </div>
+              ) : (
+                <span
+                  className="text-xl gradient-text"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  ₹{item.price}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Action */}

@@ -43,6 +43,19 @@ const CartItemSchema = new Schema(
     image: {
       type: String,
     },
+
+    // AI discount information
+    aiDiscount: {
+      originalPrice: {
+        type: Number,
+      },
+      discountPercent: {
+        type: Number,
+      },
+      discountedPrice: {
+        type: Number,
+      },
+    },
   },
   { _id: false }
 );

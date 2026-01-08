@@ -73,17 +73,33 @@ export const getAdminDashboard = async (req, res) => {
     const itemCount = {};
     orders.forEach(order => {
       order.items?.forEach(item => {
-        itemCount[item.name] = (itemCount[item.name] || 0) + item.quantity;
+        if (item.itemId) {
+          itemCount[item.itemId] = (itemCount[item.itemId] || 0) + (item.quantity || 0);
+        }
       });
     });
 
-    const mostSoldItem = Object.entries(itemCount)
+    // Find most sold item and get its name from menu
+    const mostSoldEntry = Object.entries(itemCount)
       .sort((a, b) => b[1] - a[1])[0];
+    
+    let mostSoldItem = null;
+    if (mostSoldEntry) {
+      const menuItem = menuItems.find(m => m._id.toString() === mostSoldEntry[0]);
+      if (menuItem) {
+        mostSoldItem = { name: menuItem.name, count: mostSoldEntry[1] };
+      }
+    }
 
     // ====== LOW STOCK ======
+    // Since menu only has inStock boolean, we'll show out-of-stock items
     const lowStockItems = menuItems.filter(
-      item => item.stock < config.lowStockLimit
-    );
+      item => !item.inStock
+    ).map(item => ({
+      _id: item._id,
+      name: item.name,
+      stock: item.inStock ? 'In Stock' : 'Out of Stock'
+    }));
 
     // ====== PEAK HOUR ======
     const hourMap = {};
@@ -102,9 +118,7 @@ export const getAdminDashboard = async (req, res) => {
         revenueToday,
       },
       insights: {
-        mostSoldItem: mostSoldItem
-          ? { name: mostSoldItem[0], count: mostSoldItem[1] }
-          : null,
+        mostSoldItem,
         lowStockItems,
         peakHour: peakHour
           ? `${peakHour[0]}:00 - ${+peakHour[0] + 1}:00`
@@ -204,7 +218,8 @@ export const getDiscountSuggestions = async (req, res) => {
           soldLast7Days: soldByItemId.get(id) ?? 0,
         };
       })
-      .sort((a, b) => a.soldLast7Days - b.soldLast7Days)
+      .sort((a, b) => a.soldLast7Days - b.soldLast7Days) // Lowest sales first (candidates for discount)
+      .filter(item => item.soldLast7Days >= 0) // Include all items
       .slice(0, 10);
 
     res.json({ since, suggestions });

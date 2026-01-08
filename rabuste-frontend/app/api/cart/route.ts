@@ -42,6 +42,17 @@ export async function POST(req: Request) {
 
     const { menuItemId, artItemId, quantity } = await req.json();
 
+    // Get AI discount configuration
+    let aiDiscount = { enableDiscountAI: false, discountItemId: null, discountPercent: 0 };
+    try {
+      const discountRes = await fetch('http://localhost:3000/api/ai-discount');
+      if (discountRes.ok) {
+        aiDiscount = await discountRes.json();
+      }
+    } catch (error) {
+      console.warn('Failed to fetch AI discount config:', error);
+    }
+
     let cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -59,6 +70,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid menu item" }, { status: 400 });
     }
 
+    // Check if this item is eligible for AI discount
+    let itemPrice = menuItem.price;
+    let hasAIDiscount = false;
+    if (aiDiscount.enableDiscountAI && 
+        aiDiscount.discountItemId && 
+        aiDiscount.discountItemId === menuItemId && 
+        aiDiscount.discountPercent > 0) {
+      itemPrice = menuItem.price * (1 - aiDiscount.discountPercent / 100);
+      hasAIDiscount = true;
+    }
+
     // Find existing item by ID or by name (for merging duplicates)
     const existingItemById = cart.items.find(
       (item: any) => item.itemType === "menu" && item.menuItem?.toString() === menuItemId
@@ -72,8 +94,16 @@ export async function POST(req: Request) {
 
     if (existingItem) {
       existingItem.quantity += quantity;
-      // Update the menuItem reference to the current one
+      // Update the menuItem reference and apply discount price
       existingItem.menuItem = menuItem._id;
+      existingItem.price = itemPrice;
+      if (hasAIDiscount) {
+        existingItem.aiDiscount = {
+          originalPrice: menuItem.price,
+          discountPercent: aiDiscount.discountPercent,
+          discountedPrice: itemPrice
+        };
+      }
     
       if (existingItem.quantity <= 0) {
         cart.items = cart.items.filter(
@@ -81,14 +111,25 @@ export async function POST(req: Request) {
         );
       }
     } else if (quantity > 0) {
-      cart.items.push({
+      const newItem: any = {
         menuItem: menuItem._id,
         itemType: "menu",
         name: menuItem.name,
-        price: menuItem.price,
+        price: itemPrice,
         quantity,
         image: menuItem.image,
-      });
+      };
+      
+      // Add AI discount information if applicable
+      if (hasAIDiscount) {
+        newItem.aiDiscount = {
+          originalPrice: menuItem.price,
+          discountPercent: aiDiscount.discountPercent,
+          discountedPrice: itemPrice
+        };
+      }
+      
+      cart.items.push(newItem);
     }
   }
 
