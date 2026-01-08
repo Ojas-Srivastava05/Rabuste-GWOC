@@ -35,45 +35,43 @@ export default function FranchisePage() {
     setSubmitStatus({ type: '', message: '' });
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-      const response = await fetch(`${apiUrl}/api/franchise/enquiry`, {
-        method: 'POST',
+      const response = await fetch("/api/franchise", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        setSubmitStatus({
-          type: 'success',
-          message: 'Thank you! Your franchise enquiry has been submitted successfully. Our team will contact you within 2-3 business days.'
-        });
-        
-        setTimeout(() => {
-          setFormData({
-            fullName: '',
-            email: '',
-            phone: '',
-            organizationName: '',
-            organizationType: 'individual',
-            city: '',
-            state: '',
-            preferredLocation: '',
-            investmentCapacity: '',
-            experience: '',
-            message: ''
-          });
-          setSubmitStatus({ type: '', message: '' });
-        }, 5000);
-      } else {
-        throw new Error('Submission failed');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Submission failed");
       }
-    } catch (error) {
-      console.error('Franchise submission error:', error);
+
       setSubmitStatus({
-        type: 'error',
-        message: 'Failed to submit enquiry. Please try again or contact us directly.'
+        type: "success",
+        message: data.message,
+      });
+
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        organizationName: '',
+        organizationType: 'individual',
+        city: '',
+        state: '',
+        preferredLocation: '',
+        investmentCapacity: '',
+        experience: '',
+        message: ''
+      });
+
+    } catch (error: any) {
+      setSubmitStatus({
+        type: "error",
+        message: error.message || "Failed to submit enquiry",
       });
     } finally {
       setIsSubmitting(false);
