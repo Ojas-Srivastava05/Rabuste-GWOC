@@ -35,6 +35,7 @@ export default function AdminOrdersPage() {
   const [locationPermission, setLocationPermission] = useState<'pending' | 'granted' | 'denied'>('pending');
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'completed'>('all');
 
   const fetchOrders = async (showRefreshing = false) => {
     if (showRefreshing) setIsRefreshing(true);
@@ -203,6 +204,25 @@ export default function AdminOrdersPage() {
   const pendingOrders = orders.filter((o) => o.status === "pending");
   const completedOrders = orders.filter((o) => o.status === "completed");
 
+  // Filter orders based on active filter
+  const displayedOrders = activeFilter === 'all' 
+    ? orders 
+    : activeFilter === 'pending' 
+    ? pendingOrders 
+    : completedOrders;
+
+  // Handler for filter clicks
+  const handleFilterClick = (filter: 'all' | 'pending' | 'completed') => {
+    setActiveFilter(filter);
+    // Smooth scroll to orders section
+    setTimeout(() => {
+      const ordersSection = document.getElementById('orders-section');
+      if (ordersSection) {
+        ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   return (
     <div
       className="min-h-screen p-4 sm:p-6 lg:p-8"
@@ -293,7 +313,12 @@ export default function AdminOrdersPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-        <div className="brutal-card p-4 sm:p-6">
+        <button 
+          onClick={() => handleFilterClick('pending')}
+          className={`brutal-card p-4 sm:p-6 cursor-pointer transition-all hover:scale-105 ${
+            activeFilter === 'pending' ? 'ring-2 ring-[#B87333] shadow-lg shadow-[#B87333]/50' : ''
+          }`}
+        >
           <div className="flex items-center gap-3 sm:gap-4 mb-3">
             <Clock size={24} className="text-[#B87333]" />
             <span className="section-label text-sm">PENDING</span>
@@ -304,9 +329,14 @@ export default function AdminOrdersPage() {
           >
             {pendingOrders.length}
           </p>
-        </div>
+        </button>
 
-        <div className="brutal-card p-4 sm:p-6">
+        <button 
+          onClick={() => handleFilterClick('completed')}
+          className={`brutal-card p-4 sm:p-6 cursor-pointer transition-all hover:scale-105 ${
+            activeFilter === 'completed' ? 'ring-2 ring-[#6f8f72] shadow-lg shadow-[#6f8f72]/50' : ''
+          }`}
+        >
           <div className="flex items-center gap-3 sm:gap-4 mb-3">
             <CheckCircle2 size={24} className="text-[#6f8f72]" />
             <span className="section-label text-sm">COMPLETED</span>
@@ -317,9 +347,14 @@ export default function AdminOrdersPage() {
           >
             {completedOrders.length}
           </p>
-        </div>
+        </button>
 
-        <div className="brutal-card p-4 sm:p-6">
+        <button 
+          onClick={() => handleFilterClick('all')}
+          className={`brutal-card p-4 sm:p-6 cursor-pointer transition-all hover:scale-105 ${
+            activeFilter === 'all' ? 'ring-2 ring-[#B87333] shadow-lg shadow-[#B87333]/50' : ''
+          }`}
+        >
           <div className="flex items-center gap-3 sm:gap-4 mb-3">
             <Package size={24} className="text-[#B87333]" />
             <span className="section-label text-sm">TOTAL</span>
@@ -330,7 +365,7 @@ export default function AdminOrdersPage() {
           >
             {orders.length}
           </p>
-        </div>
+        </button>
       </div>
 
       {orders.length === 0 && (
@@ -343,8 +378,19 @@ export default function AdminOrdersPage() {
       )}
 
       {/* Orders List */}
-      <div className="space-y-6">
-        {orders.map((order) => {
+      {displayedOrders.length > 0 && (
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+            {activeFilter === 'pending' ? 'Pending Orders' : activeFilter === 'completed' ? 'Completed Orders' : 'All Orders'}
+          </h2>
+          <span className="text-[#8B6F47]">
+            Showing {displayedOrders.length} of {orders.length} orders
+          </span>
+        </div>
+      )}
+      
+      <div id="orders-section" className="space-y-6">
+        {displayedOrders.map((order) => {
           // Calculate if coupon was applied using simple math
           const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
           const amountPaid = order.totalAmount;
