@@ -6,6 +6,12 @@ import { CreditCard, ShoppingBag, CheckCircle, Loader2, Package } from "lucide-r
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
+import {
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  initializeRazorpayPayment,
+  RazorpayResponse
+} from "@/lib/razorpay";
 
 type CartItem = {
   name: string;
@@ -44,75 +50,119 @@ export default function CheckoutPage() {
     }
   }
 
-  async function handleMockPayment() {
+  async function handleRazorpayPayment() {
     if (!cart) return;
   
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/auth?redirect=/checkout");
+      return;
+    }
+
     setPaying(true);
-  
-    // simulate payment delay
-    setTimeout(async () => {
-      try {
-        const token = localStorage.getItem("token");
-  
-        if (!token) {
-          router.push("/auth?redirect=/checkout");
-          return;
-        }
-  
-        // Prepare order data - ensure all fields are explicitly set
-        const orderPayload = {
-          items: cart.items,
-          totalAmount: cart.discountedTotal || cart.totalAmount,
-          instructions: "",
-          couponCode: cart.couponCode ? String(cart.couponCode).toUpperCase() : null,
-          couponDiscount: cart.couponDiscount ? Number(cart.couponDiscount) : 0,
-        };
+    
+    try {
+      // Create Razorpay order
+      const totalAmount = cart.discountedTotal || cart.totalAmount;
+      const razorpayOrder = await createRazorpayOrder(totalAmount);
 
-        console.log('🛒 Checkout - Sending order:', {
-          totalAmount: orderPayload.totalAmount,
-          hasCoupon: !!orderPayload.couponCode,
-          couponCode: orderPayload.couponCode,
-          couponDiscount: orderPayload.couponDiscount,
-        });
+      // Initialize Razorpay payment
+      await initializeRazorpayPayment({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || '',
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        name: 'Rabuste Coffee',
+        description: 'Premium Robusta Coffee Order',
+        order_id: razorpayOrder.id,
+        handler: async (response: RazorpayResponse) => {
+          try {
+            // Verify payment
+            const isVerified = await verifyRazorpayPayment(response);
+            
+            if (isVerified) {
+              // Create order after successful payment
+              await createOrderAfterPayment(response.razorpay_payment_id);
+            } else {
+              throw new Error('Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+            setPaying(false);
+          }
+        },
+        prefill: {
+          name: 'Customer',
+          email: 'customer@example.com',
+        },
+        theme: {
+          color: '#B87333'
+        },
+        modal: {
+          ondismiss: () => {
+            setPaying(false);
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      alert('Failed to initialize payment. Please try again.');
+      setPaying(false);
+    }
+  }
 
-        const res = await fetch("/api/orders", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(orderPayload),
-        });
-  
-        if (!res.ok) {
-          throw new Error("Order creation failed");
-        }
+  async function createOrderAfterPayment(paymentId: string) {
+    try {
+      const token = localStorage.getItem("token");
+      
+      // Prepare order data
+      const orderPayload = {
+        items: cart!.items,
+        totalAmount: cart!.discountedTotal || cart!.totalAmount,
+        instructions: "",
+        couponCode: cart!.couponCode ? String(cart!.couponCode).toUpperCase() : null,
+        couponDiscount: cart!.couponDiscount ? Number(cart!.couponDiscount) : 0,
+        paymentId: paymentId,
+        paymentStatus: 'completed'
+      };
 
-        const orderData = await res.json();
-        
-        // Clear the cart after successful order
-        try {
-          await fetch("/api/cart", { method: "DELETE" });
-        } catch (clearError) {
-          console.error("Failed to clear cart:", clearError);
-        }
-        
-        // Check if order contains art items
-        const hasArtItems = cart.items.some((item) => item.itemType === 'art');
-        
-        // Redirect to appropriate order status page
-        if (hasArtItems) {
-          router.push(`/art-order-status?orderId=${orderData._id}`);
-        } else {
-          router.push("/order-status");
-        }
-      } catch (err) {
-        console.error("Checkout error:", err);
-        alert("Something went wrong while placing your order.");
-      } finally {
-        setPaying(false);
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!res.ok) {
+        throw new Error("Order creation failed");
       }
-    }, 2000);
+
+      const orderData = await res.json();
+      
+      // Clear the cart after successful order
+      try {
+        await fetch("/api/cart", { method: "DELETE" });
+      } catch (clearError) {
+        console.error("Failed to clear cart:", clearError);
+      }
+      
+      // Check if order contains art items
+      const hasArtItems = cart!.items.some((item) => item.itemType === 'art');
+      
+      // Redirect to appropriate order status page
+      if (hasArtItems) {
+        router.push(`/art-order-status?orderId=${orderData._id}`);
+      } else {
+        router.push("/order-status");
+      }
+    } catch (err) {
+      console.error("Order creation error:", err);
+      alert("Payment successful but order creation failed. Please contact support.");
+    } finally {
+      setPaying(false);
+    }
   }
   
 
@@ -315,11 +365,11 @@ export default function CheckoutPage() {
               </div>
 
               <p className="text-lg mb-8" style={{ color: '#8B6F47', lineHeight: 1.7 }}>
-                This is a demo checkout. No actual payment will be processed.
+                Secure payment powered by Razorpay. Your payment information is encrypted and safe.
               </p>
 
               <button
-                onClick={handleMockPayment}
+                onClick={handleRazorpayPayment}
                 disabled={paying}
                 className="btn btn-primary w-full"
                 style={{

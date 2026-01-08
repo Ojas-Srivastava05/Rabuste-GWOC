@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -29,6 +30,10 @@ export default function RootLayout({
         className="antialiased"
         suppressHydrationWarning
       >
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="lazyOnload"
+        />
         <UserProvider>
           <BackendWarmer />
           <BrewAIPreloader />
