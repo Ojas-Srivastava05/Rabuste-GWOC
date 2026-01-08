@@ -46,7 +46,7 @@ router.post("/enquiry", async (req, res) => {
 
     // Test connection
     console.log("🔍 Verifying email connection...");
-    await transporter.verify();
+    // await transporter.verify();
     console.log("✅ Email connection verified!");
 
     // Email content for admin
@@ -149,7 +149,7 @@ router.post("/enquiry", async (req, res) => {
         <strong>Rabuste Coffee Franchise Team</strong></p>
 
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; text-align: center;">
-          <p>© ${new Date().getFullYear()} Rabuste Coffee. All rights reserved.</p>
+          <p>©️ ${new Date().getFullYear()} Rabuste Coffee. All rights reserved.</p>
         </div>
       </div>
     `;
