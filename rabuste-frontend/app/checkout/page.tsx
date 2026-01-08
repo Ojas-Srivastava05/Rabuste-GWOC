@@ -307,7 +307,7 @@ export default function CheckoutPage() {
                 </div>
                 
                 {cart.couponCode && discount > 0 && (
-                  <div className="flex justify-between text-base" style={{ color: '#6f8f72' }}>
+                  <div className="flex justify-between text-base" style={{ color: '#5E7D4C' }}>
                     <span>Coupon Discount ({cart.couponCode})</span>
                     <span>- ₹{discount}</span>
                   </div>

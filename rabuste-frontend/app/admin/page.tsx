@@ -79,7 +79,7 @@ export default function AdminPage() {
         <div className="group bg-[#FFFDF2] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Orders Completed</p>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6f8f72] to-[#4CAF50] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5E7D4C] to-[#5E7D4C] flex items-center justify-center">
               <span className="text-white text-xs font-bold">✓</span>
             </div>
           </div>

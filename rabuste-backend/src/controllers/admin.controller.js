@@ -64,10 +64,31 @@ export const getAdminDashboard = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const totalOrders = orders.length;
 
-    const revenueToday = orders.reduce(
-      (sum, o) => sum + (o.totalAmount || 0),
-      0
-    );
+    // Calculate revenue for today only
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    console.log('🕐 Today range:', { todayStart, todayEnd });
+    console.log('📦 Total orders:', orders.length);
+    
+    const todaysOrders = orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      console.log('Order date:', orderDate, 'In range:', orderDate >= todayStart && orderDate <= todayEnd);
+      return orderDate >= todayStart && orderDate <= todayEnd;
+    });
+    
+    console.log('📦 Today\'s orders:', todaysOrders.length);
+    
+    // Check both price and totalAmount fields
+    const revenueToday = todaysOrders.reduce((sum, o) => {
+      const amount = o.totalAmount || o.price || 0;
+      console.log('Order amount:', amount, 'from order:', o._id);
+      return sum + amount;
+    }, 0);
+    console.log('💰 Revenue today:', revenueToday);
 
     // ====== MOST SOLD ITEM ======
     const itemCount = {};
