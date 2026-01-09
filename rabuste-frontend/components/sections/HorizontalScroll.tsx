@@ -370,7 +370,6 @@ function DesktopHorizontalScroll({
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start start", "end start"],
-    layoutEffect: false,
   });
 
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-83.33%"]);
