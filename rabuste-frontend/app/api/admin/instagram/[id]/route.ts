@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-
-const backendURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+import { connectDB } from "@/src/lib/db";
+import InstagramPost from "@/src/models/InstagramPost";
 
 // Update Instagram post (admin)
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -13,27 +13,37 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const res = await fetch(`${backendURL}/api/instagram/admin/${params.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: authHeader,
-      },
-      body: JSON.stringify(body),
-    });
+    const { id } = await params;
 
-    if (!res.ok) {
-      const error = await res.json();
-      return NextResponse.json({ error: error.message || "Failed to update post" }, { status: res.status });
+    await connectDB();
+
+    const body = await req.json();
+    const { updates } = body;
+
+    const updatedPost = await InstagramPost.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true }
+    );
+
+    if (!updatedPost) {
+      return NextResponse.json(
+        { error: "Post not found" },
+        { status: 404 }
+      );
     }
 
-    const data = await res.json();
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(
+      { 
+        message: "Post updated successfully",
+        post: updatedPost 
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Error updating Instagram post:", error);
     return NextResponse.json(
-      { error: "Failed to update Instagram post" },
+      { error: error.message || "Failed to update Instagram post" },
       { status: 500 }
     );
   }
@@ -42,7 +52,7 @@ export async function PATCH(
 // Delete Instagram post (admin)
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -50,24 +60,27 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const res = await fetch(`${backendURL}/api/instagram/admin/${params.id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: authHeader,
-      },
-    });
+    const { id } = await params;
 
-    if (!res.ok) {
-      const error = await res.json();
-      return NextResponse.json({ error: error.message || "Failed to delete post" }, { status: res.status });
+    await connectDB();
+
+    const deletedPost = await InstagramPost.findByIdAndDelete(id);
+
+    if (!deletedPost) {
+      return NextResponse.json(
+        { error: "Post not found" },
+        { status: 404 }
+      );
     }
 
-    const data = await res.json();
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(
+      { message: "Post deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Error deleting Instagram post:", error);
     return NextResponse.json(
-      { error: "Failed to delete Instagram post" },
+      { error: error.message || "Failed to delete Instagram post" },
       { status: 500 }
     );
   }
