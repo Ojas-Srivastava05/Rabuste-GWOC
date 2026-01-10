@@ -8,8 +8,6 @@ import Coupon from "@/src/models/Coupon";
 import { sendOrderConfirmation } from "@/src/lib/email";
 import { calculateDistance, calculateTimeToCafe, CAFE_LOCATION } from "@/lib/locationUtils";
 
-
-
 export async function POST(req: Request) {
   await connectDB();
 
@@ -124,8 +122,8 @@ export async function POST(req: Request) {
       itemsCount: orderData.items.length,
     });
     
-    // Create order
-    const order = await Order.create(orderData);
+    // Create order - explicitly type as single document
+    const order = await Order.create(orderData) as any;
     
     // Fetch back to verify all fields were saved
     const savedOrder = await Order.findById(order._id).lean();
@@ -154,8 +152,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
-
 
 export async function GET(req: Request) {
   await connectDB();
@@ -198,7 +194,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
 
 export async function PATCH(req: Request) {
   await connectDB();
