@@ -19,7 +19,7 @@ import {
   CalendarCheck,
   List,
 } from "lucide-react";
-
+import Footer from "@/components/sections/footer";
 type Workshop = {
   _id: string;
   title: string;
@@ -48,6 +48,7 @@ export default function WorkshopsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -75,6 +76,14 @@ export default function WorkshopsPage() {
     };
 
     fetchWorkshops();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleAddToCalendar = (workshop: Workshop) => {
@@ -392,12 +401,13 @@ export default function WorkshopsPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-xl sticky top-32"
+                className="p-6 rounded-xl lg:sticky lg:top-32"
                 style={{
                   background: 'rgba(61, 43, 31, 0.6)',
                   border: '2px solid rgba(184, 115, 51, 0.4)',
-                  height: 'fit-content',
-                  maxHeight: 'calc(100vh - 180px)',
+                  ...(isDesktop
+                    ? { height: 'fit-content', maxHeight: 'calc(100vh - 180px)' }
+                    : { height: 'auto', maxHeight: 'none' }),
                 }}
               >
                 <div className="mb-4">
@@ -493,12 +503,12 @@ export default function WorkshopsPage() {
                 </div>
                 
                 {/* Legend */}
-                <div className="mt-6 pt-4 border-t border-[#B87333]/20 space-y-2">
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                <div className="mt-8 pt-5 border-t border-[#B87333]/20 space-y-3">
+                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
                     <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
                     <span>Has workshops</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
                     <div className="w-3 h-3 rounded-full" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
                     <span>Today</span>
                   </div>
@@ -1301,6 +1311,7 @@ export default function WorkshopsPage() {
           </motion.div>
         )}
       </div>
+      <Footer/>
     </>
   );
 }
