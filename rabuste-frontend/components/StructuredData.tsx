@@ -12,8 +12,8 @@ export default function StructuredData() {
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'CoffeeShop',
-    name: 'Rabuste - Premium Robusta Coffee',
-    alternateName: 'Rabuste Coffee',
+    name: 'Rabuste Coffee',
+    alternateName: 'Rabuste',
     description: 'Premium Robusta coffee shop offering the best Robusta coffee beans online. Buy high-quality Robusta coffee with 2x the caffeine. Specializing in bold, intense Robusta coffee flavor.',
     url: baseUrl,
     logo: `${baseUrl}/Rabuste%20logo.png`,
@@ -36,7 +36,7 @@ export default function StructuredData() {
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Rabuste - Premium Robusta Coffee',
+    name: 'Rabuste Coffee',
     url: baseUrl,
     description: 'Buy premium Robusta coffee online. Best Robusta coffee beans with 2x the caffeine. Shop Robusta coffee, ground Robusta coffee, and instant Robusta coffee.',
     keywords: 'Robusta coffee, buy Robusta coffee, Robusta coffee beans, premium Robusta coffee',
@@ -112,7 +112,7 @@ export default function StructuredData() {
       {
         '@type': 'ListItem',
         position: 2,
-        name: 'Robusta Coffee Menu',
+        name: 'Rabuste Coffee Menu',
         item: `${baseUrl}/menu`,
       },
       {

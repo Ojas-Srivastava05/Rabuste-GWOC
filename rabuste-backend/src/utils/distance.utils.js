@@ -16,4 +16,14 @@ export const calculateDistance = (lat1, lon1, lat2, lon2) => {
   
     return R * c; // distance in km
   };
+
+// Calculate estimated time to reach cafe based on distance
+// Assumes average speed of 30 km/h in city traffic
+export const calculateTimeToCafe = (distanceKm) => {
+  if (!distanceKm || distanceKm <= 0) return null;
+  const averageSpeedKmh = 30; // km/h
+  const timeHours = distanceKm / averageSpeedKmh;
+  const timeMinutes = Math.ceil(timeHours * 60); // Round up to nearest minute
+  return timeMinutes;
+};
   

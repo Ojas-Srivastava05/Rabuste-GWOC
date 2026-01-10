@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
@@ -21,6 +22,15 @@ import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
   const { user, showWelcomePopup, setShowWelcomePopup } = useUser();
+
+  // Ensure page starts at top on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, []);
 
   return (
     <>

@@ -145,6 +145,7 @@ export default function AdminLayout({ children }: Props) {
           <NavLink href="/admin/coupons" onClick={() => setSidebarOpen(false)}>Coupons</NavLink>
           <NavLink href="/admin/users" onClick={() => setSidebarOpen(false)}>Users</NavLink>
           <NavLink href="/admin/feedback" onClick={() => setSidebarOpen(false)}>Feedback</NavLink>
+          <NavLink href="/admin/instagram" onClick={() => setSidebarOpen(false)}>Instagram</NavLink>
           <NavLink href="/admin/ai-settings" onClick={() => setSidebarOpen(false)}> AI Settings</NavLink>
 
         </nav>

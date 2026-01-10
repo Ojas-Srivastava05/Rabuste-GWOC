@@ -6,8 +6,7 @@ import Order from "@/src/models/Order";
 import User from "@/src/models/Users";
 import Coupon from "@/src/models/Coupon";
 import { sendOrderConfirmation } from "@/src/lib/email";
-
-
+import { calculateDistance, calculateTimeToCafe, CAFE_LOCATION } from "@/lib/locationUtils";
 
 export async function POST(req: Request) {
   await connectDB();
@@ -69,8 +68,29 @@ export async function POST(req: Request) {
       }
     }
 
+    // Calculate time estimates if userLocation is provided
+    let estimatedTimeToCafe: number | null = null;
+    let distanceFromCafe: number | null = null;
+    let defaultPreparationTime: number | null = null;
+
+    if (data.userLocation?.lat && data.userLocation?.lng) {
+      try {
+        distanceFromCafe = calculateDistance(
+          data.userLocation.lat,
+          data.userLocation.lng,
+          CAFE_LOCATION.lat,
+          CAFE_LOCATION.lng
+        );
+        estimatedTimeToCafe = calculateTimeToCafe(distanceFromCafe);
+        // Default preparation time: 5 minutes base + 2 minutes per item
+        defaultPreparationTime = 5 + (data.items.length * 2);
+      } catch (error) {
+        console.error("Error calculating time estimates:", error);
+      }
+    }
+
     // Prepare order data - ALL fields must be explicitly set
-    const orderData = {
+    const orderData: any = {
       userId,
       customerName: user.name,
       customerEmail: user.email,
@@ -82,6 +102,17 @@ export async function POST(req: Request) {
       couponDescription: couponDescription || null,
       status: "pending",
     };
+
+    // Add location and time fields if available
+    if (data.userLocation) {
+      orderData.userLocation = {
+        lat: data.userLocation.lat,
+        lng: data.userLocation.lng,
+      };
+    }
+    if (distanceFromCafe !== null) orderData.distanceFromCafe = distanceFromCafe;
+    if (estimatedTimeToCafe !== null) orderData.estimatedTimeToCafe = estimatedTimeToCafe;
+    if (defaultPreparationTime !== null) orderData.preparationTime = defaultPreparationTime;
     
     console.log('💾 API - Creating order:', {
       customerName: orderData.customerName,
@@ -91,8 +122,8 @@ export async function POST(req: Request) {
       itemsCount: orderData.items.length,
     });
     
-    // Create order
-    const order = await Order.create(orderData);
+    // Create order - explicitly type as single document
+    const order = await Order.create(orderData) as any;
     
     // Fetch back to verify all fields were saved
     const savedOrder = await Order.findById(order._id).lean();
@@ -121,8 +152,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
-
 
 export async function GET(req: Request) {
   await connectDB();
@@ -165,7 +194,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-
 
 export async function PATCH(req: Request) {
   await connectDB();

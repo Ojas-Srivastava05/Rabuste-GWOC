@@ -51,20 +51,26 @@ export default function FloatingMoodBrewer() {
     return () => unsubscribe();
   }, [scrollY, showFloating]);
 
-  // Close when clicking outside
+  // Close when clicking outside (works on both desktop and mobile)
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (botRef.current && !botRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     }
 
     if (open) {
+      // Add both mouse and touch events for mobile support
       document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+      document.body.style.overflow = "unset";
     };
   }, [open]);
 
@@ -228,6 +234,24 @@ export default function FloatingMoodBrewer() {
         )}
       </AnimatePresence>
 
+      {/* Backdrop Overlay - tap to close on mobile */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setOpen(false)}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              setOpen(false);
+            }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+            style={{ touchAction: "none" }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* Bot Window */}
       <AnimatePresence>
         {open && (
@@ -253,15 +277,15 @@ export default function FloatingMoodBrewer() {
               }}
             >
               <div
-                className="relative p-4 border-b"
+                className="relative p-4 sm:p-4 md:p-4 border-b"
                 style={{
                   borderColor: "rgba(184, 115, 51, 0.3)",
                   background: "linear-gradient(90deg, rgba(184, 115, 51, 0.1), transparent)",
                 }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 pr-12 sm:pr-12 md:pr-12">
                   <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    className="w-10 h-10 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0"
                     style={{
                       background: "linear-gradient(135deg, #B87333, #CD7F32)",
                       boxShadow: "0 0 20px rgba(184, 115, 51, 0.5)",
@@ -269,37 +293,50 @@ export default function FloatingMoodBrewer() {
                   >
                     <Brain size={20} style={{ color: "#000000" }} />
                   </div>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h3
                       style={{
                         fontFamily: "Bebas Neue, sans-serif",
-                        fontSize: "1.25rem",
+                        fontSize: "1.125rem sm:text-1.25rem md:text-1.25rem",
                         color: "#FFFEF9",
                         letterSpacing: "0.1em",
                         margin: 0,
+                        lineHeight: "1.2",
                       }}
                     >
                       BREW AI
                     </h3>
-                    <p style={{ fontSize: "0.75rem", color: "#B87333", margin: 0 }}>
+                    <p style={{ fontSize: "0.7rem sm:text-0.75rem md:text-0.75rem", color: "#B87333", margin: 0 }}>
                       Your AI Coffee Sommelier
                     </p>
                   </div>
                 </div>
 
+                {/* Enhanced close button - bigger and more accessible on mobile */}
                 <button
                   onClick={() => setOpen(false)}
-                  className="absolute top-4 right-4 p-2 rounded-full transition-all hover:scale-110"
-                  style={{
-                    background: "rgba(184, 115, 51, 0.2)",
-                    border: "1px solid rgba(184, 115, 51, 0.4)",
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    setOpen(false);
                   }}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 rounded-full transition-all active:scale-95 touch-manipulation"
+                  style={{
+                    background: "rgba(184, 115, 51, 0.3)",
+                    border: "2px solid rgba(184, 115, 51, 0.6)",
+                    padding: "10px",
+                    minWidth: "44px",
+                    minHeight: "44px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  aria-label="Close Brew AI"
                 >
-                  <X className="w-4 h-4" style={{ color: "#D4A574" }} />
+                  <X className="w-5 h-5 sm:w-5 sm:h-5 md:w-4 md:h-4" style={{ color: "#D4A574" }} />
                 </button>
               </div>
 
-              <div className="overflow-y-auto p-4 sm:p-6 flex-1">
+              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch" }}>
                 <MoodBrewerChat />
               </div>
             </div>

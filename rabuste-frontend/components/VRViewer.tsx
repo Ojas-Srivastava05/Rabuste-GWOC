@@ -13,6 +13,17 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentScene, setCurrentScene] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Coffee shop 360° panoramic images (optimized for faster loading)
   const scenes = [
@@ -77,24 +88,42 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
     scene.setAttribute('vr-mode-ui', 'enabled: true');
     scene.setAttribute('device-orientation-permission-ui', 'enabled: true');
 
-    // Add sky with 360 image
+    // Add sky with 360 image - adjusted scale for mobile
     const sky = document.createElement('a-sky');
     sky.setAttribute('src', scenes[currentScene].image);
-    sky.setAttribute('rotation', '0 -130 0');
+    // Adjust rotation and scale for mobile to prevent zoom
+    if (isMobile) {
+      sky.setAttribute('rotation', '0 -130 0');
+      sky.setAttribute('scale', '1 1 1'); // Ensure no extra scaling
+      sky.setAttribute('radius', '500'); // Larger radius for less zoom effect on mobile
+    } else {
+      sky.setAttribute('rotation', '0 -130 0');
+    }
     scene.appendChild(sky);
 
-    // Add camera with cursor
+    // Add camera with cursor - adjusted for mobile
     const cameraRig = document.createElement('a-entity');
     cameraRig.setAttribute('id', 'cameraRig');
 
     const camera = document.createElement('a-camera');
     camera.setAttribute('wasd-controls-enabled', 'false');
     camera.setAttribute('look-controls', 'pointerLockEnabled: false');
+    // Adjust FOV for mobile to prevent zoom - wider FOV = less zoom
+    camera.setAttribute('fov', isMobile ? '80' : '75'); // Wider FOV on mobile
+    
+    // Add camera position adjustment for mobile
+    if (isMobile) {
+      cameraRig.setAttribute('position', '0 1.6 0'); // Standard eye height
+    }
 
     const cursor = document.createElement('a-cursor');
     cursor.setAttribute('color', '#B87333');
     cursor.setAttribute('fuse', 'true');
     cursor.setAttribute('fuse-timeout', '1500');
+    // Make cursor more visible on mobile
+    if (isMobile) {
+      cursor.setAttribute('geometry', 'primitive: ring; radiusInner: 0.02; radiusOuter: 0.03');
+    }
     camera.appendChild(cursor);
 
     cameraRig.appendChild(camera);
@@ -175,7 +204,7 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         sceneRef.current.innerHTML = '';
       }
     };
-  }, [isLoaded, currentScene]);
+  }, [isLoaded, currentScene, isMobile]);
 
   if (!isOpen) return null;
 
@@ -186,9 +215,11 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         inset: 0,
         zIndex: 99999,
         background: '#000000',
+        touchAction: 'none', // Prevent default touch behaviors on mobile
+        overflow: 'hidden',
       }}
     >
-      {/* Header */}
+      {/* Header - responsive for mobile */}
       <div
         style={{
           position: 'absolute',
@@ -196,18 +227,20 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
           left: 0,
           right: 0,
           zIndex: 100000,
-          padding: '20px',
-          paddingTop: '100px', // Add extra padding to account for navbar
+          padding: isMobile ? '12px 16px' : '20px',
+          paddingTop: isMobile ? '80px' : '100px',
           background: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
         }}
       >
         <div>
           <h2 style={{
             fontFamily: 'Bebas Neue, sans-serif',
-            fontSize: '1.5rem',
+            fontSize: isMobile ? '1.125rem' : '1.5rem',
             color: '#FFFEF9',
             marginBottom: '0.25rem',
             letterSpacing: '0.05em',
@@ -215,7 +248,7 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
             360° VR TOUR
           </h2>
           <p style={{
-            fontSize: '0.875rem',
+            fontSize: isMobile ? '0.75rem' : '0.875rem',
             color: '#B87333',
             letterSpacing: '0.1em',
           }}>
@@ -231,11 +264,18 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
             }
             onClose();
           }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            if (scenes[currentScene]) {
+              trackVRSceneInteraction(scenes[currentScene].name, 'close');
+            }
+            onClose();
+          }}
           style={{
             background: 'rgba(184, 115, 51, 1)',
-            border: '3px solid #D4A574',
+            border: isMobile ? '2px solid #D4A574' : '3px solid #D4A574',
             color: '#000000',
-            padding: '14px 18px',
+            padding: isMobile ? '12px 16px' : '14px 18px',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
             borderRadius: '10px',
@@ -246,12 +286,17 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
             zIndex: 100001,
             position: 'relative',
             fontWeight: 'bold',
+            touchAction: 'manipulation',
+            minWidth: isMobile ? '44px' : 'auto',
+            minHeight: isMobile ? '44px' : 'auto',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(135deg, #D4A574 0%, #B87333 100%)';
-            e.currentTarget.style.transform = 'scale(1.15)';
-            e.currentTarget.style.boxShadow = '0 8px 25px rgba(184, 115, 51, 1), 0 0 40px rgba(212, 165, 116, 0.8)';
-            e.currentTarget.style.borderColor = '#FFFEF9';
+            if (!isMobile) {
+              e.currentTarget.style.background = 'linear-gradient(135deg, #D4A574 0%, #B87333 100%)';
+              e.currentTarget.style.transform = 'scale(1.15)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(184, 115, 51, 1), 0 0 40px rgba(212, 165, 116, 0.8)';
+              e.currentTarget.style.borderColor = '#FFFEF9';
+            }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.background = 'rgba(184, 115, 51, 1)';
@@ -261,7 +306,7 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
           }}
           aria-label="Close VR Tour"
         >
-          <X style={{ width: 24, height: 24 }} />
+          <X style={{ width: isMobile ? 20 : 24, height: isMobile ? 20 : 24 }} />
         </button>
       </div>
 

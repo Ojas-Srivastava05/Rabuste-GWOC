@@ -401,7 +401,7 @@ export default function MenuPage() {
                 color: '#F5F1E8',
               }}
             >
-              <span className="gradient-text">ROBUSTA COFFEE MENU</span>
+              <span className="gradient-text">RABUSTE COFFEE MENU</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}

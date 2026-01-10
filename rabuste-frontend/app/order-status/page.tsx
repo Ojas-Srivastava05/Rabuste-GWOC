@@ -28,6 +28,9 @@ type Order = {
     distance?: number;
     estimatedTime?: number;
   };
+  estimatedTimeToCafe?: number; // in minutes, calculated when order is created
+  preparationTime?: number; // in minutes, admin configurable
+  distanceFromCafe?: number; // in km
 };
 
 // Coffee facts database
@@ -452,12 +455,17 @@ export default function OrderStatusPage() {
   }
 
   const estimatedTime = (order: Order) => {
-    // Use location-based ETA if available, otherwise use item-based estimate
+    // Use backend-stored total time if available (preparationTime + estimatedTimeToCafe)
+    if (order.preparationTime !== undefined && order.estimatedTimeToCafe !== undefined) {
+      return order.preparationTime + order.estimatedTimeToCafe;
+    }
+    
+    // Fallback: Use location-based ETA if available
     if (order.userLocation?.estimatedTime) {
       return order.userLocation.estimatedTime;
     }
     
-    // Fallback: Only count menu items for prep time
+    // Final fallback: Estimate based on menu items
     const menuItems = order.items.filter(item => item.itemType === 'menu' || !item.itemType);
     const menuItemCount = menuItems.reduce((sum, item) => sum + item.quantity, 0);
     return menuItemCount > 0 ? Math.max(10, menuItemCount * 3) : 0; // 3 mins per item, minimum 10 mins

@@ -5,19 +5,48 @@ import { motion } from 'framer-motion';
 import { Instagram, ExternalLink } from 'lucide-react';
 import SectionTracker from '@/components/SectionTracker';
 
-export default function InstagramShowcase() {
-  const [isHovered, setIsHovered] = useState<number | null>(null);
+interface InstagramPost {
+  _id: string;
+  instagramId: string;
+  imageUrl: string;
+  caption: string;
+  permalink: string;
+  likes: number;
+  timestamp: string;
+  mediaType: string;
+}
 
-  // Sample Instagram posts - In production, you'd fetch these from Instagram API
-  // For now, using placeholder structure
-  const instagramPosts = [
-    { id: 1, image: '/instagram-placeholder-1.jpg', caption: 'Premium Robusta Coffee', likes: 234 },
-    { id: 2, image: '/instagram-placeholder-2.jpg', caption: 'Cafe Ambience', likes: 189 },
-    { id: 3, image: '/instagram-placeholder-3.jpg', caption: 'Fresh Brew', likes: 312 },
-    { id: 4, image: '/instagram-placeholder-4.jpg', caption: 'Coffee Art', likes: 267 },
-    { id: 5, image: '/instagram-placeholder-5.jpg', caption: 'Workshop Session', likes: 198 },
-    { id: 6, image: '/instagram-placeholder-6.jpg', caption: 'Customer Moments', likes: 245 },
-  ];
+export default function InstagramShowcase() {
+  const [isHovered, setIsHovered] = useState<string | null>(null);
+  const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInstagramPosts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/instagram');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch Instagram posts');
+        }
+        
+        const posts = await response.json();
+        setInstagramPosts(posts);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching Instagram posts:', err);
+        setError('Unable to load Instagram posts');
+        // Fallback to empty array or placeholder posts
+        setInstagramPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstagramPosts();
+  }, []);
 
   return (
     <SectionTracker sectionName="instagram_showcase">
@@ -93,89 +122,113 @@ export default function InstagramShowcase() {
           </motion.div>
 
           {/* Instagram Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
-            {instagramPosts.map((post, index) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                onMouseEnter={() => setIsHovered(post.id)}
-                onMouseLeave={() => setIsHovered(null)}
-                className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
-                }}
-              >
-                {/* Placeholder Image - Replace with actual Instagram images */}
-                <div 
-                  className="w-full h-full bg-gradient-to-br from-amber-900/20 to-zinc-900/40 flex items-center justify-center"
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
+              {[...Array(6)].map((_, index) => (
+                <div
+                  key={index}
+                  className="aspect-square rounded-xl bg-gradient-to-br from-amber-900/20 to-zinc-900/40 animate-pulse flex items-center justify-center"
                   style={{
-                    backgroundImage: `url(${post.image})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    border: '2px solid rgba(184, 115, 51, 0.3)',
                   }}
                 >
-                  {!post.image.includes('placeholder') ? null : (
-                    <div className="text-center p-4">
-                      <Instagram size={48} className="mx-auto mb-2" style={{ color: '#B87333', opacity: 0.5 }} />
-                      <p className="text-sm" style={{ color: '#B87333', opacity: 0.7 }}>
-                        Instagram Post
-                      </p>
-                    </div>
-                  )}
+                  <Instagram size={48} style={{ color: '#B87333', opacity: 0.3 }} />
                 </div>
-
-                {/* Overlay on Hover */}
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-lg mb-4" style={{ color: '#B87333' }}>
+                {error}
+              </p>
+              <p className="text-sm" style={{ color: 'rgba(184, 115, 51, 0.7)' }}>
+                Follow us on Instagram to see our latest updates!
+              </p>
+            </div>
+          ) : instagramPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-lg mb-4" style={{ color: '#B87333' }}>
+                No Instagram posts available yet
+              </p>
+              <p className="text-sm" style={{ color: 'rgba(184, 115, 51, 0.7)' }}>
+                Follow us on Instagram to see our latest updates!
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
+              {instagramPosts.map((post, index) => (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: isHovered === post.id ? 1 : 0 }}
-                  className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center p-4"
+                  key={post._id || post.instagramId}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  onMouseEnter={() => setIsHovered(post._id || post.instagramId)}
+                  onMouseLeave={() => setIsHovered(null)}
+                  className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
+                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                  }}
                 >
-                  <div className="text-center">
-                    <p className="text-white font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
-                      {post.caption}
-                    </p>
-                    <div className="flex items-center justify-center gap-2 text-white/80">
-                      <Instagram size={16} />
-                      <span className="text-sm">{post.likes} likes</span>
-                    </div>
+                  {/* Instagram Image */}
+                  <div 
+                    className="w-full h-full bg-gradient-to-br from-amber-900/20 to-zinc-900/40 flex items-center justify-center relative"
+                    style={{
+                      backgroundImage: post.imageUrl && !post.imageUrl.includes('instagram.com/p/') ? `url(${post.imageUrl})` : undefined,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }}
+                  >
+                    {(!post.imageUrl || post.imageUrl.includes('instagram.com/p/')) && (
+                      <div className="w-full h-full flex items-center justify-center p-4">
+                        <div className="text-center">
+                          <Instagram size={48} className="mx-auto mb-3" style={{ color: '#B87333', opacity: 0.8 }} />
+                          <p className="text-sm font-semibold" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
+                            Instagram Post
+                          </p>
+                          {post.caption && (
+                            <p className="text-xs mt-2 line-clamp-2 px-2" style={{ color: '#D4A574', opacity: 0.9 }}>
+                              {post.caption}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Overlay on Hover */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered === (post._id || post.instagramId) ? 1 : 0 }}
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center p-4"
+                  >
+                    <div className="text-center">
+                      <p className="text-white font-bold mb-2 text-sm line-clamp-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                        {post.caption || 'Instagram Post'}
+                      </p>
+                      <div className="flex items-center justify-center gap-2 text-white/80">
+                        <Instagram size={16} />
+                        <span className="text-sm">{post.likes || 0} likes</span>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Click to view on Instagram - Only if permalink exists */}
+                  {post.permalink && (
+                    <a
+                      href={post.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute inset-0 z-10"
+                      aria-label="View on Instagram"
+                    />
+                  )}
                 </motion.div>
+              ))}
+            </div>
+          )}
 
-                {/* Click to view on Instagram */}
-                <a
-                  href="https://www.instagram.com/rabuste.coffee/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 z-10"
-                  aria-label="View on Instagram"
-                />
-              </motion.div>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="text-center mt-12"
-          >
-            <a
-              href="https://www.instagram.com/rabuste.coffee/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-lg font-bold hover:gap-4 transition-all"
-              style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
-            >
-              View More on Instagram
-              <ExternalLink size={20} />
-            </a>
-          </motion.div>
         </div>
       </section>
     </SectionTracker>

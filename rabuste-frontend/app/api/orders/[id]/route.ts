@@ -99,15 +99,31 @@ export async function PATCH(
     const params = await context.params;
     const { id } = params;
 
-    const { status } = await req.json();
+    const updateData = await req.json();
+    const { status, preparationTime } = updateData;
 
     if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    // Build update object
+    const updateFields: any = {};
+    if (status !== undefined) updateFields.status = status;
+    if (preparationTime !== undefined) {
+      // Validate preparation time (should be positive number)
+      const prepTime = Number(preparationTime);
+      if (isNaN(prepTime) || prepTime < 0) {
+        return NextResponse.json(
+          { error: "Preparation time must be a positive number" },
+          { status: 400 }
+        );
+      }
+      updateFields.preparationTime = prepTime;
+    }
+
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
-      { status },
+      updateFields,
       { new: true }
     );
 

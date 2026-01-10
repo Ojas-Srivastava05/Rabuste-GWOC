@@ -1,0 +1,432 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Instagram, RefreshCw, Plus, Trash2, ExternalLink, Download, Upload } from "lucide-react";
+
+interface InstagramPost {
+  _id: string;
+  instagramId: string;
+  imageUrl: string;
+  caption: string;
+  permalink: string;
+  likes: number;
+  timestamp: string;
+  mediaType: string;
+  isManual: boolean;
+}
+
+export default function AdminInstagramPage() {
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Manual post form state
+  const [showManualPost, setShowManualPost] = useState(false);
+  const [manualForm, setManualForm] = useState({
+    embedUrl: "", // Instagram post URL
+    caption: "",
+  });
+
+  const getAuthHeaders = () => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await fetch("/api/admin/instagram", {
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) {
+        let errorText = "Failed to fetch posts";
+        try {
+          const contentType = res.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
+            const err = await res.json();
+            errorText = err.message || err.error || errorText;
+          } else {
+            errorText = await res.text();
+          }
+        } catch {
+          // ignore parsing errors
+        }
+        throw new Error(errorText);
+      }
+
+      const data = await res.json();
+      setPosts(data.posts || []);
+    } catch (err: any) {
+      console.error("Failed to fetch Instagram posts:", err);
+      setError(err.message || "Unable to load Instagram posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddManualPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualForm.embedUrl.trim()) {
+      setError("Instagram post URL is required");
+      return;
+    }
+
+    try {
+      setFetching(true);
+      setError("");
+      setSuccess("");
+
+      const res = await fetch("/api/admin/instagram", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          action: "manual",
+          embedUrl: manualForm.embedUrl.trim(),
+          caption: manualForm.caption.trim(),
+          likes: 0,
+        }),
+      });
+
+      if (!res.ok) {
+        let errorText = "Failed to add post";
+        try {
+          const contentType = res.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
+            const err = await res.json();
+            errorText = err.message || err.error || errorText;
+          } else {
+            errorText = await res.text();
+          }
+        } catch {
+          // ignore parsing errors
+        }
+        throw new Error(errorText);
+      }
+
+      setSuccess("Post added successfully!");
+      setManualForm({ embedUrl: "", caption: "" });
+      setShowManualPost(false);
+      await fetchPosts();
+    } catch (err: any) {
+      console.error("Failed to add manual post:", err);
+      setError(err.message || "Failed to add post");
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  const handleDelete = async (postId: string) => {
+    if (!confirm("Are you sure you want to delete this Instagram post?")) {
+      return;
+    }
+
+    try {
+      setError("");
+      setSuccess("");
+      const res = await fetch(`/api/admin/instagram?postId=${postId}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+
+      if (!res.ok) {
+        let errorText = "Failed to delete post";
+        try {
+          const contentType = res.headers.get("content-type");
+          if (contentType?.includes("application/json")) {
+            const err = await res.json();
+            errorText = err.message || err.error || errorText;
+          } else {
+            errorText = await res.text();
+          }
+        } catch {
+          // ignore parsing errors
+        }
+        throw new Error(errorText);
+      }
+
+      setSuccess("Post deleted successfully!");
+      await fetchPosts();
+    } catch (err: any) {
+      console.error("Failed to delete post:", err);
+      setError(err.message || "Failed to delete post");
+    }
+  };
+
+  const handleRefresh = async () => {
+    await fetchPosts();
+    setSuccess("Posts refreshed!");
+    setTimeout(() => setSuccess(""), 3000);
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-[#FAF3E0] rounded-2xl p-8 shadow-2xl border border-[#B87333]/20">
+        <p className="text-[#2e211a]">Loading Instagram posts...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
+      style={{
+        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
+        color: '#F5F1E8',
+      }}
+    >
+      {/* Header */}
+      <div className="mb-8 sm:mb-12">
+        <div className="flex items-center gap-4 mb-4 sm:mb-6">
+          <div className="copper-line" />
+          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
+          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+        </div>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              lineHeight: 0.9,
+            }}
+          >
+            INSTAGRAM
+            <br />
+            <span className="text-[#B87333]">MANAGEMENT</span>
+          </h1>
+          <button
+            onClick={handleRefresh}
+            disabled={fetching}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.9), rgba(205, 127, 50, 0.9))',
+              border: '2px solid rgba(184, 115, 51, 0.3)',
+              color: '#1A1110',
+              fontFamily: 'var(--font-heading)',
+              letterSpacing: '0.1em',
+              fontWeight: 600,
+              boxShadow: '0 4px 20px rgba(184, 115, 51, 0.4)',
+            }}
+          >
+            <RefreshCw size={20} className={fetching ? "animate-spin" : ""} />
+            REFRESH
+          </button>
+        </div>
+      </div>
+
+      {/* Messages */}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-950/30 border-2 border-red-800/50 text-red-300">
+          <p className="font-semibold">Error: {error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 p-4 rounded-xl bg-green-950/30 border-2 border-green-800/50 text-green-300">
+          <p className="font-semibold">Success: {success}</p>
+        </div>
+      )}
+
+      {/* Action Button */}
+      <div className="mb-8">
+        <button
+          onClick={() => {
+            setShowManualPost(!showManualPost);
+          }}
+          className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg w-full md:w-auto"
+          style={{
+            background: 'linear-gradient(135deg, rgba(131, 58, 180, 0.9), rgba(253, 29, 29, 0.9), rgba(252, 175, 69, 0.9))',
+            border: '2px solid rgba(184, 115, 51, 0.3)',
+            color: '#FFFFFF',
+            fontFamily: 'var(--font-heading)',
+            letterSpacing: '0.1em',
+            fontWeight: 600,
+            boxShadow: '0 4px 20px rgba(184, 115, 51, 0.4)',
+          }}
+        >
+          <Plus size={24} />
+          ADD INSTAGRAM POST
+        </button>
+      </div>
+
+      {/* Manual Post Form */}
+      {showManualPost && (
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-[#FFFDF2] to-[#FFF8E8] border-2 border-[#B87333]/30 shadow-xl">
+          <h2 className="text-2xl font-bold mb-4 text-[#2e211a]" style={{ fontFamily: 'var(--font-heading)' }}>
+            Add Instagram Post
+          </h2>
+          <form onSubmit={handleAddManualPost} className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
+                Instagram Post URL *
+              </label>
+              <input
+                type="url"
+                value={manualForm.embedUrl}
+                onChange={(e) => setManualForm({ ...manualForm, embedUrl: e.target.value })}
+                placeholder="https://www.instagram.com/p/ABC123/"
+                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
+                required
+              />
+              <p className="mt-2 text-xs text-[#8B6F47]">
+                Paste the Instagram post URL. The system will automatically extract the post ID.
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
+                Caption (Optional)
+              </label>
+              <textarea
+                value={manualForm.caption}
+                onChange={(e) => setManualForm({ ...manualForm, caption: e.target.value })}
+                placeholder="Enter caption for this Instagram post..."
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
+              />
+              <p className="mt-2 text-xs text-[#8B6F47]">
+                This caption will be displayed when users hover over the post.
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={fetching}
+                className="px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                  color: '#FFFFFF',
+                  fontFamily: 'var(--font-heading)',
+                  fontWeight: 600,
+                }}
+              >
+                {fetching ? "Adding..." : "Add Post"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowManualPost(false);
+                  setManualForm({ embedUrl: "", caption: "" });
+                }}
+                className="px-6 py-3 rounded-lg border-2 border-[#B87333]/50 text-[#6b4a2f] hover:bg-[#B87333]/10 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Posts Grid */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
+          Current Instagram Posts ({posts.length})
+        </h2>
+        {posts.length === 0 ? (
+          <div className="p-8 rounded-2xl bg-gradient-to-br from-[#FFFDF2] to-[#FFF8E8] border-2 border-[#B87333]/30 text-center">
+            <Instagram size={48} className="mx-auto mb-4 text-[#B87333] opacity-50" />
+              <p className="text-lg text-[#6b4a2f] mb-2">No Instagram posts yet</p>
+              <p className="text-sm text-[#8B6F47]">Click the button above to add Instagram posts</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+              <div
+                key={post._id}
+                className="relative group rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
+                  border: '2px solid rgba(184, 115, 51, 0.3)',
+                }}
+              >
+                {/* Image */}
+                <div className="aspect-square relative overflow-hidden">
+                  {post.imageUrl && !post.imageUrl.includes('instagram.com/p/') ? (
+                    <img
+                      src={post.imageUrl}
+                      alt={post.caption || "Instagram post"}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "";
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-amber-900/20 to-zinc-900/40 flex items-center justify-center">
+                      <div className="text-center p-4">
+                        <Instagram size={48} className="mx-auto mb-2 text-[#B87333] opacity-70" />
+                        <p className="text-xs text-[#B87333] opacity-80">Instagram Post</p>
+                        {post.caption && (
+                          <p className="text-xs mt-2 line-clamp-2 text-[#D4A574] opacity-90">{post.caption.substring(0, 60)}...</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
+                    <div className="text-center text-white">
+                      <p className="text-sm font-semibold mb-2 line-clamp-2">{post.caption || "No caption"}</p>
+                      <div className="flex items-center justify-center gap-2 text-white/80">
+                        <Instagram size={16} />
+                        <span className="text-sm">{post.likes} likes</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Badge */}
+                  {post.isManual && (
+                    <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-[#B87333] text-white text-xs font-semibold">
+                      Manual
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-[#8B6F47]">
+                      {new Date(post.timestamp).toLocaleDateString()}
+                    </span>
+                    <span className="text-xs px-2 py-1 rounded bg-[#B87333]/20 text-[#B87333]">
+                      {post.mediaType}
+                    </span>
+                  </div>
+                  <p className="text-sm text-[#F5F1E8] line-clamp-2 mb-3">
+                    {post.caption || "No caption"}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={post.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#B87333]/20 text-[#B87333] hover:bg-[#B87333]/30 transition-all text-sm font-semibold"
+                    >
+                      <ExternalLink size={16} />
+                      View
+                    </a>
+                    <button
+                      onClick={() => handleDelete(post._id)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-950/30 text-red-400 hover:bg-red-950/50 transition-all text-sm font-semibold"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

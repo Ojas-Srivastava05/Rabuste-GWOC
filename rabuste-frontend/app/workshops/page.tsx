@@ -88,6 +88,18 @@ export default function WorkshopsPage() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
+
   const handleAddToCalendar = (workshop: Workshop) => {
     // Format date and time for Google Calendar
     const workshopDate = new Date(workshop.date);
@@ -856,25 +868,47 @@ export default function WorkshopsPage() {
           <div
             className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
             onClick={() => setIsModalOpen(false)}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              setIsModalOpen(false);
+            }}
+            style={{ touchAction: "none" }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-3xl p-10 relative max-h-[90vh] overflow-y-auto rounded-xl"
+              className="w-full max-w-3xl p-6 sm:p-8 md:p-10 relative max-h-[90vh] overflow-y-auto rounded-xl"
               onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               style={{
                 background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
                 border: '3px solid rgba(184, 115, 51, 0.6)',
                 backdropFilter: 'blur(20px)',
+                WebkitOverflowScrolling: 'touch',
               }}
             >
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-lg transition-all"
-                style={{ color: '#B87333' }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  setIsModalOpen(false);
+                }}
+                className="absolute top-3 right-3 sm:top-6 sm:right-6 rounded-full transition-all active:scale-95 touch-manipulation"
+                style={{ 
+                  color: '#B87333',
+                  padding: '10px',
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(184, 115, 51, 0.1)',
+                  border: '1px solid rgba(184, 115, 51, 0.3)',
+                }}
+                aria-label="Close workshop modal"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
 
               <div className="mb-8">
