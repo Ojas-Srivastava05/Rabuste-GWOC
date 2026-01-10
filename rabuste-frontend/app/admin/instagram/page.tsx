@@ -325,27 +325,56 @@ export default function AdminInstagramPage() {
         </div>
       )}
 
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Instagram size={20} className="text-[#B87333]" />
+            <span className="section-label text-xs">TOTAL POSTS</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+            {posts.length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Instagram size={20} className="text-[#833AB4]" />
+            <span className="section-label text-xs">AUTO SYNC</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#833AB4' }}>
+            {posts.filter(p => !p.isManual).length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Upload size={20} className="text-[#D4A574]" />
+            <span className="section-label text-xs">MANUAL</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
+            {posts.filter(p => p.isManual).length}
+          </p>
+        </div>
+      </div>
+
       {/* Posts Grid */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-          Current Instagram Posts ({posts.length})
+        <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+          INSTAGRAM POSTS
         </h2>
         {posts.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-gradient-to-br from-[#FFFDF2] to-[#FFF8E8] border-2 border-[#B87333]/30 text-center">
-            <Instagram size={48} className="mx-auto mb-4 text-[#B87333] opacity-50" />
-              <p className="text-lg text-[#6b4a2f] mb-2">No Instagram posts yet</p>
-              <p className="text-sm text-[#8B6F47]">Click the button above to add Instagram posts</p>
+          <div className="brutal-card p-12 text-center">
+            <Instagram size={64} className="mx-auto mb-6 text-[#B87333]" />
+            <p className="text-xl mb-2" style={{ color: '#8B6F47' }}>No Instagram posts yet</p>
+            <p className="text-sm" style={{ color: '#8B6F47' }}>Click the button above to add Instagram posts</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {posts.map((post) => (
               <div
                 key={post._id}
-                className="relative group rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
-                }}
+                className="brutal-card p-0 overflow-hidden group transition-all duration-300 hover:scale-105"
               >
                 {/* Image */}
                 <div className="aspect-square relative overflow-hidden">
@@ -393,14 +422,14 @@ export default function AdminInstagramPage() {
                 {/* Info */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-[#8B6F47]">
+                    <span className="text-xs" style={{ color: '#8B6F47' }}>
                       {new Date(post.timestamp).toLocaleDateString()}
                     </span>
-                    <span className="text-xs px-2 py-1 rounded bg-[#B87333]/20 text-[#B87333]">
+                    <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(184, 115, 51, 0.2)', color: '#B87333' }}>
                       {post.mediaType}
                     </span>
                   </div>
-                  <p className="text-sm text-[#F5F1E8] line-clamp-2 mb-3">
+                  <p className="text-sm line-clamp-2 mb-3" style={{ color: '#F5F1E8' }}>
                     {post.caption || "No caption"}
                   </p>
                   <div className="flex items-center gap-2">
@@ -408,17 +437,27 @@ export default function AdminInstagramPage() {
                       href={post.permalink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#B87333]/20 text-[#B87333] hover:bg-[#B87333]/30 transition-all text-sm font-semibold"
+                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
+                      style={{
+                        background: 'rgba(184, 115, 51, 0.2)',
+                        border: '2px solid rgba(184, 115, 51, 0.4)',
+                        color: '#B87333',
+                        fontFamily: 'var(--font-heading)',
+                      }}
                     >
-                      <ExternalLink size={16} />
+                      <ExternalLink size={14} />
                       View
                     </a>
                     <button
                       onClick={() => handleDelete(post._id)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-950/30 text-red-400 hover:bg-red-950/50 transition-all text-sm font-semibold"
+                      className="py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
+                      style={{
+                        background: 'rgba(220, 38, 38, 0.2)',
+                        border: '2px solid rgba(220, 38, 38, 0.5)',
+                        color: '#FCA5A5',
+                      }}
                     >
-                      <Trash2 size={16} />
-                      Delete
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>

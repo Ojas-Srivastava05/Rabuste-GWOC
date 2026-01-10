@@ -195,11 +195,14 @@ export default function FloatingMoodBrewer() {
                   className="absolute left-full ml-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap"
                 >
                   <div
+                    className="md:block hidden"
                     style={{
-                      background: "rgba(0, 0, 0, 0.9)",
+                      background: "rgba(0, 0, 0, 0.95)",
                       border: "2px solid rgba(184, 115, 51, 0.6)",
                       padding: "8px 16px",
                       backdropFilter: "blur(10px)",
+                      borderRadius: "4px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
                     }}
                   >
                     <p
@@ -260,9 +263,11 @@ export default function FloatingMoodBrewer() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: "-100%", y: "-100%" }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-0 top-0 z-50 w-full sm:w-[95vw] md:w-[500px] lg:w-[550px] h-full sm:h-[95vh] md:h-[90vh] flex flex-col"
+            className="fixed left-0 z-50 w-full sm:w-[95vw] md:w-[500px] lg:w-[550px] flex flex-col"
             style={{
-              maxHeight: "100vh",
+              top: "70px",
+              height: "calc(100vh - 70px)",
+              maxHeight: "calc(100vh - 70px)",
             }}
             ref={botRef}
           >
@@ -336,8 +341,10 @@ export default function FloatingMoodBrewer() {
                 </button>
               </div>
 
-              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch" }}>
-                <MoodBrewerChat />
+              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch", paddingTop: "1rem" }}>
+                <div style={{ paddingTop: "1rem" }}>
+                  <MoodBrewerChat />
+                </div>
               </div>
             </div>
           </motion.div>

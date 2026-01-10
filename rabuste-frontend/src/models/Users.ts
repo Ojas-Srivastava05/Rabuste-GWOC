@@ -48,6 +48,7 @@ const UserSchema = new mongoose.Schema({
   },
   role: { type: String, default: "user" },
   isVerified: { type: Boolean, default: false },
+  isBlocked: { type: Boolean, default: false },
 
   // OTP verification
   verificationCode: String,

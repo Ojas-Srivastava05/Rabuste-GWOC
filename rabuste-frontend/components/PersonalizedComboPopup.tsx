@@ -119,10 +119,10 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
         }}
         exit={{ opacity: 0, y: 100, scale: 0.8 }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-        className="fixed bottom-6 right-6 z-[9997]"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9997]"
         style={{
-          maxWidth: isMinimized ? '60px' : '320px',
-          width: isMinimized ? '60px' : '90%',
+          maxWidth: isMinimized ? '60px' : '280px',
+          width: isMinimized ? '60px' : 'calc(100vw - 2rem)',
         }}
       >
         {/* Minimized View */}

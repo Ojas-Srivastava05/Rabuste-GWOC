@@ -218,6 +218,49 @@ export default function AdminMenuPage() {
         </form>
       </div>
 
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Coffee size={20} className="text-[#B87333]" />
+            <span className="section-label text-xs">TOTAL</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+            {menu.length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Power size={20} className="text-[#5E7D4C]" />
+            <span className="section-label text-xs">AVAILABLE</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
+            {menu.filter(m => m.isAvailable).length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <PowerOff size={20} className="text-red-500" />
+            <span className="section-label text-xs">DISABLED</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#EF4444' }}>
+            {menu.filter(m => !m.isAvailable).length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Coffee size={20} className="text-[#D4A574]" />
+            <span className="section-label text-xs">CATEGORIES</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
+            {new Set(menu.map(m => m.category)).size}
+          </p>
+        </div>
+      </div>
+
       {/* Menu List */}
       <div>
         <h2
