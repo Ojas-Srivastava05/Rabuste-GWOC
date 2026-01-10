@@ -10,9 +10,9 @@ import PageViewTracker from "@/components/PageViewTracker";
 import { UserProvider } from "@/contexts/UserContext";
 
 export const metadata: Metadata = {
-  title: "Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee",
-  description: "Premium Robusta coffee with 2x the caffeine. Bold, intense, and unapologetically powerful. Experience the superiority of Robusta. Order premium coffee online, explore our art gallery, and join exclusive workshops.",
-  keywords: "robusta coffee, high caffeine, bold coffee, premium coffee, strong coffee, 2x caffeine, intense coffee, powerful brew, coffee shop, art gallery, coffee workshops, online coffee order",
+  title: "Robusta Coffee | Premium 2X Caffeine Coffee Online | Rabuste",
+  description: "Buy premium Robusta coffee online with 2x the caffeine. Best Robusta coffee beans, ground coffee, and instant Robusta coffee. Free shipping on Robusta coffee orders. Experience bold, intense Robusta coffee flavor.",
+  keywords: "robusta coffee, buy robusta coffee, robusta coffee beans, premium robusta coffee, robusta coffee online, best robusta coffee, robusta coffee india, strong robusta coffee, high caffeine robusta coffee, robusta coffee shop, robusta vs arabica, robusta coffee benefits, robusta coffee price, robusta coffee brands, organic robusta coffee",
   authors: [{ name: "Rabuste" }],
   creator: "Rabuste",
   publisher: "Rabuste",
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: (process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000',
-    siteName: 'Rabuste',
-    title: 'Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee',
-    description: 'Premium Robusta coffee with 2x the caffeine. Bold, intense, and unapologetically powerful.',
+    siteName: 'Rabuste - Premium Robusta Coffee',
+    title: 'Robusta Coffee | Premium 2X Caffeine Coffee Online | Rabuste',
+    description: 'Buy premium Robusta coffee online with 2x the caffeine. Best Robusta coffee beans, ground coffee, and instant Robusta coffee. Free shipping on Robusta coffee orders.',
     images: [
       {
         url: `${(process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000'}/Rabuste%20logo.png`,
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee',
-    description: 'Premium Robusta coffee with 2x the caffeine. Bold, intense, and unapologetically powerful.',
+    title: 'Robusta Coffee | Premium 2X Caffeine Coffee Online | Rabuste',
+    description: 'Buy premium Robusta coffee online with 2x the caffeine. Best Robusta coffee beans, ground coffee, and instant Robusta coffee.',
     images: [`${(process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000'}/Rabuste%20logo.png`],
   },
   viewport: {

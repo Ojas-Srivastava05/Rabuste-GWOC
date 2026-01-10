@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 
 type MenuItem = {
   _id: string;
@@ -323,8 +324,53 @@ export default function MenuPage() {
     filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
   }
 
+  // Generate Product Schema for menu items
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: menu.slice(0, 10).map((item, index) => ({
+      '@type': 'Product',
+      position: index + 1,
+      name: item.name,
+      description: item.description,
+      image: item.image,
+      category: item.category,
+      offers: {
+        '@type': 'Offer',
+        price: item.price,
+        priceCurrency: 'INR',
+        availability: item.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/menu#item-${item._id}`,
+      },
+      brand: {
+        '@type': 'Brand',
+        name: 'Rabuste',
+      },
+      additionalProperty: [
+        {
+          '@type': 'PropertyValue',
+          name: 'Coffee Type',
+          value: 'Robusta Coffee',
+        },
+        {
+          '@type': 'PropertyValue',
+          name: 'Caffeine Content',
+          value: '2X Caffeine',
+        },
+      ],
+    })),
+  };
+
   return (
     <>
+      {/* Product Schema for SEO */}
+      <Script
+        id="menu-products-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productSchema),
+        }}
+      />
       <Navbar />
       <DynamicBackground />
 
@@ -339,7 +385,7 @@ export default function MenuPage() {
             >
               <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
               <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
-                EXPLORE FLAVORS
+                PREMIUM ROBUSTA COFFEE
               </span>
               <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </motion.div>
@@ -355,7 +401,7 @@ export default function MenuPage() {
                 color: '#F5F1E8',
               }}
             >
-              <span className="gradient-text">MENU</span>
+              <span className="gradient-text">ROBUSTA COFFEE MENU</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -364,7 +410,7 @@ export default function MenuPage() {
               className="text-lg"
               style={{ color: '#B87333' }}
             >
-              {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available
+              Premium Robusta Coffee - {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available. Buy the best Robusta coffee online with 2x caffeine.
             </motion.p>
           </div>
 
