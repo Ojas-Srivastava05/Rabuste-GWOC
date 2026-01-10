@@ -185,7 +185,12 @@ export default function MenuPage() {
     try {
       const res = await fetch("/api/ai-discount");
       const data = await res.json();
-      setAiDiscount(data);
+      // Ensure discountItemId is converted to string
+      setAiDiscount({
+        enableDiscountAI: data.enableDiscountAI || false,
+        discountItemId: data.discountItemId ? String(data.discountItemId) : null,
+        discountPercent: data.discountPercent || 0,
+      });
     } catch (err) {
       console.error("Failed to fetch AI discount", err);
     }
@@ -244,9 +249,13 @@ export default function MenuPage() {
 
   // AI Discount helper functions
   function hasAIDiscount(itemId: string): boolean {
-    return aiDiscount.enableDiscountAI && 
-           aiDiscount.discountItemId === itemId && 
-           aiDiscount.discountPercent > 0;
+    if (!aiDiscount.enableDiscountAI || !aiDiscount.discountItemId || aiDiscount.discountPercent <= 0) {
+      return false;
+    }
+    // Ensure both are strings for comparison (handle ObjectId conversion)
+    const discountId = String(aiDiscount.discountItemId);
+    const itemIdStr = String(itemId);
+    return discountId === itemIdStr;
   }
 
   function getDiscountedPrice(item: MenuItem): number {

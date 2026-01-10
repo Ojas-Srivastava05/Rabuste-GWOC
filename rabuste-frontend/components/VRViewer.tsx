@@ -216,19 +216,30 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(184, 115, 51, 0.2)',
-            border: '1px solid #B87333',
+            background: 'rgba(184, 115, 51, 0.9)',
+            border: '2px solid #B87333',
             color: '#FFFEF9',
-            padding: '12px',
+            padding: '12px 16px',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.5)',
+            zIndex: 10001,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)';
+            e.currentTarget.style.background = 'rgba(184, 115, 51, 1)';
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(184, 115, 51, 0.7)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(184, 115, 51, 0.2)';
+            e.currentTarget.style.background = 'rgba(184, 115, 51, 0.9)';
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(184, 115, 51, 0.5)';
           }}
+          aria-label="Close VR Tour"
         >
           <X style={{ width: 24, height: 24 }} />
         </button>

@@ -47,7 +47,13 @@ export async function POST(req: Request) {
     try {
       const discountRes = await fetch('http://localhost:3000/api/ai-discount');
       if (discountRes.ok) {
-        aiDiscount = await discountRes.json();
+        const discountData = await discountRes.json();
+        // Ensure discountItemId is converted to string
+        aiDiscount = {
+          enableDiscountAI: discountData.enableDiscountAI || false,
+          discountItemId: discountData.discountItemId ? String(discountData.discountItemId) : null,
+          discountPercent: discountData.discountPercent || 0,
+        };
       }
     } catch (error) {
       console.warn('Failed to fetch AI discount config:', error);
@@ -75,7 +81,7 @@ export async function POST(req: Request) {
     let hasAIDiscount = false;
     if (aiDiscount.enableDiscountAI && 
         aiDiscount.discountItemId && 
-        aiDiscount.discountItemId === menuItemId && 
+        String(aiDiscount.discountItemId) === String(menuItemId) && 
         aiDiscount.discountPercent > 0) {
       itemPrice = menuItem.price * (1 - aiDiscount.discountPercent / 100);
       hasAIDiscount = true;
