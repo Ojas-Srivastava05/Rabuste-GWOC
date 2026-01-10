@@ -48,6 +48,7 @@ export default function WorkshopsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [isDesktop, setIsDesktop] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchWorkshops = async () => {
@@ -75,6 +76,14 @@ export default function WorkshopsPage() {
     };
 
     fetchWorkshops();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleAddToCalendar = (workshop: Workshop) => {
@@ -392,12 +401,13 @@ export default function WorkshopsPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-xl sticky top-32"
+                className="p-6 rounded-xl lg:sticky lg:top-32"
                 style={{
                   background: 'rgba(61, 43, 31, 0.6)',
                   border: '2px solid rgba(184, 115, 51, 0.4)',
-                  height: 'fit-content',
-                  maxHeight: 'calc(100vh - 180px)',
+                  ...(isDesktop
+                    ? { height: 'fit-content', maxHeight: 'calc(100vh - 180px)' }
+                    : { height: 'auto', maxHeight: 'none' }),
                 }}
               >
                 <div className="mb-4">
