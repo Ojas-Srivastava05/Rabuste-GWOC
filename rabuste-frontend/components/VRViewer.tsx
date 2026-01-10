@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Maximize2, RotateCw, ZoomIn, ZoomOut } from 'lucide-react';
+import { trackVRSceneInteraction } from '@/lib/analytics';
 
 interface VRViewerProps {
   isOpen: boolean;
@@ -43,6 +44,11 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
 
   useEffect(() => {
     if (!isOpen) return;
+    
+    // Track VR view when opened
+    if (scenes[currentScene]) {
+      trackVRSceneInteraction(scenes[currentScene].name, 'view');
+    }
 
     // Dynamically load A-Frame
     const loadAFrame = async () => {
@@ -113,7 +119,10 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
       
       // Use mousedown/touchstart for better mobile support
       const handleClick = () => {
+        const targetScene = scenes[hotspot.target];
         setCurrentScene(hotspot.target);
+        // Track VR scene navigation
+        trackVRSceneInteraction(targetScene.name, 'navigate');
       };
       
       sphere.addEventListener('mousedown', handleClick);
@@ -215,7 +224,13 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         </div>
 
         <button
-          onClick={onClose}
+          onClick={() => {
+            // Track VR close
+            if (scenes[currentScene]) {
+              trackVRSceneInteraction(scenes[currentScene].name, 'close');
+            }
+            onClose();
+          }}
           style={{
             background: 'rgba(184, 115, 51, 1)',
             border: '3px solid #D4A574',
@@ -319,7 +334,11 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
           {scenes.map((scene, index) => (
             <button
               key={index}
-              onClick={() => setCurrentScene(index)}
+              onClick={() => {
+                setCurrentScene(index);
+                // Track scene selection
+                trackVRSceneInteraction(scene.name, 'navigate');
+              }}
               style={{
                 padding: '12px 24px',
                 background: currentScene === index 

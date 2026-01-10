@@ -15,6 +15,7 @@ import FloatingCart from "@/components/FloatingCart";
 import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
 import WelcomePopup from "@/components/WelcomePopup";
 import PersonalizedComboPopup from "@/components/PersonalizedComboPopup";
+import SectionTracker from "@/components/SectionTracker";
 import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
@@ -55,31 +56,49 @@ export default function Home() {
       
       <main style={{ background: 'transparent', position: 'relative', zIndex: 2 }}>
         {/* Hero - Bold & Massive with Animations */}
-        <HeroRevamped />
+        <SectionTracker sectionName="hero">
+          <HeroRevamped />
+        </SectionTracker>
 
         {/* Horizontal Scroll Section - UNIQUE EXPERIENCE */}
-        <HorizontalScroll />
+        <SectionTracker sectionName="horizontal_scroll">
+          <HorizontalScroll />
+        </SectionTracker>
 
         {/* Experience - What We Offer */}
-        <ExperienceSection />
+        <SectionTracker sectionName="experience">
+          <ExperienceSection />
+        </SectionTracker>
 
         {/* Benefits - Science Backed Power */}
-        <BenefitsShowcase />
+        <SectionTracker sectionName="benefits">
+          <BenefitsShowcase />
+        </SectionTracker>
 
         {/* VR/AR Experience - Virtual Exploration */}
-        <VRExperienceSection />
+        <SectionTracker sectionName="vr_experience">
+          <VRExperienceSection />
+        </SectionTracker>
 
         {/* Process - Bean to Cup Journey (Revamped) */}
-        <ProcessSectionRevamped />
+        <SectionTracker sectionName="process">
+          <ProcessSectionRevamped />
+        </SectionTracker>
 
         {/* Strong CTA Section - Visit Us */}
-        <CallToAction />
+        <SectionTracker sectionName="call_to_action">
+          <CallToAction />
+        </SectionTracker>
 
         {/* Social Proof - Customer Testimonials */}
-        <TestimonialsSection />
+        <SectionTracker sectionName="testimonials">
+          <TestimonialsSection />
+        </SectionTracker>
 
         {/* Contact Section - Get in Touch */}
-        <ContactSection />
+        <SectionTracker sectionName="contact">
+          <ContactSection />
+        </SectionTracker>
       </main>
 
       {/* Footer */}

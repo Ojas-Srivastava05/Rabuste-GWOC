@@ -3,6 +3,7 @@
 import Navbar from "@/components/Navbar";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { trackWorkshopClick } from "@/lib/analytics";
 import {
   Calendar,
   Coffee,
@@ -565,6 +566,8 @@ export default function WorkshopsPage() {
                           className="p-6 rounded-xl cursor-pointer transition-all hover:border-[#D4A574]"
                           onClick={() => {
                             if (!isPast) {
+                              // Track workshop click
+                              trackWorkshopClick(workshop._id, workshop.title);
                               setSelectedWorkshop(workshop);
                               setIsModalOpen(true);
                             }
@@ -729,6 +732,8 @@ export default function WorkshopsPage() {
                     className="rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-2xl"
                     onClick={() => {
                       if (!isPast) {
+                        // Track workshop click
+                        trackWorkshopClick(workshop._id, workshop.title);
                         setSelectedWorkshop(workshop);
                         setIsModalOpen(true);
                       }

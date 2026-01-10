@@ -329,5 +329,36 @@ body {
   
   img {
     height: auto;
+    max-width: 100%;
+  }
+  
+  /* Ensure all containers are responsive */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Additional responsive improvements */
+@media (max-width: 640px) {
+  /* Ensure text is readable on mobile */
+  body {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  /* Touch-friendly buttons */
+  button, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
