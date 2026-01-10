@@ -107,6 +107,7 @@ const getItemFlags = (item: MenuItem) => {
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
+import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } from "@/lib/analytics";
 
 export default function MenuPage() {
   const router = useRouter();
@@ -117,6 +118,7 @@ export default function MenuPage() {
   );
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [lastSearchQuery, setLastSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name">("default");
   const [showFilters, setShowFilters] = useState(false);
@@ -206,6 +208,18 @@ export default function MenuPage() {
     
     const item = menu.find(i => i._id === menuItemId);
     
+    // Track add to cart
+    if (item) {
+      trackAddToCart({
+        itemId: item._id,
+        itemName: item.name,
+        itemType: 'menu',
+        price: item.price,
+        quantity: 1,
+        category: item.category,
+      });
+    }
+    
     // Check user preference for upselling
     const disableUpsell = localStorage.getItem('disableUpsell') === 'true';
     
@@ -235,12 +249,19 @@ export default function MenuPage() {
   }
 
   async function removeFromCart(menuItemId: string) {
+    const item = menu.find(i => i._id === menuItemId);
+    
     await fetch("/api/cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ menuItemId, quantity: -1 }),
     });
     fetchCart();
+    
+    // Track remove from cart
+    if (item) {
+      trackRemoveFromCart(item._id, item.name, 'menu');
+    }
   }
 
   function getQty(menuItemId: string) {
@@ -372,7 +393,15 @@ export default function MenuPage() {
                   type="text"
                   placeholder="Search menu..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery && searchQuery !== lastSearchQuery) {
+                      trackSearch(searchQuery, filtered.length);
+                      setLastSearchQuery(searchQuery);
+                    }
+                  }}
                   className="w-full pl-11 pr-10 py-3 bg-transparent outline-none text-sm"
                   style={{
                     color: '#F5F1E8',

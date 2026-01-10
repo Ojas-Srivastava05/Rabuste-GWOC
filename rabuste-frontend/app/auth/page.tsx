@@ -8,6 +8,7 @@ import DynamicBackground from "@/components/DynamicBackground";
 import PhoneInput from "@/components/PhoneInput";
 import { Coffee, Zap, Shield, Eye, EyeOff } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { trackUserLogin, trackUserSignup } from "@/lib/analytics";
 
 const isStrongPassword = (password: string) =>
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
@@ -78,6 +79,9 @@ function AuthForm() {
       if (!res.ok) throw new Error(data.message);
 
       if (isLogin) {
+        // Track login
+        trackUserLogin('email');
+        
         const isDirectLogin = !redirect;
         login(data.token, data.user, isDirectLogin);
       
@@ -91,6 +95,9 @@ function AuthForm() {
         const destination = data.user?.role === "admin" ? "/admin" : redirect || "/";
         router.push(destination);
       } else {
+        // Track signup
+        trackUserSignup();
+        
         router.push(`/verify?email=${encodeURIComponent(form.email)}`);
       }
       

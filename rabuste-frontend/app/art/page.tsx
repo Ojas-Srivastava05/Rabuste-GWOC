@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
+import { trackAddToCart, trackRemoveFromCart, trackArtItemView } from "@/lib/analytics";
 
 type ArtItem = {
   _id: string;
@@ -90,6 +91,8 @@ export default function ArtGalleryPage() {
   }
 
   async function removeFromCart(artItemId: string) {
+    const item = gallery.find(a => a._id === artItemId);
+    
     try {
       const res = await fetch("/api/cart", {
         method: "POST",
@@ -98,6 +101,11 @@ export default function ArtGalleryPage() {
       });
       if (res.ok) {
         await fetchCart();
+        
+        // Track remove from cart
+        if (item) {
+          trackRemoveFromCart(item._id, item.title, 'art');
+        }
       }
     } catch (err) {
       console.error("Failed to remove from cart", err);
@@ -137,6 +145,15 @@ export default function ArtGalleryPage() {
   function openArtModal(art: ArtItem) {
     setSelectedArt(art);
     setCurrentImageIndex(0);
+    
+    // Track art item view
+    trackArtItemView(
+      art._id,
+      art.title,
+      art.artist,
+      art.category,
+      art.price
+    );
   }
 
   function closeArtModal() {

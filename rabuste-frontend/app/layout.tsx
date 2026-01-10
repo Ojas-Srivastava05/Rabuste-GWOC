@@ -6,6 +6,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import BrewAIPreloader from "@/components/BrewAIPreloader";
 import BackendWarmer from "@/components/BackendWarmer";
 import StructuredData from "@/components/StructuredData";
+import PageViewTracker from "@/components/PageViewTracker";
 import { UserProvider } from "@/contexts/UserContext";
 
 export const metadata: Metadata = {
@@ -29,13 +30,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://rabuste.com',
+    url: (process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000',
     siteName: 'Rabuste',
     title: 'Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee',
     description: 'Premium Robusta coffee with 2x the caffeine. Bold, intense, and unapologetically powerful.',
     images: [
       {
-        url: '/Rabuste%20logo.png',
+        url: `${(process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000'}/Rabuste%20logo.png`,
         width: 1200,
         height: 630,
         alt: 'Rabuste Coffee Logo',
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Rabuste - Unapologetically Bold | 2X Caffeine Robusta Coffee',
     description: 'Premium Robusta coffee with 2x the caffeine. Bold, intense, and unapologetically powerful.',
-    images: ['/Rabuste%20logo.png'],
+    images: [`${(process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000'}/Rabuste%20logo.png`],
   },
   viewport: {
     width: 'device-width',
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
     userScalable: true,
   },
   alternates: {
-    canonical: 'https://rabuste.com',
+    canonical: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
 };
 
@@ -86,6 +87,7 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
         <UserProvider>
+          <PageViewTracker />
           <BackendWarmer />
           <BrewAIPreloader />
           <LoadingScreen />
