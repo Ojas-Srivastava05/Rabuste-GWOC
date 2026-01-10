@@ -28,7 +28,7 @@ export default function ProcessSectionRevamped() {
       desc: 'Careful processing using advanced techniques to preserve the natural caffeine content and robust flavor profile. Every bean undergoes rigorous quality control.',
       image: 'https://images.pexels.com/photos/25547393/pexels-photo-25547393.jpeg',
       imageAlt: 'Coffee processing by Nati on Pexels',
-      color: '#CD7F32',
+      color: '#B87333',
       features: ['Natural Process', 'No Chemicals', 'Hand Sorted'],
     },
     {
@@ -39,7 +39,7 @@ export default function ProcessSectionRevamped() {
       desc: 'Small-batch roasting at optimal temperatures to unlock peak flavor and aroma. Our master roasters monitor every batch for perfection.',
       image: 'https://images.pexels.com/photos/31945549/pexels-photo-31945549.jpeg',
       imageAlt: 'Coffee roasting by Ksenia Yakovleva on Pexels',
-      color: '#D4A574',
+      color: '#B87333',
       features: ['Small Batches', 'Expert Roasters', 'Perfect Temperature'],
     },
     {
@@ -83,11 +83,12 @@ export default function ProcessSectionRevamped() {
         >
           <p
             style={{
-              color: '#B87333',
+              color: '#8B6F47',
               fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-              letterSpacing: '0.3em',
-              fontWeight: 700,
-              marginBottom: '1rem',
+              letterSpacing: '0.2em',
+              fontWeight: 400,
+              marginBottom: '1.5rem',
+              textTransform: 'uppercase',
             }}
           >
             OUR JOURNEY
@@ -96,10 +97,12 @@ export default function ProcessSectionRevamped() {
           <h2
             style={{
               fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(2.5rem, 8vw, 6rem)',
+              fontSize: 'clamp(3.5rem, 10vw, 7rem)',
               lineHeight: 0.9,
-              color: '#FFFEF9',
-              marginBottom: '1rem',
+              color: '#F5F1E8',
+              marginBottom: '1.5rem',
+              fontWeight: 400,
+              letterSpacing: '0.02em',
             }}
           >
             FROM BEAN TO{' '}
@@ -118,9 +121,11 @@ export default function ProcessSectionRevamped() {
           <p
             style={{
               fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-              color: 'rgba(255, 254, 249, 0.7)',
+              color: 'rgba(245, 241, 232, 0.6)',
               maxWidth: '700px',
               margin: '0 auto',
+              lineHeight: 1.7,
+              fontWeight: 300,
             }}
           >
             Click each step to explore our meticulous process
@@ -147,13 +152,11 @@ export default function ProcessSectionRevamped() {
                 className="cursor-pointer relative group"
                 style={{
                   background: isActive
-                    ? `linear-gradient(135deg, ${step.color}15, rgba(26, 17, 16, 0.8))`
-                    : 'linear-gradient(135deg, rgba(61, 43, 31, 0.4), rgba(26, 17, 16, 0.6))',
-                  border: `3px solid ${isActive ? step.color : 'rgba(184, 115, 51, 0.2)'}`,
+                    ? 'rgba(26, 17, 16, 0.8)'
+                    : 'rgba(26, 17, 16, 0.6)',
+                  border: `1px solid ${isActive ? 'rgba(184, 115, 51, 0.4)' : 'rgba(184, 115, 51, 0.2)'}`,
                   padding: 'clamp(1.5rem, 3vw, 2rem)',
-                  backdropFilter: 'blur(10px)',
                   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: isActive ? `0 20px 40px ${step.color}40` : '0 4px 12px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 {/* Active Glow */}
@@ -178,8 +181,7 @@ export default function ProcessSectionRevamped() {
                 <div
                   className="absolute -top-3 -left-3 w-12 h-12 flex items-center justify-center"
                   style={{
-                    background: isActive ? step.color : 'rgba(184, 115, 51, 0.3)',
-                    boxShadow: isActive ? `0 0 20px ${step.color}` : 'none',
+                    background: isActive ? '#B87333' : 'rgba(184, 115, 51, 0.3)',
                     transition: 'all 0.3s ease',
                   }}
                 >
@@ -187,8 +189,8 @@ export default function ProcessSectionRevamped() {
                     style={{
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: '1.25rem',
-                      color: isActive ? '#000' : '#FFFEF9',
-                      fontWeight: 700,
+                      color: isActive ? '#000' : '#F5F1E8',
+                      fontWeight: 400,
                     }}
                   >
                     {step.number}
@@ -199,19 +201,19 @@ export default function ProcessSectionRevamped() {
                 <div
                   className="mb-4 relative"
                   style={{
-                    background: isActive ? `${step.color}20` : 'rgba(184, 115, 51, 0.1)',
+                    background: isActive ? 'rgba(184, 115, 51, 0.2)' : 'rgba(184, 115, 51, 0.1)',
                     width: 'clamp(60px, 12vw, 80px)',
                     height: 'clamp(60px, 12vw, 80px)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: `2px solid ${isActive ? step.color : 'rgba(184, 115, 51, 0.2)'}`,
+                    border: `1px solid ${isActive ? 'rgba(184, 115, 51, 0.4)' : 'rgba(184, 115, 51, 0.2)'}`,
                     transition: 'all 0.3s ease',
                   }}
                 >
                   <Icon
                     size={32}
-                    color={isActive ? step.color : '#B87333'}
+                    color="#B87333"
                     strokeWidth={2.5}
                     className="w-6 h-6 sm:w-8 sm:h-8"
                   />
@@ -222,10 +224,11 @@ export default function ProcessSectionRevamped() {
                   style={{
                     fontFamily: 'Bebas Neue, sans-serif',
                     fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                    color: isActive ? step.color : '#FFFEF9',
+                    color: isActive ? '#B87333' : '#F5F1E8',
                     marginBottom: '0.5rem',
                     lineHeight: 1,
                     transition: 'color 0.3s ease',
+                    fontWeight: 400,
                   }}
                 >
                   {step.title}
@@ -235,8 +238,9 @@ export default function ProcessSectionRevamped() {
                 <p
                   style={{
                     fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
-                    color: isActive ? 'rgba(255, 254, 249, 0.9)' : 'rgba(255, 254, 249, 0.6)',
+                    color: isActive ? 'rgba(245, 241, 232, 0.7)' : 'rgba(245, 241, 232, 0.5)',
                     letterSpacing: '0.05em',
+                    fontWeight: 300,
                   }}
                 >
                   {step.subtitle}
@@ -249,8 +253,7 @@ export default function ProcessSectionRevamped() {
                   animate={{ width: isActive ? '100%' : '0%' }}
                   transition={{ duration: 0.4 }}
                   style={{
-                    background: step.color,
-                    boxShadow: isActive ? `0 0 15px ${step.color}` : 'none',
+                    background: '#B87333',
                   }}
                 />
               </motion.div>
@@ -272,9 +275,8 @@ export default function ProcessSectionRevamped() {
             <motion.div
               className="relative overflow-hidden order-2 lg:order-1"
               style={{
-                border: `4px solid ${currentStep.color}`,
+                border: `1px solid rgba(184, 115, 51, 0.3)`,
                 aspectRatio: '4/3',
-                boxShadow: `0 0 40px ${currentStep.color}40`,
               }}
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
@@ -293,7 +295,7 @@ export default function ProcessSectionRevamped() {
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: `linear-gradient(to top, ${currentStep.color}cc 0%, transparent 50%)`,
+                  background: `linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%)`,
                 }}
               />
 
@@ -322,8 +324,8 @@ export default function ProcessSectionRevamped() {
                 <div className="flex items-center gap-4 mb-6">
                   <div
                     style={{
-                      background: `${currentStep.color}20`,
-                      border: `3px solid ${currentStep.color}`,
+                      background: 'rgba(184, 115, 51, 0.2)',
+                      border: `1px solid rgba(184, 115, 51, 0.4)`,
                       width: 'clamp(70px, 15vw, 90px)',
                       height: 'clamp(70px, 15vw, 90px)',
                       display: 'flex',
@@ -333,7 +335,7 @@ export default function ProcessSectionRevamped() {
                   >
                     {React.createElement(currentStep.icon, {
                       size: 40,
-                      color: currentStep.color,
+                      color: '#B87333',
                       strokeWidth: 2.5,
                       className: 'w-8 h-8 sm:w-10 sm:h-10',
                     })}
@@ -344,8 +346,9 @@ export default function ProcessSectionRevamped() {
                       style={{
                         fontFamily: 'Bebas Neue, sans-serif',
                         fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                        color: currentStep.color,
+                        color: '#B87333',
                         lineHeight: 1,
+                        fontWeight: 400,
                       }}
                     >
                       {currentStep.number}
@@ -357,10 +360,11 @@ export default function ProcessSectionRevamped() {
                   style={{
                     fontFamily: 'Bebas Neue, sans-serif',
                     fontSize: 'clamp(2.5rem, 6vw, 4rem)',
-                    color: '#FFFEF9',
+                    color: '#F5F1E8',
                     letterSpacing: '0.02em',
                     marginBottom: '1rem',
                     lineHeight: 0.9,
+                    fontWeight: 400,
                   }}
                 >
                   {currentStep.title}
@@ -369,9 +373,9 @@ export default function ProcessSectionRevamped() {
                 <p
                   style={{
                     fontSize: 'clamp(1.125rem, 2vw, 1.375rem)',
-                    color: currentStep.color,
+                    color: '#B87333',
                     marginBottom: '1.5rem',
-                    fontWeight: 600,
+                    fontWeight: 400,
                     letterSpacing: '0.05em',
                   }}
                 >
@@ -381,9 +385,10 @@ export default function ProcessSectionRevamped() {
                 <p
                   style={{
                     fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-                    color: 'rgba(255, 254, 249, 0.85)',
+                    color: 'rgba(245, 241, 232, 0.7)',
                     lineHeight: 1.8,
                     marginBottom: '2rem',
+                    fontWeight: 300,
                   }}
                 >
                   {currentStep.desc}
@@ -403,15 +408,14 @@ export default function ProcessSectionRevamped() {
                         style={{
                           width: '8px',
                           height: '8px',
-                          background: currentStep.color,
-                          boxShadow: `0 0 10px ${currentStep.color}`,
+                          background: '#B87333',
                         }}
                       />
                       <span
                         style={{
                           fontSize: '1.125rem',
-                          color: 'rgba(255, 254, 249, 0.9)',
-                          fontWeight: 500,
+                          color: 'rgba(245, 241, 232, 0.8)',
+                          fontWeight: 300,
                         }}
                       >
                         {feature}
@@ -434,10 +438,9 @@ export default function ProcessSectionRevamped() {
               style={{
                 width: activeStep === index ? '48px' : '12px',
                 height: '12px',
-                background: activeStep === index ? step.color : 'rgba(184, 115, 51, 0.3)',
+                background: activeStep === index ? '#B87333' : 'rgba(184, 115, 51, 0.3)',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: activeStep === index ? `0 0 20px ${step.color}` : 'none',
               }}
               aria-label={`Go to step ${index + 1}`}
             />
@@ -456,12 +459,13 @@ export default function ProcessSectionRevamped() {
               onClick={() => setActiveStep(activeStep + 1)}
               className="flex items-center gap-3 px-8 py-4 transition-all hover:scale-105"
               style={{
-                background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
-                border: `2px solid ${currentStep.color}`,
-                color: currentStep.color,
+                background: 'rgba(26, 17, 16, 0.6)',
+                border: `1px solid rgba(184, 115, 51, 0.4)`,
+                color: '#B87333',
                 fontFamily: 'Bebas Neue, sans-serif',
                 fontSize: '1.25rem',
                 letterSpacing: '0.1em',
+                fontWeight: 400,
               }}
             >
               NEXT STEP

@@ -87,21 +87,24 @@ export default function BenefitsShowcase() {
           className="text-center mb-12 sm:mb-20"
         >
           <p style={{
-            color: '#B87333',
+            color: '#8B6F47',
             fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-            letterSpacing: '0.3em',
-            fontWeight: 700,
+            letterSpacing: '0.2em',
+            fontWeight: 400,
             marginBottom: '1.5rem',
+            textTransform: 'uppercase',
           }}>
             WHY ROBUSTA DOMINATES
           </p>
           
           <h2 style={{
             fontFamily: 'Bebas Neue, sans-serif',
-            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
+            fontSize: 'clamp(3rem, 10vw, 8rem)',
             lineHeight: 0.9,
-            color: '#FFFEF9',
+            color: '#F5F1E8',
             marginBottom: '1rem',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}>
             SCIENCE
             <br />
@@ -128,11 +131,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(184, 115, 51, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(184, 115, 51, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -186,8 +186,8 @@ export default function BenefitsShowcase() {
                   2.7% caffeine content delivers twice the energy
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>
@@ -201,11 +201,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(205, 127, 50, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(205, 127, 50, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -215,7 +212,7 @@ export default function BenefitsShowcase() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div style={{
-                    background: '#CD7F32',
+                    background: '#B87333',
                     width: '60px',
                     height: '60px',
                     display: 'flex',
@@ -229,7 +226,7 @@ export default function BenefitsShowcase() {
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: 'clamp(2rem, 4vw, 2.5rem)',
                       lineHeight: 0.9,
-                      color: '#CD7F32',
+                      color: '#B87333',
                     }}>
                       4-6HRS
                     </div>
@@ -259,8 +256,8 @@ export default function BenefitsShowcase() {
                   Sustained energy throughout workday
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #CD7F32, #D4A574, #B87333)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>
@@ -274,11 +271,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(212, 165, 116, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(212, 165, 116, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -288,7 +282,7 @@ export default function BenefitsShowcase() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div style={{
-                    background: '#D4A574',
+                    background: '#B87333',
                     width: '60px',
                     height: '60px',
                     display: 'flex',
@@ -302,7 +296,7 @@ export default function BenefitsShowcase() {
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: 'clamp(2rem, 4vw, 2.5rem)',
                       lineHeight: 0.9,
-                      color: '#D4A574',
+                      color: '#B87333',
                     }}>
                       +15%
                     </div>
@@ -332,8 +326,8 @@ export default function BenefitsShowcase() {
                   Perfect pre-workout fuel
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #D4A574, #B87333, #CD7F32)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>
@@ -347,11 +341,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(184, 115, 51, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(184, 115, 51, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -405,8 +396,8 @@ export default function BenefitsShowcase() {
                   No mid-day crashes
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>
@@ -420,11 +411,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(205, 127, 50, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(205, 127, 50, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(205, 127, 50, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -434,7 +422,7 @@ export default function BenefitsShowcase() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div style={{
-                    background: '#CD7F32',
+                    background: '#B87333',
                     width: '60px',
                     height: '60px',
                     display: 'flex',
@@ -448,7 +436,7 @@ export default function BenefitsShowcase() {
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: 'clamp(2rem, 4vw, 2.5rem)',
                       lineHeight: 0.9,
-                      color: '#CD7F32',
+                      color: '#B87333',
                     }}>
                       +11%
                     </div>
@@ -478,8 +466,8 @@ export default function BenefitsShowcase() {
                   Burns calories naturally
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #CD7F32, #D4A574, #B87333)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>
@@ -493,11 +481,8 @@ export default function BenefitsShowcase() {
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(212, 165, 116, 0.25), rgba(26, 17, 16, 0.4))',
-              border: '2px solid rgba(212, 165, 116, 0.6)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              boxShadow: '0 8px 32px rgba(212, 165, 116, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+              background: 'rgba(26, 17, 16, 0.6)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               padding: 'clamp(16px, 3vw, 24px)',
               minHeight: 'clamp(200px, 25vw, 280px)',
               cursor: 'pointer',
@@ -507,7 +492,7 @@ export default function BenefitsShowcase() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div style={{
-                    background: '#D4A574',
+                    background: '#B87333',
                     width: '60px',
                     height: '60px',
                     display: 'flex',
@@ -521,7 +506,7 @@ export default function BenefitsShowcase() {
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: 'clamp(2rem, 4vw, 2.5rem)',
                       lineHeight: 0.9,
-                      color: '#D4A574',
+                      color: '#B87333',
                     }}>
                       7-10%
                     </div>
@@ -551,8 +536,8 @@ export default function BenefitsShowcase() {
                   Superior health benefits
                 </p>
               </div>
-              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
-                background: 'linear-gradient(90deg, #D4A574, #B87333, #CD7F32)',
+              <div className="h-1 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: '#B87333',
                 marginTop: '1rem',
               }} />
             </div>

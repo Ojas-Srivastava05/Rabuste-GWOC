@@ -63,27 +63,29 @@ export default function VRExperienceSection() {
           className="text-center mb-12 lg:mb-16"
         >
           <p style={{
-            color: '#B87333',
+            color: '#8B6F47',
             fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
-            letterSpacing: '0.3em',
-            fontWeight: 700,
+            letterSpacing: '0.2em',
+            fontWeight: 400,
             marginBottom: '1.5rem',
+            textTransform: 'uppercase',
           }}>
             EXPLORE VIRTUALLY
           </p>
 
           <h2 style={{
             fontFamily: 'Bebas Neue, sans-serif',
-            fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
+            fontSize: 'clamp(3rem, 8vw, 6rem)',
             lineHeight: 0.9,
-            color: '#FFFEF9',
+            color: '#F5F1E8',
             marginBottom: '1rem',
-            letterSpacing: '-0.02em',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}>
             360° VR
             <br />
             <span style={{
-              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 30%, #D4A574 60%, #CD7F32 100%)',
+              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -94,10 +96,10 @@ export default function VRExperienceSection() {
 
           <p style={{
             fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-            color: 'rgba(255, 254, 249, 0.7)',
+            color: 'rgba(245, 241, 232, 0.6)',
             maxWidth: '600px',
             margin: '0 auto',
-            lineHeight: 1.5,
+            lineHeight: 1.7,
             fontWeight: 300,
           }}>
             Take a virtual tour of our coffee shop from anywhere
@@ -187,14 +189,14 @@ export default function VRExperienceSection() {
                 transition={{ duration: 0.6, delay: 0.4 + index * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="flex items-start gap-4 p-4"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.6), rgba(42, 24, 16, 0.6))',
-                  border: '2px solid rgba(184, 115, 51, 0.2)',
+                  background: 'rgba(26, 17, 16, 0.6)',
+                  border: '1px solid rgba(184, 115, 51, 0.2)',
                 }}
               >
                 <div 
                   className="flex-shrink-0 p-3"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                    background: 'rgba(184, 115, 51, 0.2)',
                     border: '1px solid rgba(184, 115, 51, 0.3)',
                   }}
                 >
@@ -204,16 +206,18 @@ export default function VRExperienceSection() {
                   <h3 style={{
                     fontFamily: 'Bebas Neue, sans-serif',
                     fontSize: '1.25rem',
-                    color: '#FFFEF9',
+                    color: '#F5F1E8',
                     marginBottom: '0.25rem',
                     letterSpacing: '0.05em',
+                    fontWeight: 400,
                   }}>
                     {feature.title}
                   </h3>
                   <p style={{
                     fontSize: '0.875rem',
-                    color: 'rgba(255, 254, 249, 0.7)',
-                    lineHeight: 1.5,
+                    color: 'rgba(245, 241, 232, 0.6)',
+                    lineHeight: 1.6,
+                    fontWeight: 300,
                   }}>
                     {feature.desc}
                   </p>
@@ -229,14 +233,14 @@ export default function VRExperienceSection() {
               className="group relative overflow-hidden w-full"
               style={{
                 padding: '16px 32px',
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                background: '#B87333',
                 border: 'none',
                 fontFamily: 'Bebas Neue, sans-serif',
                 fontSize: '1.125rem',
                 letterSpacing: '0.15em',
                 color: '#000000',
                 cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(184, 115, 51, 0.5)',
+                fontWeight: 400,
               }}
             >
               <div className="flex items-center justify-center gap-3">

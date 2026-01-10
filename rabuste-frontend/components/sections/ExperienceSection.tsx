@@ -22,21 +22,21 @@ export default function ExperienceSection() {
       icon: Palette,
       title: 'ART GALLERY',
       desc: 'Rotating exhibitions from local artists',
-      color: '#CD7F32',
+      color: '#B87333',
       route: '/art',
     },
     {
       icon: Users,
       title: 'WORKSHOPS',
       desc: 'Coffee tasting, art sessions & community events',
-      color: '#D4A574',
+      color: '#B87333',
       route: '/workshops',
     },
     {
       icon: Wifi,
       title: 'WORK SPACE',
       desc: 'Cozy corner to create and collaborate',
-      color: '#CD7F32',
+      color: '#B87333',
       route: '/store',
     },
   ];
@@ -60,21 +60,24 @@ export default function ExperienceSection() {
           className="text-center mb-20"
         >
           <p style={{
-            color: '#B87333',
+            color: '#8B6F47',
             fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-            letterSpacing: '0.3em',
-            fontWeight: 700,
+            letterSpacing: '0.2em',
+            fontWeight: 400,
             marginBottom: '1.5rem',
+            textTransform: 'uppercase',
           }}>
             THE EXPERIENCE
           </p>
 
           <h2 style={{
             fontFamily: 'Bebas Neue, sans-serif',
-            fontSize: 'clamp(3rem, 8vw, 6rem)',
+            fontSize: 'clamp(3.5rem, 10vw, 7rem)',
             lineHeight: 0.9,
-            color: '#FFFEF9',
+            color: '#F5F1E8',
             marginBottom: '1.5rem',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}>
             MORE THAN
             <br />
@@ -90,10 +93,11 @@ export default function ExperienceSection() {
 
           <p style={{
             fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-            color: 'rgba(255, 254, 249, 0.7)',
+            color: 'rgba(245, 241, 232, 0.6)',
             maxWidth: '700px',
             margin: '0 auto',
-            lineHeight: 1.6,
+            lineHeight: 1.7,
+            fontWeight: 300,
           }}>
             A vibrant space where coffee culture, fine arts, and community converge
           </p>
@@ -113,17 +117,16 @@ export default function ExperienceSection() {
                 onClick={() => router.push(exp.route)}
                 className="group relative cursor-pointer"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
-                  border: `3px solid ${exp.color}40`,
+                  background: 'rgba(26, 17, 16, 0.6)',
+                  border: `1px solid rgba(184, 115, 51, 0.2)`,
                   padding: 'clamp(32px, 5vw, 40px)',
-                  backdropFilter: 'blur(10px)',
                 }}
               >
                 {/* Glow effect */}
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                   style={{
-                    background: `radial-gradient(circle at top, ${exp.color}15 0%, transparent 70%)`,
+                    background: `radial-gradient(circle at top, rgba(184, 115, 51, 0.1) 0%, transparent 70%)`,
                     pointerEvents: 'none',
                   }}
                 />
@@ -133,7 +136,7 @@ export default function ExperienceSection() {
                   <div
                     className="mb-6 relative overflow-hidden"
                     style={{
-                      background: exp.color,
+                      background: '#B87333',
                       width: 'clamp(60px, 15vw, 80px)',
                       height: 'clamp(60px, 15vw, 80px)',
                       display: 'flex',
@@ -142,27 +145,20 @@ export default function ExperienceSection() {
                     }}
                   >
                     <Icon size={32} color="#000" strokeWidth={2.5} className="relative z-10 sm:w-10 sm:h-10" />
-                    {/* Shine effect on hover */}
-                    <div
-                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{
-                        background: 'linear-gradient(135deg, transparent, rgba(255,255,255,0.3), transparent)',
-                      }}
-                    />
                   </div>
 
                   {/* Title with arrow */}
                   <h3 className="flex items-center justify-between mb-4" style={{
                     fontFamily: 'Bebas Neue, sans-serif',
                     fontSize: 'clamp(1.75rem, 4vw, 2.25rem)',
-                    color: exp.color,
+                    color: '#B87333',
                     letterSpacing: '0.05em',
                   }}>
                     {exp.title}
                     <ArrowRight 
                       size={24} 
-                      color={exp.color}
-                      strokeWidth={3}
+                      color="#B87333"
+                      strokeWidth={2}
                       className="opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300"
                     />
                   </h3>
@@ -170,9 +166,10 @@ export default function ExperienceSection() {
                   {/* Description */}
                   <p style={{
                     fontSize: 'clamp(0.875rem, 2vw, 1.125rem)',
-                    color: 'rgba(255, 254, 249, 0.85)',
-                    lineHeight: 1.6,
+                    color: 'rgba(245, 241, 232, 0.7)',
+                    lineHeight: 1.7,
                     flex: 1,
+                    fontWeight: 300,
                   }}>
                     {exp.desc}
                   </p>
@@ -181,10 +178,11 @@ export default function ExperienceSection() {
                   <div 
                     className="mt-6 flex items-center gap-2 opacity-70 group-hover:opacity-100 transition-opacity"
                     style={{
-                      color: exp.color,
+                      color: '#B87333',
                       fontSize: '0.875rem',
                       fontWeight: 600,
                       letterSpacing: '0.05em',
+                      fontFamily: 'Bebas Neue, sans-serif',
                     }}
                   >
                     EXPLORE
@@ -195,16 +193,7 @@ export default function ExperienceSection() {
                   <div
                     className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-500"
                     style={{
-                      background: exp.color,
-                      boxShadow: `0 0 20px ${exp.color}`,
-                    }}
-                  />
-
-                  {/* Corner accent on hover */}
-                  <div
-                    className="absolute top-0 right-0 w-0 h-0 group-hover:w-16 group-hover:h-16 transition-all duration-500"
-                    style={{
-                      background: `linear-gradient(135deg, transparent 50%, ${exp.color}30 50%)`,
+                      background: '#B87333',
                     }}
                   />
                 </div>
@@ -223,7 +212,7 @@ export default function ExperienceSection() {
           <div
             className="relative overflow-hidden"
             style={{
-              border: '3px solid rgba(184, 115, 51, 0.4)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               aspectRatio: '4/3',
             }}
           >
@@ -263,7 +252,7 @@ export default function ExperienceSection() {
           <div
             className="relative overflow-hidden"
             style={{
-              border: '3px solid rgba(205, 127, 50, 0.4)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               aspectRatio: '4/3',
             }}
           >
@@ -285,7 +274,7 @@ export default function ExperienceSection() {
               <p style={{
                 fontFamily: 'Bebas Neue, sans-serif',
                 fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-                color: '#CD7F32',
+                color: '#B87333',
                 marginBottom: '0.5rem',
                 letterSpacing: '0.05em',
               }}>

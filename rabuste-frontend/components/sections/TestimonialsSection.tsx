@@ -19,7 +19,7 @@ const testimonials = [
     image: 'https://i.pravatar.cc/150?u=priya',
     rating: 5,
     text: 'I recommend Rabuste to all my clients. Perfect pre-workout. The sustained energy helps them push harder.',
-    color: '#CD7F32',
+    color: '#B87333',
   },
   {
     name: 'Vikram Singh',
@@ -27,7 +27,7 @@ const testimonials = [
     image: 'https://i.pravatar.cc/150?u=vikram',
     rating: 5,
     text: 'Was skeptical about Robusta. One cup and I was converted. Bold flavor and focus are game changers.',
-    color: '#D4A574',
+    color: '#B87333',
   },
   {
     name: 'Ananya Reddy',
@@ -58,22 +58,24 @@ export default function TestimonialsSection() {
           className="text-center mb-16"
         >
           <p style={{
-            color: '#B87333',
+            color: '#8B6F47',
             fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-            letterSpacing: '0.3em',
-            fontWeight: 700,
+            letterSpacing: '0.2em',
+            fontWeight: 400,
             marginBottom: '1.5rem',
+            textTransform: 'uppercase',
           }}>
             REAL RESULTS
           </p>
 
           <h2 style={{
             fontFamily: 'var(--font-heading)',
-            fontSize: 'clamp(2.5rem, 8vw, 7rem)',
+            fontSize: 'clamp(3rem, 10vw, 8rem)',
             lineHeight: 0.9,
-            color: '#FFFEF9',
+            color: '#F5F1E8',
             marginBottom: '1rem',
-            letterSpacing: '0.05em',
+            fontWeight: 400,
+            letterSpacing: '0.02em',
           }}>
             WHAT OUR
             <br />
@@ -102,26 +104,17 @@ export default function TestimonialsSection() {
               whileHover={{ y: -4 }}
               className="group relative"
               style={{
-                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.6), rgba(42, 24, 16, 0.5))',
-                border: `1px solid ${testimonial.color}30`,
-                padding: 'clamp(20px, 4vw, 28px)',
-                backdropFilter: 'blur(10px)',
+                background: 'rgba(26, 17, 16, 0.6)',
+                border: `1px solid rgba(184, 115, 51, 0.2)`,
+                padding: 'clamp(24px, 4vw, 32px)',
                 transition: 'all 0.3s ease',
               }}
             >
-              {/* Subtle Corner Accent */}
-              <div 
-                className="absolute top-0 left-0 w-12 h-12 opacity-20"
-                style={{
-                  background: `linear-gradient(135deg, ${testimonial.color}, transparent)`,
-                }}
-              />
-
               {/* Quote Icon - Smaller and Subtle */}
               <Quote 
                 size={32} 
-                className="absolute top-4 right-4 opacity-10"
-                style={{ color: testimonial.color }}
+                className="absolute top-4 right-4 opacity-5"
+                style={{ color: '#B87333' }}
               />
 
               {/* Rating - Compact */}
@@ -130,8 +123,8 @@ export default function TestimonialsSection() {
                   <Star
                     key={i}
                     size={14}
-                    fill={testimonial.color}
-                    color={testimonial.color}
+                    fill="#B87333"
+                    color="#B87333"
                   />
                 ))}
               </div>
@@ -140,16 +133,17 @@ export default function TestimonialsSection() {
               <p style={{
                 fontSize: 'clamp(0.9rem, 1.8vw, 1rem)',
                 lineHeight: 1.7,
-                color: 'rgba(255, 254, 249, 0.85)',
+                color: 'rgba(245, 241, 232, 0.8)',
                 marginBottom: '20px',
                 position: 'relative',
                 zIndex: 1,
+                fontWeight: 300,
               }}>
                 "{testimonial.text}"
               </p>
 
               {/* Author - Horizontal Layout, Compact */}
-              <div className="flex items-center gap-3 pt-4 border-t border-[rgba(184,115,51,0.15)]">
+              <div className="flex items-center gap-3 pt-4 border-t" style={{ borderColor: 'rgba(184, 115, 51, 0.2)' }}>
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
@@ -157,7 +151,7 @@ export default function TestimonialsSection() {
                     width: '40px',
                     height: '40px',
                     borderRadius: '50%',
-                    border: `2px solid ${testimonial.color}`,
+                    border: `2px solid rgba(184, 115, 51, 0.3)`,
                   }}
                 />
                 
@@ -165,15 +159,16 @@ export default function TestimonialsSection() {
                   <div style={{
                     fontFamily: 'var(--font-heading)',
                     fontSize: 'clamp(1rem, 2vw, 1.125rem)',
-                    color: '#FFFEF9',
+                    color: '#F5F1E8',
                     letterSpacing: '0.03em',
                     lineHeight: 1.2,
+                    fontWeight: 400,
                   }}>
                     {testimonial.name}
                   </div>
                   <div style={{
                     fontSize: 'clamp(0.7rem, 1.4vw, 0.8rem)',
-                    color: testimonial.color,
+                    color: '#B87333',
                     letterSpacing: '0.03em',
                   }}>
                     {testimonial.role}
