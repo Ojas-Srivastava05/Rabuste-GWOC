@@ -175,56 +175,71 @@ export default function AdminFeedbackPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
+      style={{
+        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
+        color: '#F5F1E8',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#F5F1E8' }}>
-            CUSTOMER FEEDBACK
-          </h1>
-          <p style={{ color: '#8B6F47' }}>AI-analyzed feedback with sentiment analysis</p>
+      <div className="mb-8 sm:mb-12">
+        <div className="flex items-center gap-4 mb-4 sm:mb-6">
+          <div className="copper-line" />
+          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
+          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
         </div>
+        <h1
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
+          style={{
+            fontFamily: 'var(--font-heading)',
+            lineHeight: 0.9,
+          }}
+        >
+          FEEDBACK <span className="gradient-text">MANAGEMENT</span>
+        </h1>
+        <p className="mt-4 text-sm sm:text-base" style={{ color: '#8B6F47' }}>AI-analyzed feedback with sentiment analysis</p>
       </div>
 
       {/* Statistics Cards */}
       {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-6 rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(184, 115, 51, 0.3)' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          <div className="brutal-card p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
-              <MessageSquare size={24} style={{ color: '#B87333' }} />
-              <span className="text-sm" style={{ color: '#8B6F47' }}>Total Feedback</span>
+              <MessageSquare size={20} className="text-[#B87333]" />
+              <span className="section-label text-xs">TOTAL</span>
             </div>
-            <p className="text-3xl font-bold" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+            <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
               {stats.total}
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+          <div className="brutal-card p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
-              <TrendingUp size={24} style={{ color: '#10B981' }} />
-              <span className="text-sm" style={{ color: '#8B6F47' }}>Avg Rating</span>
+              <TrendingUp size={20} className="text-[#10B981]" />
+              <span className="section-label text-xs">AVG RATING</span>
             </div>
-            <p className="text-3xl font-bold" style={{ color: '#10B981', fontFamily: 'var(--font-heading)' }}>
+            <p className="text-2xl sm:text-3xl font-bold" style={{ color: '#10B981', fontFamily: 'var(--font-heading)' }}>
               {stats.averageRating.toFixed(1)}/5
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(239, 68, 68, 0.3)' }}>
+          <div className="brutal-card p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
-              <AlertTriangle size={24} style={{ color: '#EF4444' }} />
-              <span className="text-sm" style={{ color: '#8B6F47' }}>Flagged</span>
+              <AlertTriangle size={20} className="text-[#EF4444]" />
+              <span className="section-label text-xs">FLAGGED</span>
             </div>
-            <p className="text-3xl font-bold" style={{ color: '#EF4444', fontFamily: 'var(--font-heading)' }}>
+            <p className="text-2xl sm:text-3xl font-bold" style={{ color: '#EF4444', fontFamily: 'var(--font-heading)' }}>
               {stats.flagged}
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(184, 115, 51, 0.3)' }}>
+          <div className="brutal-card p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Star size={24} style={{ color: '#B87333' }} />
-              <span className="text-sm" style={{ color: '#8B6F47' }}>Positive</span>
+              <Star size={20} className="text-[#10B981]" />
+              <span className="section-label text-xs">POSITIVE</span>
             </div>
-            <p className="text-3xl font-bold" style={{ color: '#10B981', fontFamily: 'var(--font-heading)' }}>
+            <p className="text-2xl sm:text-3xl font-bold" style={{ color: '#10B981', fontFamily: 'var(--font-heading)' }}>
               {stats.bySentiment.positive}
             </p>
           </div>
@@ -232,7 +247,7 @@ export default function AdminFeedbackPage() {
       )}
 
       {/* Filters */}
-      <div className="p-6 rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(184, 115, 51, 0.3)' }}>
+      <div className="brutal-card p-4 sm:p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: '#8B6F47' }} />
@@ -241,16 +256,14 @@ export default function AdminFeedbackPage() {
               placeholder="Search feedback..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full pl-10 pr-4 py-2 rounded-lg"
-              style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid rgba(184, 115, 51, 0.3)', color: '#F5F1E8' }}
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-[#1A1110] border-2 border-[#B87333]/30 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
             />
           </div>
 
           <select
             value={filters.type}
             onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-            className="px-4 py-2 rounded-lg"
-            style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid rgba(184, 115, 51, 0.3)', color: '#F5F1E8' }}
+            className="px-4 py-3 rounded-lg bg-[#1A1110] border-2 border-[#B87333]/30 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
           >
             <option value="">All Types</option>
             <option value="order">Order</option>
@@ -261,8 +274,7 @@ export default function AdminFeedbackPage() {
           <select
             value={filters.sentiment}
             onChange={(e) => setFilters({ ...filters, sentiment: e.target.value })}
-            className="px-4 py-2 rounded-lg"
-            style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid rgba(184, 115, 51, 0.3)', color: '#F5F1E8' }}
+            className="px-4 py-3 rounded-lg bg-[#1A1110] border-2 border-[#B87333]/30 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
           >
             <option value="">All Sentiments</option>
             <option value="positive">Positive</option>
@@ -273,8 +285,7 @@ export default function AdminFeedbackPage() {
           <select
             value={filters.priority}
             onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-            className="px-4 py-2 rounded-lg"
-            style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid rgba(184, 115, 51, 0.3)', color: '#F5F1E8' }}
+            className="px-4 py-3 rounded-lg bg-[#1A1110] border-2 border-[#B87333]/30 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
           >
             <option value="">All Priorities</option>
             <option value="urgent">Urgent</option>
@@ -283,7 +294,7 @@ export default function AdminFeedbackPage() {
             <option value="low">Low</option>
           </select>
 
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer px-4 py-3 rounded-lg bg-[#1A1110] border-2 border-[#B87333]/30">
             <input
               type="checkbox"
               checked={filters.flagged === 'true'}
@@ -296,174 +307,127 @@ export default function AdminFeedbackPage() {
         </div>
       </div>
 
-      {/* Feedback List */}
-      <div className="space-y-4">
+      {/* Feedback List - Card Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredFeedbacks.length === 0 ? (
-          <div className="p-12 text-center rounded-xl border-2" style={{ background: 'rgba(26, 17, 16, 0.6)', borderColor: 'rgba(184, 115, 51, 0.3)' }}>
-            <p style={{ color: '#8B6F47' }}>No feedback found</p>
+          <div className="col-span-full p-12 text-center brutal-card">
+            <MessageSquare size={64} className="text-[#B87333] mx-auto mb-6" />
+            <p className="text-xl" style={{ color: '#8B6F47' }}>No feedback found</p>
           </div>
         ) : (
           filteredFeedbacks.map((feedback) => (
             <div
               key={feedback._id}
-              className="p-6 rounded-xl border-2 transition-all hover:border-opacity-60"
+              className="brutal-card p-6 flex flex-col"
               style={{
                 background: feedback.isFlagged
-                  ? 'rgba(239, 68, 68, 0.1)'
-                  : 'rgba(26, 17, 16, 0.6)',
-                borderColor: feedback.isFlagged
-                  ? 'rgba(239, 68, 68, 0.5)'
-                  : 'rgba(184, 115, 51, 0.3)',
+                  ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(42, 24, 16, 0.8))'
+                  : 'linear-gradient(135deg, rgba(184, 115, 51, 0.1), rgba(42, 24, 16, 0.8))',
+                border: feedback.isFlagged
+                  ? '2px solid rgba(239, 68, 68, 0.5)'
+                  : '2px solid rgba(184, 115, 51, 0.4)',
               }}
             >
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div className="flex-1">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span
-                          className="px-3 py-1 rounded-lg text-sm font-bold uppercase"
-                          style={{
-                            background: `rgba(${feedback.type === 'order' ? '184, 115, 51' : feedback.type === 'cafe' ? '16, 185, 129' : '59, 130, 246'}, 0.2)`,
-                            color: feedback.type === 'order' ? '#B87333' : feedback.type === 'cafe' ? '#10B981' : '#3B82F6',
-                            fontFamily: 'var(--font-heading)',
-                            letterSpacing: '0.05em',
-                          }}
-                        >
-                          {feedback.type}
-                        </span>
-                        <span
-                          className="px-3 py-1 rounded-lg text-sm font-bold"
-                          style={{
-                            background: `${getSentimentColor(feedback.sentiment)}20`,
-                            color: getSentimentColor(feedback.sentiment),
-                          }}
-                        >
-                          {feedback.sentiment}
-                        </span>
-                        <span
-                          className="px-3 py-1 rounded-lg text-sm font-bold"
-                          style={{
-                            background: `${getPriorityColor(feedback.priority)}20`,
-                            color: getPriorityColor(feedback.priority),
-                          }}
-                        >
-                          {feedback.priority}
-                        </span>
-                        {feedback.isFlagged && (
-                          <span className="px-3 py-1 rounded-lg text-sm font-bold bg-red-500/20 text-red-400">
-                            ⚠️ FLAGGED
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm mb-1" style={{ color: '#8B6F47' }}>
-                        {feedback.userName} ({feedback.userEmail})
-                      </p>
-                      <p className="text-xs" style={{ color: '#6B7280' }}>
-                        {new Date(feedback.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={20}
-                          className={i < feedback.rating ? 'text-amber-500 fill-amber-500' : 'text-zinc-600'}
-                        />
-                      ))}
-                      <span className="ml-2 text-lg font-bold" style={{ color: '#D4A574' }}>
-                        {feedback.rating}/5
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* AI Summary */}
-                  <div className="mb-4 p-4 rounded-lg" style={{ background: 'rgba(0, 0, 0, 0.2)' }}>
-                    <p className="text-sm font-bold mb-2" style={{ color: '#B87333' }}>
-                      AI SUMMARY:
+              {/* Header */}
+              <div className="mb-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold mb-1" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)' }}>
+                      {feedback.userName}
                     </p>
-                    <p className="text-sm" style={{ color: '#F5F1E8' }}>
-                      {feedback.summary}
+                    <p className="text-xs mb-2" style={{ color: '#8B6F47' }}>
+                      {new Date(feedback.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-
-                  {/* Categories */}
-                  {feedback.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {feedback.categories.map((cat, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 rounded text-xs"
-                          style={{ background: 'rgba(184, 115, 51, 0.2)', color: '#D4A574' }}
-                        >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Comments */}
-                  {feedback.comments && (
-                    <div className="mb-4">
-                      <p className="text-sm font-bold mb-2" style={{ color: '#B87333' }}>
-                        COMMENTS:
-                      </p>
-                      <p className="text-sm" style={{ color: '#F5F1E8' }}>
-                        {feedback.comments}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Detailed Ratings */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                  {feedback.foodQuality !== undefined && feedback.foodQuality > 0 && (
-  <div>
-    <span style={{ color: '#8B6F47' }}>Food Quality: </span>
-    <span style={{ color: '#D4A574' }}>{feedback.foodQuality}/5</span>
-  </div>
-)}
-
-{feedback.deliveryTime !== undefined && feedback.deliveryTime > 0 && (
-  <div>
-    <span style={{ color: '#8B6F47' }}>Delivery: </span>
-    <span style={{ color: '#D4A574' }}>{feedback.deliveryTime}/5</span>
-  </div>
-)}
-
-{feedback.ambience !== undefined && feedback.ambience > 0 && (
-  <div>
-    <span style={{ color: '#8B6F47' }}>Ambience: </span>
-    <span style={{ color: '#D4A574' }}>{feedback.ambience}/5</span>
-  </div>
-)}
-
-{feedback.service !== undefined && feedback.service > 0 && (
-  <div>
-    <span style={{ color: '#8B6F47' }}>Service: </span>
-    <span style={{ color: '#D4A574' }}>{feedback.service}/5</span>
-  </div>
-)}
-
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        size={14}
+                        className={i < feedback.rating ? 'text-amber-500 fill-amber-500' : 'text-zinc-600'}
+                      />
+                    ))}
+                    <span className="ml-1 text-sm font-bold" style={{ color: '#D4A574' }}>
+                      {feedback.rating}
+                    </span>
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => updateFeedback(feedback._id, { isFlagged: !feedback.isFlagged })}
-                    className="px-4 py-2 rounded-lg text-sm font-bold transition-all"
+                
+                <div className="flex flex-wrap gap-2 mb-3">
+                  <span
+                    className="px-2 py-1 rounded text-xs font-bold uppercase"
                     style={{
-                      background: feedback.isFlagged
-                        ? 'rgba(16, 185, 129, 0.2)'
-                        : 'rgba(239, 68, 68, 0.2)',
-                      border: `1px solid ${feedback.isFlagged ? '#10B981' : '#EF4444'}`,
-                      color: feedback.isFlagged ? '#10B981' : '#EF4444',
+                      background: `rgba(${feedback.type === 'order' ? '184, 115, 51' : feedback.type === 'cafe' ? '16, 185, 129' : '59, 130, 246'}, 0.2)`,
+                      color: feedback.type === 'order' ? '#B87333' : feedback.type === 'cafe' ? '#10B981' : '#3B82F6',
+                      fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    {feedback.isFlagged ? 'Unflag' : 'Flag'}
-                  </button>
+                    {feedback.type}
+                  </span>
+                  <span
+                    className="px-2 py-1 rounded text-xs font-bold"
+                    style={{
+                      background: `${getSentimentColor(feedback.sentiment)}20`,
+                      color: getSentimentColor(feedback.sentiment),
+                    }}
+                  >
+                    {feedback.sentiment}
+                  </span>
+                  <span
+                    className="px-2 py-1 rounded text-xs font-bold"
+                    style={{
+                      background: `${getPriorityColor(feedback.priority)}20`,
+                      color: getPriorityColor(feedback.priority),
+                    }}
+                  >
+                    {feedback.priority}
+                  </span>
+                  {feedback.isFlagged && (
+                    <span className="px-2 py-1 rounded text-xs font-bold bg-red-500/20 text-red-400">
+                      ⚠️ FLAGGED
+                    </span>
+                  )}
                 </div>
+              </div>
+
+              {/* AI Summary */}
+              <div className="mb-3 p-3 rounded-lg flex-1" style={{ background: 'rgba(0, 0, 0, 0.2)' }}>
+                <p className="text-xs font-bold mb-1" style={{ color: '#B87333' }}>
+                  AI SUMMARY:
+                </p>
+                <p className="text-xs line-clamp-3" style={{ color: '#F5F1E8' }}>
+                  {feedback.summary}
+                </p>
+              </div>
+
+              {/* Comments */}
+              {feedback.comments && (
+                <div className="mb-3">
+                  <p className="text-xs font-bold mb-1" style={{ color: '#B87333' }}>
+                    COMMENTS:
+                  </p>
+                  <p className="text-xs line-clamp-2" style={{ color: '#F5F1E8' }}>
+                    {feedback.comments}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="mt-auto pt-3 border-t-2" style={{ borderColor: 'rgba(184, 115, 51, 0.3)' }}>
+                <button
+                  onClick={() => updateFeedback(feedback._id, { isFlagged: !feedback.isFlagged })}
+                  className="w-full py-2 px-3 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                  style={{
+                    background: feedback.isFlagged
+                      ? 'rgba(16, 185, 129, 0.2)'
+                      : 'rgba(239, 68, 68, 0.2)',
+                    border: `2px solid ${feedback.isFlagged ? '#10B981' : '#EF4444'}`,
+                    color: feedback.isFlagged ? '#10B981' : '#EF4444',
+                    fontFamily: 'var(--font-heading)',
+                  }}
+                >
+                  {feedback.isFlagged ? '✓ UNFLAG' : '⚠️ FLAG'}
+                </button>
               </div>
             </div>
           ))

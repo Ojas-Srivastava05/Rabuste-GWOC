@@ -194,9 +194,9 @@ export default function BenefitsShowcase() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             viewport={{ once: true }}
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
@@ -211,37 +211,65 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Brain size={32} color="#CD7F32" strokeWidth={2} className="mb-3" />
-            <div style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-              color: '#CD7F32',
-              marginBottom: '0.5rem',
-            }}>
-              4-6HRS
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div style={{
+                    background: '#CD7F32',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Brain size={32} color="#000" strokeWidth={2} fill="#000" />
+                  </div>
+                  <div className="text-right">
+                    <div style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+                      lineHeight: 0.9,
+                      color: '#CD7F32',
+                    }}>
+                      4-6HRS
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                      color: 'rgba(255, 254, 249, 0.6)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      sustained
+                    </div>
+                  </div>
+                </div>
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFEF9',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}>
+                  SHARP FOCUS
+                </h3>
+                <p style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+                  color: 'rgba(255, 254, 249, 0.85)',
+                  lineHeight: 1.5,
+                }}>
+                  Sustained energy throughout workday
+                </p>
+              </div>
+              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: 'linear-gradient(90deg, #CD7F32, #D4A574, #B87333)',
+                marginTop: '1rem',
+              }} />
             </div>
-            <h4 style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
-              color: '#FFFEF9',
-              marginBottom: '0.5rem',
-              letterSpacing: '0.05em',
-            }}>
-              SHARP FOCUS
-            </h4>
-            <p style={{
-              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-              color: 'rgba(255, 254, 249, 0.7)',
-              lineHeight: 1.5,
-            }}>
-              Sustained energy throughout workday
-            </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
             viewport={{ once: true }}
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
@@ -256,37 +284,65 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Dumbbell size={32} color="#D4A574" strokeWidth={2} className="mb-3" />
-            <div style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-              color: '#D4A574',
-              marginBottom: '0.5rem',
-            }}>
-              +15%
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div style={{
+                    background: '#D4A574',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Dumbbell size={32} color="#000" strokeWidth={2} fill="#000" />
+                  </div>
+                  <div className="text-right">
+                    <div style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+                      lineHeight: 0.9,
+                      color: '#D4A574',
+                    }}>
+                      +15%
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                      color: 'rgba(255, 254, 249, 0.6)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      boost
+                    </div>
+                  </div>
+                </div>
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFEF9',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}>
+                  PERFORMANCE
+                </h3>
+                <p style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+                  color: 'rgba(255, 254, 249, 0.85)',
+                  lineHeight: 1.5,
+                }}>
+                  Perfect pre-workout fuel
+                </p>
+              </div>
+              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: 'linear-gradient(90deg, #D4A574, #B87333, #CD7F32)',
+                marginTop: '1rem',
+              }} />
             </div>
-            <h4 style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
-              color: '#FFFEF9',
-              marginBottom: '0.5rem',
-              letterSpacing: '0.05em',
-            }}>
-              PERFORMANCE
-            </h4>
-            <p style={{
-              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-              color: 'rgba(255, 254, 249, 0.7)',
-              lineHeight: 1.5,
-            }}>
-              Perfect pre-workout fuel
-            </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
@@ -301,37 +357,65 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Clock size={32} color="#B87333" strokeWidth={2} className="mb-3" />
-            <div style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-              color: '#B87333',
-              marginBottom: '0.5rem',
-            }}>
-              6-8HRS
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div style={{
+                    background: '#B87333',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Clock size={32} color="#000" strokeWidth={2} fill="#000" />
+                  </div>
+                  <div className="text-right">
+                    <div style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+                      lineHeight: 0.9,
+                      color: '#B87333',
+                    }}>
+                      6-8HRS
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                      color: 'rgba(255, 254, 249, 0.6)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      duration
+                    </div>
+                  </div>
+                </div>
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFEF9',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}>
+                  LONG LASTING
+                </h3>
+                <p style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+                  color: 'rgba(255, 254, 249, 0.85)',
+                  lineHeight: 1.5,
+                }}>
+                  No mid-day crashes
+                </p>
+              </div>
+              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)',
+                marginTop: '1rem',
+              }} />
             </div>
-            <h4 style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
-              color: '#FFFEF9',
-              marginBottom: '0.5rem',
-              letterSpacing: '0.05em',
-            }}>
-              LONG LASTING
-            </h4>
-            <p style={{
-              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-              color: 'rgba(255, 254, 249, 0.75)',
-              lineHeight: 1.5,
-            }}>
-              No mid-day crashes
-            </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
             viewport={{ once: true }}
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
@@ -346,37 +430,65 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <TrendingUp size={32} color="#CD7F32" strokeWidth={2} className="mb-3" />
-            <div style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-              color: '#CD7F32',
-              marginBottom: '0.5rem',
-            }}>
-              +11%
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div style={{
+                    background: '#CD7F32',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <TrendingUp size={32} color="#000" strokeWidth={2} fill="#000" />
+                  </div>
+                  <div className="text-right">
+                    <div style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+                      lineHeight: 0.9,
+                      color: '#CD7F32',
+                    }}>
+                      +11%
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                      color: 'rgba(255, 254, 249, 0.6)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      metabolic
+                    </div>
+                  </div>
+                </div>
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFEF9',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}>
+                  METABOLISM
+                </h3>
+                <p style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+                  color: 'rgba(255, 254, 249, 0.85)',
+                  lineHeight: 1.5,
+                }}>
+                  Burns calories naturally
+                </p>
+              </div>
+              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: 'linear-gradient(90deg, #CD7F32, #D4A574, #B87333)',
+                marginTop: '1rem',
+              }} />
             </div>
-            <h4 style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
-              color: '#FFFEF9',
-              marginBottom: '0.5rem',
-              letterSpacing: '0.05em',
-            }}>
-              METABOLISM
-            </h4>
-            <p style={{
-              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-              color: 'rgba(255, 254, 249, 0.75)',
-              lineHeight: 1.5,
-            }}>
-              Burns calories naturally
-            </p>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
             viewport={{ once: true }}
             whileHover={{ y: -8, scale: 1.05 }}
             className="group relative overflow-hidden"
@@ -391,31 +503,59 @@ export default function BenefitsShowcase() {
               cursor: 'pointer',
             }}
           >
-            <Award size={32} color="#D4A574" strokeWidth={2} className="mb-3" />
-            <div style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-              color: '#D4A574',
-              marginBottom: '0.5rem',
-            }}>
-              7-10%
+            <div className="relative z-10 flex flex-col justify-between h-full">
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div style={{
+                    background: '#D4A574',
+                    width: '60px',
+                    height: '60px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Award size={32} color="#000" strokeWidth={2} fill="#000" />
+                  </div>
+                  <div className="text-right">
+                    <div style={{
+                      fontFamily: 'Bebas Neue, sans-serif',
+                      fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+                      lineHeight: 0.9,
+                      color: '#D4A574',
+                    }}>
+                      7-10%
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)',
+                      color: 'rgba(255, 254, 249, 0.6)',
+                      letterSpacing: '0.1em',
+                    }}>
+                      more CGA
+                    </div>
+                  </div>
+                </div>
+                <h3 style={{
+                  fontFamily: 'Bebas Neue, sans-serif',
+                  fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+                  color: '#FFFEF9',
+                  marginBottom: '0.75rem',
+                  letterSpacing: '0.05em',
+                }}>
+                  ANTIOXIDANTS
+                </h3>
+                <p style={{
+                  fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+                  color: 'rgba(255, 254, 249, 0.85)',
+                  lineHeight: 1.5,
+                }}>
+                  Superior health benefits
+                </p>
+              </div>
+              <div className="h-2 w-0 group-hover:w-full transition-all duration-700" style={{
+                background: 'linear-gradient(90deg, #D4A574, #B87333, #CD7F32)',
+                marginTop: '1rem',
+              }} />
             </div>
-            <h4 style={{
-              fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)',
-              color: '#FFFEF9',
-              marginBottom: '0.5rem',
-              letterSpacing: '0.05em',
-            }}>
-              ANTIOXIDANTS
-            </h4>
-            <p style={{
-              fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
-              color: 'rgba(255, 254, 249, 0.75)',
-              lineHeight: 1.5,
-            }}>
-              Superior health benefits
-            </p>
           </motion.div>
         </div>
 

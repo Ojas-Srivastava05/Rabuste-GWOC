@@ -36,7 +36,7 @@ export default function ExperienceSection() {
       icon: Wifi,
       title: 'WORK SPACE',
       desc: 'Cozy corner to create and collaborate',
-      color: '#B87333',
+      color: '#CD7F32',
       route: '/store',
     },
   ];

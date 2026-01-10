@@ -224,8 +224,8 @@ export default function AdminCouponsPage() {
         </div>
       </div>
 
-      {/* Coupons List */}
-      <div className="space-y-6">
+      {/* Coupons List - Card Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {coupons.map((coupon) => {
           const isExpired = new Date(coupon.validUntil) < new Date();
           const isLimitReached = coupon.usageLimit && coupon.usageCount >= coupon.usageLimit;
@@ -233,7 +233,7 @@ export default function AdminCouponsPage() {
           return (
             <div
               key={coupon._id}
-              className="brutal-card p-8"
+              className="brutal-card p-6 flex flex-col"
               style={{
                 background: coupon.isActive && !isExpired
                   ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(42, 24, 16, 0.8))'
@@ -241,98 +241,114 @@ export default function AdminCouponsPage() {
                 opacity: !coupon.isActive || isExpired ? 0.6 : 1,
               }}
             >
-              <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2
-                      className="text-3xl"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        color: '#F5F1E8',
-                        letterSpacing: '0.1em',
-                      }}
-                    >
-                      {coupon.code}
-                    </h2>
-                    <div
-                      className="px-4 py-1 flex items-center gap-2"
-                      style={{
-                        background: coupon.isActive && !isExpired
-                          ? 'rgba(94, 125, 76, 0.3)'
-                          : 'rgba(139, 111, 71, 0.3)',
-                        border: `2px solid ${coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47'}`,
-                        color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47',
-                      }}
-                    >
-                      <Percent size={16} />
-                      <span className="text-sm font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-                        {coupon.discountPercentage}% OFF
-                      </span>
-                    </div>
+              {/* Header */}
+              <div className="mb-4">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <h2
+                    className="text-xl sm:text-2xl font-bold flex-1"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      color: '#F5F1E8',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    {coupon.code}
+                  </h2>
+                  <div
+                    className="px-3 py-1 rounded-full uppercase tracking-widest text-xs font-bold whitespace-nowrap"
+                    style={{
+                      fontFamily: 'var(--font-heading)',
+                      background: coupon.isActive
+                        ? 'linear-gradient(135deg, #B87333, #CD7F32)'
+                        : 'rgba(139, 111, 71, 0.3)',
+                      color: coupon.isActive ? '#000000' : '#8B6F47',
+                      border: !coupon.isActive ? '2px solid #8B6F47' : 'none',
+                    }}
+                  >
+                    {coupon.isActive ? 'ACTIVE' : 'INACTIVE'}
                   </div>
-                  <p className="text-sm mb-2" style={{ color: '#D4A574' }}>
-                    {coupon.description || "No description"}
-                  </p>
-                  <div className="flex flex-wrap gap-4 text-sm" style={{ color: '#8B6F47' }}>
-                    <div className="flex items-center gap-2">
-                      <Calendar size={16} />
-                      Valid until: {new Date(coupon.validUntil).toLocaleDateString()}
-                    </div>
-                    {coupon.usageLimit && (
-                      <div>
-                        Used: {coupon.usageCount} / {coupon.usageLimit}
-                        {isLimitReached && <span style={{ color: '#ef4444' }}> (Limit Reached)</span>}
-                      </div>
-                    )}
-                    {coupon.minOrderAmount > 0 && (
-                      <div>Min Order: ₹{coupon.minOrderAmount}</div>
-                    )}
-                  </div>
-                  {isExpired && (
-                    <p className="text-sm mt-2" style={{ color: '#ef4444' }}>
-                      ⚠️ Expired
-                    </p>
-                  )}
                 </div>
-
+                
                 <div
-                  className="px-5 py-2 rounded-full uppercase tracking-widest text-sm font-bold"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg mb-3"
                   style={{
-                    fontFamily: 'var(--font-heading)',
-                    background: coupon.isActive
-                      ? 'linear-gradient(135deg, #B87333, #CD7F32)'
+                    background: coupon.isActive && !isExpired
+                      ? 'rgba(94, 125, 76, 0.3)'
                       : 'rgba(139, 111, 71, 0.3)',
-                    color: coupon.isActive ? '#000000' : '#8B6F47',
-                    border: !coupon.isActive ? '2px solid #8B6F47' : 'none',
+                    border: `2px solid ${coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47'}`,
                   }}
                 >
-                  {coupon.isActive ? 'ACTIVE' : 'INACTIVE'}
+                  <Percent size={16} style={{ color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47' }} />
+                  <span className="text-base font-bold" style={{ color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                    {coupon.discountPercentage}% OFF
+                  </span>
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              {/* Description */}
+              <p className="text-sm mb-4 line-clamp-2" style={{ color: '#D4A574' }}>
+                {coupon.description || "No description"}
+              </p>
+
+              {/* Details */}
+              <div className="space-y-2 mb-4 text-xs" style={{ color: '#8B6F47' }}>
+                <div className="flex items-center gap-2">
+                  <Calendar size={14} />
+                  <span>Valid until: {new Date(coupon.validUntil).toLocaleDateString()}</span>
+                </div>
+                {coupon.usageLimit && (
+                  <div>
+                    Used: {coupon.usageCount} / {coupon.usageLimit}
+                    {isLimitReached && <span style={{ color: '#ef4444' }}> (Full)</span>}
+                  </div>
+                )}
+                {coupon.minOrderAmount > 0 && (
+                  <div>Min Order: ₹{coupon.minOrderAmount}</div>
+                )}
+                {isExpired && (
+                  <p className="text-red-400 font-semibold">
+                    ⚠️ Expired
+                  </p>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2 mt-auto">
                 <button
                   onClick={() => handleToggleActive(coupon)}
-                  className="btn btn-secondary flex-1"
+                  className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                  style={{
+                    background: coupon.isActive
+                      ? 'rgba(220, 38, 38, 0.2)'
+                      : 'rgba(94, 125, 76, 0.3)',
+                    border: `2px solid ${coupon.isActive ? 'rgba(220, 38, 38, 0.5)' : 'rgba(94, 125, 76, 0.5)'}`,
+                    color: coupon.isActive ? '#FCA5A5' : '#5E7D4C',
+                    fontFamily: 'var(--font-heading)',
+                  }}
                 >
                   {coupon.isActive ? 'DEACTIVATE' : 'ACTIVATE'}
                 </button>
                 <button
                   onClick={() => handleEdit(coupon)}
-                  className="btn btn-secondary"
+                  className="py-2 px-3 rounded-lg transition-all hover:scale-105"
+                  style={{
+                    background: 'rgba(184, 115, 51, 0.2)',
+                    border: '2px solid rgba(184, 115, 51, 0.4)',
+                    color: '#D4A574',
+                  }}
                 >
-                  <Edit2 size={18} />
+                  <Edit2 size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(coupon._id)}
-                  className="btn"
+                  className="py-2 px-3 rounded-lg transition-all hover:scale-105"
                   style={{
                     background: 'rgba(220, 38, 38, 0.2)',
                     border: '2px solid rgba(220, 38, 38, 0.5)',
                     color: '#FCA5A5',
                   }}
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

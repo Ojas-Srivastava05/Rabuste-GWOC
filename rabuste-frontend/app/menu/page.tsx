@@ -130,9 +130,12 @@ export default function MenuPage() {
   const [additionCount, setAdditionCount] = useState(0);
 
   useEffect(() => {
-    fetchMenu();
-    fetchCart();
-    fetchAIDiscount();
+    // Parallel fetch for better performance
+    Promise.all([
+      fetchMenu(),
+      fetchCart(),
+      fetchAIDiscount(),
+    ]).catch(err => console.error('Failed to fetch initial data:', err));
     
     // Load addition count from session storage
     const count = sessionStorage.getItem('additionCount');
@@ -166,7 +169,10 @@ export default function MenuPage() {
 
   async function fetchMenu() {
     try {
-      const res = await fetch("/api/menu");
+      const res = await fetch("/api/menu", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       setMenu(data);
     } catch (err) {
@@ -176,7 +182,10 @@ export default function MenuPage() {
 
   async function fetchCart() {
     try {
-      const res = await fetch("/api/cart");
+      const res = await fetch("/api/cart", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       setCart(data);
     } catch (err) {
@@ -186,7 +195,10 @@ export default function MenuPage() {
 
   async function fetchAIDiscount() {
     try {
-      const res = await fetch("/api/ai-discount");
+      const res = await fetch("/api/ai-discount", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       // Ensure discountItemId is converted to string
       setAiDiscount({

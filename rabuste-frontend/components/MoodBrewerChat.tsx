@@ -168,6 +168,8 @@ export default function MoodBrewerChat() {
         border: '2px solid rgba(184, 115, 51, 0.4)',
         backdropFilter: 'blur(20px)',
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(184, 115, 51, 0.15)',
+        paddingTop: '2rem',
+        marginTop: '1rem',
       }}
     >
       {/* Subtle Copper Glow - Top */}
@@ -179,7 +181,7 @@ export default function MoodBrewerChat() {
       />
       
       {/* Header */}
-      <div className="text-center space-y-2 relative z-10">
+      <div className="text-center space-y-2 relative z-10" style={{ paddingTop: '1rem' }}>
         <div className="relative inline-block">
           {/* Metallic Glow */}
           <div 

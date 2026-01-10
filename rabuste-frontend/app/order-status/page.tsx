@@ -356,6 +356,7 @@ export default function OrderStatusPage() {
   const [gameStats, setGameStats] = useState({ memory: 0, trivia: 0, origin: 0 });
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [completedOrdersVisible, setCompletedOrdersVisible] = useState(3);
 
   useEffect(() => {
     fetchOrders();
@@ -918,7 +919,7 @@ export default function OrderStatusPage() {
                   </div>
                   
                   <AnimatePresence>
-                    {completedOrders.map((order, index) => (
+                    {completedOrders.slice(0, completedOrdersVisible).map((order, index) => (
                       <motion.div
                         key={order._id}
                         initial={{ opacity: 0, y: 20 }}
@@ -1123,6 +1124,29 @@ export default function OrderStatusPage() {
                       </motion.div>
                     ))}
                   </AnimatePresence>
+                  
+                  {/* View More Button */}
+                  {completedOrders.length > completedOrdersVisible && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-center mt-6"
+                    >
+                      <button
+                        onClick={() => setCompletedOrdersVisible(prev => prev + 3)}
+                        className="px-8 py-4 rounded-lg transition-all hover:scale-105 font-bold uppercase tracking-wide"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(94, 125, 76, 0.3), rgba(94, 125, 76, 0.2))',
+                          border: '2px solid rgba(94, 125, 76, 0.5)',
+                          color: '#5E7D4C',
+                          fontFamily: 'var(--font-heading)',
+                          letterSpacing: '0.1em',
+                        }}
+                      >
+                        View More ({completedOrders.length - completedOrdersVisible} remaining)
+                      </button>
+                    </motion.div>
+                  )}
                 </div>
               )}
             </div>
