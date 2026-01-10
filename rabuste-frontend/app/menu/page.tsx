@@ -593,67 +593,116 @@ export default function MenuPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex flex-wrap gap-3"
+            className="mb-6 space-y-4"
           >
-            <button
-              onClick={() => setQuickFilter("all")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "all" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "all" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "all" ? '#D4A574' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              ALL ITEMS
-            </button>
-            <button
-              onClick={() => setQuickFilter("bestseller")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Star size={16} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
-              BESTSELLERS
-            </button>
-            <button
-              onClick={() => setQuickFilter("trending")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Flame size={16} />
-              TRENDING
-            </button>
-            <button
-              onClick={() => setQuickFilter("limited")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Clock size={16} />
-              LIMITED STOCK
-            </button>
+            {/* Special Filters Row */}
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:flex-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <button
+                onClick={() => {
+                  setQuickFilter("all");
+                  setActiveCategory("All");
+                }}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "all" && activeCategory === "All" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                ALL ITEMS
+              </button>
+              <button
+                onClick={() => setQuickFilter("bestseller")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Star size={16} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
+                BESTSELLERS
+              </button>
+              <button
+                onClick={() => setQuickFilter("trending")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Flame size={16} />
+                TRENDING
+              </button>
+              <button
+                onClick={() => setQuickFilter("limited")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Clock size={16} />
+                LIMITED STOCK
+              </button>
+            </div>
+
+            {/* Category Filters Row */}
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div 
+                  className="h-px flex-1"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.3))' }}
+                />
+                <span 
+                  className="text-xs uppercase tracking-wider whitespace-nowrap"
+                  style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                >
+                  BROWSE BY CATEGORY
+                </span>
+                <div 
+                  className="h-px flex-1"
+                  style={{ background: 'linear-gradient(90deg, rgba(184, 115, 51, 0.3), transparent)' }}
+                />
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {categories.filter(c => c !== "All").map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => {
+                      setActiveCategory(category);
+                      setQuickFilter("all");
+                    }}
+                    className={`px-4 py-2 transition-all whitespace-nowrap flex-shrink-0`}
+                    style={{
+                      background: activeCategory === category ? 'rgba(205, 127, 50, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                      border: `2px solid ${activeCategory === category ? 'rgba(205, 127, 50, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                      color: activeCategory === category ? '#F5F1E8' : '#B87333',
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: '14px',
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
           {/* Cart Float Button */}
