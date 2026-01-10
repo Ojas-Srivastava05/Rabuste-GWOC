@@ -175,7 +175,7 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 9999,
+        zIndex: 99999,
         background: '#000000',
       }}
     >
@@ -186,9 +186,10 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 10000,
+          zIndex: 100000,
           padding: '20px',
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)',
+          paddingTop: '100px', // Add extra padding to account for navbar
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -216,19 +217,34 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(184, 115, 51, 0.2)',
-            border: '1px solid #B87333',
-            color: '#FFFEF9',
-            padding: '12px',
+            background: 'rgba(184, 115, 51, 1)',
+            border: '3px solid #D4A574',
+            color: '#000000',
+            padding: '14px 18px',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 6px 20px rgba(184, 115, 51, 0.8), 0 0 30px rgba(212, 165, 116, 0.5)',
+            zIndex: 100001,
+            position: 'relative',
+            fontWeight: 'bold',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)';
+            e.currentTarget.style.background = 'linear-gradient(135deg, #D4A574 0%, #B87333 100%)';
+            e.currentTarget.style.transform = 'scale(1.15)';
+            e.currentTarget.style.boxShadow = '0 8px 25px rgba(184, 115, 51, 1), 0 0 40px rgba(212, 165, 116, 0.8)';
+            e.currentTarget.style.borderColor = '#FFFEF9';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(184, 115, 51, 0.2)';
+            e.currentTarget.style.background = 'rgba(184, 115, 51, 1)';
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(184, 115, 51, 0.8), 0 0 30px rgba(212, 165, 116, 0.5)';
+            e.currentTarget.style.borderColor = '#D4A574';
           }}
+          aria-label="Close VR Tour"
         >
           <X style={{ width: 24, height: 24 }} />
         </button>
@@ -240,6 +256,8 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
         style={{
           width: '100%',
           height: '100%',
+          position: 'relative',
+          zIndex: 99999,
         }}
       />
 
@@ -287,9 +305,9 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
           bottom: 0,
           left: 0,
           right: 0,
-          zIndex: 10000,
+          zIndex: 100000,
           padding: '20px',
-          background: 'linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0) 100%)',
         }}
       >
         <div style={{

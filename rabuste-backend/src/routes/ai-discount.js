@@ -12,9 +12,10 @@ router.get("/", async (req, res) => {
     }
     
     // Return only the public discount information
+    // Convert ObjectId to string for consistent comparison
     res.json({
       enableDiscountAI: config.enableDiscountAI || false,
-      discountItemId: config.discountItemId || null,
+      discountItemId: config.discountItemId ? String(config.discountItemId) : null,
       discountPercent: config.discountPercent || 0,
     });
   } catch (err) {
