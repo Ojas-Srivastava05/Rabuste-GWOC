@@ -190,6 +190,14 @@ export default function AdminPage() {
             <span className="text-sm font-medium">Coupons</span>
           </a>
 
+          <a
+            href="/admin/instagram"
+            className="group bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white px-4 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-[#B87333]/30 hover:border-[#B87333]/50 flex items-center justify-center gap-2"
+          >
+            <span className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span className="text-sm font-medium">Instagram</span>
+          </a>
+
         </div>
       </div>
     </div>

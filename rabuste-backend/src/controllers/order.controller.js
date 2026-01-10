@@ -1,6 +1,6 @@
 import Order from "../models/order.js";
 import Store from "../models/store.js";
-import { calculateDistance } from "../utils/distance.utils.js";
+import { calculateDistance, calculateTimeToCafe } from "../utils/distance.utils.js";
 
 /* USER places order */
 export const placeOrder = async (req, res) => {
@@ -35,6 +35,11 @@ export const placeOrder = async (req, res) => {
       }
     });
 
+    // Calculate estimated time to reach cafe
+    const estimatedTimeToCafe = calculateTimeToCafe(minDistance);
+    // Default preparation time based on order size (5 minutes base + 2 minutes per item)
+    const defaultPreparationTime = 5 + (items.length * 2);
+
     const order = await Order.create({
       userId,
       items,
@@ -47,7 +52,10 @@ export const placeOrder = async (req, res) => {
       couponCode,
       couponDiscount,
       paymentId,
-      paymentStatus
+      paymentStatus,
+      distanceFromCafe: minDistance,
+      estimatedTimeToCafe,
+      preparationTime: defaultPreparationTime,
     });
 
     res.status(201).json({

@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, Loader2, Ticket } from "lucide-react";
-import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
+import { getCurrentLocation, calculateDistance, calculateTimeToCafe, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import { trackOrderStatusUpdate } from "@/lib/analytics";
 
 interface OrderItem {
@@ -29,6 +29,9 @@ interface Order {
     distance?: number;
     estimatedTime?: number;
   };
+  estimatedTimeToCafe?: number; // in minutes
+  preparationTime?: number; // in minutes, admin configurable
+  distanceFromCafe?: number; // in km
 }
 
 export default function AdminOrdersPage() {
@@ -37,6 +40,8 @@ export default function AdminOrdersPage() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'completed'>('all');
+  const [editingPrepTime, setEditingPrepTime] = useState<{ [orderId: string]: boolean }>({});
+  const [prepTimeValues, setPrepTimeValues] = useState<{ [orderId: string]: string }>({});
 
   const fetchOrders = async (showRefreshing = false) => {
     if (showRefreshing) setIsRefreshing(true);
@@ -124,28 +129,52 @@ export default function AdminOrdersPage() {
       setOrders((prev) =>
         prev.map((order) =>
           order._id === updated._id
-            ? { ...order, status: updated.status }
+            ? { ...order, status: updated.status, ...updated }
             : order
         )
       );
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
+  const updatePreparationTime = async (orderId: string) => {
+    const token = localStorage.getItem("token");
+    const prepTime = prepTimeValues[orderId];
     
-    // Set up polling for real-time updates every 10 seconds
-    const pollInterval = setInterval(() => {
-      fetchOrders();
-    }, 10000);
+    if (!prepTime || isNaN(Number(prepTime)) || Number(prepTime) < 0) {
+      alert("Please enter a valid positive number for preparation time");
+      return;
+    }
 
-    // Request location permission
-    requestLocationPermission();
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ preparationTime: Number(prepTime) }),
+      });
 
-    return () => {
-      clearInterval(pollInterval);
-    };
-  }, []);
+      if (res.ok) {
+        const updated = await res.json();
+        setOrders((prev) =>
+          prev.map((order) =>
+            order._id === updated._id
+              ? { ...order, preparationTime: updated.preparationTime }
+              : order
+          )
+        );
+        setEditingPrepTime({ ...editingPrepTime, [orderId]: false });
+        setPrepTimeValues({ ...prepTimeValues, [orderId]: "" });
+      } else {
+        const error = await res.json();
+        alert(error.error || "Failed to update preparation time");
+      }
+    } catch (err) {
+      console.error("Failed to update preparation time:", err);
+      alert("Failed to update preparation time");
+    }
+  };
 
   const requestLocationPermission = async () => {
     try {
@@ -167,8 +196,8 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const calculateOrderETA = async (order: Order) => {
-    if (locationPermission !== 'granted') return;
+  const calculateOrderETA = useCallback(async (order: Order) => {
+    if (locationPermission !== 'granted' || order.distanceFromCafe) return;
 
     try {
       const userLocation = await getCurrentLocation();
@@ -178,7 +207,7 @@ export default function AdminOrdersPage() {
         CAFE_LOCATION.lat,
         CAFE_LOCATION.lng
       );
-      const estimatedTime = calculateDeliveryTime(distance);
+      const estimatedTime = calculateTimeToCafe(distance);
 
       // Update order with location data
       setOrders((prevOrders) =>
@@ -191,6 +220,8 @@ export default function AdminOrdersPage() {
                   distance,
                   estimatedTime,
                 },
+                distanceFromCafe: distance,
+                estimatedTimeToCafe: estimatedTime,
               }
             : o
         )
@@ -198,18 +229,34 @@ export default function AdminOrdersPage() {
     } catch (error) {
       console.error("Error calculating ETA:", error);
     }
-  };
+  }, [locationPermission]);
+
+  useEffect(() => {
+    fetchOrders();
+    
+    // Set up polling for real-time updates every 10 seconds
+    const pollInterval = setInterval(() => {
+      fetchOrders();
+    }, 10000);
+
+    // Request location permission
+    requestLocationPermission();
+
+    return () => {
+      clearInterval(pollInterval);
+    };
+  }, []);
 
   useEffect(() => {
     // Calculate ETA for all pending orders when location permission is granted
     if (locationPermission === 'granted') {
       orders.filter(o => o.status === 'pending').forEach(order => {
-        if (!order.userLocation) {
+        if (!order.userLocation && !order.distanceFromCafe) {
           calculateOrderETA(order);
         }
       });
     }
-  }, [orders, locationPermission]);
+  }, [orders, locationPermission, calculateOrderETA]);
 
   const pendingOrders = orders.filter((o) => o.status === "pending");
   const completedOrders = orders.filter((o) => o.status === "completed");
@@ -449,25 +496,115 @@ export default function AdminOrdersPage() {
                   {new Date(order.createdAt).toLocaleString()}
                 </div>
                 
-                {/* Location-based ETA */}
-                {order.status === 'pending' && order.userLocation && (
-                  <div className="mt-3 flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2 text-sm" style={{ color: '#B87333' }}>
-                      <Navigation size={16} />
-                      <span>{formatDistance(order.userLocation.distance!)}</span>
+                {/* Location-based ETA and Time Management */}
+                {order.status === 'pending' && (
+                  <div className="mt-4 space-y-3">
+                    {/* Distance and Time to Cafe */}
+                    {(order.distanceFromCafe || order.estimatedTimeToCafe) && (
+                      <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.1)', border: '1px solid rgba(184, 115, 51, 0.3)' }}>
+                        {order.distanceFromCafe && (
+                          <div className="flex items-center gap-2 text-sm" style={{ color: '#B87333' }}>
+                            <Navigation size={16} />
+                            <span className="font-semibold">Distance: {formatDistance(order.distanceFromCafe)}</span>
+                          </div>
+                        )}
+                        {order.estimatedTimeToCafe && (
+                          <div className="flex items-center gap-2 text-sm" style={{ color: '#D4A574' }}>
+                            <Clock size={16} />
+                            <span className="font-semibold">Time to reach cafe: ~{order.estimatedTimeToCafe} min</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Preparation Time Editor */}
+                    <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(94, 125, 76, 0.1)', border: '1px solid rgba(94, 125, 76, 0.3)' }}>
+                      <div className="flex items-center gap-2 flex-1">
+                        <Clock size={16} style={{ color: '#5E7D4C' }} />
+                        <span className="text-sm font-semibold" style={{ color: '#5E7D4C' }}>
+                          Preparation Time:
+                        </span>
+                        {editingPrepTime[order._id] ? (
+                          <div className="flex items-center gap-2 flex-1">
+                            <input
+                              type="number"
+                              min="0"
+                              value={prepTimeValues[order._id] ?? order.preparationTime ?? ''}
+                              onChange={(e) => setPrepTimeValues({ ...prepTimeValues, [order._id]: e.target.value })}
+                              className="px-3 py-1 rounded text-sm w-20"
+                              style={{
+                                background: '#FFFDF2',
+                                border: '2px solid rgba(94, 125, 76, 0.5)',
+                                color: '#2e211a',
+                              }}
+                              placeholder="5"
+                              autoFocus
+                            />
+                            <span className="text-xs" style={{ color: '#8B6F47' }}>min</span>
+                            <button
+                              onClick={() => updatePreparationTime(order._id)}
+                              className="px-3 py-1 rounded text-xs font-semibold transition-all hover:scale-105"
+                              style={{
+                                background: 'linear-gradient(135deg, #5E7D4C, #4A6741)',
+                                color: '#FFFFFF',
+                              }}
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingPrepTime({ ...editingPrepTime, [order._id]: false });
+                                setPrepTimeValues({ ...prepTimeValues, [order._id]: "" });
+                              }}
+                              className="px-3 py-1 rounded text-xs font-semibold transition-all hover:scale-105"
+                              style={{
+                                background: 'rgba(139, 111, 71, 0.2)',
+                                border: '1px solid rgba(139, 111, 71, 0.4)',
+                                color: '#8B6F47',
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="text-lg font-bold" style={{ color: '#5E7D4C' }}>
+                              {order.preparationTime ?? 'Not set'} min
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingPrepTime({ ...editingPrepTime, [order._id]: true });
+                                setPrepTimeValues({ ...prepTimeValues, [order._id]: String(order.preparationTime ?? '') });
+                              }}
+                              className="px-3 py-1 rounded text-xs font-semibold transition-all hover:scale-105 ml-2"
+                              style={{
+                                background: 'rgba(94, 125, 76, 0.2)',
+                                border: '1px solid rgba(94, 125, 76, 0.4)',
+                                color: '#5E7D4C',
+                              }}
+                            >
+                              Edit
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div
-                      className="px-3 py-1 rounded-full text-xs"
-                      style={{
-                        background: 'rgba(94, 125, 76, 0.2)',
-                        border: '1px solid rgba(94, 125, 76, 0.4)',
-                        color: '#5E7D4C',
-                        fontFamily: 'var(--font-heading)',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      ETA: ~{order.userLocation.estimatedTime} min
-                    </div>
+
+                    {/* Total Estimated Time */}
+                    {(order.estimatedTimeToCafe || order.preparationTime) && (
+                      <div className="flex items-center gap-2 p-3 rounded-lg" style={{ background: 'linear-gradient(135deg, rgba(94, 125, 76, 0.2), rgba(184, 115, 51, 0.1))', border: '2px solid rgba(94, 125, 76, 0.5)' }}>
+                        <Clock size={18} style={{ color: '#5E7D4C' }} />
+                        <span className="text-sm font-bold uppercase tracking-wider" style={{ color: '#5E7D4C', fontFamily: 'var(--font-heading)' }}>
+                          Total Estimated Time:
+                        </span>
+                        <span className="text-xl font-bold" style={{ color: '#FFFFFF' }}>
+                          {(order.preparationTime || 0) + (order.estimatedTimeToCafe || 0)} min
+                        </span>
+                        <span className="text-xs" style={{ color: '#8B6F47' }}>
+                          (Preparation: {order.preparationTime || 0} min + Travel: {order.estimatedTimeToCafe || 0} min)
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

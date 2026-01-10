@@ -20,16 +20,28 @@ export default function HeroRevamped() {
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
 
   useEffect(() => {
+    // Ensure page starts at top on initial load
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <section
-  ref={containerRef}
-  className="relative min-h-screen flex items-center justify-center overflow-hidden"
-  style={{ background: 'transparent' }}
->
+      ref={containerRef}
+      id="hero"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      style={{ 
+        background: 'transparent',
+        paddingTop: '0',
+        marginTop: '0',
+        scrollMarginTop: '0'
+      }}
+    >
 
       {/* Balatro Background Effect */}
       <Balatro />

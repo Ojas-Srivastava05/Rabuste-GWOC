@@ -58,6 +58,20 @@ const OrderSchema = new Schema(
       default: "",
     },
 
+    // Time estimation fields
+    estimatedTimeToCafe: {
+      type: Number, // in minutes
+      default: null,
+    },
+    preparationTime: {
+      type: Number, // in minutes, admin configurable
+      default: null,
+    },
+    distanceFromCafe: {
+      type: Number, // in km
+      default: null,
+    },
+
     status: {
       type: String,
       enum: ["pending", "completed"],

@@ -28,7 +28,21 @@ const orderSchema=new mongoose.Schema(
       type:mongoose.Schema.Types.ObjectId,
       ref:"Store",
     },
-     pickupSlot: String,
+    pickupSlot: String,
+    
+    // Time estimation fields
+    estimatedTimeToCafe: {
+      type: Number, // in minutes
+      default: null,
+    },
+    preparationTime: {
+      type: Number, // in minutes, admin configurable
+      default: null,
+    },
+    distanceFromCafe: {
+      type: Number, // in km
+      default: null,
+    },
 
     status: {
       type: String,

@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { ReactNode, useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import { User, LogOut, ShoppingBag, Settings, Edit } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 type NavButtonProps = {
   href?: string;
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const { user, logout } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function Navbar() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
@@ -41,9 +43,25 @@ export default function Navbar() {
 
     if (showDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, [showDropdown]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [open]);
 
   const handleLogout = () => {
     logout();
@@ -110,7 +128,12 @@ export default function Navbar() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((s) => !s)}
-            className="inline-flex items-center justify-center w-10 h-10 bg-transparent border-2 border-[#B87333] text-[#B87333] hover:bg-[#B87333] hover:text-[#000000] transition-all duration-300"
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              setOpen((s) => !s);
+            }}
+            className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-transparent border-2 border-[#B87333] text-[#B87333] hover:bg-[#B87333] hover:text-[#000000] active:bg-[#B87333] active:text-[#000000] transition-all duration-300 touch-manipulation"
+            style={{ minWidth: '44px', minHeight: '44px' }}
             type="button"
           >
             <svg
@@ -143,7 +166,19 @@ export default function Navbar() {
           style={{ left: "50%" }}
           aria-hidden={false}
         >
-          <Link href="/" aria-label="Home">
+          <Link 
+            href="/" 
+            aria-label="Home"
+            onClick={(e) => {
+              // If already on home page, prevent navigation and just scroll to top
+              if (pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+              }
+            }}
+          >
             <div 
               className={`flex items-center justify-center cursor-pointer transition-all duration-300 ${
                 scrolled ? 'h-9 w-9 md:h-10 md:w-10' : 'h-10 w-10 md:h-12 md:w-12'
@@ -354,6 +389,21 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Mobile menu backdrop */}
+      <AnimatePresence>
+        {open && (
+          <div
+            className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={() => setOpen(false)}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              setOpen(false);
+            }}
+            style={{ touchAction: "none" }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Mobile menu overlay */}
       <div

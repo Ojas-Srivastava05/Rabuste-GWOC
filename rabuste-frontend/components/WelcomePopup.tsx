@@ -11,12 +11,17 @@ export default function WelcomePopup({ userName, onClose }: WelcomePopupProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
+    // Prevent body scroll when popup is visible
+    document.body.style.overflow = 'hidden';
     // Auto-close after 8 seconds
     const timer = setTimeout(() => {
       handleClose();
     }, 8000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      document.body.style.overflow = 'unset';
+    };
   }, []);
 
   const handleClose = () => {
@@ -37,7 +42,7 @@ export default function WelcomePopup({ userName, onClose }: WelcomePopupProps) {
     <AnimatePresence>
       {isVisible && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - tap to close on mobile */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -45,6 +50,11 @@ export default function WelcomePopup({ userName, onClose }: WelcomePopupProps) {
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-md"
             onClick={handleClose}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleClose();
+            }}
+            style={{ touchAction: "none" }}
           />
 
           {/* Popup */}
@@ -62,11 +72,12 @@ export default function WelcomePopup({ userName, onClose }: WelcomePopupProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div 
-              className="relative overflow-hidden p-10 md:p-14"
+              className="relative overflow-hidden p-6 sm:p-8 md:p-10 lg:p-14 max-h-[90vh] overflow-y-auto"
               style={{
                 background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95))',
                 border: '3px solid rgba(184, 115, 51, 0.4)',
                 boxShadow: '0 30px 100px rgba(0, 0, 0, 0.9), 0 0 80px rgba(184, 115, 51, 0.3)',
+                WebkitOverflowScrolling: 'touch',
               }}
             >
               {/* Animated Background Glow */}
@@ -87,13 +98,28 @@ export default function WelcomePopup({ userName, onClose }: WelcomePopupProps) {
                 }}
               />
 
-              {/* Close Button */}
+              {/* Close Button - mobile-friendly */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 z-10 p-2 transition-all duration-300 hover:rotate-90"
-                style={{ color: '#B87333' }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleClose();
+                }}
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 rounded-full transition-all duration-300 hover:rotate-90 active:scale-95 touch-manipulation"
+                style={{ 
+                  color: '#B87333',
+                  padding: '10px',
+                  minWidth: '44px',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'rgba(184, 115, 51, 0.1)',
+                  border: '1px solid rgba(184, 115, 51, 0.3)',
+                }}
+                aria-label="Close welcome popup"
               >
-                <X size={24} />
+                <X size={isVisible ? 20 : 20} />
               </button>
 
               {/* Content */}

@@ -39,6 +39,18 @@ function toRadians(degrees: number): number {
 }
 
 /**
+ * Calculate estimated time to reach cafe based on distance
+ * Assumes average speed of 30 km/h for city traffic
+ * Returns time in minutes (just travel time, no preparation)
+ */
+export function calculateTimeToCafe(distanceKm: number): number {
+  if (!distanceKm || distanceKm <= 0) return 0;
+  const averageSpeedKmh = 30; // Average speed in city traffic
+  const travelTimeMinutes = (distanceKm / averageSpeedKmh) * 60;
+  return Math.ceil(travelTimeMinutes); // Round up to nearest minute
+}
+
+/**
  * Calculate estimated delivery time based on distance
  * Assumes average speed of 30 km/h for delivery
  * Returns time in minutes
