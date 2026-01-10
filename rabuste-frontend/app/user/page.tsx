@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@/contexts/UserContext";
-import { TrendingUp, ShoppingBag, Heart, Clock, Package } from "lucide-react";
+import { TrendingUp, ShoppingBag, Heart, Clock, Package, Mail, Phone, MessageCircle, HelpCircle } from "lucide-react";
 
 type DashboardData = {
   stats: {
@@ -247,6 +247,98 @@ export default function UserDashboard() {
             <span className="w-2 h-2 rounded-full bg-[#B87333] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <span className="text-sm font-medium">Available Coupons</span>
           </a>
+        </div>
+      </div>
+
+      {/* Help & Support Section */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <HelpCircle size={20} style={{ color: '#B87333' }} />
+          <h2 className="text-lg font-semibold text-[#2e211a]" style={{ fontFamily: 'var(--font-heading)' }}>
+            Need Help?
+          </h2>
+        </div>
+        
+        <div className="bg-gradient-to-br from-[#B87333]/10 to-[#CD7F32]/10 p-6 rounded-2xl border border-[#B87333]/30">
+          <p className="text-sm text-[#6b4a2f] mb-6">
+            Having issues with your order or need assistance? We're here to help! Reach out to us through any of the following channels:
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Email Support */}
+            <a
+              href="mailto:support@rabuste.com"
+              className="group bg-[#FFFDF2] p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center flex-shrink-0">
+                  <Mail size={18} style={{ color: '#FFF' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-[#2e211a] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
+                    Email Us
+                  </h3>
+                  <p className="text-xs text-[#8B6F47] break-all">support@rabuste.com</p>
+                  <p className="text-xs text-[#6b4a2f] mt-2 opacity-70">Response within 24 hours</p>
+                </div>
+              </div>
+            </a>
+
+            {/* Phone Support */}
+            <a
+              href="tel:+911234567890"
+              className="group bg-[#FFFDF2] p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5E7D4C] to-[#4A6339] flex items-center justify-center flex-shrink-0">
+                  <Phone size={18} style={{ color: '#FFF' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-[#2e211a] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
+                    Call Us
+                  </h3>
+                  <p className="text-xs text-[#8B6F47]">+91 123 456 7890</p>
+                  <p className="text-xs text-[#6b4a2f] mt-2 opacity-70">Mon-Sat, 9 AM - 8 PM</p>
+                </div>
+              </div>
+            </a>
+
+            {/* WhatsApp Support */}
+            <a
+              href="https://wa.me/911234567890?text=Hi%20Rabuste,%20I%20need%20help%20with"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-[#FFFDF2] p-4 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#25D366] to-[#128C7E] flex items-center justify-center flex-shrink-0">
+                  <MessageCircle size={18} style={{ color: '#FFF' }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-semibold text-[#2e211a] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>
+                    WhatsApp
+                  </h3>
+                  <p className="text-xs text-[#8B6F47]">Chat with us</p>
+                  <p className="text-xs text-[#6b4a2f] mt-2 opacity-70">Instant support</p>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          {/* Feedback Link */}
+          <div className="mt-6 pt-6 border-t border-[#B87333]/20 text-center">
+            <p className="text-xs text-[#6b4a2f] mb-3">
+              Want to share your experience or suggestions?
+            </p>
+            <a
+              href="/feedback"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#3a2618] to-[#2a1a12] text-[#fffbd6] rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-[#B87333]/30 hover:border-[#B87333]/50 text-sm font-medium"
+              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
+            >
+              <MessageCircle size={16} />
+              SUBMIT FEEDBACK
+            </a>
+          </div>
         </div>
       </div>
     </div>
