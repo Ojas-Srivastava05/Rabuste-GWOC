@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
@@ -977,6 +977,24 @@ export default function OrderStatusPage() {
                           </p>
                         </div>
 
+                        {/* Feedback Button */}
+                        <div className="mb-4">
+                          <button
+                            onClick={() => router.push(`/feedback?orderId=${order._id}`)}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:scale-105"
+                            style={{
+                              background: 'rgba(184, 115, 51, 0.2)',
+                              border: '1px solid rgba(184, 115, 51, 0.4)',
+                              color: '#D4A574',
+                            }}
+                          >
+                            <MessageSquare size={16} />
+                            <span className="text-sm font-bold uppercase tracking-wide" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                              Share Feedback
+                            </span>
+                          </button>
+                        </div>
+
                         {/* Order Items */}
                         <div className="space-y-3 mb-6">
                           {order.items.map((item, i) => (
@@ -1070,8 +1088,26 @@ export default function OrderStatusPage() {
                           </span>
                         </div>
 
+                        {/* Feedback Button */}
+                        <div className="mt-6 flex justify-center">
+                          <button
+                            onClick={() => router.push(`/feedback?orderId=${order._id}`)}
+                            className="flex items-center gap-2 px-6 py-3 rounded-xl transition-all hover:scale-105"
+                            style={{
+                              background: 'rgba(184, 115, 51, 0.2)',
+                              border: '2px solid rgba(184, 115, 51, 0.4)',
+                              color: '#D4A574',
+                            }}
+                          >
+                            <MessageSquare size={18} />
+                            <span className="text-sm font-bold uppercase tracking-wide" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                              Share Feedback
+                            </span>
+                          </button>
+                        </div>
+
                         {/* Thank You Message */}
-                        <div className="mt-6 text-center">
+                        <div className="mt-4 text-center">
                           <p className="text-sm" style={{ color: '#8B6F47' }}>
                             Thank you for your order! ❤️
                           </p>

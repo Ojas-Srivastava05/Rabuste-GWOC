@@ -9,6 +9,7 @@ import VRExperienceSection from "@/components/sections/VRExperienceSection";
 import ProcessSectionRevamped from "@/components/sections/ProcessSectionRevamped";
 import CallToAction from "@/components/sections/CallToAction";
 import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import InstagramShowcase from "@/components/sections/InstagramShowcase";
 import ContactSection from "@/components/sections/ContactSection";
 import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
@@ -103,6 +104,11 @@ export default function Home() {
         {/* Social Proof - Customer Testimonials */}
         <SectionTracker sectionName="testimonials">
           <TestimonialsSection />
+        </SectionTracker>
+
+        {/* Instagram Showcase */}
+        <SectionTracker sectionName="instagram_showcase">
+          <InstagramShowcase />
         </SectionTracker>
 
         {/* Contact Section - Get in Touch */}

@@ -178,15 +178,7 @@ export default function ArtGalleryPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen relative" style={{ paddingTop: '100px', paddingBottom: '60px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        {/* Premium Gradient Overlays */}
-        <div 
-          className="fixed inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at top, rgba(184, 115, 51, 0.03), transparent 50%), radial-gradient(ellipse at bottom, rgba(205, 127, 50, 0.02), transparent 50%)',
-            zIndex: 1,
-          }}
-        />
+      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         
         <div className="container px-4 md:px-6 relative z-10">
           {/* Premium Header */}

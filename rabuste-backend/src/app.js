@@ -14,6 +14,7 @@ import adminMenuRoutes from "./routes/admin.menu.routes.js";
 import adminWorkshopRoutes from "./routes/admin.workshop.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import aiDiscountRoutes from "./routes/ai-discount.js";
+import feedbackRoutes from "./routes/feedback.js";
 
 import paymentRoutes from "./routes/payment.routes.js";
 
@@ -81,6 +82,7 @@ app.use("/api/admin",adminMenuRoutes);
 app.use("/api/admin", adminWorkshopRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/ai-discount", aiDiscountRoutes);
+app.use("/api/feedback", feedbackRoutes);
 export default app; 
 
 app.use("/api/payment", paymentRoutes);

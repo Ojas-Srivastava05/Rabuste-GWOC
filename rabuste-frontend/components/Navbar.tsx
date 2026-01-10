@@ -101,6 +101,7 @@ export default function Navbar() {
           <NavButton href="/franchise">FRANCHISE</NavButton>
           <NavButton href="/workshops">WORKSHOP</NavButton>
           <NavButton href="/order-status">MY ORDERS</NavButton>
+          <NavButton href="/feedback">FEEDBACK</NavButton>
         </div>
 
         {/* MOBILE: hamburger on left */}
