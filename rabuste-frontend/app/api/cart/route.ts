@@ -43,7 +43,11 @@ export async function POST(req: Request) {
     const { menuItemId, artItemId, quantity } = await req.json();
 
     // Get AI discount configuration
-    let aiDiscount = { enableDiscountAI: false, discountItemId: null, discountPercent: 0 };
+    let aiDiscount: { enableDiscountAI: boolean; discountItemId: string | null; discountPercent: number } = { 
+      enableDiscountAI: false, 
+      discountItemId: null, 
+      discountPercent: 0 
+    };
     try {
       const discountRes = await fetch('http://localhost:3000/api/ai-discount');
       if (discountRes.ok) {
