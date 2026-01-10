@@ -52,6 +52,8 @@ const UserSchema = new mongoose.Schema({
   // OTP verification
   verificationCode: String,
   verificationCodeExpiry: Date,
+  resetPasswordCode: String,
+  resetPasswordExpiry: Date,
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

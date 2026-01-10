@@ -301,6 +301,13 @@ function AuthForm() {
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
+                <p
+                  onClick={() => router.push("/forgot-password")}
+                  className="text-xs text-[#B87333] cursor-pointer text-center mt-2"
+                >
+                  Forgot Password?
+                </p>
+
               </div>
 
               {!isLogin && (
