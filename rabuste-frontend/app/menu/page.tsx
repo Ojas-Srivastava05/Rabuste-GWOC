@@ -748,7 +748,7 @@ export default function MenuPage() {
           {filtered.length > 0 ? (
             viewMode === "grid" ? (
               activeCategory === "All" ? (
-                // Show category-separated grid view for "All"
+                // Show horizontal scrolling view for "All" category on mobile
                 <div className="space-y-12">
                   {categories.filter(c => c !== "All").map((category) => {
                     const categoryItems = filtered.filter(item => item.category === category);
@@ -787,9 +787,29 @@ export default function MenuPage() {
                           </p>
                         </div>
 
-                        {/* Category Items Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                           {categoryItems.map((item, index) => (
+                        {/* Category Items - Horizontal scrolling on mobile, grid on desktop */}
+                        <div className="md:hidden flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                          {categoryItems.map((item, index) => (
+                            <div key={item._id} className="flex-shrink-0 snap-start" style={{ width: 'calc(50% - 6px)' }}>
+                              <GridMenuItem
+                                item={item}
+                                quantity={getQty(item._id)}
+                                onAdd={() => addToCart(item._id)}
+                                onRemove={() => removeFromCart(item._id)}
+                                index={index}
+                                flags={getItemFlags(item)}
+                                isHighlighted={highlightedItemId === item._id}
+                                hasAIDiscount={hasAIDiscount(item._id)}
+                                discountedPrice={getDiscountedPrice(item)}
+                                originalPrice={getOriginalPrice(item)}
+                                discountPercent={aiDiscount.discountPercent}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {/* Desktop grid view */}
+                        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {categoryItems.map((item, index) => (
                             <GridMenuItem
                               key={item._id}
                               item={item}
@@ -811,8 +831,8 @@ export default function MenuPage() {
                   })}
                 </div>
               ) : (
-                // Show normal grid for specific category
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                // Show grid for specific category (2 cols on mobile, more on desktop)
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                   {filtered.map((item, index) => (
                     <GridMenuItem
                       key={item._id}
@@ -1093,7 +1113,7 @@ function GridMenuItem({
         scale: { duration: 0.6, ease: "easeOut" }
       }}
       whileHover={{ y: -4 }}
-      className="group relative"
+      className="group relative flex flex-col h-full"
       style={{
         ...(isHighlighted ? {
           backgroundImage: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
@@ -1142,7 +1162,7 @@ function GridMenuItem({
         </>
       )}
       {/* Image */}
-      <div className="aspect-[4/3] overflow-hidden relative">
+      <div className="w-full h-40 overflow-hidden relative flex-shrink-0">
         <img
           src={item.image}
           alt={item.name}
@@ -1214,7 +1234,7 @@ function GridMenuItem({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <h3
           className="text-base mb-1 line-clamp-1"
           style={{
@@ -1225,12 +1245,12 @@ function GridMenuItem({
         >
           {item.name}
         </h3>
-        <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47', lineHeight: 1.4 }}>
+        <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47', lineHeight: 1.4, minHeight: '32px' }}>
           {item.description}
         </p>
 
         {/* Activity Indicators */}
-        <div className="flex flex-wrap gap-2 mb-3 text-xs">
+        <div className="flex flex-wrap gap-2 mb-3 text-xs min-h-[20px]">
           {flags.soldToday && (
             <div className="flex items-center gap-1" style={{ color: '#B87333' }}>
               <TrendingUp size={12} />
@@ -1246,7 +1266,7 @@ function GridMenuItem({
         </div>
 
         {/* Price and Action */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-auto">
           <div className="flex flex-col">
             {hasAIDiscount ? (
               <>
