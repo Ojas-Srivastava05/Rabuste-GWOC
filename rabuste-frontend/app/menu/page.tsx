@@ -339,7 +339,7 @@ export default function MenuPage() {
         '@type': 'Offer',
         price: item.price,
         priceCurrency: 'INR',
-        availability: item.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        availability: 'https://schema.org/InStock',
         url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/menu#item-${item._id}`,
       },
       brand: {

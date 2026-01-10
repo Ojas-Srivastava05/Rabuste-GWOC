@@ -8,6 +8,7 @@ import BackendWarmer from "@/components/BackendWarmer";
 import StructuredData from "@/components/StructuredData";
 import PageViewTracker from "@/components/PageViewTracker";
 import { UserProvider } from "@/contexts/UserContext";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Robusta Coffee | Premium 2X Caffeine Coffee Online | Rabuste",
@@ -94,6 +95,7 @@ export default function RootLayout({
           <ScrollToTop />
           {children}
         </UserProvider>
+        <Analytics />
       </body>
     </html>
   );

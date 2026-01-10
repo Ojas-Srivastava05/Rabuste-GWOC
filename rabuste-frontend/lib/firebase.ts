@@ -1,6 +1,6 @@
 // Firebase Analytics Configuration
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAnalytics, Analytics } from 'firebase/analytics';
+import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 
 // Firebase configuration - Uses environment variables
 const firebaseConfig = {
@@ -17,8 +17,12 @@ const firebaseConfig = {
 let app: FirebaseApp | undefined;
 let analytics: Analytics | null = null;
 
-if (typeof window !== 'undefined') {
-  // Only initialize on client side
+// Function to get analytics instance (ensures it's initialized)
+function getAnalyticsInstance(): Analytics | null {
+  if (typeof window === 'undefined') return null;
+  
+  if (analytics) return analytics;
+  
   try {
     if (getApps().length === 0) {
       app = initializeApp(firebaseConfig);
@@ -26,13 +30,27 @@ if (typeof window !== 'undefined') {
       app = getApps()[0];
     }
 
-    // Initialize Analytics synchronously (works in all modern browsers)
     if (app) {
       analytics = getAnalytics(app);
+      return analytics;
     }
   } catch (error) {
     console.warn('Firebase Analytics initialization error:', error);
   }
+  
+  return null;
 }
 
-export { app, analytics };
+// Initialize on client side
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      getAnalyticsInstance();
+    }
+  }).catch(() => {
+    // Fallback: try to initialize anyway
+    getAnalyticsInstance();
+  });
+}
+
+export { app, analytics, getAnalyticsInstance };

@@ -1,12 +1,21 @@
 // Analytics utility functions for tracking events
-import { analytics } from './firebase';
+import { getAnalyticsInstance } from './firebase';
 import { logEvent, EventParams } from 'firebase/analytics';
+
+/**
+ * Get analytics instance (ensures it's initialized)
+ */
+function getAnalytics() {
+  if (typeof window === 'undefined') return null;
+  return getAnalyticsInstance();
+}
 
 /**
  * Track section views
  */
 export const trackSectionView = (sectionName: string) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'section_view', {
@@ -22,7 +31,8 @@ export const trackSectionView = (sectionName: string) => {
  * Track VR scene interactions
  */
 export const trackVRSceneInteraction = (sceneName: string, interactionType: 'view' | 'navigate' | 'close') => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'vr_scene_interaction', {
@@ -39,7 +49,8 @@ export const trackVRSceneInteraction = (sceneName: string, interactionType: 'vie
  * Track workshop clicks
  */
 export const trackWorkshopClick = (workshopId: string, workshopTitle: string) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'workshop_click', {
@@ -64,10 +75,11 @@ export const trackOrderPlaced = (orderData: {
   couponDiscount?: number;
   itemTypes: string[];
 }) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
-    logEvent(analytics, 'purchase', {
+    logEvent(analytics, 'purchase' as any, {
       transaction_id: orderData.orderId,
       value: orderData.totalAmount,
       currency: 'INR',
@@ -97,7 +109,8 @@ export const trackOrderPlaced = (orderData: {
  * Track order status update
  */
 export const trackOrderStatusUpdate = (orderId: string, oldStatus: string, newStatus: string) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'order_status_update', {
@@ -122,7 +135,8 @@ export const trackAddToCart = (itemData: {
   quantity: number;
   category?: string;
 }) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'add_to_cart', {
@@ -156,7 +170,8 @@ export const trackAddToCart = (itemData: {
  * Track remove from cart
  */
 export const trackRemoveFromCart = (itemId: string, itemName: string, itemType: 'menu' | 'art') => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'remove_from_cart', {
@@ -179,10 +194,11 @@ export const trackCheckoutStarted = (cartData: {
   hasCoupon: boolean;
   itemTypes: string[];
 }) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
-    logEvent(analytics, 'begin_checkout', {
+    logEvent(analytics, 'begin_checkout' as any, {
       currency: 'INR',
       value: cartData.totalAmount,
       items: cartData.itemCount,
@@ -198,7 +214,8 @@ export const trackCheckoutStarted = (cartData: {
  * Track page view
  */
 export const trackPageView = (pageName: string, pagePath: string) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'page_view', {
@@ -215,7 +232,8 @@ export const trackPageView = (pageName: string, pagePath: string) => {
  * Track menu item view
  */
 export const trackMenuItemView = (itemId: string, itemName: string, category: string, price: number) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'view_item', {
@@ -245,7 +263,8 @@ export const trackMenuItemView = (itemId: string, itemName: string, category: st
  * Track art item view
  */
 export const trackArtItemView = (itemId: string, itemName: string, artist: string, category: string, price: number) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'view_item', {
@@ -276,7 +295,8 @@ export const trackArtItemView = (itemId: string, itemName: string, artist: strin
  * Track user login
  */
 export const trackUserLogin = (method: 'email' | 'guest') => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'login', {
@@ -292,7 +312,8 @@ export const trackUserLogin = (method: 'email' | 'guest') => {
  * Track user signup
  */
 export const trackUserSignup = () => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'sign_up', {
@@ -307,7 +328,8 @@ export const trackUserSignup = () => {
  * Track search
  */
 export const trackSearch = (searchTerm: string, resultCount: number) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, 'search', {
@@ -324,7 +346,8 @@ export const trackSearch = (searchTerm: string, resultCount: number) => {
  * Generic event tracking
  */
 export const trackEvent = (eventName: string, params?: EventParams) => {
-  if (typeof window === 'undefined' || !analytics) return;
+  const analytics = getAnalytics();
+  if (!analytics) return;
   
   try {
     logEvent(analytics, eventName, params);
