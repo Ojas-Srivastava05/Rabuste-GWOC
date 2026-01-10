@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
+import DynamicBackground from "@/components/DynamicBackground";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { trackWorkshopClick } from "@/lib/analytics";
@@ -265,6 +266,7 @@ export default function WorkshopsPage() {
   return (
     <>
       <Navbar />
+      <DynamicBackground />
       
       <div className="min-h-screen" style={{ paddingTop: '140px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-6 max-w-7xl mx-auto">
