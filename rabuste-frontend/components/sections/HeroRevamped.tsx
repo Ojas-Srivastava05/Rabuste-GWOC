@@ -25,11 +25,12 @@ export default function HeroRevamped() {
   }, []);
 
   return (
-    <section 
-      ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{ background: 'transparent', paddingTop: '80px' }}
-    >
+    <section
+  ref={containerRef}
+  className="relative min-h-screen flex items-center justify-center overflow-hidden"
+  style={{ background: 'transparent' }}
+>
+
       {/* Balatro Background Effect */}
       <Balatro />
       
