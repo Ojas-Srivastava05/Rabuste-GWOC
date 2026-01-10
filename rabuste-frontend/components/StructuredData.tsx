@@ -7,7 +7,7 @@ import Script from 'next/script';
  * Helps search engines understand the website content
  */
 export default function StructuredData() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rabuste.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   const organizationSchema = {
     '@context': 'https://schema.org',

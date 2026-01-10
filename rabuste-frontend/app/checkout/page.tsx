@@ -12,6 +12,7 @@ import {
   initializeRazorpayPayment,
   RazorpayResponse
 } from "@/lib/razorpay";
+import { trackCheckoutStarted, trackOrderPlaced } from "@/lib/analytics";
 
 type CartItem = {
   name: string;
@@ -37,6 +38,18 @@ export default function CheckoutPage() {
   useEffect(() => {
     fetchCart();
   }, []);
+
+  // Track checkout started
+  useEffect(() => {
+    if (cart && cart.items.length > 0) {
+      trackCheckoutStarted({
+        itemCount: cart.items.length,
+        totalAmount: cart.discountedTotal || cart.totalAmount,
+        hasCoupon: !!cart.couponCode,
+        itemTypes: [...new Set(cart.items.map(item => item.itemType || 'menu'))],
+      });
+    }
+  }, [cart]);
 
   async function fetchCart() {
     try {
@@ -140,6 +153,17 @@ export default function CheckoutPage() {
       }
 
       const orderData = await res.json();
+      
+      // Track order placed
+      trackOrderPlaced({
+        orderId: orderData._id,
+        totalAmount: cart!.discountedTotal || cart!.totalAmount,
+        itemCount: cart!.items.length,
+        hasCoupon: !!cart!.couponCode,
+        couponCode: cart!.couponCode || undefined,
+        couponDiscount: cart!.couponDiscount || undefined,
+        itemTypes: [...new Set(cart!.items.map(item => item.itemType || 'menu'))],
+      });
       
       // Clear the cart after successful order
       try {

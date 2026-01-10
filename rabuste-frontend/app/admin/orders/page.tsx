@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, Loader2, Ticket } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
+import { trackOrderStatusUpdate } from "@/lib/analytics";
 
 interface OrderItem {
   name: string;
@@ -99,6 +100,9 @@ export default function AdminOrdersPage() {
 
   const markCompleted = async (orderId: string) => {
     const token = localStorage.getItem("token");
+    
+    // Find the order before updating to track status change
+    const currentOrder = orders.find(o => o._id === orderId);
 
     const res = await fetch(`/api/orders/${orderId}`, {
       method: "PATCH",
@@ -111,6 +115,12 @@ export default function AdminOrdersPage() {
 
     if (res.ok) {
       const updated = await res.json();
+      
+      // Track order status update
+      if (currentOrder) {
+        trackOrderStatusUpdate(orderId, currentOrder.status, 'completed');
+      }
+      
       setOrders((prev) =>
         prev.map((order) =>
           order._id === updated._id
