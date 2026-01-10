@@ -19,7 +19,7 @@ import {
   CalendarCheck,
   List,
 } from "lucide-react";
-
+import Footer from "@/components/sections/footer";
 type Workshop = {
   _id: string;
   title: string;
@@ -493,12 +493,12 @@ export default function WorkshopsPage() {
                 </div>
                 
                 {/* Legend */}
-                <div className="mt-6 pt-4 border-t border-[#B87333]/20 space-y-2">
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                <div className="mt-8 pt-5 border-t border-[#B87333]/20 space-y-3">
+                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
                     <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
                     <span>Has workshops</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
+                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
                     <div className="w-3 h-3 rounded-full" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
                     <span>Today</span>
                   </div>
@@ -1301,6 +1301,7 @@ export default function WorkshopsPage() {
           </motion.div>
         )}
       </div>
+      <Footer/>
     </>
   );
 }
