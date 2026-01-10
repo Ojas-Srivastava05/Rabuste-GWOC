@@ -417,30 +417,34 @@ export default function AdminFeedbackPage() {
 
                   {/* Detailed Ratings */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                    {feedback.foodQuality > 0 && (
-                      <div>
-                        <span style={{ color: '#8B6F47' }}>Food Quality: </span>
-                        <span style={{ color: '#D4A574' }}>{feedback.foodQuality}/5</span>
-                      </div>
-                    )}
-                    {feedback.deliveryTime > 0 && (
-                      <div>
-                        <span style={{ color: '#8B6F47' }}>Delivery: </span>
-                        <span style={{ color: '#D4A574' }}>{feedback.deliveryTime}/5</span>
-                      </div>
-                    )}
-                    {feedback.ambience > 0 && (
-                      <div>
-                        <span style={{ color: '#8B6F47' }}>Ambience: </span>
-                        <span style={{ color: '#D4A574' }}>{feedback.ambience}/5</span>
-                      </div>
-                    )}
-                    {feedback.service > 0 && (
-                      <div>
-                        <span style={{ color: '#8B6F47' }}>Service: </span>
-                        <span style={{ color: '#D4A574' }}>{feedback.service}/5</span>
-                      </div>
-                    )}
+                  {feedback.foodQuality !== undefined && feedback.foodQuality > 0 && (
+  <div>
+    <span style={{ color: '#8B6F47' }}>Food Quality: </span>
+    <span style={{ color: '#D4A574' }}>{feedback.foodQuality}/5</span>
+  </div>
+)}
+
+{feedback.deliveryTime !== undefined && feedback.deliveryTime > 0 && (
+  <div>
+    <span style={{ color: '#8B6F47' }}>Delivery: </span>
+    <span style={{ color: '#D4A574' }}>{feedback.deliveryTime}/5</span>
+  </div>
+)}
+
+{feedback.ambience !== undefined && feedback.ambience > 0 && (
+  <div>
+    <span style={{ color: '#8B6F47' }}>Ambience: </span>
+    <span style={{ color: '#D4A574' }}>{feedback.ambience}/5</span>
+  </div>
+)}
+
+{feedback.service !== undefined && feedback.service > 0 && (
+  <div>
+    <span style={{ color: '#8B6F47' }}>Service: </span>
+    <span style={{ color: '#D4A574' }}>{feedback.service}/5</span>
+  </div>
+)}
+
                   </div>
                 </div>
 
