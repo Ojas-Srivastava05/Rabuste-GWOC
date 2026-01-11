@@ -164,10 +164,10 @@ export default function MoodBrewerChat() {
       ref={containerRef}
       className="rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6 relative flex flex-col overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.95) 0%, rgba(42, 24, 16, 0.9) 100%)',
-        border: '2px solid rgba(184, 115, 51, 0.4)',
+        background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.98) 0%, rgba(42, 24, 16, 0.95) 100%)',
+        border: '1px solid rgba(184, 115, 51, 0.3)',
         backdropFilter: 'blur(20px)',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(184, 115, 51, 0.15)',
+        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(184, 115, 51, 0.2), inset 0 1px 0 rgba(184, 115, 51, 0.1)',
         paddingTop: '2rem',
         marginTop: '1rem',
       }}
@@ -194,18 +194,38 @@ export default function MoodBrewerChat() {
         </div>
         <div>
           <h1 
-            className="text-2xl sm:text-3xl font-bold mb-1" 
+            className="text-2xl sm:text-3xl font-bold mb-1 relative" 
             style={{ 
               fontFamily: 'var(--font-heading)', 
-              background: 'linear-gradient(135deg, #D4A574 0%, #CD7F32 50%, #B87333 100%)',
+              background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               letterSpacing: '0.1em',
-              textShadow: '0 0 30px rgba(212, 165, 116, 0.3)',
+              textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
             }}
           >
             BREW AI
+            {/* Glow effect behind text */}
+            <motion.span
+              animate={{
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute inset-0 blur-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                zIndex: -1,
+              }}
+            >
+              BREW AI
+            </motion.span>
           </h1>
           <div className="flex items-center justify-center gap-2">
             <Cpu size={10} className="sm:w-3 sm:h-3" style={{ color: '#B87333' }} />

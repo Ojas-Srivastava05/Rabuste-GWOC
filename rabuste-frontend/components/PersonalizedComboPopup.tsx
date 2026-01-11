@@ -177,10 +177,10 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
           <div
             className="relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-              border: '3px solid rgba(184, 115, 51, 0.5)',
+              background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.98) 0%, rgba(42, 24, 16, 0.95) 100%)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               backdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(184, 115, 51, 0.3)',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(184, 115, 51, 0.2), inset 0 1px 0 rgba(184, 115, 51, 0.1)',
             }}
           >
             {/* Animated Glow Background */}
@@ -257,16 +257,40 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
               >
                 {/* Title */}
                 <h3
-                  className="mb-1.5"
+                  className="mb-1.5 relative"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     fontSize: 'clamp(16px, 4vw, 18px)',
-                    color: '#FFFEF9',
+                    background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
                     letterSpacing: '0.05em',
                     lineHeight: 1.2,
+                    textShadow: '0 0 40px rgba(212, 165, 116, 0.3)',
                   }}
                 >
                   {currentMessage.title}
+                  {/* Glow effect behind text */}
+                  <motion.span
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 blur-xl"
+                    style={{
+                      background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      zIndex: -1,
+                    }}
+                  >
+                    {currentMessage.title}
+                  </motion.span>
                 </h3>
 
                 {/* Description */}

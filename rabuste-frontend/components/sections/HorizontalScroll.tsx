@@ -178,7 +178,37 @@ export default function HorizontalScroll() {
               fontWeight: 400,
               letterSpacing: '0.05em',
             }}>
-              Featured Selections
+              <span style={{
+                background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
+                position: 'relative',
+                display: 'inline-block',
+              }}>
+                Featured Selections
+                {/* Glow effect behind text */}
+                <motion.span
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 blur-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: -1,
+                  }}
+                >
+                  Featured Selections
+                </motion.span>
+              </span>
             </h2>
           </motion.div>
         </div>
