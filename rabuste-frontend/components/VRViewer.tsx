@@ -161,8 +161,10 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
     }
   }, [isOpen]);
 
-  // Preload A-Frame script on component mount (not just when opened)
+  // Load A-Frame script only when VR is opened (lazy load)
   useEffect(() => {
+    if (!isOpen) return; // Only load when VR is actually opened
+    
     if (typeof window !== 'undefined' && !(window as any).AFRAME) {
       const script = document.createElement('script');
       script.src = 'https://aframe.io/releases/1.7.1/aframe.min.js';
@@ -170,11 +172,15 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
       script.onload = () => {
         setIsLoaded(true);
       };
+      script.onerror = () => {
+        console.error('Failed to load A-Frame');
+        setIsLoaded(false);
+      };
       document.head.appendChild(script);
     } else if ((window as any).AFRAME) {
       setIsLoaded(true);
     }
-  }, []);
+  }, [isOpen]);
 
   // Preload all VR images for faster switching
   useEffect(() => {

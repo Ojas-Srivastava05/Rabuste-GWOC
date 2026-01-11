@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Flame, Zap, Award, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 export default function BoldProducts() {
   const router = useRouter();
@@ -118,16 +119,19 @@ export default function BoldProducts() {
                 aspectRatio: '4/3',
                 overflow: 'hidden',
               }}>
-                <img
+                <Image
                   src={product.image}
                   alt={`${product.name} - Photo by ${product.attribution}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{
-                    width: '100%',
-                    height: '100%',
                     objectFit: 'cover',
                     transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
                   className="group-hover:scale-110"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  quality={75}
+                  priority={index === 0}
                 />
                 
                 {/* Gradient overlay */}

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const items = [
   { id: '1', img: '/hero/img1.jpeg', title: 'Morning Ritual', category: 'Espresso' },
@@ -146,13 +147,17 @@ export default function Gallery() {
                 }}
                 className="absolute inset-0"
               >
-                <img
+                <Image
                   src={items[activeIndex].img}
                   alt={items[activeIndex].title}
-                  className="w-full h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                  className="object-cover"
                   style={{
                     filter: 'brightness(0.98) contrast(1.05)',
                   }}
+                  priority={activeIndex === 0}
+                  quality={90}
                 />
                 
                 {/* Elegant gradient overlay */}
