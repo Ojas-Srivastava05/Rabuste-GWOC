@@ -97,6 +97,8 @@ export default function CheckoutPage() {
     
     try {
       // Create Razorpay order
+      // ✅ SECURITY: Backend will verify this amount against database cart total
+      // If amounts don't match, payment will be rejected
       const totalAmount = cart.discountedTotal || cart.totalAmount;
       const razorpayOrder = await createRazorpayOrder(totalAmount);
 
