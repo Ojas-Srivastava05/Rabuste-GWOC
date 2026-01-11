@@ -135,7 +135,7 @@ export default function UserOrders() {
                 {order.items.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center bg-white/50 p-3 rounded-lg">
                     <span className="text-[#2e211a]">
-                      {item.name || `Item ${item.itemId.slice(-6)}`} × {item.quantity}
+                      {item.name || (item.itemId ? `Item ${item.itemId.slice(-6)}` : `Item ${idx + 1}`)} × {item.quantity}
                     </span>
                     {item.price && (
                       <span className="text-[#B87333] font-semibold">₹{item.price * item.quantity}</span>

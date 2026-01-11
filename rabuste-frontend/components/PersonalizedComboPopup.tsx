@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Coffee, Sparkles, ArrowRight, Palette } from "lucide-react";
+import { X, Coffee, Sparkles, ArrowRight, Palette, Zap, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PersonalizedComboPopupProps {
@@ -8,11 +8,163 @@ interface PersonalizedComboPopupProps {
   isLoggedIn: boolean;
 }
 
+type MenuItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image?: string;
+};
+
+type ComboMessage = {
+  icon: typeof Coffee;
+  title: string;
+  description: string;
+  cta: string;
+  route: string;
+  color: string;
+};
+
 export default function PersonalizedComboPopup({ userName, isLoggedIn }: PersonalizedComboPopupProps) {
   const router = useRouter();
   const [isMinimized, setIsMinimized] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<ComboMessage[]>([]);
+
+  // Fetch menu items and generate AI suggestions
+  useEffect(() => {
+    const fetchMenuAndSuggestions = async () => {
+      try {
+        // Fetch menu items
+        const menuRes = await fetch("/api/menu");
+        if (menuRes.ok) {
+          const menuData = await menuRes.json();
+          const items = Array.isArray(menuData) ? menuData : menuData?.items || [];
+          setMenuItems(items);
+          
+          // Generate AI-powered suggestions for guests
+          if (!isLoggedIn && items.length > 0) {
+            generateAISuggestions(items);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch menu:", error);
+      }
+    };
+
+    fetchMenuAndSuggestions();
+  }, [isLoggedIn]);
+
+  // Generate AI-powered combo suggestions based on menu data
+  const generateAISuggestions = (items: MenuItem[]) => {
+    // Get popular items (by price range - mid-range items are often popular)
+    const popularItems = items
+      .filter(item => item.price >= 100 && item.price <= 300)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 3);
+
+    // Get premium items
+    const premiumItems = items
+      .filter(item => item.price > 300)
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 2);
+
+    // Get budget-friendly items
+    const budgetItems = items
+      .filter(item => item.price < 150)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 2);
+
+    // Get trending categories
+    const categories = [...new Set(items.map(item => item.category))];
+    const trendingCategory = categories[Math.floor(Math.random() * categories.length)] || "Coffee";
+
+    const suggestions: ComboMessage[] = [];
+
+    // Suggestion 1: Popular combo
+    if (popularItems.length > 0) {
+      const item = popularItems[0];
+      suggestions.push({
+        icon: TrendingUp,
+        title: `Trending: ${item.name}`,
+        description: `Join ${Math.floor(Math.random() * 50) + 20} others who loved this today!`,
+        cta: "Try It Now",
+        route: `/menu#item-${item._id}`,
+        color: "#B87333",
+      });
+    }
+
+    // Suggestion 2: Premium experience
+    if (premiumItems.length > 0) {
+      const item = premiumItems[0];
+      suggestions.push({
+        icon: Zap,
+        title: `Premium: ${item.name}`,
+        description: "Elevate your coffee experience with our finest selection.",
+        cta: "Explore Premium",
+        route: `/menu#item-${item._id}`,
+        color: "#CD7F32",
+      });
+    }
+
+    // Suggestion 3: Budget-friendly
+    if (budgetItems.length > 0) {
+      const item = budgetItems[0];
+      suggestions.push({
+        icon: Coffee,
+        title: `Great Value: ${item.name}`,
+        description: `Amazing taste at just ₹${item.price}. Perfect for daily coffee!`,
+        cta: "Get It Now",
+        route: `/menu#item-${item._id}`,
+        color: "#D4A574",
+      });
+    }
+
+    // Suggestion 4: Category-based
+    suggestions.push({
+      icon: Palette,
+      title: `Explore ${trendingCategory}`,
+      description: `Discover our curated ${trendingCategory.toLowerCase()} collection.`,
+      cta: "View Collection",
+      route: `/menu?category=${trendingCategory}`,
+      color: "#B87333",
+    });
+
+    // Fallback suggestions
+    if (suggestions.length === 0) {
+      suggestions.push(
+        {
+          icon: Coffee,
+          title: "Discover Bold Coffee",
+          description: "2X caffeine. Zero compromises.",
+          cta: "Explore Menu",
+          route: "/menu",
+          color: "#B87333",
+        },
+        {
+          icon: Palette,
+          title: "Explore Art Gallery",
+          description: "Where coffee meets creativity.",
+          cta: "View Collection",
+          route: "/art",
+          color: "#CD7F32",
+        },
+        {
+          icon: Sparkles,
+          title: "Join the Movement",
+          description: "Sign up for exclusive perks!",
+          cta: "Sign Up Now",
+          route: "/auth",
+          color: "#D4A574",
+        }
+      );
+    }
+
+    setAiSuggestions(suggestions);
+  };
 
   // Show popup after 3 seconds on mount
   useEffect(() => {
@@ -35,7 +187,8 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
     return () => clearInterval(interval);
   }, [isVisible, isMinimized, isLoggedIn]);
 
-  const guestMessages = [
+  // Base guest messages (fallback)
+  const baseGuestMessages: ComboMessage[] = [
     {
       icon: Coffee,
       title: "Discover Bold Coffee",
@@ -57,10 +210,13 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
       title: "Join the Movement",
       description: "Sign up for exclusive perks!",
       cta: "Sign Up Now",
-      route: "/auth/login",
+      route: "/auth",
       color: "#D4A574",
     },
   ];
+
+  // Use AI suggestions if available, otherwise use base messages
+  const guestMessages = aiSuggestions.length > 0 ? aiSuggestions : baseGuestMessages;
 
   const loggedInMessages = [
     {
@@ -102,7 +258,13 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
   };
 
   const handleCTAClick = () => {
-    router.push(currentMessage.route);
+    // If route contains #item-, scroll to that item after navigation
+    if (currentMessage.route.includes('#item-')) {
+      router.push(currentMessage.route);
+      // The menu page will handle the highlighting via hash change
+    } else {
+      router.push(currentMessage.route);
+    }
   };
 
   if (!isVisible) return null;

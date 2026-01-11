@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Heart, Clock, TrendingUp } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useRouter } from "next/navigation";
 
 type MenuItem = {
   _id: string;
@@ -9,21 +11,29 @@ type MenuItem = {
   description: string;
   price: number;
   image: string;
-  brewTime: number;
+  brewTime?: number;
   category: string;
-  inStock: boolean;
+  inStock?: boolean;
 };
 
 export default function UserFavorites() {
+  const { user } = useUser();
+  const router = useRouter();
   const [favorites, setFavorites] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // For now, load favorites from localStorage
-    // In future, this could be fetched from backend
+    // Redirect to login if not logged in
+    if (!user?.id) {
+      router.push('/auth?redirect=/user/favorites');
+      return;
+    }
+
+    // Load favorites from localStorage based on user ID
     const loadFavorites = async () => {
       try {
-        const storedFavorites = localStorage.getItem("favorites");
+        const storageKey = `favorites_${user.id}`;
+        const storedFavorites = localStorage.getItem(storageKey);
         if (storedFavorites) {
           const favoriteIds = JSON.parse(storedFavorites);
           
@@ -44,14 +54,17 @@ export default function UserFavorites() {
     };
 
     loadFavorites();
-  }, []);
+  }, [user?.id, router]);
 
   const removeFavorite = (id: string) => {
-    const storedFavorites = localStorage.getItem("favorites");
+    if (!user?.id) return;
+    
+    const storageKey = `favorites_${user.id}`;
+    const storedFavorites = localStorage.getItem(storageKey);
     if (storedFavorites) {
       const favoriteIds = JSON.parse(storedFavorites);
       const updated = favoriteIds.filter((fid: string) => fid !== id);
-      localStorage.setItem("favorites", JSON.stringify(updated));
+      localStorage.setItem(storageKey, JSON.stringify(updated));
       setFavorites(favorites.filter(item => item._id !== id));
     }
   };
@@ -99,11 +112,6 @@ export default function UserFavorites() {
                 >
                   <Heart size={20} fill="#DC2626" color="#DC2626" />
                 </button>
-                {!item.inStock && (
-                  <div className="absolute bottom-3 left-3 px-3 py-1 bg-red-600 text-white text-xs font-semibold rounded-full">
-                    Out of Stock
-                  </div>
-                )}
               </div>
 
               {/* Content */}
@@ -117,20 +125,18 @@ export default function UserFavorites() {
                   <div className="text-2xl font-bold text-[#B87333]" style={{ fontFamily: 'var(--font-heading)' }}>
                     ₹{item.price}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-[#6b4a2f]">
-                    <Clock size={14} />
-                    <span>{item.brewTime} min</span>
-                  </div>
+                  {item.brewTime && (
+                    <div className="flex items-center gap-1 text-sm text-[#6b4a2f]">
+                      <Clock size={14} />
+                      <span>{item.brewTime} min</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
                   <a
-                    href="/menu"
-                    className={`flex-1 text-center py-2 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                      item.inStock
-                        ? 'bg-gradient-to-r from-[#B87333] to-[#CD7F32] text-white hover:shadow-lg hover:scale-105'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
+                    href={`/menu#item-${item._id}`}
+                    className="flex-1 text-center py-2 px-4 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-[#B87333] to-[#CD7F32] text-white hover:shadow-lg hover:scale-105"
                   >
                     Order Now
                   </a>

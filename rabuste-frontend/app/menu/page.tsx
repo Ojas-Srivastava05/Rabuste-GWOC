@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
+import { useUser } from "@/contexts/UserContext";
 
 type MenuItem = {
   _id: string;
@@ -112,6 +113,7 @@ import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } f
 
 export default function MenuPage() {
   const router = useRouter();
+  const { user } = useUser();
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
   const [aiDiscount, setAiDiscount] = useState<{ enableDiscountAI: boolean; discountItemId: string | null; discountPercent: number }>(
@@ -126,6 +128,7 @@ export default function MenuPage() {
   const [upsellModal, setUpsellModal] = useState<{ item: MenuItem; suggestions: MenuItem[] } | null>(null);
   const [quickFilter, setQuickFilter] = useState<"all" | "trending" | "bestseller" | "limited">("all");
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [addedToast, setAddedToast] = useState<{ show: boolean; itemName: string }>({ show: false, itemName: '' });
   const [additionCount, setAdditionCount] = useState(0);
 
@@ -142,29 +145,65 @@ export default function MenuPage() {
     if (count) {
       setAdditionCount(parseInt(count, 10));
     }
-  }, []);
+
+    // Load favorites from localStorage based on user ID
+    if (user?.id) {
+      const storedFavorites = localStorage.getItem(`favorites_${user.id}`);
+      if (storedFavorites) {
+        setFavorites(JSON.parse(storedFavorites));
+      } else {
+        setFavorites([]);
+      }
+    } else {
+      setFavorites([]);
+    }
+  }, [user?.id]);
 
   // Handle scrolling to specific item from hash
   useEffect(() => {
-    if (menu.length > 0 && typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash.startsWith('#item-')) {
-        const itemId = hash.replace('#item-', '');
-        // Wait for DOM to render
-        setTimeout(() => {
-          const element = document.getElementById(`item-${itemId}`);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Set highlighted item for premium animation
-            setHighlightedItemId(itemId);
-            // Remove highlight after 4 seconds
-            setTimeout(() => {
-              setHighlightedItemId(null);
-            }, 4000);
-          }
-        }, 500);
+    const handleHashScroll = () => {
+      if (menu.length > 0 && typeof window !== 'undefined') {
+        const hash = window.location.hash;
+        if (hash.startsWith('#item-')) {
+          const itemId = hash.replace('#item-', '');
+          // Wait for DOM to render and ensure menu items are loaded
+          setTimeout(() => {
+            const element = document.getElementById(`item-${itemId}`);
+            if (element) {
+              // Scroll to element with offset for navbar
+              const elementPosition = element.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset for navbar
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+              
+              // Set highlighted item for premium animation
+              setHighlightedItemId(itemId);
+              // Remove highlight after 4 seconds
+              setTimeout(() => {
+                setHighlightedItemId(null);
+              }, 4000);
+            }
+          }, 800); // Increased timeout to ensure DOM is ready
+        }
       }
-    }
+    };
+
+    // Handle initial hash
+    handleHashScroll();
+
+    // Handle hash changes
+    const handleHashChange = () => {
+      handleHashScroll();
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [menu]);
 
   async function fetchMenu() {
@@ -294,7 +333,8 @@ export default function MenuPage() {
 
   function getDiscountedPrice(item: MenuItem): number {
     if (hasAIDiscount(item._id)) {
-      return item.price * (1 - aiDiscount.discountPercent / 100);
+      const discounted = item.price * (1 - aiDiscount.discountPercent / 100);
+      return Math.ceil(discounted); // Round up to nearest integer
     }
     return item.price;
   }
@@ -302,6 +342,33 @@ export default function MenuPage() {
   function getOriginalPrice(item: MenuItem): number {
     return item.price;
   }
+
+  // Favorite functions - user-specific
+  const toggleFavorite = (itemId: string) => {
+    if (!user?.id) {
+      // If not logged in, redirect to login
+      router.push('/auth?redirect=/menu');
+      return;
+    }
+
+    const storageKey = `favorites_${user.id}`;
+    const storedFavorites = localStorage.getItem(storageKey);
+    let favoriteIds: string[] = storedFavorites ? JSON.parse(storedFavorites) : [];
+    
+    if (favoriteIds.includes(itemId)) {
+      favoriteIds = favoriteIds.filter(id => id !== itemId);
+    } else {
+      favoriteIds.push(itemId);
+    }
+    
+    localStorage.setItem(storageKey, JSON.stringify(favoriteIds));
+    setFavorites(favoriteIds);
+  };
+
+  const isFavorite = (itemId: string): boolean => {
+    if (!user?.id) return false;
+    return favorites.includes(itemId);
+  };
 
   const totalItems = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + i.quantity, 0) || 0;
   const totalPrice = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + (i.price * i.quantity), 0) || 0;
@@ -796,6 +863,8 @@ export default function MenuPage() {
                                 quantity={getQty(item._id)}
                                 onAdd={() => addToCart(item._id)}
                                 onRemove={() => removeFromCart(item._id)}
+                                onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
+                                isFavorite={isFavorite(item._id)}
                                 index={index}
                                 flags={getItemFlags(item)}
                                 isHighlighted={highlightedItemId === item._id}
@@ -816,6 +885,8 @@ export default function MenuPage() {
                               quantity={getQty(item._id)}
                               onAdd={() => addToCart(item._id)}
                               onRemove={() => removeFromCart(item._id)}
+                              onFavorite={() => toggleFavorite(item._id)}
+                              isFavorite={isFavorite(item._id)}
                               index={index}
                               flags={getItemFlags(item)}
                               isHighlighted={highlightedItemId === item._id}
@@ -840,6 +911,8 @@ export default function MenuPage() {
                       quantity={getQty(item._id)}
                       onAdd={() => addToCart(item._id)}
                       onRemove={() => removeFromCart(item._id)}
+                      onFavorite={() => toggleFavorite(item._id)}
+                      isFavorite={isFavorite(item._id)}
                       index={index}
                       flags={getItemFlags(item)}
                       isHighlighted={highlightedItemId === item._id}
@@ -861,6 +934,8 @@ export default function MenuPage() {
                     quantity={getQty(item._id)}
                     onAdd={() => addToCart(item._id)}
                     onRemove={() => removeFromCart(item._id)}
+                    onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
+                    isFavorite={isFavorite(item._id)}
                     index={index}
                     flags={getItemFlags(item)}
                     isHighlighted={highlightedItemId === item._id}
@@ -1079,6 +1154,8 @@ function GridMenuItem({
   quantity,
   onAdd,
   onRemove,
+  onFavorite,
+  isFavorite,
   index,
   flags,
   isHighlighted,
@@ -1091,6 +1168,8 @@ function GridMenuItem({
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
+  onFavorite?: () => void;
+  isFavorite: boolean;
   index: number;
   flags: any;
   isHighlighted?: boolean;
@@ -1112,7 +1191,7 @@ function GridMenuItem({
         delay: index * 0.03,
         scale: { duration: 0.6, ease: "easeOut" }
       }}
-      whileHover={{ y: -4 }}
+      whileHover={{ scale: 1.02 }}
       className="group relative flex flex-col h-full"
       style={{
         ...(isHighlighted ? {
@@ -1169,6 +1248,28 @@ function GridMenuItem({
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
+        {/* Favorite Button - Only show if logged in */}
+        {onFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onFavorite();
+            }}
+            className="absolute top-2 right-2 p-2 rounded-full transition-all hover:scale-110"
+            style={{
+              background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+              border: `2px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
+              backdropFilter: 'blur(10px)',
+              zIndex: 20,
+              pointerEvents: 'auto',
+              cursor: 'pointer',
+            }}
+          >
+            <Heart size={16} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+          </button>
+        )}
+
         {/* Top Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {hasAIDiscount && (
@@ -1234,7 +1335,7 @@ function GridMenuItem({
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-4 flex flex-col flex-1" style={{ position: 'relative', zIndex: 10 }}>
         <h3
           className="text-base mb-1 line-clamp-1"
           style={{
@@ -1274,7 +1375,7 @@ function GridMenuItem({
                   className="text-xl gradient-text"
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
-                  ₹{Math.round(discountedPrice || 0)}
+                  ₹{Math.ceil(discountedPrice || 0)}
                 </span>
                 <span
                   className="text-sm line-through opacity-60"
@@ -1300,21 +1401,43 @@ function GridMenuItem({
                 background: 'rgba(184, 115, 51, 0.2)',
                 padding: '4px 8px',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
+                position: 'relative',
+                zIndex: 10,
               }}
             >
-              <button onClick={onRemove} className="text-[#B87333] hover:text-[#D4A574]">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onRemove();
+                }} 
+                className="text-[#B87333] hover:text-[#D4A574]"
+                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+              >
                 <Minus size={14} />
               </button>
               <span className="text-sm font-bold gradient-text" style={{ minWidth: '16px', textAlign: 'center' }}>
                 {quantity}
               </span>
-              <button onClick={onAdd} className="text-[#B87333] hover:text-[#D4A574]">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onAdd();
+                }} 
+                className="text-[#B87333] hover:text-[#D4A574]"
+                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+              >
                 <Plus size={14} />
               </button>
             </div>
           ) : (
             <button
-              onClick={onAdd}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onAdd();
+              }}
               className="px-3 py-1.5 text-xs flex items-center gap-1"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
@@ -1323,6 +1446,10 @@ function GridMenuItem({
                 fontFamily: 'var(--font-body)',
                 letterSpacing: '0.05em',
                 transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                position: 'relative',
+                zIndex: 10,
               }}
             >
               <Plus size={12} />
@@ -1341,6 +1468,8 @@ function ListMenuItem({
   quantity,
   onAdd,
   onRemove,
+  onFavorite,
+  isFavorite,
   index,
   flags,
   isHighlighted,
@@ -1353,6 +1482,8 @@ function ListMenuItem({
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
+  onFavorite?: () => void;
+  isFavorite: boolean;
   index: number;
   flags: any;
   isHighlighted?: boolean;
@@ -1374,7 +1505,7 @@ function ListMenuItem({
         delay: index * 0.03,
         scale: { duration: 0.6, ease: "easeOut" }
       }}
-      whileHover={{ x: 4 }}
+      whileHover={{ scale: 1.01 }}
       className="group relative"
       style={{
         ...(isHighlighted ? {
@@ -1430,10 +1561,31 @@ function ListMenuItem({
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
+          {/* Favorite Button - Only show if logged in */}
+          {onFavorite && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onFavorite();
+              }}
+              className="absolute top-1 right-1 p-1.5 rounded-full transition-all hover:scale-110"
+              style={{
+                background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+                border: `1.5px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
+                backdropFilter: 'blur(10px)',
+                zIndex: 20,
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+              }}
+            >
+              <Heart size={12} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" style={{ position: 'relative', zIndex: 10 }}>
           <div className="flex items-start justify-between gap-4 mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1528,7 +1680,7 @@ function ListMenuItem({
                     className="text-xl gradient-text"
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
-                    ₹{discountedPrice}
+                    ₹{Math.ceil(discountedPrice || 0)}
                   </span>
                 </div>
               ) : (
@@ -1551,26 +1703,52 @@ function ListMenuItem({
                   background: 'rgba(184, 115, 51, 0.2)',
                   padding: '6px 12px',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
+                  position: 'relative',
+                  zIndex: 10,
                 }}
               >
-                <button onClick={onRemove} className="text-[#B87333] hover:text-[#D4A574]">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onRemove();
+                  }} 
+                  className="text-[#B87333] hover:text-[#D4A574]"
+                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                >
                   <Minus size={16} />
                 </button>
                 <span className="text-sm font-bold gradient-text" style={{ minWidth: '20px', textAlign: 'center' }}>
                   {quantity}
                 </span>
-                <button onClick={onAdd} className="text-[#B87333] hover:text-[#D4A574]">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onAdd();
+                  }} 
+                  className="text-[#B87333] hover:text-[#D4A574]"
+                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                >
                   <Plus size={16} />
                 </button>
               </div>
             ) : (
               <button
-                onClick={onAdd}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onAdd();
+                }}
                 className="px-4 py-2 text-xs"
                 style={{
                   background: 'rgba(184, 115, 51, 0.2)',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
                   color: '#D4A574',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  zIndex: 10,
                   fontFamily: 'var(--font-body)',
                   letterSpacing: '0.05em',
                 }}

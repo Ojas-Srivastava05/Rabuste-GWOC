@@ -297,16 +297,22 @@ export default function CartPage() {
                 >
                   <div className="flex flex-col md:flex-row gap-6 md:items-center">
                     <div className="flex-1">
-                      <h3 
-                        className="text-2xl mb-2"
-                        style={{
-                          fontFamily: 'var(--font-heading)',
-                          color: '#F5F1E8',
-                          letterSpacing: '0.05em',
-                        }}
+                      <a
+                        href={`/menu#item-${item.menuItem || item.artItem}`}
+                        className="block"
                       >
-                        {item.name}
-                      </h3>
+                        <h3 
+                          className="text-2xl mb-2 hover:underline transition-all"
+                          style={{
+                            fontFamily: 'var(--font-heading)',
+                            color: '#F5F1E8',
+                            letterSpacing: '0.05em',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {item.name}
+                        </h3>
+                      </a>
                       <div className="flex items-center gap-4 text-lg mb-4 md:mb-0">
                         <span className="gradient-text font-bold">₹{item.price}</span>
                         <span style={{ color: '#8B6F47' }}>each</span>

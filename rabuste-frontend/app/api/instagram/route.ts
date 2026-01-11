@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/src/lib/mongodb";
+import { connectDB } from "@/src/lib/db";
 import InstagramPost from "@/src/models/InstagramPost";
 
 // Get latest 6 Instagram posts (public route)
@@ -16,12 +16,11 @@ export async function GET() {
       .limit(6)
       .lean();
 
-    return NextResponse.json(posts, { status: 200 });
-  } catch (error) {
+    // Return empty array if no posts found (don't throw error)
+    return NextResponse.json(posts || [], { status: 200 });
+  } catch (error: any) {
     console.error("Error fetching Instagram posts:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch Instagram posts" },
-      { status: 500 }
-    );
+    // Return empty array instead of error to prevent frontend crashes
+    return NextResponse.json([], { status: 200 });
   }
 }

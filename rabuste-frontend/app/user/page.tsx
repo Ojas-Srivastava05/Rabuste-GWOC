@@ -47,7 +47,23 @@ export default function UserDashboard() {
         if (!res.ok) throw new Error("Failed to fetch");
 
         const json = await res.json();
-        setData(json);
+        
+        // Calculate favorites count from localStorage based on user ID
+        const userId = user?.id;
+        const favoriteCount = userId 
+          ? (() => {
+              const storedFavorites = localStorage.getItem(`favorites_${userId}`);
+              return storedFavorites ? JSON.parse(storedFavorites).length : 0;
+            })()
+          : 0;
+        
+        setData({
+          ...json,
+          stats: {
+            ...json.stats,
+            favoriteItems: favoriteCount,
+          },
+        });
       } catch (err) {
         setError("Unable to load dashboard");
       } finally {

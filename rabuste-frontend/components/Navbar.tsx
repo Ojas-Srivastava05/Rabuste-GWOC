@@ -214,6 +214,11 @@ export default function Navbar() {
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
           <NavButton href="/menu">MENU</NavButton>
+          {user && (
+            <NavButton href="/user/favorites">
+              FAVORITES
+            </NavButton>
+          )}
           <NavButton href="/art">GALLERY</NavButton>
           {user ? (
             <div className="relative" ref={dropdownRef}>
@@ -323,6 +328,46 @@ export default function Navbar() {
 
                   {/* Menu Items */}
                   <div className="py-2">
+                    <button
+                      onClick={() => {
+                        router.push('/user');
+                        setShowDropdown(false);
+                      }}
+                      className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#B87333]/10 transition-colors text-left relative"
+                    >
+                      <div
+                        className="w-8 h-8 flex items-center justify-center flex-shrink-0"
+                        style={{
+                          background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                          borderRadius: '6px',
+                        }}
+                      >
+                        <User size={16} style={{ color: '#000' }} />
+                      </div>
+                      <div className="flex-1">
+                        <span 
+                          className="text-sm block"
+                          style={{ 
+                            color: '#FFFEF9',
+                            fontFamily: 'var(--font-heading)',
+                            letterSpacing: '0.05em',
+                            fontWeight: 600,
+                          }}
+                        >
+                          MY DASHBOARD
+                        </span>
+                        <span 
+                          className="text-xs block mt-0.5"
+                          style={{ 
+                            color: '#8B6F47',
+                            fontFamily: 'var(--font-body)',
+                          }}
+                        >
+                          Orders, Favorites & More
+                        </span>
+                      </div>
+                    </button>
+
                     <button
                       onClick={() => {
                         router.push('/profile/edit');
@@ -577,6 +622,14 @@ export default function Navbar() {
                     label="MENU"
                     onClick={() => setOpen(false)}
                   />
+                  {user && (
+                    <MobileNavItem 
+                      href="/user/favorites" 
+                      icon={Heart} 
+                      label="FAVORITES"
+                      onClick={() => setOpen(false)}
+                    />
+                  )}
                   <MobileNavItem 
                     href="/art" 
                     icon={Palette} 
@@ -630,6 +683,22 @@ export default function Navbar() {
                     label="CART"
                     onClick={() => setOpen(false)}
                   />
+                  {user && (
+                    <MobileNavItem 
+                      href="/user" 
+                      icon={User} 
+                      label="MY DASHBOARD"
+                      onClick={() => setOpen(false)}
+                    />
+                  )}
+                  {user && (
+                    <MobileNavItem 
+                      href="/user/favorites" 
+                      icon={Heart} 
+                      label="FAVORITES"
+                      onClick={() => setOpen(false)}
+                    />
+                  )}
                   <MobileNavItem 
                     href="/order-status" 
                     icon={Package} 

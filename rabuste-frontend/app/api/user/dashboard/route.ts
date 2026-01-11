@@ -27,7 +27,9 @@ export async function GET(req: NextRequest) {
     const totalSpent = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
 
     // Get favorite items count from localStorage (client-side)
-    const favoriteItems = 0; // This will be calculated on client side
+    // Note: Favorites are stored client-side, so we return 0 here
+    // The actual count will be calculated on the client side
+    const favoriteItems = 0;
 
     // Find most ordered item
     const itemCounts = new Map<string, number>();

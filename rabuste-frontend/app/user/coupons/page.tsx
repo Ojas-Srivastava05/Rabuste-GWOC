@@ -9,8 +9,8 @@ type Coupon = {
   discountPercentage: number;
   description: string;
   validUntil: string;
-  usageLimit: number;
-  usedCount: number;
+  usageLimit: number | null;
+  usageCount: number;
   minOrderAmount: number;
   isActive: boolean;
 };
@@ -30,7 +30,7 @@ export default function UserCoupons() {
         const data = await res.json();
         const activeCoupons = (data.coupons || []).filter((c: Coupon) => {
           const isValid = c.isActive && new Date(c.validUntil) > new Date();
-          const hasUsageLeft = c.usedCount < c.usageLimit;
+          const hasUsageLeft = c.usageLimit === null || (c.usageCount || 0) < c.usageLimit;
           return isValid && hasUsageLeft;
         });
         setCoupons(activeCoupons);
@@ -96,7 +96,7 @@ export default function UserCoupons() {
             const daysLeft = Math.ceil(
               (new Date(coupon.validUntil).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
             );
-            const usageLeft = coupon.usageLimit - coupon.usedCount;
+            const usageLeft = coupon.usageLimit === null ? null : coupon.usageLimit - (coupon.usageCount || 0);
 
             return (
               <div
@@ -171,7 +171,9 @@ export default function UserCoupons() {
                         <Ticket size={16} style={{ color: '#B87333' }} />
                         <span>Uses Left</span>
                       </div>
-                      <span className="font-semibold text-[#2e211a]">{usageLeft}</span>
+                      <span className="font-semibold text-[#2e211a]">
+                        {coupon.usageLimit === null ? 'Unlimited' : usageLeft}
+                      </span>
                     </div>
                   </div>
 
