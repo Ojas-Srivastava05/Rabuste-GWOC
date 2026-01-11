@@ -9,6 +9,7 @@ import StructuredData from "@/components/StructuredData";
 import PageViewTracker from "@/components/PageViewTracker";
 import { UserProvider } from "@/contexts/UserContext";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Rabuste Coffee | Premium 2X Caffeine Coffee Online",
@@ -96,6 +97,7 @@ export default function RootLayout({
           {children}
         </UserProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
