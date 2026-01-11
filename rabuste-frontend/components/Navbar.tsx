@@ -207,34 +207,47 @@ export default function Navbar() {
           <NavButton href="/art">GALLERY</NavButton>
           {user ? (
             <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="px-4 py-2.5 flex items-center gap-2 border-2 border-[#B87333]/40 text-[#FFFEF9] hover:bg-[#B87333]/20 transition-all duration-300"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  letterSpacing: '0.1em',
-                  fontSize: '12px',
-                }}
-              >
-                <div 
-                  className="w-7 h-7 flex items-center justify-center text-xs font-bold"
-                  style={{
-                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                    color: '#000000',
+              <div className="flex items-center gap-0 border-2 border-[#B87333]/40 hover:bg-[#B87333]/20 transition-all duration-300">
+                <button
+                  onClick={() => {
+                    router.push('/user');
+                    setShowDropdown(false);
                   }}
+                  className="px-4 py-2.5 flex items-center gap-2 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-all duration-300 flex-1"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    letterSpacing: '0.1em',
+                    fontSize: '12px',
+                  }}
+                  title="Go to Dashboard"
                 >
-                  {getInitials(user.name)}
-                </div>
-                <span className="uppercase">{user.name.split(' ')[0]}</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
+                  <div 
+                    className="w-7 h-7 flex items-center justify-center text-xs font-bold"
+                    style={{
+                      background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                      color: '#000000',
+                    }}
+                  >
+                    {getInitials(user.name)}
+                  </div>
+                  <span className="uppercase">{user.name.split(' ')[0]}</span>
+                </button>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="px-2 py-2.5 border-l-2 border-[#B87333]/40 hover:bg-[#B87333]/10 transition-all duration-300"
+                  title="Toggle menu"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                  <svg 
+                    className={`w-4 h-4 transition-transform duration-300 ${showDropdown ? 'rotate-180' : ''}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                    style={{ color: '#FFFEF9' }}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
 
               {/* Dropdown Menu */}
               {showDropdown && (
@@ -424,7 +437,13 @@ export default function Navbar() {
           {/* Mobile User Info */}
           {user && (
             <div className="mb-4 pb-4 border-b border-[#B87333]/20">
-              <div className="flex items-center gap-3 mb-2">
+              <button
+                onClick={() => {
+                  router.push('/user');
+                  setOpen(false);
+                }}
+                className="w-full flex items-center gap-3 mb-2 p-2 rounded-lg hover:bg-[#B87333]/10 transition-all duration-300"
+              >
                 <div 
                   className="w-10 h-10 flex items-center justify-center text-sm font-bold"
                   style={{
@@ -434,7 +453,7 @@ export default function Navbar() {
                 >
                   {getInitials(user.name)}
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 text-left">
                   <p 
                     className="font-medium text-sm"
                     style={{ 
@@ -449,7 +468,16 @@ export default function Navbar() {
                     {user.email}
                   </p>
                 </div>
-              </div>
+                <svg 
+                  className="w-4 h-4" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  style={{ color: '#B87333' }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
               {user.role && (
                 <span 
                   className="inline-block px-2 py-1 text-xs uppercase"
