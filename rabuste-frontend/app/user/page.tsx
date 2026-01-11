@@ -94,7 +94,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className="bg-[#FAF3E0] rounded-2xl p-4 sm:p-6 lg:p-8 shadow-2xl space-y-6 sm:space-y-8 lg:space-y-10 border border-[#B87333]/20">
+    <div className="bg-[#FAF3E0] rounded-2xl p-3 sm:p-4 md:p-6 lg:p-8 shadow-2xl space-y-4 sm:space-y-6 lg:space-y-10 border border-[#B87333]/20">
       {/* PAGE HEADING */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-1 h-8 bg-gradient-to-b from-[#B87333] to-[#CD7F32] rounded-full" />
@@ -115,61 +115,61 @@ export default function UserDashboard() {
       </div>
 
       {/* STAT CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         {/* Total Orders */}
-        <div className="group bg-[#FFFDF2] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Total Orders</p>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-              <ShoppingBag size={16} style={{ color: '#FFF' }} />
+        <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 border border-[#B87333]/20">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Total Orders</p>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center flex-shrink-0">
+              <ShoppingBag size={14} className="sm:w-4 sm:h-4" style={{ color: '#FFF' }} />
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
             {data?.stats.totalOrders || 0}
           </h2>
-          <div className="mt-3 text-xs text-[#8B6F47] opacity-70">Lifetime orders</div>
+          <div className="mt-2 sm:mt-3 text-xs text-[#8B6F47] opacity-70">Lifetime orders</div>
         </div>
 
         {/* Total Spent */}
-        <div className="group bg-[#FFFDF2] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Total Spent</p>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5E7D4C] to-[#4A6339] flex items-center justify-center">
+        <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 border border-[#B87333]/20">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Total Spent</p>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#5E7D4C] to-[#4A6339] flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xs font-bold">₹</span>
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
             ₹{data?.stats.totalSpent || 0}
           </h2>
-          <div className="mt-3 text-xs text-[#8B6F47] opacity-70">Lifetime spending</div>
+          <div className="mt-2 sm:mt-3 text-xs text-[#8B6F47] opacity-70">Lifetime spending</div>
         </div>
 
         {/* Favorite Items */}
-        <div className="group bg-[#FFFDF2] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Favorites</p>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#DC2626] to-[#B91C1C] flex items-center justify-center">
-              <Heart size={16} style={{ color: '#FFF' }} />
+        <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 border border-[#B87333]/20">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Favorites</p>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#DC2626] to-[#B91C1C] flex items-center justify-center flex-shrink-0">
+              <Heart size={14} className="sm:w-4 sm:h-4" style={{ color: '#FFF' }} />
             </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
             {data?.stats.favoriteItems || 0}
           </h2>
-          <div className="mt-3 text-xs text-[#8B6F47] opacity-70">Saved items</div>
+          <div className="mt-2 sm:mt-3 text-xs text-[#8B6F47] opacity-70">Saved items</div>
         </div>
 
         {/* Most Ordered */}
-        <div className="group bg-[#FFFDF2] p-4 sm:p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-[#B87333]/20 hover:border-[#B87333]/40">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Top Choice</p>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-              <TrendingUp size={16} style={{ color: '#FFF' }} />
+        <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg active:scale-95 transition-all duration-300 border border-[#B87333]/20">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">Top Choice</p>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center flex-shrink-0">
+              <TrendingUp size={14} className="sm:w-4 sm:h-4" style={{ color: '#FFF' }} />
             </div>
           </div>
-          <h2 className="text-lg font-bold text-[#2e211a] mt-2" style={{ fontFamily: 'var(--font-heading)' }}>
+          <h2 className="text-base sm:text-lg font-bold text-[#2e211a] mt-2 line-clamp-1" style={{ fontFamily: 'var(--font-heading)' }}>
             {data?.stats.mostOrderedItem?.name || 'N/A'}
           </h2>
-          <div className="mt-3 text-xs text-[#8B6F47] opacity-70">
+          <div className="mt-2 sm:mt-3 text-xs text-[#8B6F47] opacity-70">
             {data?.stats.mostOrderedItem ? `${data.stats.mostOrderedItem.count} orders` : 'No orders yet'}
           </div>
         </div>

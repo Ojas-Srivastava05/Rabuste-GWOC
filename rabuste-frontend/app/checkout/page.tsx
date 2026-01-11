@@ -266,7 +266,7 @@ export default function CheckoutPage() {
             </div>
 
             <h1
-              className="text-6xl md:text-8xl mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-6"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
@@ -276,23 +276,23 @@ export default function CheckoutPage() {
               CHECK<span className="gradient-text">OUT</span>
             </h1>
 
-            <p className="text-xl" style={{ color: '#B87333' }}>
+            <p className="text-base sm:text-lg md:text-xl px-2" style={{ color: '#B87333' }}>
               Complete your order securely
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
             {/* Order Summary Card */}
-            <div className="brutal-card p-8 mb-8">
+            <div className="brutal-card p-4 sm:p-6 md:p-8 mb-6 sm:mb-8">
               <h2
-                className="text-3xl mb-8 flex items-center gap-3"
+                className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: '#F5F1E8',
                   letterSpacing: '0.1em',
                 }}
               >
-                <ShoppingBag size={32} className="text-[#B87333]" />
+                <ShoppingBag size={28} className="text-[#B87333]" />
                 YOUR ORDER
               </h2>
 
@@ -302,9 +302,9 @@ export default function CheckoutPage() {
                     key={i}
                     className="flex justify-between items-center pb-4 border-b border-[#B87333]/20"
                   >
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <h3
-                        className="text-xl mb-1"
+                        className="text-lg sm:text-xl mb-1"
                         style={{
                           fontFamily: 'var(--font-heading)',
                           color: '#F5F1E8',
@@ -313,11 +313,11 @@ export default function CheckoutPage() {
                       >
                         {item.name}
                       </h3>
-                      <p style={{ color: '#8B6F47' }}>
+                      <p className="text-sm sm:text-base" style={{ color: '#8B6F47' }}>
                         ₹{item.price} × {item.quantity}
                       </p>
                     </div>
-                    <span className="text-2xl gradient-text font-bold">
+                    <span className="text-xl sm:text-2xl gradient-text font-bold flex-shrink-0 ml-2">
                       ₹{item.price * item.quantity}
                     </span>
                   </div>
@@ -343,7 +343,7 @@ export default function CheckoutPage() {
                 
                 <div className="flex justify-between items-center pt-4 border-t-2 border-[#B87333]/30">
                   <span
-                    className="text-3xl"
+                    className="text-2xl sm:text-3xl"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: '#F5F1E8',
@@ -353,7 +353,7 @@ export default function CheckoutPage() {
                     TOTAL
                   </span>
                   <span
-                    className="text-4xl gradient-text"
+                    className="text-3xl sm:text-4xl gradient-text"
                     style={{
                       fontFamily: 'var(--font-heading)',
                     }}
@@ -365,19 +365,19 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment Button */}
-            <div className="brutal-card p-8">
-              <div className="flex items-center gap-3 mb-6">
+            <div className="brutal-card p-4 sm:p-6 md:p-8">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div
-                  className="w-12 h-12 flex items-center justify-center rounded-full"
+                  className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full flex-shrink-0"
                   style={{
                     background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.3))',
                     border: '2px solid rgba(184, 115, 51, 0.5)',
                   }}
                 >
-                  <CreditCard size={24} className="text-[#B87333]" />
+                  <CreditCard size={20} className="text-[#B87333]" />
                 </div>
                 <h2
-                  className="text-3xl"
+                  className="text-2xl sm:text-3xl"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: '#F5F1E8',
@@ -388,7 +388,7 @@ export default function CheckoutPage() {
                 </h2>
               </div>
 
-              <p className="text-lg mb-8" style={{ color: '#8B6F47', lineHeight: 1.7 }}>
+              <p className="text-base sm:text-lg mb-6 sm:mb-8" style={{ color: '#8B6F47', lineHeight: 1.7 }}>
                 Secure payment powered by Razorpay. Your payment information is encrypted and safe.
               </p>
 
@@ -397,8 +397,9 @@ export default function CheckoutPage() {
                 disabled={paying}
                 className="btn btn-primary w-full"
                 style={{
-                  fontSize: '20px',
-                  padding: '24px 50px',
+                  fontSize: 'clamp(16px, 4vw, 20px)',
+                  padding: 'clamp(16px, 4vw, 24px) clamp(24px, 6vw, 50px)',
+                  minHeight: '56px',
                 }}
               >
                 {paying ? (

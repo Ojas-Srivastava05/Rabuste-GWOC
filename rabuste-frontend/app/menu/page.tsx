@@ -453,8 +453,8 @@ export default function MenuPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        <div className="container px-4 md:px-6">
+      <div className="min-h-screen" style={{ paddingTop: 'clamp(80px, 15vw, 120px)', paddingBottom: 'clamp(40px, 10vw, 80px)', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+        <div className="container px-3 sm:px-4 md:px-6">
           {/* Header */}
           <div className="text-center mb-12">
             <motion.div
@@ -473,7 +473,7 @@ export default function MenuPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl mb-4"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
@@ -486,7 +486,7 @@ export default function MenuPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg"
+              className="text-sm sm:text-base md:text-lg px-2"
               style={{ color: '#B87333' }}
             >
               Premium Robusta Coffee - {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available. Buy the best Robusta coffee online with 2x caffeine.
@@ -527,18 +527,20 @@ export default function MenuPage() {
                       setLastSearchQuery(searchQuery);
                     }
                   }}
-                  className="w-full pl-11 pr-10 py-3 bg-transparent outline-none text-sm"
+                  className="w-full pl-11 pr-12 py-3.5 sm:py-3 bg-transparent outline-none text-base sm:text-sm"
                   style={{
                     color: '#F5F1E8',
                     fontFamily: 'var(--font-body)',
+                    minHeight: '44px', // Touch-friendly height
                   }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 -mr-2 transition-transform active:scale-90"
+                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
-                    <X size={16} style={{ color: '#B87333' }} />
+                    <X size={18} style={{ color: '#B87333' }} />
                   </button>
                 )}
               </div>
@@ -555,35 +557,40 @@ export default function MenuPage() {
                 >
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`px-4 py-3 transition-colors ${viewMode === "grid" ? 'bg-copper-gradient' : ''}`}
+                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors ${viewMode === "grid" ? 'bg-copper-gradient' : ''}`}
                     style={{
                       background: viewMode === "grid" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
+                      minWidth: '48px',
+                      minHeight: '44px',
                     }}
                   >
-                    <Grid3x3 size={18} style={{ color: viewMode === "grid" ? '#D4A574' : '#B87333' }} />
+                    <Grid3x3 size={20} style={{ color: viewMode === "grid" ? '#D4A574' : '#B87333' }} />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`px-4 py-3 transition-colors`}
+                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors`}
                     style={{
                       background: viewMode === "list" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
                       borderLeft: '1px solid rgba(184, 115, 51, 0.2)',
+                      minWidth: '48px',
+                      minHeight: '44px',
                     }}
                   >
-                    <List size={18} style={{ color: viewMode === "list" ? '#D4A574' : '#B87333' }} />
+                    <List size={20} style={{ color: viewMode === "list" ? '#D4A574' : '#B87333' }} />
                   </button>
                 </div>
 
                 {/* Filters Button */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="px-4 py-3 flex items-center gap-2"
+                  className="px-4 sm:px-4 py-3.5 sm:py-3 flex items-center gap-2"
                   style={{
                     background: showFilters ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
                     border: '1px solid rgba(184, 115, 51, 0.3)',
+                    minHeight: '44px',
                   }}
                 >
-                  <SlidersHorizontal size={18} style={{ color: '#B87333' }} />
+                  <SlidersHorizontal size={20} style={{ color: '#B87333' }} />
                   <span className="text-sm hidden sm:inline" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
                     Filters
                   </span>
@@ -1256,7 +1263,7 @@ function GridMenuItem({
               e.preventDefault();
               onFavorite();
             }}
-            className="absolute top-2 right-2 p-2 rounded-full transition-all hover:scale-110"
+            className="absolute top-2 right-2 p-2.5 sm:p-2 rounded-full transition-all active:scale-95"
             style={{
               background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
               border: `2px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
@@ -1264,9 +1271,14 @@ function GridMenuItem({
               zIndex: 20,
               pointerEvents: 'auto',
               cursor: 'pointer',
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <Heart size={16} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+            <Heart size={18} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
           </button>
         )}
 
@@ -1396,13 +1408,14 @@ function GridMenuItem({
 
           {quantity > 0 ? (
             <div
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 sm:gap-2"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
-                padding: '4px 8px',
+                padding: '6px 10px',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
                 position: 'relative',
                 zIndex: 10,
+                borderRadius: '8px',
               }}
             >
               <button 
@@ -1411,12 +1424,20 @@ function GridMenuItem({
                   e.preventDefault();
                   onRemove();
                 }} 
-                className="text-[#B87333] hover:text-[#D4A574]"
-                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                style={{ 
+                  cursor: 'pointer', 
+                  pointerEvents: 'auto',
+                  minWidth: '36px',
+                  minHeight: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                <Minus size={14} />
+                <Minus size={18} />
               </button>
-              <span className="text-sm font-bold gradient-text" style={{ minWidth: '16px', textAlign: 'center' }}>
+              <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
                 {quantity}
               </span>
               <button 
@@ -1425,10 +1446,18 @@ function GridMenuItem({
                   e.preventDefault();
                   onAdd();
                 }} 
-                className="text-[#B87333] hover:text-[#D4A574]"
-                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                style={{ 
+                  cursor: 'pointer', 
+                  pointerEvents: 'auto',
+                  minWidth: '36px',
+                  minHeight: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
               >
-                <Plus size={14} />
+                <Plus size={18} />
               </button>
             </div>
           ) : (
@@ -1438,7 +1467,7 @@ function GridMenuItem({
                 e.preventDefault();
                 onAdd();
               }}
-              className="px-3 py-1.5 text-xs flex items-center gap-1"
+              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-sm sm:text-xs flex items-center gap-1.5 sm:gap-1"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
@@ -1450,9 +1479,20 @@ function GridMenuItem({
                 pointerEvents: 'auto',
                 position: 'relative',
                 zIndex: 10,
+                minHeight: '44px',
+                borderRadius: '8px',
+                active: {
+                  transform: 'scale(0.95)',
+                },
+              }}
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+              }}
+              onTouchEnd={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              <Plus size={12} />
+              <Plus size={16} />
               ADD
             </button>
           )}
@@ -1553,9 +1593,9 @@ function ListMenuItem({
           />
         </>
       )}
-      <div className="flex gap-4 p-4">
+      <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
         {/* Image */}
-        <div className="w-24 h-24 flex-shrink-0 overflow-hidden relative">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden relative">
           <img
             src={item.image}
             alt={item.name}
@@ -1569,7 +1609,7 @@ function ListMenuItem({
                 e.preventDefault();
                 onFavorite();
               }}
-              className="absolute top-1 right-1 p-1.5 rounded-full transition-all hover:scale-110"
+              className="absolute top-1 right-1 p-2.5 sm:p-1.5 rounded-full transition-all active:scale-95"
               style={{
                 background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
                 border: `1.5px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
@@ -1577,9 +1617,14 @@ function ListMenuItem({
                 zIndex: 20,
                 pointerEvents: 'auto',
                 cursor: 'pointer',
+                minWidth: '40px',
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Heart size={12} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+              <Heart size={16} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
             </button>
           )}
         </div>
@@ -1695,16 +1740,17 @@ function ListMenuItem({
           </div>
 
           {/* Action */}
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-3">
             {quantity > 0 ? (
               <div
-                className="flex items-center gap-3"
+                className="flex items-center gap-3 sm:gap-3"
                 style={{
                   background: 'rgba(184, 115, 51, 0.2)',
-                  padding: '6px 12px',
+                  padding: '8px 14px',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
                   position: 'relative',
                   zIndex: 10,
+                  borderRadius: '8px',
                 }}
               >
                 <button 
@@ -1713,12 +1759,20 @@ function ListMenuItem({
                     e.preventDefault();
                     onRemove();
                   }} 
-                  className="text-[#B87333] hover:text-[#D4A574]"
-                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                  style={{ 
+                    cursor: 'pointer', 
+                    pointerEvents: 'auto',
+                    minWidth: '36px',
+                    minHeight: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <Minus size={16} />
+                  <Minus size={18} />
                 </button>
-                <span className="text-sm font-bold gradient-text" style={{ minWidth: '20px', textAlign: 'center' }}>
+                <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
                   {quantity}
                 </span>
                 <button 
@@ -1727,10 +1781,18 @@ function ListMenuItem({
                     e.preventDefault();
                     onAdd();
                   }} 
-                  className="text-[#B87333] hover:text-[#D4A574]"
-                  style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                  style={{ 
+                    cursor: 'pointer', 
+                    pointerEvents: 'auto',
+                    minWidth: '36px',
+                    minHeight: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <Plus size={16} />
+                  <Plus size={18} />
                 </button>
               </div>
             ) : (
@@ -1740,7 +1802,7 @@ function ListMenuItem({
                   e.preventDefault();
                   onAdd();
                 }}
-                className="px-4 py-2 text-xs"
+                className="px-5 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-xs"
                 style={{
                   background: 'rgba(184, 115, 51, 0.2)',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
@@ -1751,6 +1813,14 @@ function ListMenuItem({
                   zIndex: 10,
                   fontFamily: 'var(--font-body)',
                   letterSpacing: '0.05em',
+                  minHeight: '44px',
+                  borderRadius: '8px',
+                }}
+                onTouchStart={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                }}
+                onTouchEnd={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
                 ADD TO CART

@@ -263,8 +263,8 @@ export default function CartPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        <div className="container px-6">
+      <div className="min-h-screen" style={{ paddingTop: 'clamp(80px, 15vw, 120px)', paddingBottom: 'clamp(40px, 10vw, 80px)', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+        <div className="container px-3 sm:px-4 md:px-6">
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-4 mb-8">
@@ -276,7 +276,7 @@ export default function CartPage() {
             </div>
             
             <h1 
-              className="text-6xl md:text-8xl mb-6"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-6"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
@@ -302,7 +302,7 @@ export default function CartPage() {
                         className="block"
                       >
                         <h3 
-                          className="text-2xl mb-2 hover:underline transition-all"
+                          className="text-xl sm:text-2xl mb-2 hover:underline transition-all"
                           style={{
                             fontFamily: 'var(--font-heading)',
                             color: '#F5F1E8',
@@ -313,15 +313,15 @@ export default function CartPage() {
                           {item.name}
                         </h3>
                       </a>
-                      <div className="flex items-center gap-4 text-lg mb-4 md:mb-0">
+                      <div className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg mb-4 md:mb-0">
                         <span className="gradient-text font-bold">₹{item.price}</span>
                         <span style={{ color: '#8B6F47' }}>each</span>
                       </div>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <button
                           onClick={() => {
                             const itemId = item.menuItem || item.artItem;
@@ -329,7 +329,7 @@ export default function CartPage() {
                               updateQuantity(itemId, item.itemType, item.quantity - 1);
                             }
                           }}
-                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg"
+                          className="w-12 h-12 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
                           style={{
                             background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                             border: '2px solid rgba(184, 115, 51, 0.6)',
@@ -337,16 +337,16 @@ export default function CartPage() {
                             boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
                           }}
                         >
-                          <Minus size={20} style={{ color: '#000', fontWeight: 'bold' }} />
+                          <Minus size={22} style={{ color: '#000', fontWeight: 'bold' }} />
                         </button>
                         
                         <div
-                          className="px-6 py-2 text-xl font-bold rounded-lg"
+                          className="px-5 sm:px-6 py-2 text-lg sm:text-xl font-bold rounded-lg"
                           style={{
                             background: 'rgba(26, 17, 16, 0.6)',
                             border: '2px solid rgba(184, 115, 51, 0.4)',
                             color: '#F5F1E8',
-                            minWidth: '70px',
+                            minWidth: '60px',
                             textAlign: 'center',
                             fontFamily: 'var(--font-heading)',
                             letterSpacing: '0.05em',
@@ -362,7 +362,7 @@ export default function CartPage() {
                               updateQuantity(itemId, item.itemType, item.quantity + 1);
                             }
                           }}
-                          className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110 hover:shadow-lg"
+                          className="w-12 h-12 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
                           style={{
                             background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                             border: '2px solid rgba(184, 115, 51, 0.6)',
@@ -370,15 +370,15 @@ export default function CartPage() {
                             boxShadow: '0 4px 12px rgba(184, 115, 51, 0.3)',
                           }}
                         >
-                          <Plus size={20} style={{ color: '#000', fontWeight: 'bold' }} />
+                          <Plus size={22} style={{ color: '#000', fontWeight: 'bold' }} />
                         </button>
                       </div>
 
                       <div 
-                        className="text-2xl font-bold gradient-text"
+                        className="text-xl sm:text-2xl font-bold gradient-text"
                         style={{
                           fontFamily: 'var(--font-heading)',
-                          minWidth: '120px',
+                          minWidth: '100px',
                           textAlign: 'right',
                         }}
                       >
@@ -390,11 +390,17 @@ export default function CartPage() {
                           item.menuItem || item.artItem || '',
                           item.itemType
                         )}
-                        className="p-2 transition-all hover:scale-110"
+                        className="p-2.5 sm:p-2 transition-all active:scale-95"
                         style={{
                           background: 'rgba(239, 68, 68, 0.2)',
                           border: '1px solid rgba(239, 68, 68, 0.4)',
                           cursor: 'pointer',
+                          minWidth: '44px',
+                          minHeight: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '8px',
                         }}
                       >
                         <Trash2 size={18} style={{ color: '#ef4444' }} />
@@ -414,7 +420,7 @@ export default function CartPage() {
                 }}
               >
                 <h2 
-                  className="text-3xl mb-8"
+                  className="text-2xl sm:text-3xl mb-6 sm:mb-8"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     color: '#F5F1E8',
@@ -551,6 +557,11 @@ export default function CartPage() {
                     }
                   }}
                   className="btn btn-primary w-full mb-4"
+                  style={{
+                    minHeight: '56px',
+                    fontSize: 'clamp(14px, 3.5vw, 16px)',
+                    padding: 'clamp(14px, 3.5vw, 18px) clamp(20px, 5vw, 32px)',
+                  }}
                 >
                   PROCEED TO CHECKOUT
                   <ArrowRight size={20} />
@@ -567,6 +578,9 @@ export default function CartPage() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '12px',
+                    minHeight: '48px',
+                    fontSize: 'clamp(13px, 3vw, 15px)',
+                    padding: 'clamp(12px, 3vw, 16px) clamp(18px, 4.5vw, 28px)',
                   }}
                 >
                   <Trash2 size={18} />
