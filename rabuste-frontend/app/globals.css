@@ -200,6 +200,9 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .btn-primary {

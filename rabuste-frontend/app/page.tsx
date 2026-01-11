@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import DynamicBackground from "@/components/DynamicBackground";
 import HeroRevamped from "@/components/sections/HeroRevamped";
 import HorizontalScroll from "@/components/sections/HorizontalScroll";
 import ExperienceSection from "@/components/sections/ExperienceSection";
@@ -35,6 +36,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      <DynamicBackground />
       <FloatingCart />
       <FloatingMoodBrewer />
 

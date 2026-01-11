@@ -59,6 +59,7 @@ export default function Navbar() {
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
+    console.log('Menu open state changed to:', open);
     if (open) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -129,20 +130,37 @@ export default function Navbar() {
         </div>
 
         {/* MOBILE: hamburger on left */}
-        <div className="flex md:hidden items-center gap-3 flex-1 z-50 relative">
+        <div className="flex md:hidden items-center gap-3 flex-1 relative" style={{ zIndex: 1002 }}>
           <button
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
-            onClick={() => setOpen((s) => !s)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const newState = !open;
+              console.log('Hamburger clicked, setting open to:', newState);
+              setOpen(newState);
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
             onTouchEnd={(e) => {
               e.preventDefault();
-              setOpen((s) => !s);
+              e.stopPropagation();
+              const newState = !open;
+              console.log('Hamburger touched, setting open to:', newState);
+              setOpen(newState);
             }}
-            className="inline-flex items-center justify-center w-11 h-11 bg-transparent border-2 border-[#B87333] text-[#B87333] hover:bg-[#B87333] hover:text-[#000000] active:bg-[#B87333] active:text-[#000000] transition-all duration-300 touch-manipulation"
+            className="inline-flex items-center justify-center w-11 h-11 bg-[#B87333] border-2 border-[#B87333] text-[#000000] active:bg-[#CD7F32] active:scale-95 transition-all duration-200"
             style={{ 
               minWidth: '44px', 
               minHeight: '44px',
-              boxShadow: open ? '0 0 15px rgba(184, 115, 51, 0.5)' : 'none',
+              boxShadow: '0 0 10px rgba(184, 115, 51, 0.5)',
+              zIndex: 1002,
+              position: 'relative',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              WebkitTapHighlightColor: 'transparent',
             }}
             type="button"
           >
@@ -172,21 +190,41 @@ export default function Navbar() {
 
         {/* Center logo */}
         <div
-          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto z-10"
-          style={{ left: "50%" }}
+          className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+          style={{ left: "50%", zIndex: 1001, pointerEvents: 'none' }}
           aria-hidden={false}
         >
-          <Link 
-            href="/" 
-            aria-label="Home"
+          <div
             onClick={(e) => {
-              // If already on home page, prevent navigation and just scroll to top
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Logo clicked, pathname:', pathname);
               if (pathname === '/') {
-                e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 document.documentElement.scrollTop = 0;
                 document.body.scrollTop = 0;
+              } else {
+                router.push('/');
               }
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('Logo touched, pathname:', pathname);
+              if (pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                router.push('/');
+              }
+            }}
+            style={{
+              display: 'block',
+              pointerEvents: 'auto',
+              cursor: 'pointer',
+              touchAction: 'manipulation',
             }}
           >
             <div 
@@ -197,6 +235,8 @@ export default function Navbar() {
                 background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
                 border: '2px solid rgba(184, 115, 51, 0.4)',
                 boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
+                pointerEvents: 'auto',
+                cursor: 'pointer',
               }}
             >
               <Image
@@ -208,7 +248,7 @@ export default function Navbar() {
                 priority
               />
             </div>
-          </Link>
+          </div>
         </div>
 
         {/* RIGHT (hidden on small screens) */}
@@ -459,32 +499,33 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu backdrop */}
-      <AnimatePresence>
         {open && (
           <div
-            className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
+          className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setOpen(false)}
             onTouchStart={(e) => {
               e.preventDefault();
               setOpen(false);
             }}
-            style={{ touchAction: "none" }}
-          />
-        )}
-      </AnimatePresence>
+          style={{ 
+            touchAction: "none",
+            zIndex: 1002,
+          }}
+        />
+      )}
 
       {/* Mobile menu overlay - Full height scrollable */}
       <div
-        className={`md:hidden fixed inset-y-0 left-0 right-0 z-50 transform-gpu transition-all duration-300 ease-out ${
-          open
-            ? "opacity-100 translate-x-0 pointer-events-auto"
-            : "opacity-0 -translate-x-full pointer-events-none"
+        className={`md:hidden fixed inset-0 transform-gpu transition-all duration-300 ease-out ${
+          open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-full pointer-events-none'
         }`}
-        aria-hidden={!open}
         style={{
           top: scrolled ? '60px' : '70px',
-          maxHeight: `calc(100vh - ${scrolled ? '60px' : '70px'})`,
+          height: `calc(100vh - ${scrolled ? '60px' : '70px'})`,
+          width: '100%',
+          zIndex: 1003,
         }}
+        aria-hidden={!open}
       >
         <div 
           className="h-full overflow-y-auto"

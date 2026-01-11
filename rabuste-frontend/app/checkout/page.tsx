@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { CreditCard, ShoppingBag, CheckCircle, Loader2, Package } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -34,6 +34,8 @@ export default function CheckoutPage() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [paying, setPaying] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const lastClickTime = useRef<number>(0);
 
   useEffect(() => {
     fetchCart();
@@ -63,15 +65,34 @@ export default function CheckoutPage() {
     }
   }
 
-  async function handleRazorpayPayment() {
-    if (!cart) return;
-  
+  const handleRazorpayPayment = useCallback(async (e?: React.MouseEvent | React.TouchEvent) => {
+    // Prevent default and stop propagation
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Debounce: Prevent rapid clicks (within 1 second)
+    const now = Date.now();
+    if (now - lastClickTime.current < 1000) {
+      console.log('Payment button clicked too quickly, ignoring...');
+      return;
+    }
+    lastClickTime.current = now;
+
+    // Prevent multiple simultaneous calls
+    if (isProcessing || paying || !cart) {
+      console.log('Payment already processing or cart empty');
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       router.push("/auth?redirect=/checkout");
       return;
     }
 
+    setIsProcessing(true);
     setPaying(true);
     
     try {
@@ -102,6 +123,7 @@ export default function CheckoutPage() {
             console.error('Payment verification error:', error);
             alert('Payment verification failed. Please contact support.');
             setPaying(false);
+            setIsProcessing(false);
           }
         },
         prefill: {
@@ -114,6 +136,7 @@ export default function CheckoutPage() {
         modal: {
           ondismiss: () => {
             setPaying(false);
+            setIsProcessing(false);
           }
         }
       });
@@ -121,8 +144,9 @@ export default function CheckoutPage() {
       console.error('Payment initialization error:', error);
       alert('Failed to initialize payment. Please try again.');
       setPaying(false);
+      setIsProcessing(false);
     }
-  }
+  }, [cart, isProcessing, paying, router]);
 
   async function createOrderAfterPayment(paymentId: string) {
     try {
@@ -184,8 +208,16 @@ export default function CheckoutPage() {
     } catch (err) {
       console.error("Order creation error:", err);
       alert("Payment successful but order creation failed. Please contact support.");
-    } finally {
       setPaying(false);
+      setIsProcessing(false);
+    } finally {
+      // Only reset if not already reset
+      if (paying) {
+        setPaying(false);
+      }
+      if (isProcessing) {
+        setIsProcessing(false);
+      }
     }
   }
   
@@ -314,11 +346,11 @@ export default function CheckoutPage() {
                         {item.name}
                       </h3>
                       <p className="text-sm sm:text-base" style={{ color: '#8B6F47' }}>
-                        ₹{item.price} × {item.quantity}
+                        ₹{Math.ceil(item.price)} × {item.quantity}
                       </p>
                     </div>
                     <span className="text-xl sm:text-2xl gradient-text font-bold flex-shrink-0 ml-2">
-                      ₹{item.price * item.quantity}
+                      ₹{Math.ceil(item.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -327,13 +359,13 @@ export default function CheckoutPage() {
               <div className="space-y-4 pt-6 border-t-2 border-[#B87333]/30">
                 <div className="flex justify-between text-base" style={{ color: '#8B6F47' }}>
                   <span>Subtotal</span>
-                  <span>₹{subtotal}</span>
+                  <span>₹{Math.ceil(subtotal)}</span>
                 </div>
                 
                 {cart.couponCode && discount > 0 && (
                   <div className="flex justify-between text-base" style={{ color: '#5E7D4C' }}>
                     <span>Coupon Discount ({cart.couponCode})</span>
-                    <span>- ₹{discount}</span>
+                    <span>- ₹{Math.ceil(discount)}</span>
                   </div>
                 )}
 
@@ -358,14 +390,14 @@ export default function CheckoutPage() {
                       fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    ₹{totalAmount}
+                    ₹{Math.ceil(totalAmount)}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Payment Button */}
-            <div className="brutal-card p-4 sm:p-6 md:p-8">
+            {/* Payment Button - Desktop */}
+            <div className="hidden lg:block brutal-card p-4 sm:p-6 md:p-8">
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div
                   className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full flex-shrink-0"
@@ -393,14 +425,10 @@ export default function CheckoutPage() {
               </p>
 
               <button
-                onClick={handleRazorpayPayment}
-                disabled={paying}
+                type="button"
+                onClick={(e) => handleRazorpayPayment(e)}
+                disabled={paying || isProcessing}
                 className="btn btn-primary w-full"
-                style={{
-                  fontSize: 'clamp(16px, 4vw, 20px)',
-                  padding: 'clamp(16px, 4vw, 24px) clamp(24px, 6vw, 50px)',
-                  minHeight: '56px',
-                }}
               >
                 {paying ? (
                   <>
@@ -410,7 +438,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <CreditCard size={24} />
-                    PAY ₹{totalAmount}
+                    PAY ₹{Math.ceil(totalAmount)}
                   </>
                 )}
               </button>
@@ -422,7 +450,92 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Payment Bar - Fixed at Bottom */}
+        <div 
+          className="lg:hidden fixed bottom-0 left-0 right-0 z-[9999]"
+          style={{
+            background: 'linear-gradient(180deg, rgba(26, 17, 16, 0.98) 0%, rgba(42, 24, 16, 0.98) 100%)',
+            backdropFilter: 'blur(20px)',
+            borderTop: '2px solid rgba(184, 115, 51, 0.4)',
+            boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(184, 115, 51, 0.2)',
+          }}
+        >
+          <div className="container px-4 py-4">
+            {/* Total Price */}
+            <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#B87333]/30">
+              <span 
+                className="text-xl"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#F5F1E8',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                TOTAL
+              </span>
+              <span 
+                className="text-2xl gradient-text font-bold"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                ₹{Math.ceil(totalAmount)}
+              </span>
+            </div>
+
+            {/* Payment Button */}
+            <button
+              type="button"
+              onClick={(e) => handleRazorpayPayment(e)}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleRazorpayPayment(e);
+              }}
+              disabled={paying || isProcessing}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: paying || isProcessing 
+                  ? 'rgba(184, 115, 51, 0.5)' 
+                  : 'linear-gradient(135deg, #B87333, #CD7F32)',
+                border: '2px solid rgba(184, 115, 51, 0.6)',
+                color: '#000',
+                fontFamily: 'var(--font-heading)',
+                fontWeight: 'bold',
+                letterSpacing: '0.1em',
+                fontSize: '15px',
+                borderRadius: '8px',
+                cursor: (paying || isProcessing) ? 'not-allowed' : 'pointer',
+                pointerEvents: (paying || isProcessing) ? 'none' : 'auto',
+                touchAction: 'manipulation',
+                boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
+              }}
+            >
+              {paying ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  PROCESSING...
+                </>
+              ) : (
+                <>
+                  <CreditCard size={20} />
+                  PAY ₹{Math.ceil(totalAmount)}
+                </>
+              )}
+            </button>
+
+            {/* Security Badge */}
+            <div className="flex items-center justify-center gap-2 mt-3" style={{ color: '#8B6F47' }}>
+              <CheckCircle size={14} />
+              <span className="text-xs">Secure & encrypted</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Spacer for mobile payment bar */}
+      <div className="lg:hidden h-32" />
 
       <Footer />
     </>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Coffee, Sparkles, ArrowRight, Palette, Zap, TrendingUp } from "lucide-react";
+import { X, Coffee, Sparkles, ArrowRight, Palette, Zap, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PersonalizedComboPopupProps {
@@ -166,27 +166,6 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
     setAiSuggestions(suggestions);
   };
 
-  // Show popup after 3 seconds on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Rotate messages every 8 seconds
-  useEffect(() => {
-    if (!isVisible || isMinimized) return;
-
-    const messages = isLoggedIn ? loggedInMessages : guestMessages;
-    const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [isVisible, isMinimized, isLoggedIn]);
-
   // Base guest messages (fallback)
   const baseGuestMessages: ComboMessage[] = [
     {
@@ -215,9 +194,6 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
     },
   ];
 
-  // Use AI suggestions if available, otherwise use base messages
-  const guestMessages = aiSuggestions.length > 0 ? aiSuggestions : baseGuestMessages;
-
   const loggedInMessages = [
     {
       icon: Coffee,
@@ -245,7 +221,45 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
     },
   ];
 
-  const messages = isLoggedIn ? loggedInMessages : guestMessages;
+  // Get current messages array
+  const getMessages = () => {
+    const guestMessages = aiSuggestions.length > 0 ? aiSuggestions : baseGuestMessages;
+    return isLoggedIn ? loggedInMessages : guestMessages;
+  };
+
+  // Navigation functions
+  const goToPrevious = () => {
+    const messages = getMessages();
+    setCurrentMessageIndex((prev) => (prev - 1 + messages.length) % messages.length);
+  };
+
+  const goToNext = () => {
+    const messages = getMessages();
+    setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+  };
+
+  // Show popup after 3 seconds on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Rotate messages every 8 seconds (autoplay)
+  useEffect(() => {
+    if (!isVisible || isMinimized) return;
+
+    const interval = setInterval(() => {
+      const messages = getMessages();
+      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [isVisible, isMinimized, isLoggedIn, aiSuggestions.length]);
+
+  const messages = getMessages();
   const currentMessage = messages[currentMessageIndex];
   const Icon = currentMessage.icon;
 
@@ -407,6 +421,82 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
               </div>
             </div>
 
+            {/* Navigation Arrows */}
+            <div className="relative z-10 flex items-center justify-between px-2 pb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                className="p-1.5 rounded-full transition-all active:scale-95"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.3)',
+                  border: '1px solid rgba(184, 115, 51, 0.6)',
+                  color: '#D4A574',
+                  minWidth: '32px',
+                  minHeight: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                }}
+                aria-label="Previous"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="flex gap-1">
+                {getMessages().map((_, index) => (
+                  <div
+                    key={index}
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      background: index === currentMessageIndex 
+                        ? currentMessage.color 
+                        : 'rgba(255, 254, 249, 0.3)',
+                      width: index === currentMessageIndex ? '20px' : '6px',
+                    }}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                className="p-1.5 rounded-full transition-all active:scale-95"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.3)',
+                  border: '1px solid rgba(184, 115, 51, 0.6)',
+                  color: '#D4A574',
+                  minWidth: '32px',
+                  minHeight: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                }}
+                aria-label="Next"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+
             {/* Content */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -493,24 +583,6 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
                 </motion.button>
               </motion.div>
             </AnimatePresence>
-
-            {/* Progress Indicators */}
-            <div className="relative z-10 flex gap-1 px-3 pb-2.5">
-              {messages.map((_, index) => (
-                <div
-                  key={index}
-                  className="flex-1 h-0.5 transition-all duration-300"
-                  style={{
-                    background: index === currentMessageIndex 
-                      ? currentMessage.color 
-                      : 'rgba(255, 254, 249, 0.2)',
-                    boxShadow: index === currentMessageIndex 
-                      ? `0 0 10px ${currentMessage.color}` 
-                      : 'none',
-                  }}
-                />
-              ))}
-            </div>
 
             {/* Corner Decorations */}
             <div

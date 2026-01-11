@@ -314,7 +314,7 @@ export default function CartPage() {
                         </h3>
                       </a>
                       <div className="flex items-center gap-3 sm:gap-4 text-base sm:text-lg mb-4 md:mb-0">
-                        <span className="gradient-text font-bold">₹{item.price}</span>
+                        <span className="gradient-text font-bold">₹{Math.ceil(item.price)}</span>
                         <span style={{ color: '#8B6F47' }}>each</span>
                       </div>
                     </div>
@@ -382,7 +382,7 @@ export default function CartPage() {
                           textAlign: 'right',
                         }}
                       >
-                        ₹{item.price * item.quantity}
+                        ₹{Math.ceil(item.price * item.quantity)}
                       </div>
 
                       <button
@@ -411,8 +411,8 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
+            {/* Order Summary - Desktop */}
+            <div className="hidden lg:block lg:col-span-1" style={{ position: 'relative', zIndex: 100 }}>
               <div 
                 className="sticky top-32 brutal-card p-8"
                 style={{
@@ -512,13 +512,13 @@ export default function CartPage() {
                 <div className="space-y-4 mb-8 pb-6">
                   <div className="flex justify-between text-base" style={{ color: '#8B6F47' }}>
                     <span>Subtotal</span>
-                    <span>₹{cart.totalAmount}</span>
+                    <span>₹{Math.ceil(cart.totalAmount)}</span>
                   </div>
                   
                   {cart.couponCode && cart.couponDiscount && cart.couponDiscount > 0 && (
                     <div className="flex justify-between text-base" style={{ color: '#5E7D4C' }}>
                       <span>Coupon Discount ({cart.couponCode})</span>
-                      <span>- ₹{cart.couponDiscount}</span>
+                      <span>- ₹{Math.ceil(cart.couponDiscount)}</span>
                     </div>
                   )}
 
@@ -544,24 +544,20 @@ export default function CartPage() {
                       fontFamily: 'var(--font-heading)',
                     }}
                   >
-                    ₹{cart.discountedTotal || cart.totalAmount}
+                    ₹{Math.ceil(cart.discountedTotal || cart.totalAmount)}
                   </span>
                 </div>
 
                 <button
-                  onClick={() => {
-                    if (!isLoggedIn()) {
+                  onClick={async () => {
+                    const token = localStorage.getItem("token");
+                    if (!token) {
                       router.push("/auth?redirect=/checkout");
                     } else {
                       router.push("/checkout");
                     }
                   }}
                   className="btn btn-primary w-full mb-4"
-                  style={{
-                    minHeight: '56px',
-                    fontSize: 'clamp(14px, 3.5vw, 16px)',
-                    padding: 'clamp(14px, 3.5vw, 18px) clamp(20px, 5vw, 32px)',
-                  }}
                 >
                   PROCEED TO CHECKOUT
                   <ArrowRight size={20} />
@@ -573,15 +569,6 @@ export default function CartPage() {
                     window.location.reload();
                   }}
                   className="btn btn-secondary w-full"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    minHeight: '48px',
-                    fontSize: 'clamp(13px, 3vw, 15px)',
-                    padding: 'clamp(12px, 3vw, 16px) clamp(18px, 4.5vw, 28px)',
-                  }}
                 >
                   <Trash2 size={18} />
                   CLEAR CART
@@ -590,6 +577,115 @@ export default function CartPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Checkout Bar - Fixed at Bottom */}
+        {cart && (
+          <div 
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-[9999]"
+            style={{
+              background: 'linear-gradient(180deg, rgba(26, 17, 16, 0.98) 0%, rgba(42, 24, 16, 0.98) 100%)',
+              backdropFilter: 'blur(20px)',
+              borderTop: '2px solid rgba(184, 115, 51, 0.4)',
+              boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(184, 115, 51, 0.2)',
+            }}
+          >
+            <div className="container px-4 py-4">
+              {/* Total Price */}
+              <div className="flex justify-between items-center mb-4 pb-4 border-b border-[#B87333]/30">
+                <span 
+                  className="text-xl"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#F5F1E8',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  TOTAL
+                </span>
+                <span 
+                  className="text-2xl gradient-text font-bold"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                  }}
+                >
+                  ₹{Math.ceil(cart.discountedTotal || cart.totalAmount)}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await fetch("/api/cart", { method: "DELETE" });
+                    window.location.reload();
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 transition-all active:scale-95"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    border: '2px solid rgba(239, 68, 68, 0.4)',
+                    color: '#ef4444',
+                    fontFamily: 'var(--font-heading)',
+                    letterSpacing: '0.05em',
+                    fontSize: '14px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    touchAction: 'manipulation',
+                  }}
+                >
+                  <Trash2 size={18} />
+                  CLEAR
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      window.location.href = "/auth?redirect=/checkout";
+                    } else {
+                      window.location.href = "/checkout";
+                    }
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      window.location.href = "/auth?redirect=/checkout";
+                    } else {
+                      window.location.href = "/checkout";
+                    }
+                  }}
+                  className="flex-[2] flex items-center justify-center gap-2 py-3 px-4 transition-all active:scale-95"
+                  style={{
+                    background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                    border: '2px solid rgba(184, 115, 51, 0.6)',
+                    color: '#000',
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 'bold',
+                    letterSpacing: '0.1em',
+                    fontSize: '15px',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    touchAction: 'manipulation',
+                    boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
+                  }}
+                >
+                  PROCEED TO CHECKOUT
+                  <ArrowRight size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Spacer for mobile checkout bar */}
+        <div className="lg:hidden h-32" />
       </div>
 
       <Footer />

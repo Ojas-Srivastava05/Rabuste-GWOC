@@ -1481,9 +1481,6 @@ function GridMenuItem({
                 zIndex: 10,
                 minHeight: '44px',
                 borderRadius: '8px',
-                active: {
-                  transform: 'scale(0.95)',
-                },
               }}
               onTouchStart={(e) => {
                 e.currentTarget.style.transform = 'scale(0.95)';
