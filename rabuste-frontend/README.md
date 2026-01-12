@@ -1,4 +1,4 @@
-# Rabuste Coffee - Premium Robusta Coffee E-Commerce Platform
+# Rabuste Coffee -Premium Robusta Coffee E-Commerce Platform
 
 A modern, full-stack e-commerce web application for Rabuste Coffee, featuring a bold design system, AI-powered recommendations, and seamless user experience.
 
