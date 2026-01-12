@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
+import { cookies } from 'next/headers';
+import connectDB from '@/src/lib/mongodb';
+import Cart from '@/src/models/Cart';
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -28,27 +31,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { amount } = await request.json();
-    console.log('💰 Amount received:', amount);
+    // ✅ SECURITY: Get frontend amount (for comparison only)
+    const { amount: frontendAmount } = await request.json();
+    console.log('💰 Frontend amount received:', frontendAmount);
 
-    // Validate amount
-    if (!amount || amount <= 0) {
-      console.error('❌ Invalid amount:', amount);
+    // ✅ SECURITY: Fetch cart from database and recalculate amount
+    await connectDB();
+    
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get('sessionId')?.value;
+
+    if (!sessionId) {
+      console.error('❌ No session ID found');
       return NextResponse.json(
-        { error: 'Invalid amount. Must be greater than 0' },
+        { error: 'Session not found' },
+        { status: 401 }
+      );
+    }
+
+    const cart = await Cart.findOne({ sessionId });
+
+    if (!cart) {
+      console.error('❌ Cart not found for session:', sessionId);
+      return NextResponse.json(
+        { error: 'Cart not found' },
+        { status: 404 }
+      );
+    }
+
+    // ✅ SECURITY: Calculate amount from database
+    let calculatedAmount = cart.totalAmount || 0;
+    
+    // Apply coupon discount if exists
+    if (cart.couponDiscount) {
+      calculatedAmount -= cart.couponDiscount;
+    }
+
+    console.log('🔍 Amount verification:', {
+      frontendAmount,
+      calculatedAmount,
+      match: Math.abs(frontendAmount - calculatedAmount) <= 1
+    });
+
+    // ✅ SECURITY: Verify frontend amount matches calculated amount
+    // Allow 1 rupee difference for rounding errors
+    if (!frontendAmount || Math.abs(frontendAmount - calculatedAmount) > 1) {
+      console.error('❌ SECURITY ALERT: Amount mismatch detected!');
+      console.error(`Frontend: ₹${frontendAmount}, Database: ₹${calculatedAmount}`);
+      return NextResponse.json(
+        { 
+          error: 'Amount verification failed. Please refresh and try again.',
+          details: 'Price mismatch between frontend and server'
+        },
         { status: 400 }
       );
     }
 
-    // Create Razorpay order
+    // Validate final amount
+    if (calculatedAmount <= 0) {
+      console.error('❌ Invalid amount:', calculatedAmount);
+      return NextResponse.json(
+        { error: 'Invalid cart total. Must be greater than 0' },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Create Razorpay order with backend-calculated amount
     const options = {
-      amount: Math.round(amount * 100), // Convert to paise (smallest currency unit)
+      amount: Math.round(calculatedAmount * 100), // Convert to paise (smallest currency unit)
       currency: 'INR',
       receipt: `receipt_${Date.now()}`,
       payment_capture: 1, // Auto capture payment
     };
 
-    console.log('🔄 Creating order with options:', options);
+    console.log('🔄 Creating order with secure amount:', options);
     const order = await razorpay.orders.create(options);
     console.log('✅ Order created successfully:', order.id);
 
