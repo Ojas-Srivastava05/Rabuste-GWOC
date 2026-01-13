@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Power, PowerOff, Palette, ImagePlus, X } from "lucide-react";
+import { Plus, Trash2, Power, PowerOff, Palette, ImagePlus, X, Upload, Search, Filter } from "lucide-react";
+import { uploadImageToCloudinary } from "@/lib/imageUpload";
 
 type ArtItem = {
   _id: string;
@@ -21,12 +22,17 @@ type ArtItem = {
 export default function AdminGalleryPage() {
   const [gallery, setGallery] = useState<ArtItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const [title, setTitle] = useState("");
   const [artist, setArtist] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [images, setImages] = useState<string[]>([""]);
+  const [images, setImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState("painting");
   const [medium, setMedium] = useState("");
   const [dimensions, setDimensions] = useState("");
@@ -45,29 +51,31 @@ export default function AdminGalleryPage() {
     setLoading(false);
   }
 
-  function addImageField() {
-    setImages([...images, ""]);
-  }
-
-  function removeImageField(index: number) {
-    if (images.length > 1) {
-      setImages(images.filter((_, i) => i !== index));
+  const handleImageUpload = async (files: FileList) => {
+    setUploading(true);
+    try {
+      const uploadPromises = Array.from(files).map(file => uploadImageToCloudinary(file));
+      const uploadedUrls = await Promise.all(uploadPromises);
+      setImages([...images, ...uploadedUrls]);
+      setImageFiles([...imageFiles, ...Array.from(files)]);
+    } catch (error) {
+      console.error("Failed to upload images:", error);
+      alert("Failed to upload some images");
+    } finally {
+      setUploading(false);
     }
-  }
+  };
 
-  function updateImageField(index: number, value: string) {
-    const newImages = [...images];
-    newImages[index] = value;
-    setImages(newImages);
-  }
+  const removeImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+    setImageFiles(imageFiles.filter((_, i) => i !== index));
+  };
 
   async function handleAddItem(e: React.FormEvent) {
     e.preventDefault();
 
-    const filteredImages = images.filter(img => img.trim() !== "");
-    
-    if (filteredImages.length === 0) {
-      alert("Please add at least one image URL");
+    if (images.length === 0) {
+      alert("Please add at least one image");
       return;
     }
 
@@ -81,7 +89,7 @@ export default function AdminGalleryPage() {
         artist,
         description,
         price: Number(price),
-        images: filteredImages,
+        images,
         category,
         medium: medium || undefined,
         dimensions: dimensions || undefined,
@@ -95,13 +103,14 @@ export default function AdminGalleryPage() {
     setArtist("");
     setDescription("");
     setPrice("");
-    setImages([""]);
+    setImages([]);
+    setImageFiles([]);
     setCategory("painting");
     setMedium("");
     setDimensions("");
     setYear("");
     setStock("1");
-
+    setShowAddForm(false);
     fetchGallery();
   }
 
@@ -124,466 +133,369 @@ export default function AdminGalleryPage() {
   }
 
   const categories = ["painting", "sculpture", "photography", "digital", "mixed-media", "print"];
+  const allCategories = Array.from(new Set(gallery.map(g => g.category)));
+
+  const filteredGallery = gallery.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !categoryFilter || item.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const stats = {
+    total: gallery.length,
+    available: gallery.filter(g => g.isAvailable).length,
+    disabled: gallery.filter(g => !g.isAvailable).length,
+    inStock: gallery.reduce((sum, g) => sum + g.stock, 0),
+  };
 
   return (
-    <div
-      className="min-h-screen p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-12">
-        <div className="inline-flex items-center gap-4 mb-6">
-          <div className="copper-line" />
-          <span className="section-label">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">Gallery Management</h1>
+          <p className="text-gray-600 mt-1">Manage artwork and gallery items</p>
         </div>
-        <h1
-          className="text-5xl md:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
         >
-          GALLERY <span className="gradient-text">MANAGEMENT</span>
-        </h1>
-      </div>
-
-      {/* Add Form */}
-      <div className="brutal-card p-8 mb-12 max-w-4xl">
-        <h2
-          className="text-3xl mb-8 flex items-center gap-3"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <Plus size={32} className="text-[#B87333]" />
-          ADD NEW ARTWORK
-        </h2>
-
-        <form onSubmit={handleAddItem} className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Artwork Title *
-              </label>
-              <input
-                placeholder="e.g., Sunset Over Mountains"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Artist Name *
-              </label>
-              <input
-                placeholder="e.g., John Doe"
-                value={artist}
-                onChange={(e) => setArtist(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              className="block text-sm font-bold mb-3 uppercase tracking-wide"
-              style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-            >
-              Description *
-            </label>
-            <textarea
-              placeholder="Detailed description of the artwork"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              rows={4}
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all resize-none"
-            />
-          </div>
-
-          {/* Images Section */}
-          <div>
-            <label
-              className="block text-sm font-bold mb-3 uppercase tracking-wide"
-              style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-            >
-              Image URLs * (at least one required)
-            </label>
-            <div className="space-y-3">
-              {images.map((img, index) => (
-                <div key={index} className="flex gap-2">
-                  <input
-                    placeholder="https://example.com/image.jpg"
-                    value={img}
-                    onChange={(e) => updateImageField(index, e.target.value)}
-                    className="flex-1 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-                  />
-                  {images.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImageField(index)}
-                      className="px-4 py-3 bg-red-900/20 border-2 border-red-700/40 rounded-lg hover:bg-red-900/30 transition-colors"
-                    >
-                      <X size={18} className="text-red-400" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addImageField}
-                className="flex items-center gap-2 px-4 py-2 bg-[#B87333]/20 border-2 border-[#B87333]/40 rounded-lg hover:bg-[#B87333]/30 transition-colors text-sm"
-                style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}
-              >
-                <ImagePlus size={16} />
-                ADD ANOTHER IMAGE
-              </button>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Price (₹) *
-              </label>
-              <input
-                placeholder="e.g., 25000"
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Category *
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all cursor-pointer"
-              >
-                {categories.map(cat => (
-                  <option key={cat} value={cat} className="bg-[#1A1110]">
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Medium
-              </label>
-              <input
-                placeholder="e.g., Oil on Canvas"
-                value={medium}
-                onChange={(e) => setMedium(e.target.value)}
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Dimensions
-              </label>
-              <input
-                placeholder="e.g., 24x36 inches"
-                value={dimensions}
-                onChange={(e) => setDimensions(e.target.value)}
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-
-            <div>
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Year
-              </label>
-              <input
-                placeholder="e.g., 2024"
-                type="number"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="max-w-xs">
-            <label
-              className="block text-sm font-bold mb-3 uppercase tracking-wide"
-              style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-            >
-              Stock *
-            </label>
-            <input
-              placeholder="e.g., 1"
-              type="number"
-              min="0"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              required
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-5 py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] transition-all"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary w-full md:w-auto">
-            <Plus size={20} />
-            ADD ARTWORK TO GALLERY
-          </button>
-        </form>
+          <Plus size={18} />
+          Add Artwork
+        </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Palette size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">TOTAL</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Items</p>
+              <p className="text-2xl font-bold text-black">{stats.total}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <Palette size={20} className="text-white" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-            {gallery.length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Power size={20} className="text-[#5E7D4C]" />
-            <span className="section-label text-xs">AVAILABLE</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Available</p>
+              <p className="text-2xl font-bold text-green-600">{stats.available}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Power size={20} className="text-green-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
-            {gallery.filter(g => g.isAvailable).length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <PowerOff size={20} className="text-red-500" />
-            <span className="section-label text-xs">DISABLED</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Disabled</p>
+              <p className="text-2xl font-bold text-red-600">{stats.disabled}</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-lg">
+              <PowerOff size={20} className="text-red-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#EF4444' }}>
-            {gallery.filter(g => !g.isAvailable).length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Palette size={20} className="text-[#D4A574]" />
-            <span className="section-label text-xs">IN STOCK</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">In Stock</p>
+              <p className="text-2xl font-bold text-black">{stats.inStock}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <Palette size={20} className="text-gray-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
-            {gallery.reduce((sum, g) => sum + g.stock, 0)}
-          </p>
         </div>
       </div>
 
-      {/* Gallery List */}
-      <div>
-        <h2
-          className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-3"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <Palette size={28} className="text-[#B87333]" />
-          CURRENT GALLERY ITEMS
-        </h2>
+      {/* Add Form */}
+      {showAddForm && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6 animate-slideUp">
+          <h2 className="text-xl font-bold text-black mb-6">Add New Artwork</h2>
+          <form onSubmit={handleAddItem} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Artwork Title *</label>
+                <input
+                  placeholder="e.g., Sunset Over Mountains"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Artist Name *</label>
+                <input
+                  placeholder="e.g., John Doe"
+                  value={artist}
+                  onChange={(e) => setArtist(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Description *</label>
+              <textarea
+                placeholder="Detailed description of the artwork"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                rows={4}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black resize-none"
+              />
+            </div>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="section-label">Loading gallery...</p>
-          </div>
-        )}
+            {/* Images Section */}
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Images * (at least one required)</label>
+              <div className="space-y-3">
+                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
+                  <Upload size={20} className="mr-2 text-gray-400" />
+                  <span className="text-sm text-gray-600">
+                    {uploading ? "Uploading..." : "Click to upload images or drag and drop"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => e.target.files && handleImageUpload(e.target.files)}
+                    className="hidden"
+                    disabled={uploading}
+                  />
+                </label>
+                {images.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {images.map((img, index) => (
+                      <div key={index} className="relative group">
+                        <img src={img} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
 
-        {!loading && gallery.length === 0 && (
-          <div className="brutal-card p-12 text-center">
-            <Palette size={64} className="text-[#B87333] mx-auto mb-6" />
-            <p className="text-xl" style={{ color: '#8B6F47' }}>No artworks yet. Add your first piece above.</p>
-          </div>
-        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Price (₹) *</label>
+                <input
+                  placeholder="e.g., 25000"
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Category *</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {gallery.map((item) => (
-              <div
-                key={item._id}
-                className="brutal-card p-0 overflow-hidden flex flex-col"
-                style={{
-                  opacity: item.isAvailable ? 1 : 0.6,
-                  position: 'relative',
-                }}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Medium</label>
+                <input
+                  placeholder="e.g., Oil on Canvas"
+                  value={medium}
+                  onChange={(e) => setMedium(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Dimensions</label>
+                <input
+                  placeholder="e.g., 24x36 inches"
+                  value={dimensions}
+                  onChange={(e) => setDimensions(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Year</label>
+                <input
+                  placeholder="e.g., 2024"
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
+            </div>
+
+            <div className="max-w-xs">
+              <label className="block text-sm font-semibold text-black mb-2">Stock *</label>
+              <input
+                placeholder="e.g., 1"
+                type="number"
+                min="0"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={uploading}
+                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50"
               >
+                {uploading ? "Uploading..." : "Add Artwork"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setTitle("");
+                  setArtist("");
+                  setDescription("");
+                  setPrice("");
+                  setImages([]);
+                  setImageFiles([]);
+                  setCategory("painting");
+                  setMedium("");
+                  setDimensions("");
+                  setYear("");
+                  setStock("1");
+                }}
+                className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search artwork..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+            />
+          </div>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+          >
+            <option value="">All Categories</option>
+            {allCategories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Gallery Grid */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading gallery...</p>
+          </div>
+        </div>
+      ) : filteredGallery.length === 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <Palette size={64} className="mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">No artworks found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredGallery.map((item) => (
+            <div
+              key={item._id}
+              className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
+                item.isAvailable ? 'border-gray-200' : 'border-red-200 opacity-75'
+              }`}
+            >
+              <div className="aspect-square bg-gray-100 overflow-hidden relative">
+                {item.images[0] ? (
+                  <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <ImagePlus size={48} className="text-gray-400" />
+                  </div>
+                )}
                 {!item.isAvailable && (
-                  <div
-                    className="absolute top-4 right-4 px-3 py-1 rounded text-xs font-bold uppercase tracking-wide z-10"
-                    style={{
-                      background: 'rgba(220, 38, 38, 0.2)',
-                      border: '2px solid rgba(220, 38, 38, 0.5)',
-                      color: '#FCA5A5',
-                    }}
-                  >
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
                     Disabled
                   </div>
                 )}
-
-                {/* Image Gallery */}
-                <div className="aspect-square overflow-hidden relative">
-                  <img
-                    src={item.images[0]}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {item.images.length > 1 && (
-                    <div
-                      className="absolute top-2 right-2 px-2 py-1 text-xs flex items-center gap-1 rounded"
-                      style={{
-                        background: 'rgba(0, 0, 0, 0.8)',
-                        border: '1px solid rgba(184, 115, 51, 0.4)',
-                        color: '#D4A574',
-                      }}
-                    >
-                      <ImagePlus size={12} />
-                      {item.images.length}
-                    </div>
-                  )}
-                  {!item.isAvailable && (
-                    <div
-                      className="absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold uppercase"
-                      style={{
-                        background: 'rgba(220, 38, 38, 0.9)',
-                        color: '#FFFFFF',
-                      }}
-                    >
-                      Disabled
-                    </div>
-                  )}
+                {item.images.length > 1 && (
+                  <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                    +{item.images.length - 1} more
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.category}</span>
+                  <span className="text-xs font-semibold text-black">Stock: {item.stock}</span>
                 </div>
-
-                <div className="p-4 flex flex-col flex-1">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span
-                      className="text-xs uppercase tracking-widest px-2 py-1 rounded"
-                      style={{ 
-                        background: 'rgba(184, 115, 51, 0.2)',
-                        color: '#8B6F47', 
-                        fontFamily: 'var(--font-heading)' 
-                      }}
-                    >
-                      {item.category}
-                    </span>
-                    <span className="text-xs font-semibold" style={{ color: '#B87333' }}>
-                      Stock: {item.stock}
-                    </span>
-                  </div>
-
-                  <h3
-                    className="text-lg sm:text-xl mb-1 font-bold"
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      color: '#F5F1E8',
-                    }}
+                <h3 className="font-bold text-black mb-1">{item.title}</h3>
+                <p className="text-sm text-gray-600 mb-2">by {item.artist}</p>
+                <p className="text-xs text-gray-500 mb-3 line-clamp-2">{item.description}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold text-black">₹{item.price.toLocaleString()}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      item.isAvailable
+                        ? "bg-red-100 text-red-700 hover:bg-red-200"
+                        : "bg-green-100 text-green-700 hover:bg-green-200"
+                    }`}
                   >
-                    {item.title}
-                  </h3>
-
-                  <p className="text-sm mb-2" style={{ color: '#B87333' }}>
-                    by {item.artist}
-                  </p>
-
-                  <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47' }}>
-                    {item.description}
-                  </p>
-
-                  <div className="flex justify-between items-center mb-4 mt-auto">
-                    <span
-                      className="text-xl sm:text-2xl gradient-text font-bold"
-                      style={{ fontFamily: 'var(--font-heading)' }}
-                    >
-                      ₹{item.price.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => toggleAvailability(item._id, item.isAvailable)}
-                      className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all hover:scale-105"
-                      style={{
-                        background: item.isAvailable
-                          ? 'rgba(220, 38, 38, 0.2)'
-                          : 'rgba(94, 125, 76, 0.3)',
-                        border: `2px solid ${item.isAvailable ? 'rgba(220, 38, 38, 0.5)' : 'rgba(94, 125, 76, 0.5)'}`,
-                        color: item.isAvailable ? '#FCA5A5' : '#5E7D4C',
-                        fontFamily: 'var(--font-heading)',
-                      }}
-                    >
-                      {item.isAvailable ? (
-                        <>
-                          <PowerOff size={14} className="inline mr-1" />
-                          OFF
-                        </>
-                      ) : (
-                        <>
-                          <Power size={14} className="inline mr-1" />
-                          ON
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      onClick={() => deleteItem(item._id)}
-                      className="py-2 px-3 rounded-lg transition-all hover:scale-105"
-                      style={{
-                        background: 'rgba(220, 38, 38, 0.2)',
-                        border: '2px solid rgba(220, 38, 38, 0.5)',
-                        color: '#FCA5A5',
-                      }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+                    {item.isAvailable ? "Disable" : "Enable"}
+                  </button>
+                  <button
+                    onClick={() => deleteItem(item._id)}
+                    className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

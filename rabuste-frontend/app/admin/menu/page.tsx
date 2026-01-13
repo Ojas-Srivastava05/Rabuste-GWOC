@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Power, PowerOff, Coffee, Search, Filter, Grid, List, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Power, PowerOff, Coffee, Search, Filter, Grid, List, Image as ImageIcon, Upload, X } from "lucide-react";
+import { uploadImageToCloudinary } from "@/lib/imageUpload";
 
 type MenuItem = {
   _id: string;
@@ -24,6 +25,9 @@ export default function AdminMenuPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
   const [category, setCategory] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -39,8 +43,44 @@ export default function AdminMenuPage() {
     setLoading(false);
   }
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setUploading(true);
+      try {
+        const imageUrl = await uploadImageToCloudinary(file);
+        setImage(imageUrl);
+        setImagePreview(imageUrl);
+      } catch (error) {
+        console.error("Failed to upload image:", error);
+        alert("Failed to upload image. Please try again.");
+      } finally {
+        setUploading(false);
+      }
+    }
+  };
+
   async function handleAddItem(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!image && !imageFile) {
+      alert("Please add an image");
+      return;
+    }
+
+    let finalImageUrl = image;
+    if (imageFile && !image) {
+      setUploading(true);
+      try {
+        finalImageUrl = await uploadImageToCloudinary(imageFile);
+      } catch (error) {
+        alert("Failed to upload image");
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
 
     await fetch("/api/menu", {
       method: "POST",
@@ -51,7 +91,7 @@ export default function AdminMenuPage() {
         name,
         description,
         price: Number(price),
-        image,
+        image: finalImageUrl,
         category,
       }),
     });
@@ -60,6 +100,8 @@ export default function AdminMenuPage() {
     setDescription("");
     setPrice("");
     setImage("");
+    setImageFile(null);
+    setImagePreview("");
     setCategory("");
     setShowAddForm(false);
     fetchMenu();
@@ -213,14 +255,49 @@ export default function AdminMenuPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-black mb-2">Image URL *</label>
-                <input
-                  placeholder="https://example.com/image.jpg"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
+                <label className="block text-sm font-semibold text-black mb-2">Image *</label>
+                <div className="space-y-2">
+                  <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
+                    <Upload size={20} className="mr-2 text-gray-400" />
+                    <span className="text-sm text-gray-600">
+                      {uploading ? "Uploading..." : imageFile ? imageFile.name : "Click to upload or drag and drop"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                  {imagePreview && (
+                    <div className="relative">
+                      <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-lg" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setImagePreview("");
+                          setImageFile(null);
+                          setImage("");
+                        }}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+                  <div className="text-xs text-gray-500">Or enter image URL:</div>
+                  <input
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    value={image}
+                    onChange={(e) => {
+                      setImage(e.target.value);
+                      setImagePreview(e.target.value);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex gap-4">

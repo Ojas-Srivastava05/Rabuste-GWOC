@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Clock, User, MapPin, X, Plus } from "lucide-react";
+import { Clock, User, MapPin, X, Plus, Calendar, Search, Filter, GraduationCap } from "lucide-react";
 
-/* -------------------- Helpers -------------------- */
 const formatDate = (date: Date) => date.toLocaleDateString("en-CA");
 
-/* -------------------- Types -------------------- */
 type Workshop = {
   _id: string;
   title: string;
@@ -21,12 +19,9 @@ type Workshop = {
   status: "upcoming" | "past";
 };
 
-/* -------------------- Page -------------------- */
 export default function WorkshopsAdminPage() {
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(
-    null
-  );
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
   const [editWorkshop, setEditWorkshop] = useState<Workshop | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,10 +29,11 @@ export default function WorkshopsAdminPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'upcoming' | 'past' | 'registrations'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [newWorkshop, setNewWorkshop] = useState({
     title: "",
-    category: "coffee",
+    category: "coffee" as "coffee" | "painting",
     date: "",
     hour: "",
     minute: "",
@@ -48,7 +44,6 @@ export default function WorkshopsAdminPage() {
     capacity: 0,
   });
 
-  /* -------------------- Fetch -------------------- */
   useEffect(() => {
     const fetchWorkshops = async () => {
       const res = await fetch("/api/workshops");
@@ -69,7 +64,6 @@ export default function WorkshopsAdminPage() {
     fetchWorkshops();
   }, []);
 
-  /* -------------------- Calendar Helpers -------------------- */
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -99,9 +93,7 @@ export default function WorkshopsAdminPage() {
     }
   };
 
-  /* -------------------- CRUD -------------------- */
   const handleAddWorkshop = async () => {
-    // Validation
     if (!newWorkshop.title.trim()) {
       setMessage({ type: 'error', text: 'Please enter a workshop title' });
       return;
@@ -138,9 +130,7 @@ export default function WorkshopsAdminPage() {
           title: newWorkshop.title,
           category: newWorkshop.category,
           date: newWorkshop.date,
-          time: `${newWorkshop.hour}:${newWorkshop.minute || "00"} ${
-            newWorkshop.ampm
-          }`,
+          time: `${newWorkshop.hour}:${newWorkshop.minute || "00"} ${newWorkshop.ampm}`,
           description: newWorkshop.description,
           instructor: newWorkshop.instructor,
           location: newWorkshop.location,
@@ -234,330 +224,288 @@ export default function WorkshopsAdminPage() {
     }
   };
 
-  /* -------------------- UI -------------------- */
-  const { year, month, daysInMonth, startingDayOfWeek } =
-    getDaysInMonth(currentMonth);
+  const { year, month, daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
 
   const upcomingWorkshops = workshops.filter(w => w.status === 'upcoming');
   const pastWorkshops = workshops.filter(w => w.status === 'past');
   const totalRegistrations = workshops.reduce((sum, w) => sum + (w.registrations?.length || 0), 0);
 
+  let filteredWorkshops = filterStatus === 'all'
+    ? workshops
+    : filterStatus === 'registrations' 
+      ? workshops.filter(w => (w.registrations?.length || 0) > 0)
+      : filterStatus === 'upcoming' 
+        ? upcomingWorkshops 
+        : pastWorkshops;
+
+  if (searchQuery) {
+    filteredWorkshops = filteredWorkshops.filter(w =>
+      w.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
   return (
-    <div
-      className="min-h-screen p-4 sm:p-6 lg:p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center gap-4 mb-4 sm:mb-6">
-          <div className="copper-line" />
-          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">Workshop Management</h1>
+          <p className="text-gray-600 mt-1">Manage workshops and registrations</p>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
-        >
-          WORKSHOP <span className="gradient-text">MANAGEMENT</span>
-        </h1>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <button
-          onClick={() => setFilterStatus('all')}
-          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'all' ? 'ring-2 ring-[#B87333]' : ''}`}
-          style={{
-            background: filterStatus === 'all' ? 'rgba(184, 115, 51, 0.2)' : undefined,
-            cursor: 'pointer',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <Clock size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">TOTAL</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total</p>
+              <p className="text-2xl font-bold text-black">{workshops.length}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <GraduationCap size={20} className="text-white" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-            {workshops.length}
-          </p>
-        </button>
-
-        <button
-          onClick={() => setFilterStatus('upcoming')}
-          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'upcoming' ? 'ring-2 ring-[#5E7D4C]' : ''}`}
-          style={{
-            background: filterStatus === 'upcoming' ? 'rgba(94, 125, 76, 0.2)' : undefined,
-            cursor: 'pointer',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <Clock size={20} className="text-[#5E7D4C]" />
-            <span className="section-label text-xs">UPCOMING</span>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Upcoming</p>
+              <p className="text-2xl font-bold text-green-600">{upcomingWorkshops.length}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Clock size={20} className="text-green-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
-            {upcomingWorkshops.length}
-          </p>
-        </button>
-
-        <button
-          onClick={() => setFilterStatus('past')}
-          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'past' ? 'ring-2 ring-[#8B6F47]' : ''}`}
-          style={{
-            background: filterStatus === 'past' ? 'rgba(139, 111, 71, 0.2)' : undefined,
-            cursor: 'pointer',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <Clock size={20} className="text-[#8B6F47]" />
-            <span className="section-label text-xs">PAST</span>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Past</p>
+              <p className="text-2xl font-bold text-gray-600">{pastWorkshops.length}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <Clock size={20} className="text-gray-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#8B6F47' }}>
-            {pastWorkshops.length}
-          </p>
-        </button>
-
-        <button
-          onClick={() => setFilterStatus('registrations')}
-          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'registrations' ? 'ring-2 ring-[#D4A574]' : ''}`}
-          style={{
-            background: filterStatus === 'registrations' ? 'rgba(212, 165, 116, 0.2)' : undefined,
-            cursor: 'pointer',
-          }}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <User size={20} className="text-[#D4A574]" />
-            <span className="section-label text-xs">REGISTRATIONS</span>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Registrations</p>
+              <p className="text-2xl font-bold text-blue-600">{totalRegistrations}</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <User size={20} className="text-blue-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
-            {totalRegistrations}
-          </p>
-        </button>
+        </div>
       </div>
 
-      {/* Add Workshop */}
-      <div className="brutal-card p-6 sm:p-8 mb-8 sm:mb-12">
+      {/* Add Workshop Form */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
         {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg font-semibold flex items-center gap-3 ${
-              message.type === 'success' 
-                ? 'bg-[#5E7D4C]/20 border-2 border-[#5E7D4C]/50 text-[#B8D5A2]' 
-                : 'bg-[#DC2626]/20 border-2 border-[#DC2626]/50 text-[#FCA5A5]'
-            }`}
-          >
+          <div className={`mb-6 p-4 rounded-lg font-semibold ${
+            message.type === 'success' 
+              ? 'bg-green-50 border border-green-200 text-green-700' 
+              : 'bg-red-50 border border-red-200 text-red-700'
+          }`}>
             {message.type === 'success' ? '✓' : '✕'} {message.text}
           </div>
         )}
         
-        <h2 
-          className="text-2xl sm:text-3xl mb-6 flex items-center gap-3"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <Plus size={28} className="text-[#B87333]" />
-          ADD NEW WORKSHOP
+        <h2 className="text-xl font-bold text-black mb-6 flex items-center gap-3">
+          <Plus size={24} />
+          Add New Workshop
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Title *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Title *</label>
             <input
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="Workshop Title"
               value={newWorkshop.title}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, title: e.target.value })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, title: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Category *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Category *</label>
             <select
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] cursor-pointer"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               value={newWorkshop.category}
-              onChange={(e) =>
-                setNewWorkshop({
-                  ...newWorkshop,
-                  category: e.target.value as any,
-                })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, category: e.target.value as any })}
             >
-              <option value="coffee" className="bg-[#1A1110]">Coffee</option>
-              <option value="painting" className="bg-[#1A1110]">Painting</option>
+              <option value="coffee">Coffee</option>
+              <option value="painting">Painting</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Date *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Date *</label>
             <input
               type="date"
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               value={newWorkshop.date}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, date: e.target.value })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, date: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Instructor *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Instructor *</label>
             <input
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="Instructor Name"
               value={newWorkshop.instructor}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, instructor: e.target.value })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, instructor: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Time *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Time *</label>
             <div className="flex gap-2">
               <input
-                className="flex-1 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 placeholder="HH"
                 value={newWorkshop.hour}
-                onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, hour: e.target.value })
-                }
+                onChange={(e) => setNewWorkshop({ ...newWorkshop, hour: e.target.value })}
               />
               <input
-                className="flex-1 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 placeholder="MM"
                 value={newWorkshop.minute}
-                onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, minute: e.target.value })
-                }
+                onChange={(e) => setNewWorkshop({ ...newWorkshop, minute: e.target.value })}
               />
               <select
-                className="bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] cursor-pointer"
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 value={newWorkshop.ampm}
-                onChange={(e) =>
-                  setNewWorkshop({ ...newWorkshop, ampm: e.target.value })
-                }
+                onChange={(e) => setNewWorkshop({ ...newWorkshop, ampm: e.target.value })}
               >
-                <option className="bg-[#1A1110]">AM</option>
-                <option className="bg-[#1A1110]">PM</option>
+                <option>AM</option>
+                <option>PM</option>
               </select>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Location *
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Location *</label>
             <input
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="Workshop Location"
               value={newWorkshop.location}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, location: e.target.value })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, location: e.target.value })}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-              Capacity
-            </label>
+            <label className="block text-sm font-semibold text-black mb-2">Capacity</label>
             <input
               type="number"
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               placeholder="0 for unlimited"
               value={newWorkshop.capacity}
-              onChange={(e) =>
-                setNewWorkshop({ ...newWorkshop, capacity: Number(e.target.value) })
-              }
+              onChange={(e) => setNewWorkshop({ ...newWorkshop, capacity: Number(e.target.value) })}
               min="0"
             />
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-6">
-          <label className="block text-sm font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-            Description *
-          </label>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold text-black mb-2">Description *</label>
           <textarea
-            className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47] resize-none"
+            className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black resize-none"
             placeholder="Workshop description"
             rows={4}
             value={newWorkshop.description}
-            onChange={(e) =>
-              setNewWorkshop({ ...newWorkshop, description: e.target.value })
-            }
+            onChange={(e) => setNewWorkshop({ ...newWorkshop, description: e.target.value })}
           />
         </div>
 
         <button
           onClick={handleAddWorkshop}
           disabled={isLoading}
-          className="mt-6 btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50"
         >
-          <Plus size={20} />
-          {isLoading ? 'ADDING...' : 'ADD WORKSHOP'}
+          {isLoading ? 'Adding...' : 'Add Workshop'}
         </button>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search workshops..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilterStatus('all')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                filterStatus === 'all' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setFilterStatus('upcoming')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                filterStatus === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Upcoming
+            </button>
+            <button
+              onClick={() => setFilterStatus('past')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                filterStatus === 'past' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Past
+            </button>
+            <button
+              onClick={() => setFilterStatus('registrations')}
+              className={`px-4 py-2 rounded-lg transition-all ${
+                filterStatus === 'registrations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              With Registrations
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Calendar */}
-      <div className="brutal-card p-6 sm:p-8">
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-6">
           <button 
             onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
-            className="px-4 py-2 rounded-lg transition-all hover:scale-105"
-            style={{
-              background: 'rgba(184, 115, 51, 0.2)',
-              border: '2px solid rgba(184, 115, 51, 0.4)',
-              color: '#D4A574',
-            }}
+            className="px-4 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-all"
           >
             ←
           </button>
-          <h2 
-            className="text-xl sm:text-2xl font-bold"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              color: '#F5F1E8',
-            }}
-          >
-            {currentMonth.toLocaleString("default", {
-              month: "long",
-              year: "numeric",
-            })}
+          <h2 className="text-xl font-bold text-black">
+            {currentMonth.toLocaleString("default", { month: "long", year: "numeric" })}
           </h2>
           <button 
             onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
-            className="px-4 py-2 rounded-lg transition-all hover:scale-105"
-            style={{
-              background: 'rgba(184, 115, 51, 0.2)',
-              border: '2px solid rgba(184, 115, 51, 0.4)',
-              color: '#D4A574',
-            }}
+            className="px-4 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-all"
           >
             →
           </button>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 sm:gap-3">
+        <div className="grid grid-cols-7 gap-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-xs font-bold uppercase py-2" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+            <div key={day} className="text-center text-xs font-semibold text-gray-700 py-2">
               {day}
             </div>
           ))}
@@ -575,20 +523,11 @@ export default function WorkshopsAdminPage() {
               <div
                 key={day}
                 onClick={() => handleDateClick(day)}
-                className={`h-12 sm:h-14 rounded-lg flex items-center justify-center cursor-pointer font-semibold transition-all hover:scale-105
-                ${
+                className={`h-12 rounded-lg flex items-center justify-center cursor-pointer font-semibold transition-all hover:scale-105 ${
                   workshop 
-                    ? "text-white" 
-                    : "text-[#8B6F47]"
+                    ? "bg-black text-white" 
+                    : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                 }`}
-                style={{
-                  background: workshop
-                    ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.4), rgba(184, 115, 51, 0.2))'
-                    : 'rgba(0, 0, 0, 0.2)',
-                  border: workshop
-                    ? '2px solid rgba(184, 115, 51, 0.6)'
-                    : '2px solid rgba(184, 115, 51, 0.2)',
-                }}
               >
                 {day}
               </div>
@@ -597,194 +536,126 @@ export default function WorkshopsAdminPage() {
         </div>
       </div>
 
-      {/* Filtered Workshops List */}
-      {filterStatus !== '' && (
-        <div className="brutal-card p-6 sm:p-8 mt-8 sm:mt-12">
-          <h2 
-            className="text-2xl sm:text-3xl mb-6"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              letterSpacing: '0.1em',
-              color: '#F5F1E8',
-            }}
-          >
-            {filterStatus === 'all' ? 'ALL WORKSHOPS' : filterStatus === 'upcoming' ? 'UPCOMING WORKSHOPS' : filterStatus === 'past' ? 'PAST WORKSHOPS' : 'WORKSHOPS WITH REGISTRATIONS'}
+      {/* Workshops List */}
+      {filteredWorkshops.length > 0 && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-black mb-6">
+            {filterStatus === 'all' ? 'All Workshops' : 
+             filterStatus === 'upcoming' ? 'Upcoming Workshops' : 
+             filterStatus === 'past' ? 'Past Workshops' : 
+             'Workshops with Registrations'}
           </h2>
           
-          {(() => {
-            const filteredWs = filterStatus === 'all'
-              ? workshops
-              : filterStatus === 'registrations' 
-                ? workshops.filter(w => (w.registrations?.length || 0) > 0)
-                : filterStatus === 'upcoming' 
-                  ? upcomingWorkshops 
-                  : pastWorkshops;
-            
-            return filteredWs.length === 0 ? (
-              <p style={{ color: '#8B6F47' }}>No workshops to display</p>
-            ) : (
-              <div className="space-y-4">
-                {filteredWs.map((ws) => (
-                  <button
-                    key={ws._id}
-                    onClick={() => {
-                      setSelectedWorkshop(ws);
-                      setEditWorkshop({ ...ws });
-                      setIsEditing(false);
-                      setIsModalOpen(true);
-                    }}
-                    className="w-full p-4 rounded-lg transition-all hover:bg-opacity-80 text-left"
-                    style={{
-                      background: 'rgba(184, 115, 51, 0.15)',
-                      border: '2px solid rgba(184, 115, 51, 0.3)',
-                  }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)' }}>
-                        {ws.title}
-                      </h3>
-                      <p className="text-sm mt-2" style={{ color: '#D4A574' }}>
-                        {ws.date} at {ws.time}
-                      </p>
-                      <p className="text-sm" style={{ color: '#8B6F47' }}>
-                        📍 {ws.location} | 👤 {ws.instructor}
-                      </p>
-                    </div>
-                    <span
-                      className="px-3 py-1 rounded text-xs font-bold whitespace-nowrap"
-                      style={{
-                        background: 'rgba(94, 125, 76, 0.3)',
-                        color: '#5E7D4C',
-                        marginLeft: '1rem',
-                      }}
-                    >
-                      {ws.registrations?.length || 0}
-                      {ws.capacity > 0 && `/${ws.capacity}`}
-                    </span>
+          <div className="space-y-4">
+            {filteredWorkshops.map((ws) => (
+              <button
+                key={ws._id}
+                onClick={() => {
+                  setSelectedWorkshop(ws);
+                  setEditWorkshop({ ...ws });
+                  setIsEditing(false);
+                  setIsModalOpen(true);
+                }}
+                className="w-full p-4 rounded-lg transition-all hover:bg-gray-50 text-left border border-gray-200"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-black mb-2">{ws.title}</h3>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {ws.date} at {ws.time}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      📍 {ws.location} | 👤 {ws.instructor}
+                    </p>
                   </div>
-                </button>
-              ))}
-              </div>
-            );
-          })()}
+                  <span className="px-3 py-1 rounded text-xs font-bold bg-blue-100 text-blue-700">
+                    {ws.registrations?.length || 0}
+                    {ws.capacity > 0 && `/${ws.capacity}`}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Modal */}
       {isModalOpen && selectedWorkshop && (
         <div 
-          className="fixed inset-0 flex items-center justify-center z-50 p-4"
-          style={{
-            background: 'rgba(0, 0, 0, 0.9)',
-            backdropFilter: 'blur(10px)',
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => {
+            setIsModalOpen(false);
+            setIsEditing(false);
           }}
         >
           <div 
-            className="brutal-card p-6 sm:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
-            style={{
-              background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-            }}
+            className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp"
+            onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => {
-                setIsModalOpen(false);
-                setIsEditing(false);
-              }}
-              className="absolute top-4 right-4 p-2 rounded-lg transition-all hover:scale-110"
-              style={{
-                background: 'rgba(184, 115, 51, 0.2)',
-                border: '2px solid rgba(184, 115, 51, 0.4)',
-                color: '#D4A574',
-              }}
-            >
-              <X size={20} />
-            </button>
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold text-black">Workshop Details</h2>
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setIsEditing(false);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-black hover:bg-red-50 hover:text-red-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
             {isEditing ? (
-              <div className="space-y-4">
+              <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Title
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Title</label>
                   <input
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     value={editWorkshop?.title || ""}
-                    onChange={(e) =>
-                      setEditWorkshop((p) => p && { ...p, title: e.target.value })
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, title: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Time
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Time</label>
                   <input
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     value={editWorkshop?.time || ""}
-                    onChange={(e) =>
-                      setEditWorkshop((p) => p && { ...p, time: e.target.value })
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, time: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Location
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Location</label>
                   <input
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     value={editWorkshop?.location || ""}
-                    onChange={(e) =>
-                      setEditWorkshop(
-                        (p) => p && { ...p, location: e.target.value }
-                      )
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, location: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Instructor
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Instructor</label>
                   <input
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     value={editWorkshop?.instructor || ""}
-                    onChange={(e) =>
-                      setEditWorkshop(
-                        (p) => p && { ...p, instructor: e.target.value }
-                      )
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, instructor: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Capacity
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Capacity</label>
                   <input
                     type="number"
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
-                    placeholder="Capacity"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     value={editWorkshop?.capacity || 0}
-                    onChange={(e) =>
-                      setEditWorkshop(
-                        (p) => p && { ...p, capacity: Number(e.target.value) }
-                      )
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, capacity: Number(e.target.value) })}
                     min="0"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2 uppercase" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                    Description
-                  </label>
+                  <label className="block text-sm font-semibold text-black mb-2">Description</label>
                   <textarea
-                    className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] resize-none"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black resize-none"
                     rows={4}
                     value={editWorkshop?.description || ""}
-                    onChange={(e) =>
-                      setEditWorkshop(
-                        (p) => p && { ...p, description: e.target.value }
-                      )
-                    }
+                    onChange={(e) => setEditWorkshop((p) => p && { ...p, description: e.target.value })}
                   />
                 </div>
 
@@ -792,53 +663,45 @@ export default function WorkshopsAdminPage() {
                   <button
                     onClick={handleUpdateWorkshop}
                     disabled={isLoading}
-                    className="btn btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50"
                   >
-                    {isLoading ? 'SAVING...' : 'SAVE CHANGES'}
+                    {isLoading ? 'Saving...' : 'Save Changes'}
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
                     disabled={isLoading}
-                    className="btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
                   >
-                    CANCEL
+                    Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <>
-                <h3 
-                  className="text-2xl sm:text-3xl font-bold mb-4"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#F5F1E8',
-                  }}
-                >
-                  {selectedWorkshop.title}
-                </h3>
-                <p className="mb-6" style={{ color: '#D4A574' }}>{selectedWorkshop.description}</p>
+              <div className="p-6 space-y-4">
+                <h3 className="text-2xl font-bold text-black mb-4">{selectedWorkshop.title}</h3>
+                <p className="text-gray-600 mb-6">{selectedWorkshop.description}</p>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.1)' }}>
-                    <Clock size={18} style={{ color: '#B87333' }} />
-                    <span style={{ color: '#F5F1E8' }}>{selectedWorkshop.time}</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Clock size={18} className="text-gray-600" />
+                    <span className="text-black">{selectedWorkshop.time}</span>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.1)' }}>
-                    <MapPin size={18} style={{ color: '#B87333' }} />
-                    <span style={{ color: '#F5F1E8' }}>{selectedWorkshop.location}</span>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin size={18} className="text-gray-600" />
+                    <span className="text-black">{selectedWorkshop.location}</span>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.1)' }}>
-                    <User size={18} style={{ color: '#B87333' }} />
-                    <span style={{ color: '#F5F1E8' }}>{selectedWorkshop.instructor}</span>
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <User size={18} className="text-gray-600" />
+                    <span className="text-black">{selectedWorkshop.instructor}</span>
                   </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(94, 125, 76, 0.1)' }}>
-                    <User size={18} style={{ color: '#5E7D4C' }} />
-                    <span className="font-bold" style={{ color: '#F5F1E8' }}>
+                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                    <User size={18} className="text-blue-600" />
+                    <span className="font-bold text-black">
                       Registrations: {selectedWorkshop.registrations?.length || 0}
                       {selectedWorkshop.capacity > 0 && ` / ${selectedWorkshop.capacity}`}
                       {selectedWorkshop.capacity > 0 && 
                        selectedWorkshop.registrations?.length >= selectedWorkshop.capacity && (
-                        <span className="ml-2" style={{ color: '#EF4444' }}>(FULL)</span>
+                        <span className="ml-2 text-red-600">(FULL)</span>
                       )}
                     </span>
                   </div>
@@ -846,28 +709,16 @@ export default function WorkshopsAdminPage() {
 
                 {selectedWorkshop.registrations && selectedWorkshop.registrations.length > 0 && (
                   <div className="mt-6">
-                    <h4 
-                      className="font-bold mb-3 text-lg"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        color: '#B87333',
-                      }}
-                    >
-                      Registered Participants:
-                    </h4>
+                    <h4 className="font-bold mb-3 text-lg text-black">Registered Participants:</h4>
                     <div className="max-h-60 overflow-y-auto space-y-2">
                       {selectedWorkshop.registrations.map((reg, idx) => (
                         <div
                           key={idx}
-                          className="p-3 rounded-lg"
-                          style={{
-                            background: 'rgba(184, 115, 51, 0.1)',
-                            border: '1px solid rgba(184, 115, 51, 0.3)',
-                          }}
+                          className="p-3 bg-gray-50 rounded-lg border border-gray-200"
                         >
-                          <p className="font-semibold mb-1" style={{ color: '#F5F1E8' }}>{reg.name}</p>
-                          <p className="text-sm mb-1" style={{ color: '#D4A574' }}>{reg.email}</p>
-                          <p className="text-xs" style={{ color: '#8B6F47' }}>
+                          <p className="font-semibold text-black mb-1">{reg.name}</p>
+                          <p className="text-sm text-gray-600 mb-1">{reg.email}</p>
+                          <p className="text-xs text-gray-500">
                             Registered: {new Date(reg.registeredAt).toLocaleString()}
                           </p>
                         </div>
@@ -876,32 +727,26 @@ export default function WorkshopsAdminPage() {
                   </div>
                 )}
 
-                <div className="flex gap-4 mt-6">
+                <div className="flex gap-4 mt-6 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="btn btn-primary flex-1"
+                    className="flex-1 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
                   >
-                    MODIFY
+                    Modify
                   </button>
                   <button
                     onClick={() => handleDeleteWorkshop(selectedWorkshop._id)}
                     disabled={isLoading}
-                    className="btn disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background: 'rgba(220, 38, 38, 0.2)',
-                      border: '2px solid rgba(220, 38, 38, 0.5)',
-                      color: '#FCA5A5',
-                    }}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all disabled:opacity-50"
                   >
-                    {isLoading ? 'DELETING...' : 'DELETE'}
+                    {isLoading ? 'Deleting...' : 'Delete'}
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
       )}
-
     </div>
   );
 }

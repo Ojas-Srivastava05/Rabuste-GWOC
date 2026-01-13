@@ -73,9 +73,25 @@ export default function AdminPage() {
         const json = await res.json();
         
         // Generate chart data from existing data
-        const orders = await fetch("/api/orders", {
-          headers: { ...getAuthHeaders() },
-        }).then(r => r.ok ? r.json() : []).catch(() => []);
+        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        let orders: any[] = [];
+        
+        try {
+          const ordersRes = await fetch("/api/orders", {
+            headers: { 
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          });
+          if (ordersRes.ok) {
+            orders = await ordersRes.json();
+            if (!Array.isArray(orders)) {
+              orders = [];
+            }
+          }
+        } catch (err) {
+          console.error("Failed to fetch orders for charts:", err);
+          orders = [];
+        }
 
         // Generate revenue by day (last 7 days)
         const revenueByDay = generateRevenueByDay(orders);
@@ -83,8 +99,28 @@ export default function AdminPage() {
         const ordersByHour = generateOrdersByHour(orders);
         const topItems = generateTopItems(orders);
 
+        // Calculate yesterday's data for comparison
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+        const yesterdayEnd = new Date(yesterday);
+        yesterdayEnd.setHours(23, 59, 59, 999);
+        
+        const yesterdayOrders = orders.filter(order => {
+          const orderDate = new Date(order.createdAt);
+          return orderDate >= yesterday && orderDate <= yesterdayEnd;
+        });
+        
+        const revenueYesterday = yesterdayOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
         setData({
           ...json,
+          stats: {
+            ...json.stats,
+            revenueYesterday,
+            ordersToday: json.stats.totalOrders,
+            ordersYesterday: yesterdayOrders.length,
+          },
           charts: {
             revenueByDay,
             ordersByDay,

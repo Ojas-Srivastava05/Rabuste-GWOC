@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { 
   Package, CheckCircle2, Clock, Mail, FileText, MapPin, Navigation, 
   Loader2, Ticket, Search, Filter, ArrowUpDown, MoreVertical, Eye,
-  Calendar, DollarSign, User
+  Calendar, DollarSign, User, X
 } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateTimeToCafe, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import { trackOrderStatusUpdate } from "@/lib/analytics";
@@ -117,6 +117,11 @@ export default function AdminOrdersPage() {
         )
       );
     }
+  };
+
+  // Expose markCompleted to modal
+  const handleMarkCompleted = (orderId: string) => {
+    markCompleted(orderId);
   };
 
   const updatePreparationTime = async (orderId: string) => {
@@ -279,25 +284,25 @@ export default function AdminOrdersPage() {
           <h1 className="text-3xl font-bold text-black">Orders</h1>
           <p className="text-gray-600 mt-1">Manage and track all customer orders</p>
         </div>
-        <button
-          onClick={() => fetchOrders(true)}
-          disabled={isRefreshing}
+          <button
+            onClick={() => fetchOrders(true)}
+            disabled={isRefreshing}
           className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50"
-        >
-          {isRefreshing ? (
-            <>
+          >
+            {isRefreshing ? (
+              <>
               <Loader2 size={18} className="animate-spin" />
               Refreshing...
-            </>
-          ) : (
-            <>
+              </>
+            ) : (
+              <>
               <Clock size={18} />
               Refresh
-            </>
-          )}
-        </button>
-      </div>
-
+              </>
+            )}
+          </button>
+        </div>
+        
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
@@ -321,13 +326,13 @@ export default function AdminOrdersPage() {
               <Clock size={20} className="text-orange-600" />
             </div>
           </div>
-        </div>
+                </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Completed</p>
               <p className="text-2xl font-bold text-green-600">{completedOrders.length}</p>
-            </div>
+              </div>
             <div className="p-3 bg-green-100 rounded-lg">
               <CheckCircle2 size={20} className="text-green-600" />
             </div>
@@ -358,8 +363,8 @@ export default function AdminOrdersPage() {
               }`}
             >
               All
-            </button>
-            <button
+        </button>
+        <button 
               onClick={() => setActiveFilter('pending')}
               className={`px-4 py-2 rounded-lg transition-all ${
                 activeFilter === 'pending' 
@@ -368,8 +373,8 @@ export default function AdminOrdersPage() {
               }`}
             >
               Pending
-            </button>
-            <button
+        </button>
+        <button 
               onClick={() => setActiveFilter('completed')}
               className={`px-4 py-2 rounded-lg transition-all ${
                 activeFilter === 'completed' 
@@ -464,8 +469,8 @@ export default function AdminOrdersPage() {
                             <p className="text-xs text-gray-500 flex items-center gap-1">
                               <Mail size={12} />
                               {order.customerEmail}
-                            </p>
-                          </div>
+          </p>
+        </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -499,7 +504,7 @@ export default function AdminOrdersPage() {
                           }`}
                         >
                           {order.status}
-                        </span>
+          </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -535,6 +540,7 @@ export default function AdminOrdersPage() {
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
           onUpdatePrepTime={updatePreparationTime}
+          onMarkCompleted={handleMarkCompleted}
           editingPrepTime={editingPrepTime}
           setEditingPrepTime={setEditingPrepTime}
           prepTimeValues={prepTimeValues}
@@ -549,6 +555,7 @@ function OrderDetailModal({
   order,
   onClose,
   onUpdatePrepTime,
+  onMarkCompleted,
   editingPrepTime,
   setEditingPrepTime,
   prepTimeValues,
@@ -557,129 +564,190 @@ function OrderDetailModal({
   order: Order;
   onClose: () => void;
   onUpdatePrepTime: (orderId: string) => void;
+  onMarkCompleted: (orderId: string) => void;
   editingPrepTime: { [key: string]: boolean };
   setEditingPrepTime: (val: any) => void;
   prepTimeValues: { [key: string]: string };
   setPrepTimeValues: (val: any) => void;
 }) {
-  const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+          const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const hasCouponApplied = itemsTotal > order.totalAmount;
   const discountAmount = hasCouponApplied ? itemsTotal - order.totalAmount : 0;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          
+          return (
+          <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
           <h2 className="text-xl font-bold text-black">Order Details</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-all text-black hover:bg-red-50 hover:text-red-600"
+            title="Close"
           >
-            ×
+            <X size={20} className="text-black" />
           </button>
         </div>
         <div className="p-6 space-y-6">
           {/* Customer Info */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">CUSTOMER INFORMATION</h3>
+          <div className="animate-fadeIn delay-100">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Customer Information</h3>
             <div className="space-y-2">
-              <p className="text-black"><strong>Name:</strong> {order.customerName}</p>
-              <p className="text-black"><strong>Email:</strong> {order.customerEmail}</p>
-              <p className="text-black"><strong>Order ID:</strong> {order._id}</p>
-              <p className="text-black"><strong>Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
+              <p className="text-black"><strong className="text-gray-700">Name:</strong> {order.customerName}</p>
+              <p className="text-black"><strong className="text-gray-700">Email:</strong> {order.customerEmail}</p>
+              <p className="text-black"><strong className="text-gray-700">Order ID:</strong> <span className="font-mono text-sm">{order._id}</span></p>
+              <p className="text-black"><strong className="text-gray-700">Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
             </div>
           </div>
 
           {/* Items */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">ORDER ITEMS</h3>
+          <div className="animate-fadeIn delay-200">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Order Items</h3>
             <div className="space-y-2">
               {order.items.map((item, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                   <div>
                     <p className="font-medium text-black">{item.name} × {item.quantity}</p>
                     {item.itemType && (
                       <span className="text-xs text-gray-500">Type: {item.itemType}</span>
-                    )}
-                  </div>
+                  )}
+                </div>
                   <p className="font-semibold text-black">₹{item.price * item.quantity}</p>
                 </div>
               ))}
             </div>
-          </div>
-
+                </div>
+                
           {/* Coupon Info */}
           {hasCouponApplied && (
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200 animate-fadeIn delay-300">
               <p className="text-sm font-semibold text-green-700 mb-2">Coupon Applied</p>
               <p className="text-sm text-black">Discount: ₹{discountAmount}</p>
               {order.couponCode && (
-                <p className="text-sm text-black">Code: {order.couponCode}</p>
+                <p className="text-sm text-black">Code: <span className="font-mono font-bold">{order.couponCode}</span></p>
               )}
-            </div>
-          )}
+                          </div>
+                        )}
 
           {/* Instructions */}
           {order.instructions && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">SPECIAL INSTRUCTIONS</h3>
-              <p className="text-black bg-yellow-50 p-3 rounded-lg">{order.instructions}</p>
-            </div>
+            <div className="animate-fadeIn delay-300">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Special Instructions</h3>
+              <p className="text-black bg-yellow-50 p-3 rounded-lg border border-yellow-200">{order.instructions}</p>
+                          </div>
           )}
 
+          {/* Location & ETA Info */}
+          {order.status === 'pending' && (order.distanceFromCafe || order.estimatedTimeToCafe) && (
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 animate-fadeIn delay-400">
+              <h3 className="text-sm font-semibold text-blue-700 mb-2 uppercase tracking-wide">Delivery Information</h3>
+              {order.distanceFromCafe && (
+                <p className="text-sm text-black mb-1">
+                  <Navigation size={14} className="inline mr-1" />
+                  Distance: {formatDistance(order.distanceFromCafe)}
+                </p>
+              )}
+              {order.estimatedTimeToCafe && (
+                <p className="text-sm text-black">
+                  <Clock size={14} className="inline mr-1" />
+                  Estimated travel time: ~{order.estimatedTimeToCafe} min
+                </p>
+                        )}
+                      </div>
+                    )}
+                    
           {/* Preparation Time */}
           {order.status === 'pending' && (
-            <div>
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">PREPARATION TIME</h3>
-              {editingPrepTime[order._id] ? (
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 animate-fadeIn delay-400">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Preparation Time</h3>
+                        {editingPrepTime[order._id] ? (
                 <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    min="0"
-                    value={prepTimeValues[order._id] ?? order.preparationTime ?? ''}
-                    onChange={(e) => setPrepTimeValues({ ...prepTimeValues, [order._id]: e.target.value })}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                            <input
+                              type="number"
+                              min="0"
+                              value={prepTimeValues[order._id] ?? order.preparationTime ?? ''}
+                              onChange={(e) => setPrepTimeValues({ ...prepTimeValues, [order._id]: e.target.value })}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                     placeholder="Minutes"
-                    autoFocus
-                  />
-                  <button
+                              autoFocus
+                            />
+                  <span className="text-sm text-gray-600">minutes</span>
+                            <button
                     onClick={() => onUpdatePrepTime(order._id)}
-                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900"
-                  >
-                    Save
-                  </button>
-                  <button
+                    className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
+                            >
+                              Save
+                            </button>
+                            <button
                     onClick={() => setEditingPrepTime({ ...editingPrepTime, [order._id]: false })}
-                    className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300"
+                    className="px-4 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock size={18} className="text-gray-400" />
+                    <p className="text-lg font-semibold text-black">
+                      {order.preparationTime ?? 'Not set'} {order.preparationTime ? 'minutes' : ''}
+                    </p>
+                  </div>
+                            <button
+                              onClick={() => {
+                                setEditingPrepTime({ ...editingPrepTime, [order._id]: true });
+                                setPrepTimeValues({ ...prepTimeValues, [order._id]: String(order.preparationTime ?? '') });
+                              }}
+                    className="px-4 py-2 text-sm bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
                   >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <p className="text-black">{order.preparationTime ?? 'Not set'} minutes</p>
-                  <button
-                    onClick={() => {
-                      setEditingPrepTime({ ...editingPrepTime, [order._id]: true });
-                      setPrepTimeValues({ ...prepTimeValues, [order._id]: String(order.preparationTime ?? '') });
-                    }}
-                    className="px-3 py-1 text-sm bg-gray-100 text-black rounded-lg hover:bg-gray-200"
-                  >
-                    Edit
+                    Edit Time
                   </button>
                 </div>
               )}
-            </div>
-          )}
+              
+              {/* Total Estimated Time */}
+              {(order.estimatedTimeToCafe || order.preparationTime) && (
+                <div className="mt-4 p-3 bg-black text-white rounded-lg">
+                  <p className="text-sm font-semibold mb-1">Total Estimated Time</p>
+                  <p className="text-2xl font-bold">
+                    {(order.preparationTime || 0) + (order.estimatedTimeToCafe || 0)} minutes
+                  </p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    (Preparation: {order.preparationTime || 0} min + Travel: {order.estimatedTimeToCafe || 0} min)
+                  </p>
+                </div>
+              )}
+              </div>
+            )}
 
           {/* Total */}
-          <div className="pt-4 border-t border-gray-200">
+          <div className="pt-4 border-t border-gray-200 animate-fadeIn delay-500">
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold text-black">Total Amount</p>
               <p className="text-2xl font-bold text-black">₹{order.totalAmount.toLocaleString()}</p>
+                </div>
             </div>
+
+          {/* Action Button */}
+          {order.status === 'pending' && (
+            <div className="pt-4">
+              <button
+                onClick={() => {
+                  onMarkCompleted(order._id);
+                  onClose();
+                }}
+                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all font-semibold"
+              >
+                Mark as Completed
+              </button>
+            </div>
+            )}
           </div>
-        </div>
       </div>
     </div>
   );

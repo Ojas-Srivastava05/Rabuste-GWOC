@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Brain, Settings, TrendingDown, AlertTriangle, Package, Clock } from "lucide-react";
+import { Brain, Settings, TrendingDown, AlertTriangle, Package, Clock, CheckCircle, X } from "lucide-react";
 
 type AIConfig = {
   lowStockLimit: number;
@@ -132,7 +132,6 @@ export default function AISettingsPage() {
 
         setSuggestions(parsed);
 
-        // Auto-select top suggestion if admin hasn't picked yet
         if (!config.discountItemId && parsed[0]?._id) {
           setConfig((prev) => ({ ...prev, discountItemId: parsed[0]._id }));
         }
@@ -142,7 +141,6 @@ export default function AISettingsPage() {
     };
 
     fetchSuggestions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config.enableDiscountAI]);
 
   const handleSave = async () => {
@@ -151,9 +149,6 @@ export default function AISettingsPage() {
     setSuccess(false);
     
     try {
-      console.log("Saving AI config:", config);
-      
-      // Only send the fields that should be updated, not the entire config object
       const updateData = {
         lowStockLimit: config.lowStockLimit,
         inactiveDays: config.inactiveDays,
@@ -162,314 +157,266 @@ export default function AISettingsPage() {
         discountPercent: config.discountPercent,
       };
       
-      console.log("Sending update data:", updateData);
-      
       const res = await fetch("/api/admin/ai-config", {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         body: JSON.stringify(updateData),
       });
       
-      console.log("Response status:", res.status);
-      console.log("Response ok:", res.ok);
-      
       if (!res.ok) {
         const errorData = await res.json();
-        console.error("Error response:", errorData);
         throw new Error(errorData.message || `Failed to save (${res.status})`);
       }
-      
-      const data = await res.json();
-      console.log("Success response:", data);
       
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("Save error:", err);
       setError(err instanceof Error ? err.message : "Failed to save AI settings");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)' }}>
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="section-label">Loading AI Settings...</p>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading AI Settings...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
-    <div
-      className="min-h-screen p-4 sm:p-6 lg:p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center gap-4 mb-4 sm:mb-6">
-          <div className="copper-line" />
-          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">AI Settings</h1>
+          <p className="text-gray-600 mt-1">Configure AI-powered business intelligence</p>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
-        >
-          AI <span className="gradient-text">SETTINGS</span>
-        </h1>
       </div>
 
-      <div className="max-w-4xl">
-        {/* Success/Error Messages */}
-        {success && (
-          <div className="mb-6 p-4 rounded-xl border border-[#B87333]/50 bg-[#B87333]/20 text-[#F5F1E8] flex items-center gap-3">
-            <Settings size={20} style={{ color: '#B87333' }} />
-            AI settings updated successfully!
-          </div>
-        )}
-        
-        {error && (
-          <div className="mb-6 p-4 rounded-xl border border-[#8B4513]/50 bg-[#8B4513]/20 text-[#FCA5A5] flex items-center gap-3">
-            <AlertTriangle size={20} style={{ color: '#8B4513' }} />
-            {error}
-          </div>
-        )}
+      {/* Messages */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700 flex items-center gap-3 animate-fadeIn">
+          <CheckCircle size={20} />
+          AI settings updated successfully!
+        </div>
+      )}
+      
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 flex items-center gap-3 animate-fadeIn">
+          <AlertTriangle size={20} />
+          {error}
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Inventory Settings */}
-          <div className="brutal-card p-6 border border-[#B87333]/20 shadow-2xl">
-            <h2 className="text-xl font-semibold mb-6 flex items-center gap-3" style={{ fontFamily: 'var(--font-heading)' }}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-                <Brain size={16} style={{ color: '#1A1110' }} />
-              </div>
-              Inventory Intelligence
-            </h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Inventory Settings */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-black">
+            <div className="p-2 bg-black rounded-lg">
+              <Brain size={18} className="text-white" />
+            </div>
+            Inventory Intelligence
+          </h2>
 
-            <div className="space-y-6">
-              {/* Low Stock Threshold */}
-              <div className="group">
-                <label className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                  Low Stock Threshold
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={config.lowStockLimit || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow numbers, clear if empty
-                    if (value === '') {
-                      setConfig({ ...config, lowStockLimit: 0 });
-                    } else if (/^\d+$/.test(value)) {
-                      setConfig({ ...config, lowStockLimit: parseInt(value, 10) });
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Select all text when focused
-                    e.target.select();
-                  }}
-                  className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-                  placeholder="Enter stock limit..."
-                />
-                <p className="text-xs mt-2" style={{ color: '#8B6F47', opacity: 0.8 }}>
-                  Alert when stock falls below this number
-                </p>
-              </div>
+          <div className="space-y-6">
+            {/* Low Stock Threshold */}
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">
+                Low Stock Threshold
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={config.lowStockLimit || 0}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setConfig({ ...config, lowStockLimit: 0 });
+                  } else if (/^\d+$/.test(value)) {
+                    setConfig({ ...config, lowStockLimit: parseInt(value, 10) });
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                placeholder="Enter stock limit..."
+              />
+              <p className="text-xs mt-2 text-gray-500">
+                Alert when stock falls below this number
+              </p>
+            </div>
 
-              {/* Inactive Days */}
-              <div className="group">
-                <label className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                  Inactive Item Days
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={config.inactiveDays || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Only allow numbers, clear if empty
-                    if (value === '') {
-                      setConfig({ ...config, inactiveDays: 0 });
-                    } else if (/^\d+$/.test(value)) {
-                      setConfig({ ...config, inactiveDays: parseInt(value, 10) });
-                    }
-                  }}
-                  onFocus={(e) => {
-                    // Select all text when focused
-                    e.target.select();
-                  }}
-                  className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-                  placeholder="Enter number of days..."
-                />
-                <p className="text-xs mt-2" style={{ color: '#8B6F47', opacity: 0.8 }}>
-                  Flag items not sold for this many days
-                </p>
-              </div>
+            {/* Inactive Days */}
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">
+                Inactive Item Days
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={config.inactiveDays || 0}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === '') {
+                    setConfig({ ...config, inactiveDays: 0 });
+                  } else if (/^\d+$/.test(value)) {
+                    setConfig({ ...config, inactiveDays: parseInt(value, 10) });
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                placeholder="Enter number of days..."
+              />
+              <p className="text-xs mt-2 text-gray-500">
+                Flag items not sold for this many days
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Discount AI Settings */}
-          <div className="brutal-card p-6 border border-[#B87333]/20 shadow-2xl">
-            <h2 className="text-xl font-semibold mb-6 flex items-center gap-3" style={{ fontFamily: 'var(--font-heading)' }}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-                <TrendingDown size={16} style={{ color: '#1A1110' }} />
-              </div>
-              Discount Intelligence
-            </h2>
+        {/* Discount AI Settings */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-3 text-black">
+            <div className="p-2 bg-black rounded-lg">
+              <TrendingDown size={18} className="text-white" />
+            </div>
+            Discount Intelligence
+          </h2>
 
-            <div className="space-y-6">
-              {/* Enable Discount AI */}
-              <div className="flex items-center gap-3 p-4 rounded-xl border border-[#B87333]/20 hover:border-[#B87333]/40 transition-all duration-300">
-                <input
-                  type="checkbox"
-                  id="enableDiscountAI"
-                  checked={config.enableDiscountAI}
-                  onChange={(e) =>
-                    setConfig({
-                      ...config,
-                      enableDiscountAI: e.target.checked,
-                    })
-                  }
-                  className="w-5 h-5 rounded border-2 border-[#B87333] bg-[#1A1110] text-[#B87333] focus:ring-[#B87333] focus:ring-2"
-                />
-                <label htmlFor="enableDiscountAI" className="text-sm font-medium cursor-pointer">
-                  Enable Automatic Discount Suggestions
-                </label>
-              </div>
+          <div className="space-y-6">
+            {/* Enable Discount AI */}
+            <div className="flex items-center gap-3 p-4 rounded-lg border border-gray-200">
+              <input
+                type="checkbox"
+                id="enableDiscountAI"
+                checked={config.enableDiscountAI}
+                onChange={(e) =>
+                  setConfig({
+                    ...config,
+                    enableDiscountAI: e.target.checked,
+                  })
+                }
+                className="w-5 h-5 rounded border-2 border-gray-300 text-black focus:ring-2 focus:ring-black"
+              />
+              <label htmlFor="enableDiscountAI" className="text-sm font-medium cursor-pointer text-black">
+                Enable Automatic Discount Suggestions
+              </label>
+            </div>
 
-              {config.enableDiscountAI && (
-                <div className="space-y-4">
-                  {/* Suggestions */}
-                  {suggestions.length > 0 && suggestions[0]?._id && (
-                    <div className="p-4 rounded-lg bg-gradient-to-r from-[#B87333]/10 to-[#CD7F32]/10 border border-[#B87333]/30">
-                      <p className="text-sm font-medium mb-2" style={{ color: '#B87333' }}>
-                        <span style={{ color: '#B87333' }}>📊</span> AI Discount Suggestions (Items with low recent sales):
+            {config.enableDiscountAI && (
+              <div className="space-y-4">
+                {/* Suggestions */}
+                {suggestions.length > 0 && suggestions[0]?._id && (
+                  <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <p className="text-sm font-semibold mb-2 text-black">
+                      📊 AI Discount Suggestions (Items with low recent sales):
+                    </p>
+                    <div className="space-y-2">
+                      {suggestions.slice(0, 3).map((suggestion, index) => (
+                        <div key={suggestion._id} className="flex justify-between items-center text-sm">
+                          <span className="font-medium text-black">
+                            {index + 1}. {suggestion.name}
+                          </span>
+                          <span className="text-gray-600">
+                            {suggestion.soldLast7Days} sold (7 days)
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Item Selection */}
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">
+                    Select Item
+                  </label>
+                  <select
+                    value={config.discountItemId ?? ""}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        discountItemId: e.target.value || null,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                  >
+                    <option value="">Select an item…</option>
+                    {menuItems.map((item) => (
+                      <option key={item._id} value={item._id}>
+                        {item.name}
+                      </option>
+                    ))}
+                  </select>
+                  
+                  {config.discountItemId && (
+                    <div className="mt-3 p-3 rounded-lg bg-gray-50 border border-gray-200">
+                      <p className="text-sm font-medium text-black">
+                        🎯 Currently offering {config.discountPercent}% discount on:
                       </p>
-                      <div className="space-y-2">
-                        {suggestions.slice(0, 3).map((suggestion, index) => (
-                          <div key={suggestion._id} className="flex justify-between items-center text-sm">
-                            <span className="font-medium text-[#F5F1E8]">
-                              {index + 1}. {suggestion.name}
-                            </span>
-                            <span className="text-[#8B6F47]">
-                              {suggestion.soldLast7Days} sold (7 days)
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                      <p className="text-sm font-bold text-black mt-1">
+                        {menuItems.find(item => item._id === config.discountItemId)?.name || 'Unknown Item'}
+                      </p>
                     </div>
                   )}
+                </div>
 
-                  {/* Item Selection */}
-                  <div className="group">
-                    <label className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                      Select Item
-                    </label>
-                    <select
-                      value={config.discountItemId ?? ""}
-                      onChange={(e) =>
-                        setConfig({
-                          ...config,
-                          discountItemId: e.target.value || null,
-                        })
-                      }
-                      className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300"
-                    >
-                      <option value="">Select an item…</option>
-                      {menuItems.map((item) => (
-                        <option key={item._id} value={item._id}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                    
-                    {/* Show currently selected item */}
-                    {config.discountItemId && (
-                      <div className="mt-3 p-3 rounded-lg bg-gradient-to-r from-[#B87333]/20 to-[#CD7F32]/20 border border-[#B87333]/30">
-                        <p className="text-sm font-medium" style={{ color: '#B87333' }}>
-                          <span style={{ color: '#B87333' }}>🎯</span> Currently offering {config.discountPercent}% discount on:
-                        </p>
-                        <p className="text-sm font-bold text-[#F5F1E8] mt-1">
-                          {menuItems.find(item => item._id === config.discountItemId)?.name || 'Unknown Item'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Discount Percent */}
-                  <div className="group">
-                    <label className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
-                      Discount Percent
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={config.discountPercent || ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          // Only allow numbers, clear if empty
-                          if (value === '') {
-                            setConfig({ ...config, discountPercent: 0 });
-                          } else if (/^\d+$/.test(value)) {
-                            const num = parseInt(value, 10);
-                            setConfig({
-                              ...config,
-                              discountPercent: Math.min(100, Math.max(0, num)),
-                            });
-                          }
-                        }}
-                        onFocus={(e) => {
-                          // Select all text when focused
-                          e.target.select();
-                        }}
-                        className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 py-3 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-                        placeholder="Enter percentage..."
-                      />
-                      <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#8B6F47]">%</span>
-                    </div>
+                {/* Discount Percent */}
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">
+                    Discount Percent
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={config.discountPercent || 0}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '') {
+                          setConfig({ ...config, discountPercent: 0 });
+                        } else if (/^\d+$/.test(value)) {
+                          const num = parseInt(value, 10);
+                          setConfig({
+                            ...config,
+                            discountPercent: Math.min(100, Math.max(0, num)),
+                          });
+                        }
+                      }}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                      placeholder="Enter percentage..."
+                    />
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Save Button */}
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="btn btn-primary transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl px-8"
-            style={{
-              background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-              boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
-            }}
-          >
-            {saving ? (
-              <>
-                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Settings size={20} className="mr-2" />
-                Save AI Settings
-              </>
-            )}
-          </button>
-        </div>
+      {/* Save Button */}
+      <div className="flex justify-center">
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-8 py-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50 flex items-center gap-2"
+        >
+          {saving ? (
+            <>
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Settings size={20} />
+              Save AI Settings
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

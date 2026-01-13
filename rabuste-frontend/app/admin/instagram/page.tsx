@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Instagram, RefreshCw, Plus, Trash2, ExternalLink, Download, Upload, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Instagram, RefreshCw, Plus, Trash2, ExternalLink, Upload, Image as ImageIcon, Link as LinkIcon, X } from "lucide-react";
+import { uploadImageToCloudinary } from "@/lib/imageUpload";
 
 interface InstagramPost {
   _id: string;
@@ -21,12 +22,12 @@ export default function AdminInstagramPage() {
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // Manual post form state
   const [showManualPost, setShowManualPost] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState("");
   const [manualForm, setManualForm] = useState({
-    imageUrl: "", // Cloudinary image URL
-    permalink: "", // Instagram post URL for redirection
+    imageUrl: "",
+    permalink: "",
     caption: "",
     likes: 0,
   });
@@ -77,24 +78,31 @@ export default function AdminInstagramPage() {
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const imageUrl = await uploadImageToCloudinary(file);
+      setManualForm({ ...manualForm, imageUrl });
+      setImagePreview(imageUrl);
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      alert("Failed to upload image");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAddManualPost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!manualForm.imageUrl.trim()) {
-      setError("Cloudinary image URL is required");
+      setError("Image is required");
       return;
     }
     if (!manualForm.permalink.trim()) {
-      setError("Instagram post URL is required for redirection");
+      setError("Instagram post URL is required");
       return;
     }
 
-    // Validate Cloudinary URL
-    if (!manualForm.imageUrl.includes('cloudinary.com') && !manualForm.imageUrl.match(/^https?:\/\/.+/)) {
-      setError("Please provide a valid Cloudinary image URL (e.g., https://res.cloudinary.com/...)");
-      return;
-    }
-
-    // Validate Instagram URL
     if (!manualForm.permalink.includes('instagram.com')) {
       setError("Please provide a valid Instagram post URL");
       return;
@@ -135,6 +143,7 @@ export default function AdminInstagramPage() {
 
       setSuccess("Post added successfully!");
       setManualForm({ imageUrl: "", permalink: "", caption: "", likes: 0 });
+      setImagePreview("");
       setShowManualPost(false);
       await fetchPosts();
     } catch (err: any) {
@@ -188,153 +197,158 @@ export default function AdminInstagramPage() {
     setTimeout(() => setSuccess(""), 3000);
   };
 
-  if (loading) {
-    return (
-      <div className="bg-[#FAF3E0] rounded-2xl p-8 shadow-2xl border border-[#B87333]/20">
-        <p className="text-[#2e211a]">Loading Instagram posts...</p>
-      </div>
-    );
-  }
+  const stats = {
+    total: posts.length,
+    autoSync: posts.filter(p => !p.isManual).length,
+    manual: posts.filter(p => p.isManual).length,
+  };
 
   return (
-    <div
-      className="min-h-screen p-4 sm:p-6 lg:p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center gap-4 mb-4 sm:mb-6">
-          <div className="copper-line" />
-          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">Instagram Management</h1>
+          <p className="text-gray-600 mt-1">Manage Instagram posts and gallery</p>
         </div>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
-            style={{
-              fontFamily: 'var(--font-heading)',
-              lineHeight: 0.9,
-            }}
-          >
-            INSTAGRAM
-            <br />
-            <span className="text-[#B87333]">MANAGEMENT</span>
-          </h1>
+        <div className="flex gap-2">
           <button
             onClick={handleRefresh}
             disabled={fetching}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.9), rgba(205, 127, 50, 0.9))',
-              border: '2px solid rgba(184, 115, 51, 0.3)',
-              color: '#1A1110',
-              fontFamily: 'var(--font-heading)',
-              letterSpacing: '0.1em',
-              fontWeight: 600,
-              boxShadow: '0 4px 20px rgba(184, 115, 51, 0.4)',
-            }}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-all disabled:opacity-50"
           >
-            <RefreshCw size={20} className={fetching ? "animate-spin" : ""} />
-            REFRESH
+            <RefreshCw size={18} className={fetching ? "animate-spin" : ""} />
+            Refresh
+          </button>
+          <button
+            onClick={() => setShowManualPost(!showManualPost)}
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
+          >
+            <Plus size={18} />
+            Add Post
           </button>
         </div>
       </div>
 
       {/* Messages */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-950/30 border-2 border-red-800/50 text-red-300">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
           <p className="font-semibold">Error: {error}</p>
         </div>
       )}
       {success && (
-        <div className="mb-6 p-4 rounded-xl bg-green-950/30 border-2 border-green-800/50 text-green-300">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-green-700">
           <p className="font-semibold">Success: {success}</p>
         </div>
       )}
 
-      {/* Action Button */}
-      <div className="mb-8">
-        <button
-          onClick={() => {
-            setShowManualPost(!showManualPost);
-          }}
-          className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg w-full md:w-auto"
-          style={{
-            background: 'linear-gradient(135deg, rgba(131, 58, 180, 0.9), rgba(253, 29, 29, 0.9), rgba(252, 175, 69, 0.9))',
-            border: '2px solid rgba(184, 115, 51, 0.3)',
-            color: '#FFFFFF',
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-            fontWeight: 600,
-            boxShadow: '0 4px 20px rgba(184, 115, 51, 0.4)',
-          }}
-        >
-          <Plus size={24} />
-          ADD INSTAGRAM POST
-        </button>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Posts</p>
+              <p className="text-2xl font-bold text-black">{stats.total}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <Instagram size={20} className="text-white" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Auto Sync</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.autoSync}</p>
+            </div>
+            <div className="p-3 bg-purple-100 rounded-lg">
+              <Instagram size={20} className="text-purple-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Manual</p>
+              <p className="text-2xl font-bold text-gray-600">{stats.manual}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <Upload size={20} className="text-gray-600" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Manual Post Form */}
       {showManualPost && (
-        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-[#FFFDF2] to-[#FFF8E8] border-2 border-[#B87333]/30 shadow-xl">
-          <h2 className="text-2xl font-bold mb-4 text-[#2e211a]" style={{ fontFamily: 'var(--font-heading)' }}>
-            Add Instagram Post
-          </h2>
-          <form onSubmit={handleAddManualPost} className="space-y-5">
-            {/* Cloudinary Image URL */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 animate-slideUp">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-black">Add Instagram Post</h2>
+            <button
+              onClick={() => {
+                setShowManualPost(false);
+                setManualForm({ imageUrl: "", permalink: "", caption: "", likes: 0 });
+                setImagePreview("");
+                setError("");
+              }}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={20} className="text-black" />
+            </button>
+          </div>
+          <form onSubmit={handleAddManualPost} className="space-y-4">
+            {/* Image Upload */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f] flex items-center gap-2">
+              <label className="block text-sm font-semibold text-black mb-2 flex items-center gap-2">
                 <ImageIcon size={16} />
-                Cloudinary Image URL *
+                Image *
               </label>
-              <input
-                type="url"
-                value={manualForm.imageUrl}
-                onChange={(e) => setManualForm({ ...manualForm, imageUrl: e.target.value })}
-                placeholder="https://res.cloudinary.com/your-cloud/image/upload/v1234567/your-image.jpg"
-                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none font-mono text-sm"
-                required
-              />
-              <p className="mt-2 text-xs text-[#8B6F47]">
-                Upload your image to Cloudinary and paste the direct image URL here. This ensures high-quality display on your website.
-              </p>
-              <div className="mt-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
-                <p className="text-xs text-blue-700 font-semibold mb-1">💡 How to get Cloudinary URL:</p>
-                <ol className="text-xs text-blue-600 list-decimal list-inside space-y-1">
-                  <li>Upload your image to Cloudinary dashboard</li>
-                  <li>Copy the "Secure URL" or "URL" from the image details</li>
-                  <li>Paste it in the field above</li>
-                </ol>
-                <a 
-                  href="https://cloudinary.com/documentation/upload_images" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-xs text-blue-600 underline mt-2 inline-block"
-                >
-                  Learn more about Cloudinary →
-                </a>
-              </div>
-              {manualForm.imageUrl && manualForm.imageUrl.includes('cloudinary.com') && (
-                <div className="mt-3 p-3 rounded-lg bg-green-50 border border-green-200">
-                  <p className="text-xs text-green-700 font-semibold mb-2">✓ Valid Cloudinary URL detected</p>
-                  <img 
-                    src={manualForm.imageUrl} 
-                    alt="Preview" 
-                    className="max-w-full h-32 object-cover rounded border border-green-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+              <div className="space-y-2">
+                <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
+                  <Upload size={20} className="mr-2 text-gray-400" />
+                  <span className="text-sm text-gray-600">
+                    {uploading ? "Uploading..." : "Click to upload image"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
+                    className="hidden"
+                    disabled={uploading}
                   />
-                </div>
-              )}
+                </label>
+                {imagePreview && (
+                  <div className="relative">
+                    <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover rounded-lg" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagePreview("");
+                        setManualForm({ ...manualForm, imageUrl: "" });
+                      }}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                <div className="text-xs text-gray-500">Or enter image URL:</div>
+                <input
+                  type="url"
+                  value={manualForm.imageUrl}
+                  onChange={(e) => {
+                    setManualForm({ ...manualForm, imageUrl: e.target.value });
+                    setImagePreview(e.target.value);
+                  }}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+                />
+              </div>
             </div>
 
             {/* Instagram Post URL */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f] flex items-center gap-2">
+              <label className="block text-sm font-semibold text-black mb-2 flex items-center gap-2">
                 <LinkIcon size={16} />
                 Instagram Post URL *
               </label>
@@ -343,80 +357,52 @@ export default function AdminInstagramPage() {
                 value={manualForm.permalink}
                 onChange={(e) => setManualForm({ ...manualForm, permalink: e.target.value })}
                 placeholder="https://www.instagram.com/p/ABC123/"
-                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 required
               />
-              <p className="mt-2 text-xs text-[#8B6F47]">
-                Paste the Instagram post URL. Users will be redirected to this link when they click on the post.
-              </p>
             </div>
 
             {/* Caption */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
-                Caption
-              </label>
+              <label className="block text-sm font-semibold text-black mb-2">Caption</label>
               <textarea
                 value={manualForm.caption}
                 onChange={(e) => setManualForm({ ...manualForm, caption: e.target.value })}
                 placeholder="Copy and paste the Instagram post caption here..."
                 rows={5}
-                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none resize-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black resize-none"
               />
-              <p className="mt-2 text-xs text-[#8B6F47]">
-                Copy and paste the caption from Instagram. This will be displayed when users hover over the post.
-              </p>
             </div>
 
-            {/* Likes (Optional) */}
+            {/* Likes */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
-                Likes (Optional)
-              </label>
+              <label className="block text-sm font-semibold text-black mb-2">Likes (Optional)</label>
               <input
                 type="number"
                 value={manualForm.likes}
                 onChange={(e) => setManualForm({ ...manualForm, likes: parseInt(e.target.value) || 0 })}
                 placeholder="0"
                 min="0"
-                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
               />
-              <p className="mt-2 text-xs text-[#8B6F47]">
-                Enter the number of likes for this post (optional).
-              </p>
             </div>
 
             <div className="flex gap-4 pt-2">
               <button
                 type="submit"
-                disabled={fetching}
-                className="px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-heading)',
-                  fontWeight: 600,
-                }}
+                disabled={fetching || uploading}
+                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all disabled:opacity-50"
               >
-                {fetching ? (
-                  <>
-                    <RefreshCw size={16} className="animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <Plus size={16} />
-                    Add Post
-                  </>
-                )}
+                {fetching ? "Adding..." : "Add Post"}
               </button>
               <button
                 type="button"
                 onClick={() => {
                   setShowManualPost(false);
                   setManualForm({ imageUrl: "", permalink: "", caption: "", likes: 0 });
+                  setImagePreview("");
                 }}
-                className="px-6 py-3 rounded-lg border-2 border-[#B87333]/50 text-[#6b4a2f] hover:bg-[#B87333]/10 transition-all"
+                className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
               >
                 Cancel
               </button>
@@ -425,147 +411,78 @@ export default function AdminInstagramPage() {
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Instagram size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">TOTAL POSTS</span>
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-            {posts.length}
-          </p>
-        </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Instagram size={20} className="text-[#833AB4]" />
-            <span className="section-label text-xs">AUTO SYNC</span>
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#833AB4' }}>
-            {posts.filter(p => !p.isManual).length}
-          </p>
-        </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Upload size={20} className="text-[#D4A574]" />
-            <span className="section-label text-xs">MANUAL</span>
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
-            {posts.filter(p => p.isManual).length}
-          </p>
-        </div>
-      </div>
-
       {/* Posts Grid */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
-          INSTAGRAM POSTS
-        </h2>
-        {posts.length === 0 ? (
-          <div className="brutal-card p-12 text-center">
-            <Instagram size={64} className="mx-auto mb-6 text-[#B87333]" />
-            <p className="text-xl mb-2" style={{ color: '#8B6F47' }}>No Instagram posts yet</p>
-            <p className="text-sm" style={{ color: '#8B6F47' }}>Click the button above to add Instagram posts</p>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading Instagram posts...</p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {posts.map((post) => (
-              <div
-                key={post._id}
-                className="brutal-card p-0 overflow-hidden group transition-all duration-300 hover:scale-105"
-              >
-                {/* Image */}
-                <div className="aspect-square relative overflow-hidden">
-                  {post.imageUrl && !post.imageUrl.includes('instagram.com/p/') ? (
-                    <img
-                      src={post.imageUrl}
-                      alt={post.caption || "Instagram post"}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "";
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-amber-900/20 to-zinc-900/40 flex items-center justify-center">
-                      <div className="text-center p-4">
-                        <Instagram size={48} className="mx-auto mb-2 text-[#B87333] opacity-70" />
-                        <p className="text-xs text-[#B87333] opacity-80">Instagram Post</p>
-                        {post.caption && (
-                          <p className="text-xs mt-2 line-clamp-2 text-[#D4A574] opacity-90">{post.caption.substring(0, 60)}...</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center p-4">
-                    <div className="text-center text-white">
-                      <p className="text-sm font-semibold mb-2 line-clamp-2">{post.caption || "No caption"}</p>
-                      <div className="flex items-center justify-center gap-2 text-white/80">
-                        <Instagram size={16} />
-                        <span className="text-sm">{post.likes} likes</span>
-                      </div>
-                    </div>
+        </div>
+      ) : posts.length === 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <Instagram size={64} className="mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">No Instagram posts yet</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {posts.map((post) => (
+            <div
+              key={post._id}
+              className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all"
+            >
+              <div className="aspect-square bg-gray-100 overflow-hidden relative">
+                {post.imageUrl && !post.imageUrl.includes('instagram.com/p/') ? (
+                  <img
+                    src={post.imageUrl}
+                    alt={post.caption || "Instagram post"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <Instagram size={48} className="text-gray-400" />
                   </div>
-
-                  {/* Badge */}
-                  {post.isManual && (
-                    <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-[#B87333] text-white text-xs font-semibold">
-                      Manual
-                    </div>
-                  )}
+                )}
+                {post.isManual && (
+                  <div className="absolute top-2 right-2 px-2 py-1 bg-black text-white text-xs font-semibold rounded">
+                    Manual
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-500">
+                    {new Date(post.timestamp).toLocaleDateString()}
+                  </span>
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                    {post.mediaType}
+                  </span>
                 </div>
-
-                {/* Info */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs" style={{ color: '#8B6F47' }}>
-                      {new Date(post.timestamp).toLocaleDateString()}
-                    </span>
-                    <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(184, 115, 51, 0.2)', color: '#B87333' }}>
-                      {post.mediaType}
-                    </span>
-                  </div>
-                  <p className="text-sm line-clamp-2 mb-3" style={{ color: '#F5F1E8' }}>
-                    {post.caption || "No caption"}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <a
-                      href={post.permalink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
-                      style={{
-                        background: 'rgba(184, 115, 51, 0.2)',
-                        border: '2px solid rgba(184, 115, 51, 0.4)',
-                        color: '#B87333',
-                        fontFamily: 'var(--font-heading)',
-                      }}
-                    >
-                      <ExternalLink size={14} />
-                      View
-                    </a>
-                    <button
-                      onClick={() => handleDelete(post._id)}
-                      className="py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
-                      style={{
-                        background: 'rgba(220, 38, 38, 0.2)',
-                        border: '2px solid rgba(220, 38, 38, 0.5)',
-                        color: '#FCA5A5',
-                      }}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
+                <p className="text-sm text-black line-clamp-2 mb-3">
+                  {post.caption || "No caption"}
+                </p>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={post.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-black text-white rounded-lg hover:bg-gray-900 transition-all text-sm font-semibold"
+                  >
+                    <ExternalLink size={14} />
+                    View
+                  </a>
+                  <button
+                    onClick={() => handleDelete(post._id)}
+                    className="py-2 px-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
