@@ -165,7 +165,7 @@ export default function UserDashboard() {
         </div>
 
         {/* Favorite Items */}
-        <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 border border-[#B87333]/20 hover:border-[#B87333]/40">
+        {/* <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 border border-[#B87333]/20 hover:border-[#B87333]/40">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <p className="text-xs sm:text-sm font-semibold text-[#6b4a2f] uppercase tracking-wider">
               Favorites
@@ -187,7 +187,7 @@ export default function UserDashboard() {
           <div className="mt-2 sm:mt-3 text-xs text-[#8B6F47] opacity-70">
             Saved items
           </div>
-        </div>
+        </div> */}
 
         {/* Most Ordered */}
         <div className="group bg-[#FFFDF2] p-3 sm:p-4 md:p-6 rounded-2xl shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 border border-[#B87333]/20 hover:border-[#B87333]/40">
