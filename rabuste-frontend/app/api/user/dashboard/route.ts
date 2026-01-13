@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
 
     // Calculate stats
     const totalOrders = orders.length;
-    const totalSpent = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
 
     // Get favorite items count from localStorage (client-side)
     // Note: Favorites are stored client-side, so we return 0 here
@@ -55,7 +54,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       stats: {
         totalOrders,
-        totalSpent,
         favoriteItems,
         mostOrderedItem,
       },

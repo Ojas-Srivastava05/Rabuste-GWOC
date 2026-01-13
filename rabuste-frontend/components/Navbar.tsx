@@ -300,12 +300,11 @@ export default function Navbar() {
                     router.push("/user");
                     setShowDropdown(false);
                   }}
-                  className="px-4 py-2.5 flex items-center gap-2 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-all duration-300 flex-1"
+                  className="px-4 py-2.5 flex items-center gap-2 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-all duration-300 flex-1 font-black"
                   style={{
                     fontFamily: "var(--font-heading)",
                     letterSpacing: "0.1em",
                     fontSize: "16px",
-                    fontWeight: 900,
                   }}
                   title="Go to Dashboard"
                 >
@@ -995,8 +994,8 @@ export default function Navbar() {
                     }}
                   >
                     <LogOut size={18} style={{ color: "#ef4444" }} />
-                    <span
-                      className="text-sm uppercase tracking-wider"
+                    <span 
+                      className="text-sm uppercase tracking-wider font-black"
                       style={{
                         color: "#ef4444",
                         letterSpacing: "0.1em",
