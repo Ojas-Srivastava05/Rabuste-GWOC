@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
@@ -357,6 +357,7 @@ export default function OrderStatusPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [completedOrdersVisible, setCompletedOrdersVisible] = useState(3);
+  const [showPickupModal, setShowPickupModal] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -383,6 +384,26 @@ export default function OrderStatusPage() {
       clearInterval(tipInterval);
     };
   }, []);
+
+  // Show pickup modal when there are pending orders (first time only)
+  useEffect(() => {
+    const hasSeenPickupModal = sessionStorage.getItem('hasSeenPickupModal');
+    if (orders.length > 0 && !loading && !hasSeenPickupModal) {
+      const pendingOrders = orders.filter((order) => order.status === "pending");
+      if (pendingOrders.length > 0) {
+        setShowPickupModal(true);
+        sessionStorage.setItem('hasSeenPickupModal', 'true');
+      }
+    }
+  }, [orders, loading]);
+
+  const handleClosePickupModal = () => {
+    setShowPickupModal(false);
+  };
+
+  const handleOpenPickupModal = () => {
+    setShowPickupModal(true);
+  };
 
   async function getUserLocation() {
     try {
@@ -575,6 +596,210 @@ export default function OrderStatusPage() {
       <Navbar />
       <DynamicBackground />
       
+      {/* Pickup Location Modal */}
+      <AnimatePresence>
+        {showPickupModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9998] flex items-center justify-center p-4"
+              style={{
+                background: 'rgba(0, 0, 0, 0.85)',
+                backdropFilter: 'blur(10px)',
+              }}
+              onClick={handleClosePickupModal}
+            />
+            
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+              style={{ pointerEvents: 'none' }}
+            >
+              <div
+                className="relative max-w-lg w-full p-8"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.98), rgba(43, 24, 16, 0.98))',
+                  border: '3px solid rgba(184, 115, 51, 0.6)',
+                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(184, 115, 51, 0.3), inset 0 1px 0 rgba(184, 115, 51, 0.2)',
+                  pointerEvents: 'auto',
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={handleClosePickupModal}
+                  className="absolute top-4 right-4 p-2 transition-all hover:scale-110"
+                  style={{
+                    background: 'rgba(184, 115, 51, 0.2)',
+                    border: '2px solid rgba(184, 115, 51, 0.4)',
+                  }}
+                  aria-label="Close"
+                >
+                  <X size={20} style={{ color: '#B87333' }} />
+                </button>
+
+                {/* Icon */}
+                <motion.div
+                  className="flex justify-center mb-6"
+                  animate={{
+                    y: [0, -10, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <div
+                    className="p-6 rounded-full"
+                    style={{
+                      background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                      boxShadow: '0 10px 30px rgba(184, 115, 51, 0.4)',
+                    }}
+                  >
+                    <Store size={48} style={{ color: '#000' }} />
+                  </div>
+                </motion.div>
+
+                {/* Title */}
+                <h2
+                  className="text-3xl md:text-4xl mb-4 text-center uppercase"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#FFFEF9',
+                    letterSpacing: '0.05em',
+                    textShadow: '0 2px 10px rgba(184, 115, 51, 0.3)',
+                  }}
+                >
+                  Pickup Location
+                </h2>
+
+                <p
+                  className="text-center text-lg mb-6"
+                  style={{
+                    color: '#D4A574',
+                    fontFamily: 'var(--font-body)',
+                  }}
+                >
+                  Please collect your order from our shop
+                </p>
+
+                {/* Divider */}
+                <div
+                  className="h-px mb-6"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, #B87333, transparent)',
+                  }}
+                />
+
+                {/* Shop Details */}
+                <div
+                  className="p-5 mb-6"
+                  style={{
+                    background: 'rgba(184, 115, 51, 0.1)',
+                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                  }}
+                >
+                  <div className="flex items-start gap-4 mb-4">
+                    <Coffee size={24} style={{ color: '#B87333', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <h3
+                        className="text-2xl mb-2"
+                        style={{
+                          fontFamily: 'var(--font-heading)',
+                          color: '#FFFEF9',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        RABUSTE
+                      </h3>
+                      <div className="flex items-start gap-2">
+                        <MapPin size={18} style={{ color: '#B87333', flexShrink: 0, marginTop: '2px' }} />
+                        <p
+                          className="text-base leading-relaxed"
+                          style={{
+                            color: '#D4A574',
+                            fontFamily: 'var(--font-body)',
+                          }}
+                        >
+                          Dimple Row House, 15, Gymkhana Road,<br />
+                          Piplod, Surat, Gujarat 395007
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Map Link */}
+                  <a
+                    href="https://maps.google.com/?q=Dimple+Row+House+15+Gymkhana+Road+Piplod+Surat+Gujarat+395007"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 mt-4 transition-all hover:scale-105"
+                    style={{
+                      background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                      color: '#000',
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: '16px',
+                      fontWeight: 900,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      boxShadow: '0 4px 15px rgba(184, 115, 51, 0.4)',
+                    }}
+                  >
+                    <Navigation size={18} />
+                    Get Directions
+                  </a>
+                </div>
+
+                {/* Note */}
+                <div
+                  className="text-center p-4"
+                  style={{
+                    background: 'rgba(255, 183, 77, 0.1)',
+                    border: '1px solid rgba(255, 183, 77, 0.3)',
+                  }}
+                >
+                  <p
+                    className="text-sm"
+                    style={{
+                      color: '#FFB74D',
+                      fontFamily: 'var(--font-body)',
+                    }}
+                  >
+                    ☕ Your order will be ready for pickup shortly!
+                  </p>
+                </div>
+
+                {/* Got It Button */}
+                <button
+                  onClick={handleClosePickupModal}
+                  className="w-full py-4 mt-6 transition-all hover:scale-105"
+                  style={{
+                    background: 'rgba(184, 115, 51, 0.2)',
+                    border: '2px solid rgba(184, 115, 51, 0.4)',
+                    color: '#D4A574',
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '16px',
+                    fontWeight: 900,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Got It!
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+      
       <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-4 md:px-6 mx-auto">
           {/* Header */}
@@ -599,6 +824,27 @@ export default function OrderStatusPage() {
             >
               YOUR <span className="gradient-text">ORDERS</span>
             </h1>
+
+            {/* Pickup Location Button */}
+            <motion.button
+              onClick={handleOpenPickupModal}
+              className="inline-flex items-center gap-3 px-6 py-3 mt-4 transition-all hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #B87333, #CD7F32)',
+                color: '#000',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '14px',
+                fontWeight: 900,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                boxShadow: '0 4px 15px rgba(184, 115, 51, 0.4)',
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Store size={20} />
+              View Pickup Location
+            </motion.button>
             
             {/* Location Status */}
             {userLocation && (
