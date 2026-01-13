@@ -272,7 +272,8 @@ export default function Navbar() {
                   style={{
                     fontFamily: 'var(--font-heading)',
                     letterSpacing: '0.1em',
-                    fontSize: '12px',
+                    fontSize: '16px',
+                    fontWeight: 900,
                   }}
                   title="Go to Dashboard"
                 >
@@ -970,7 +971,8 @@ function NavButton({
     border border-transparent
     transition-all duration-300
     inline-flex items-center justify-center
-    text-sm
+    text-lg md:text-xl
+    font-black
     tracking-[0.1em]
     uppercase
     relative
@@ -1085,11 +1087,12 @@ function MobileNavItem({
           />
         </div>
         <span
-          className="flex-1 text-sm uppercase tracking-wider"
+          className="flex-1 text-base md:text-lg uppercase tracking-wider"
           style={{
             color: isActive ? '#B87333' : '#FFFEF9',
             fontFamily: 'var(--font-heading)',
             letterSpacing: '0.1em',
+            fontWeight: 900,
           }}
         >
           {label}
