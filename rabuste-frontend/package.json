@@ -30,6 +30,7 @@
     "firebase": "^12.7.0",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
+    "idb": "^8.0.3",
     "jsonwebtoken": "^9.0.3",
     "lamina": "^1.2.2",
     "leva": "^0.10.1",
