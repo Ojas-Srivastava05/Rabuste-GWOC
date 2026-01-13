@@ -257,7 +257,7 @@ export default function ArtGalleryPage() {
           >
             <div className="flex flex-col md:flex-row gap-4">
               {/* Premium Search */}
-              <div 
+              {/* <div 
                 className="flex-1 relative group"
                 style={{
                   background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(26, 17, 16, 0.8))',
@@ -300,7 +300,7 @@ export default function ArtGalleryPage() {
                     <X size={18} style={{ color: '#B87333' }} />
                   </button>
                 )}
-              </div>
+              </div> */}
 
               {/* Premium Controls */}
               <div className="flex gap-3">
