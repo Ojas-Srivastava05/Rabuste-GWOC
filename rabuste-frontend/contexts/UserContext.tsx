@@ -93,6 +93,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Optional: Clear cart data on logout
     localStorage.removeItem("cart");
     
+    // Clear user-specific favorites (optional - you might want to keep them)
+    // If you want to clear favorites on logout, uncomment the next line:
+    // if (user?.id) localStorage.removeItem(`favorites_${user.id}`);
+    
     // Clear user state
     setUser(null);
     

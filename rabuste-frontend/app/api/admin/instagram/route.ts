@@ -37,42 +37,71 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { action, embedUrl, caption, likes } = body;
+    const { action, imageUrl, permalink, caption, likes } = body;
 
     if (action !== "manual") {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    // Validate embedUrl
-    if (!embedUrl || typeof embedUrl !== 'string') {
+    // Validate imageUrl (Cloudinary URL)
+    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
       return NextResponse.json(
-        { error: "Valid embed URL is required" },
+        { error: "Cloudinary image URL is required" },
         { status: 400 }
       );
     }
 
-    // Extract Instagram post ID from URL
+    // Validate permalink (Instagram URL)
+    if (!permalink || typeof permalink !== 'string' || !permalink.trim()) {
+      return NextResponse.json(
+        { error: "Instagram post URL is required" },
+        { status: 400 }
+      );
+    }
+
+    // Validate Cloudinary URL format
+    if (!imageUrl.includes('cloudinary.com') && !imageUrl.match(/^https?:\/\/.+/)) {
+      return NextResponse.json(
+        { error: "Please provide a valid Cloudinary image URL" },
+        { status: 400 }
+      );
+    }
+
+    // Validate Instagram URL format
+    if (!permalink.includes('instagram.com')) {
+      return NextResponse.json(
+        { error: "Please provide a valid Instagram post URL" },
+        { status: 400 }
+      );
+    }
+
+    // Extract Instagram post ID from URL for uniqueness check
     let instagramId = '';
-    let permalink = embedUrl;
+    let normalizedPermalink = permalink.trim();
 
     // Match patterns like:
     // https://www.instagram.com/p/ABC123/
     // https://instagram.com/p/ABC123/
     // https://www.instagram.com/reel/ABC123/
-    const match = embedUrl.match(/instagram\.com\/(p|reel)\/([A-Za-z0-9_-]+)/);
+    const match = normalizedPermalink.match(/instagram\.com\/(p|reel)\/([A-Za-z0-9_-]+)/);
     
     if (match && match[2]) {
       instagramId = match[2];
-      permalink = `https://www.instagram.com/${match[1]}/${instagramId}/`;
+      // Normalize permalink
+      normalizedPermalink = `https://www.instagram.com/${match[1]}/${instagramId}/`;
     } else {
-      return NextResponse.json(
-        { error: "Invalid Instagram URL format. Use format: https://www.instagram.com/p/POST_ID/" },
-        { status: 400 }
-      );
+      // If we can't extract ID, use a hash of the URL as instagramId
+      instagramId = `manual_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     }
 
-    // Check if post already exists
-    const existingPost = await InstagramPost.findOne({ instagramId });
+    // Check if post already exists (by permalink or instagramId)
+    const existingPost = await InstagramPost.findOne({ 
+      $or: [
+        { instagramId },
+        { permalink: normalizedPermalink }
+      ]
+    });
+    
     if (existingPost) {
       return NextResponse.json(
         { error: "This Instagram post has already been added" },
@@ -83,10 +112,9 @@ export async function POST(req: Request) {
     // Create new Instagram post
     const newPost = await InstagramPost.create({
       instagramId,
-      embedUrl: permalink,
-      imageUrl: `https://www.instagram.com/p/${instagramId}/media/?size=l`, // Instagram embed image
-      caption: caption || '',
-      permalink,
+      imageUrl: imageUrl.trim(), // Cloudinary image URL
+      caption: caption?.trim() || '',
+      permalink: normalizedPermalink,
       likes: likes || 0,
       mediaType: 'IMAGE',
       isManual: true,

@@ -434,9 +434,9 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {/* Orders List */}
+      {/* Orders List - Card Grid Layout */}
       {displayedOrders.length > 0 && (
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
           <h2 className="text-2xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
             {activeFilter === 'pending' ? 'Pending Orders' : activeFilter === 'completed' ? 'Completed Orders' : 'All Orders'}
           </h2>
@@ -446,7 +446,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
       
-      <div id="orders-section" className="space-y-6">
+      <div id="orders-section" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {displayedOrders.map((order) => {
           // Calculate if coupon was applied using simple math
           const itemsTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -468,12 +468,13 @@ export default function AdminOrdersPage() {
           >
             <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
                   <h2
-                    className="text-3xl"
+                    className="text-2xl sm:text-3xl font-bold"
                     style={{
                       fontFamily: 'var(--font-heading)',
                       color: '#F5F1E8',
+                      lineHeight: 1.1,
                     }}
                   >
                     {order.customerName}
@@ -481,18 +482,18 @@ export default function AdminOrdersPage() {
                 {/* Inline Coupon Indicator next to name */}
                   {hasCouponApplied && (
                     <span
-                      className="text-2xl"
+                      className="text-2xl sm:text-3xl"
                       title={`Coupon Applied - ₹${discountAmount} off (${discountPercentage}% discount)`}
                     >
                       🎫
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 text-sm mb-1" style={{ color: '#8B6F47' }}>
-                  <Mail size={16} />
+                <div className="flex items-center gap-2 text-lg sm:text-xl mb-2" style={{ color: '#8B6F47' }}>
+                  <Mail size={20} />
                   {order.customerEmail}
                 </div>
-                <div className="text-xs" style={{ color: '#8B6F47' }}>
+                <div className="text-base sm:text-lg font-semibold" style={{ color: '#B87333' }}>
                   {new Date(order.createdAt).toLocaleString()}
                 </div>
                 
@@ -646,59 +647,72 @@ export default function AdminOrdersPage() {
               </div>
             </div>
 
-            {/* Items */}
-            <div className="mb-6">
+            {/* ORDER ITEMS - REORGANIZED FOR BARISTA VISIBILITY */}
+            <div className="mb-8" style={{ 
+              background: 'rgba(184, 115, 51, 0.1)', 
+              border: '4px solid rgba(184, 115, 51, 0.4)',
+              borderRadius: '12px',
+              padding: '2rem',
+            }}>
               <h3
-                className="text-xl mb-4 flex items-center gap-2"
+                className="text-2xl sm:text-3xl mb-6 flex items-center gap-3"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: '#B87333',
                   letterSpacing: '0.1em',
+                  fontWeight: 'bold',
                 }}
               >
-                <FileText size={20} />
+                <FileText size={28} />
                 ORDER ITEMS
               </h3>
-              <div className="space-y-3">
+              
+              {/* Grid layout for items - makes them BIG and prominent */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {order.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex justify-between items-center p-4 rounded-lg"
+                    className="p-6 rounded-lg"
                     style={{
                       background: item.itemType === 'art' 
-                        ? 'rgba(184, 115, 51, 0.15)' 
-                        : 'rgba(0, 0, 0, 0.3)',
-                      border: `2px solid ${item.itemType === 'art' 
-                        ? 'rgba(184, 115, 51, 0.4)' 
-                        : 'rgba(184, 115, 51, 0.2)'}`,
+                        ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(184, 115, 51, 0.15))' 
+                        : 'linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(42, 24, 16, 0.4))',
+                      border: `4px solid ${item.itemType === 'art' 
+                        ? 'rgba(184, 115, 51, 0.7)' 
+                        : 'rgba(184, 115, 51, 0.5)'}`,
+                      minHeight: '180px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg" style={{ color: '#F5F1E8' }}>
+                    {/* Item Name - Clear and readable */}
+                    <div className="mb-4">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <h4 className="text-xl sm:text-2xl font-bold leading-tight" style={{ color: '#F5F1E8', flex: 1 }}>
                           {item.name}
-                        </span>
+                        </h4>
                         {item.itemType === 'art' && (
                           <span 
-                            className="text-xs px-2 py-1 uppercase"
+                            className="text-xs px-2 py-1 uppercase font-bold whitespace-nowrap"
                             style={{
-                              background: 'rgba(184, 115, 51, 0.3)',
+                              background: 'rgba(184, 115, 51, 0.5)',
                               color: '#D4A574',
-                              border: '1px solid rgba(184, 115, 51, 0.5)',
+                              border: '2px solid rgba(184, 115, 51, 0.7)',
                               fontFamily: 'var(--font-heading)',
                               letterSpacing: '0.1em',
                             }}
                           >
-                            🎨 ARTWORK
+                            🎨 ART
                           </span>
                         )}
                         {item.itemType === 'menu' && (
                           <span 
-                            className="text-xs px-2 py-1 uppercase"
+                            className="text-xs px-2 py-1 uppercase font-bold whitespace-nowrap"
                             style={{
-                              background: 'rgba(139, 111, 71, 0.2)',
+                              background: 'rgba(139, 111, 71, 0.4)',
                               color: '#8B6F47',
-                              border: '1px solid rgba(139, 111, 71, 0.4)',
+                              border: '2px solid rgba(139, 111, 71, 0.6)',
                               fontFamily: 'var(--font-heading)',
                               letterSpacing: '0.1em',
                             }}
@@ -707,18 +721,31 @@ export default function AdminOrdersPage() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 text-sm" style={{ color: '#8B6F47' }}>
-                        <span>× {item.quantity}</span>
+                      
+                      {/* Quantity - Prominent but reasonable */}
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl sm:text-4xl font-bold" style={{ color: '#D4A574' }}>
+                          ×{item.quantity}
+                        </span>
                         {item.itemType === 'art' && (
-                          <span className="text-xs" style={{ color: '#B87333' }}>
-                            • Ready for pickup
+                          <span className="text-sm font-semibold" style={{ color: '#B87333' }}>
+                            Ready for pickup
                           </span>
                         )}
                       </div>
                     </div>
-                    <span className="text-xl gradient-text font-bold">
-                      ₹{item.price * item.quantity}
-                    </span>
+                    
+                    {/* Price - Clear at bottom */}
+                    <div className="mt-auto pt-4 border-t-2" style={{ borderColor: 'rgba(184, 115, 51, 0.3)' }}>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-xs uppercase tracking-wide" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                          Total
+                        </span>
+                        <span className="text-2xl sm:text-3xl gradient-text font-bold">
+                          ₹{item.price * item.quantity}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -726,16 +753,16 @@ export default function AdminOrdersPage() {
 
             {order.instructions && (
               <div
-                className="mb-6 p-4 rounded-lg"
+                className="mb-6 p-6 sm:p-8 rounded-lg"
                 style={{
-                  background: 'rgba(184, 115, 51, 0.1)',
-                  border: '1px solid rgba(184, 115, 51, 0.3)',
+                  background: 'rgba(184, 115, 51, 0.2)',
+                  border: '3px solid rgba(184, 115, 51, 0.5)',
                 }}
               >
-                <p className="text-sm font-bold mb-2 uppercase tracking-wide" style={{ color: '#B87333' }}>
-                  Special Instructions
+                <p className="text-2xl sm:text-3xl font-bold mb-3 uppercase tracking-wide" style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}>
+                  ⚠️ Special Instructions
                 </p>
-                <p style={{ color: '#D4A574' }}>{order.instructions}</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-semibold" style={{ color: '#F5F1E8' }}>{order.instructions}</p>
               </div>
             )}
 
@@ -792,7 +819,7 @@ export default function AdminOrdersPage() {
                 <span />
               )}
               <span
-                className="text-2xl"
+                className="text-3xl sm:text-4xl md:text-5xl font-bold"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   color: '#F5F1E8',
@@ -801,7 +828,7 @@ export default function AdminOrdersPage() {
                 TOTAL
               </span>
               <span
-                className="text-4xl gradient-text"
+                className="text-5xl sm:text-6xl md:text-7xl gradient-text font-bold"
                 style={{
                   fontFamily: 'var(--font-heading)',
                 }}
@@ -813,10 +840,15 @@ export default function AdminOrdersPage() {
             {order.status === "pending" && (
               <button
                 onClick={() => markCompleted(order._id)}
-                className="btn btn-primary w-full mt-6"
+                className="btn btn-primary w-full mt-8 py-6 text-2xl sm:text-3xl font-bold"
+                style={{
+                  minHeight: '80px',
+                  fontSize: '1.5rem',
+                  letterSpacing: '0.15em',
+                }}
               >
-                <CheckCircle2 size={20} />
-                MARK AS COMPLETED
+                <CheckCircle2 size={32} />
+                ✓ MARK AS COMPLETED
               </button>
             )}
           </div>

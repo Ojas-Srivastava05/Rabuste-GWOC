@@ -70,7 +70,7 @@ export default function InstagramShowcase() {
           >
             <div className="inline-flex items-center gap-4 mb-6">
               <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
-              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+              <span className="text-xs uppercase tracking-[0.2em]" style={{ color: '#8B6F47', fontFamily: 'var(--font-body)', fontWeight: 400 }}>
                 FOLLOW US
               </span>
               <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
@@ -86,9 +86,41 @@ export default function InstagramShowcase() {
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
                 color: '#F5F1E8',
+                fontWeight: 400,
+                letterSpacing: '0.02em',
               }}
             >
-              <span className="gradient-text">INSTAGRAM</span>
+              <span style={{
+                background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
+                position: 'relative',
+                display: 'inline-block',
+              }}>
+                INSTAGRAM
+                {/* Glow effect behind text */}
+                <motion.span
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 blur-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: -1,
+                  }}
+                >
+                  INSTAGRAM
+                </motion.span>
+              </span>
             </motion.h2>
 
             <motion.p
@@ -97,7 +129,7 @@ export default function InstagramShowcase() {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg md:text-xl max-w-2xl mx-auto mb-8"
-              style={{ color: '#B87333' }}
+              style={{ color: 'rgba(245, 241, 232, 0.6)', fontWeight: 300, lineHeight: 1.7 }}
             >
               Follow us on Instagram for daily coffee inspiration, behind-the-scenes content, and exclusive updates
             </motion.p>
@@ -167,8 +199,8 @@ export default function InstagramShowcase() {
                   onMouseLeave={() => setIsHovered(null)}
                   className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
-                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                    background: 'rgba(26, 17, 16, 0.6)',
+                    border: '1px solid rgba(184, 115, 51, 0.2)',
                   }}
                 >
                   {/* Instagram Image */}

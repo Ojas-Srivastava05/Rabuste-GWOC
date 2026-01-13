@@ -1,11 +1,33 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function DynamicBackground() {
+  const [key, setKey] = useState(0);
+
+  // Listen for VR close event to force re-render
+  useEffect(() => {
+    const handleVRClose = () => {
+      // Force component to re-render
+      setKey(prev => prev + 1);
+    };
+
+    window.addEventListener('vr-closed', handleVRClose);
+    window.addEventListener('resize', handleVRClose);
+    
+    return () => {
+      window.removeEventListener('vr-closed', handleVRClose);
+      window.removeEventListener('resize', handleVRClose);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
+    <div 
+      key={key}
+      className="fixed inset-0 pointer-events-none overflow-hidden" 
+      style={{ zIndex: 0 }}
+    >
       {/* Rich coffee-colored orbs */}
       <motion.div
         className="absolute -top-1/4 -right-1/4 w-[1200px] h-[1200px] rounded-full"

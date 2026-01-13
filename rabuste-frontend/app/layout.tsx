@@ -9,6 +9,7 @@ import StructuredData from "@/components/StructuredData";
 import PageViewTracker from "@/components/PageViewTracker";
 import { UserProvider } from "@/contexts/UserContext";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Rabuste Coffee | Premium 2X Caffeine Coffee Online",
@@ -69,6 +70,49 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Analytics - Required for Search Console verification */}
+        {/* Must be in <head> section and unmodified for verification */}
+        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
+          <>
+            <link
+              rel="dns-prefetch"
+              href="https://www.googletagmanager.com"
+            />
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}', {
+                    'send_page_view': false
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+        <link
+          rel="preconnect"
+          href="https://fonts.googleapis.com"
+        />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://www.googletagmanager.com"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://checkout.razorpay.com"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
@@ -96,6 +140,7 @@ export default function RootLayout({
           {children}
         </UserProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

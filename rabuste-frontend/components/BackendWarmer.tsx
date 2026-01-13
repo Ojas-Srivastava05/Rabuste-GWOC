@@ -38,8 +38,9 @@ export default function BackendWarmer() {
           const response = await fetch(`${backend.url}${backend.endpoint}`, {
             method: 'GET',
             signal: controller.signal,
-            // Use no-cache to ensure we actually hit the server
-            cache: 'no-store',
+            // Use default cache to allow back/forward cache
+            // The backend will still be warmed up on first request
+            cache: 'default',
           });
 
           clearTimeout(timeoutId);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Instagram, RefreshCw, Plus, Trash2, ExternalLink, Download, Upload } from "lucide-react";
+import { Instagram, RefreshCw, Plus, Trash2, ExternalLink, Download, Upload, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 
 interface InstagramPost {
   _id: string;
@@ -25,8 +25,10 @@ export default function AdminInstagramPage() {
   // Manual post form state
   const [showManualPost, setShowManualPost] = useState(false);
   const [manualForm, setManualForm] = useState({
-    embedUrl: "", // Instagram post URL
+    imageUrl: "", // Cloudinary image URL
+    permalink: "", // Instagram post URL for redirection
     caption: "",
+    likes: 0,
   });
 
   const getAuthHeaders = () => {
@@ -77,8 +79,24 @@ export default function AdminInstagramPage() {
 
   const handleAddManualPost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!manualForm.embedUrl.trim()) {
-      setError("Instagram post URL is required");
+    if (!manualForm.imageUrl.trim()) {
+      setError("Cloudinary image URL is required");
+      return;
+    }
+    if (!manualForm.permalink.trim()) {
+      setError("Instagram post URL is required for redirection");
+      return;
+    }
+
+    // Validate Cloudinary URL
+    if (!manualForm.imageUrl.includes('cloudinary.com') && !manualForm.imageUrl.match(/^https?:\/\/.+/)) {
+      setError("Please provide a valid Cloudinary image URL (e.g., https://res.cloudinary.com/...)");
+      return;
+    }
+
+    // Validate Instagram URL
+    if (!manualForm.permalink.includes('instagram.com')) {
+      setError("Please provide a valid Instagram post URL");
       return;
     }
 
@@ -92,9 +110,10 @@ export default function AdminInstagramPage() {
         headers: getAuthHeaders(),
         body: JSON.stringify({
           action: "manual",
-          embedUrl: manualForm.embedUrl.trim(),
+          imageUrl: manualForm.imageUrl.trim(),
+          permalink: manualForm.permalink.trim(),
           caption: manualForm.caption.trim(),
-          likes: 0,
+          likes: manualForm.likes || 0,
         }),
       });
 
@@ -115,7 +134,7 @@ export default function AdminInstagramPage() {
       }
 
       setSuccess("Post added successfully!");
-      setManualForm({ embedUrl: "", caption: "" });
+      setManualForm({ imageUrl: "", permalink: "", caption: "", likes: 0 });
       setShowManualPost(false);
       await fetchPosts();
     } catch (err: any) {
@@ -264,43 +283,114 @@ export default function AdminInstagramPage() {
           <h2 className="text-2xl font-bold mb-4 text-[#2e211a]" style={{ fontFamily: 'var(--font-heading)' }}>
             Add Instagram Post
           </h2>
-          <form onSubmit={handleAddManualPost} className="space-y-4">
+          <form onSubmit={handleAddManualPost} className="space-y-5">
+            {/* Cloudinary Image URL */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
+              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f] flex items-center gap-2">
+                <ImageIcon size={16} />
+                Cloudinary Image URL *
+              </label>
+              <input
+                type="url"
+                value={manualForm.imageUrl}
+                onChange={(e) => setManualForm({ ...manualForm, imageUrl: e.target.value })}
+                placeholder="https://res.cloudinary.com/your-cloud/image/upload/v1234567/your-image.jpg"
+                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none font-mono text-sm"
+                required
+              />
+              <p className="mt-2 text-xs text-[#8B6F47]">
+                Upload your image to Cloudinary and paste the direct image URL here. This ensures high-quality display on your website.
+              </p>
+              <div className="mt-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <p className="text-xs text-blue-700 font-semibold mb-1">💡 How to get Cloudinary URL:</p>
+                <ol className="text-xs text-blue-600 list-decimal list-inside space-y-1">
+                  <li>Upload your image to Cloudinary dashboard</li>
+                  <li>Copy the "Secure URL" or "URL" from the image details</li>
+                  <li>Paste it in the field above</li>
+                </ol>
+                <a 
+                  href="https://cloudinary.com/documentation/upload_images" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 underline mt-2 inline-block"
+                >
+                  Learn more about Cloudinary →
+                </a>
+              </div>
+              {manualForm.imageUrl && manualForm.imageUrl.includes('cloudinary.com') && (
+                <div className="mt-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                  <p className="text-xs text-green-700 font-semibold mb-2">✓ Valid Cloudinary URL detected</p>
+                  <img 
+                    src={manualForm.imageUrl} 
+                    alt="Preview" 
+                    className="max-w-full h-32 object-cover rounded border border-green-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Instagram Post URL */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f] flex items-center gap-2">
+                <LinkIcon size={16} />
                 Instagram Post URL *
               </label>
               <input
                 type="url"
-                value={manualForm.embedUrl}
-                onChange={(e) => setManualForm({ ...manualForm, embedUrl: e.target.value })}
+                value={manualForm.permalink}
+                onChange={(e) => setManualForm({ ...manualForm, permalink: e.target.value })}
                 placeholder="https://www.instagram.com/p/ABC123/"
                 className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
                 required
               />
               <p className="mt-2 text-xs text-[#8B6F47]">
-                Paste the Instagram post URL. The system will automatically extract the post ID.
+                Paste the Instagram post URL. Users will be redirected to this link when they click on the post.
               </p>
             </div>
+
+            {/* Caption */}
             <div>
               <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
-                Caption (Optional)
+                Caption
               </label>
               <textarea
                 value={manualForm.caption}
                 onChange={(e) => setManualForm({ ...manualForm, caption: e.target.value })}
-                placeholder="Enter caption for this Instagram post..."
-                rows={4}
+                placeholder="Copy and paste the Instagram post caption here..."
+                rows={5}
+                className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none resize-none"
+              />
+              <p className="mt-2 text-xs text-[#8B6F47]">
+                Copy and paste the caption from Instagram. This will be displayed when users hover over the post.
+              </p>
+            </div>
+
+            {/* Likes (Optional) */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-[#6b4a2f]">
+                Likes (Optional)
+              </label>
+              <input
+                type="number"
+                value={manualForm.likes}
+                onChange={(e) => setManualForm({ ...manualForm, likes: parseInt(e.target.value) || 0 })}
+                placeholder="0"
+                min="0"
                 className="w-full px-4 py-3 rounded-lg border-2 border-[#B87333]/30 bg-white text-[#2e211a] focus:border-[#B87333] focus:outline-none"
               />
               <p className="mt-2 text-xs text-[#8B6F47]">
-                This caption will be displayed when users hover over the post.
+                Enter the number of likes for this post (optional).
               </p>
             </div>
-            <div className="flex gap-4">
+
+            <div className="flex gap-4 pt-2">
               <button
                 type="submit"
                 disabled={fetching}
-                className="px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #B87333, #CD7F32)',
                   color: '#FFFFFF',
@@ -308,13 +398,23 @@ export default function AdminInstagramPage() {
                   fontWeight: 600,
                 }}
               >
-                {fetching ? "Adding..." : "Add Post"}
+                {fetching ? (
+                  <>
+                    <RefreshCw size={16} className="animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} />
+                    Add Post
+                  </>
+                )}
               </button>
               <button
                 type="button"
                 onClick={() => {
                   setShowManualPost(false);
-                  setManualForm({ embedUrl: "", caption: "" });
+                  setManualForm({ imageUrl: "", permalink: "", caption: "", likes: 0 });
                 }}
                 className="px-6 py-3 rounded-lg border-2 border-[#B87333]/50 text-[#6b4a2f] hover:bg-[#B87333]/10 transition-all"
               >
@@ -325,27 +425,56 @@ export default function AdminInstagramPage() {
         </div>
       )}
 
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Instagram size={20} className="text-[#B87333]" />
+            <span className="section-label text-xs">TOTAL POSTS</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
+            {posts.length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Instagram size={20} className="text-[#833AB4]" />
+            <span className="section-label text-xs">AUTO SYNC</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#833AB4' }}>
+            {posts.filter(p => !p.isManual).length}
+          </p>
+        </div>
+
+        <div className="brutal-card p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-2">
+            <Upload size={20} className="text-[#D4A574]" />
+            <span className="section-label text-xs">MANUAL</span>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
+            {posts.filter(p => p.isManual).length}
+          </p>
+        </div>
+      </div>
+
       {/* Posts Grid */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: 'var(--font-heading)' }}>
-          Current Instagram Posts ({posts.length})
+        <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+          INSTAGRAM POSTS
         </h2>
         {posts.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-gradient-to-br from-[#FFFDF2] to-[#FFF8E8] border-2 border-[#B87333]/30 text-center">
-            <Instagram size={48} className="mx-auto mb-4 text-[#B87333] opacity-50" />
-              <p className="text-lg text-[#6b4a2f] mb-2">No Instagram posts yet</p>
-              <p className="text-sm text-[#8B6F47]">Click the button above to add Instagram posts</p>
+          <div className="brutal-card p-12 text-center">
+            <Instagram size={64} className="mx-auto mb-6 text-[#B87333]" />
+            <p className="text-xl mb-2" style={{ color: '#8B6F47' }}>No Instagram posts yet</p>
+            <p className="text-sm" style={{ color: '#8B6F47' }}>Click the button above to add Instagram posts</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {posts.map((post) => (
               <div
                 key={post._id}
-                className="relative group rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:scale-105"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1))',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
-                }}
+                className="brutal-card p-0 overflow-hidden group transition-all duration-300 hover:scale-105"
               >
                 {/* Image */}
                 <div className="aspect-square relative overflow-hidden">
@@ -393,14 +522,14 @@ export default function AdminInstagramPage() {
                 {/* Info */}
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-[#8B6F47]">
+                    <span className="text-xs" style={{ color: '#8B6F47' }}>
                       {new Date(post.timestamp).toLocaleDateString()}
                     </span>
-                    <span className="text-xs px-2 py-1 rounded bg-[#B87333]/20 text-[#B87333]">
+                    <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(184, 115, 51, 0.2)', color: '#B87333' }}>
                       {post.mediaType}
                     </span>
                   </div>
-                  <p className="text-sm text-[#F5F1E8] line-clamp-2 mb-3">
+                  <p className="text-sm line-clamp-2 mb-3" style={{ color: '#F5F1E8' }}>
                     {post.caption || "No caption"}
                   </p>
                   <div className="flex items-center gap-2">
@@ -408,17 +537,27 @@ export default function AdminInstagramPage() {
                       href={post.permalink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#B87333]/20 text-[#B87333] hover:bg-[#B87333]/30 transition-all text-sm font-semibold"
+                      className="flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
+                      style={{
+                        background: 'rgba(184, 115, 51, 0.2)',
+                        border: '2px solid rgba(184, 115, 51, 0.4)',
+                        color: '#B87333',
+                        fontFamily: 'var(--font-heading)',
+                      }}
                     >
-                      <ExternalLink size={16} />
+                      <ExternalLink size={14} />
                       View
                     </a>
                     <button
                       onClick={() => handleDelete(post._id)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-950/30 text-red-400 hover:bg-red-950/50 transition-all text-sm font-semibold"
+                      className="py-2 px-3 rounded-lg transition-all hover:scale-105 text-sm font-semibold"
+                      style={{
+                        background: 'rgba(220, 38, 38, 0.2)',
+                        border: '2px solid rgba(220, 38, 38, 0.5)',
+                        color: '#FCA5A5',
+                      }}
                     >
-                      <Trash2 size={16} />
-                      Delete
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>

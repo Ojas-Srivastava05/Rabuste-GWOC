@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, MotionValue } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
@@ -20,7 +20,6 @@ type DisplayItem = MenuItem & {
   isTrending?: boolean;
 };
 
-// Consistent hash function for flags
 const hashCode = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -31,7 +30,6 @@ const hashCode = (str: string): number => {
   return Math.abs(hash);
 };
 
-// Generate consistent flags based on item name
 const getItemFlags = (item: MenuItem) => {
   const hash = hashCode(item.name);
   const flags: {
@@ -50,7 +48,6 @@ const getItemFlags = (item: MenuItem) => {
   return flags;
 };
 
-// Get color for item based on category
 const getItemColor = (category: string, index: number): string => {
   const colors = ['#B87333', '#D4A574'];
   return colors[index % colors.length];
@@ -64,7 +61,6 @@ export default function HorizontalScroll() {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -74,7 +70,6 @@ export default function HorizontalScroll() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Wait for component to mount before initializing scroll
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -125,7 +120,6 @@ export default function HorizontalScroll() {
     router.push(`/menu#item-${itemId}`);
   };
 
-  // Don't render until mounted to avoid hydration issues
   if (!mounted) {
     return null;
   }
@@ -148,54 +142,77 @@ export default function HorizontalScroll() {
 
   if (items.length === 0) return null;
 
-  // Mobile version with touch scroll
   if (isMobile) {
     return (
       <section 
-        className="relative z-20 py-16"
+        className="relative z-20 py-24"
         style={{
           background: '#000000',
           minHeight: '100vh',
         }}
       >
-        {/* Header */}
-        <div className="px-4 mb-8">
+        <div className="px-6 mb-16">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="text-center"
           >
             <p style={{
-              color: '#B87333',
-              fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-              letterSpacing: '0.3em',
-              fontWeight: 700,
-              marginBottom: '1rem',
+              color: '#8B6F47',
+              fontSize: '0.75rem',
+              letterSpacing: '0.2em',
+              fontWeight: 400,
+              marginBottom: '1.5rem',
+              textTransform: 'uppercase',
             }}>
-              SWIPE TO EXPLORE
+              Signature Collection
             </p>
             
             <h2 style={{
               fontFamily: 'Bebas Neue, sans-serif',
               fontSize: 'clamp(2.5rem, 10vw, 4rem)',
-              lineHeight: 0.9,
-              color: '#FFFEF9',
+              lineHeight: 1.1,
+              color: '#F5F1E8',
+              fontWeight: 400,
+              letterSpacing: '0.05em',
             }}>
               <span style={{
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
+                textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
+                position: 'relative',
+                display: 'inline-block',
               }}>
-                SIGNATURE
+                Featured Selections
+                {/* Glow effect behind text */}
+                <motion.span
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 blur-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: -1,
+                  }}
+                >
+                  Featured Selections
+                </motion.span>
               </span>
-              {' '}COLLECTION
             </h2>
           </motion.div>
         </div>
 
-        {/* Touch scrollable container */}
         <div 
           className="overflow-x-auto overflow-y-hidden scrollbar-hide"
           style={{
@@ -204,42 +221,44 @@ export default function HorizontalScroll() {
             scrollBehavior: 'smooth',
           }}
         >
-          <div className="flex gap-4 px-4 pb-4">
+          <div className="flex gap-8 px-6 pb-6">
             {items.map((item, index) => (
               <div
                 key={item._id}
                 className="flex-shrink-0"
                 style={{
-                  width: 'min(85vw, 350px)',
+                  width: 'min(85vw, 320px)',
                   scrollSnapAlign: 'start',
                 }}
               >
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group cursor-pointer"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.9), rgba(26, 17, 16, 0.9))',
-                    border: `3px solid ${item.color}`,
+                    background: 'rgba(26, 17, 16, 0.6)',
+                    border: `1px solid rgba(184, 115, 51, 0.2)`,
                     overflow: 'hidden',
-                    cursor: 'pointer',
-                    height: '420px',
+                    height: '480px',
                     display: 'flex',
                     flexDirection: 'column',
                   }}
                   onClick={() => handleItemClick(item._id)}
                 >
-                  {/* Image */}
                   <div style={{
                     position: 'relative',
-                    height: '55%',
+                    height: '65%',
                     overflow: 'hidden',
+                    background: '#1A1110',
                   }}>
-                    <img
+                    <motion.img
                       src={item.image}
                       alt={item.name}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.6 }}
                       style={{
                         width: '100%',
                         height: '100%',
@@ -249,44 +268,45 @@ export default function HorizontalScroll() {
                     
                     <div style={{
                       position: 'absolute',
-                      inset: 0,
-                      background: `linear-gradient(180deg, transparent 0%, ${item.color}30 100%)`,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: '40%',
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                     }} />
 
                     {(item.isBestseller || item.isTrending) && (
                       <div style={{
                         position: 'absolute',
-                        top: '12px',
-                        left: '12px',
-                        background: item.isBestseller ? '#B87333' : '#CD7F32',
+                        top: '16px',
+                        left: '16px',
+                        background: 'rgba(0, 0, 0, 0.7)',
                         padding: '6px 12px',
+                        fontSize: '0.6875rem',
+                        color: '#D4A574',
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
                         fontFamily: 'Bebas Neue, sans-serif',
-                        fontSize: '0.75rem',
-                        color: '#000000',
-                        letterSpacing: '0.1em',
                       }}>
-                        {item.isBestseller ? '⭐ BESTSELLER' : '🔥 TRENDING'}
+                        {item.isBestseller ? 'Bestseller' : 'Trending'}
                       </div>
                     )}
 
                     <div style={{
                       position: 'absolute',
-                      top: '12px',
-                      right: '12px',
-                      background: item.color,
-                      padding: '8px 16px',
+                      bottom: '16px',
+                      right: '16px',
                       fontFamily: 'Bebas Neue, sans-serif',
                       fontSize: '1.5rem',
-                      color: '#000000',
+                      color: '#F5F1E8',
                       letterSpacing: '0.05em',
                     }}>
                       ₹{item.price}
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div style={{
-                    padding: '20px',
+                    padding: '24px',
                     flex: 1,
                     display: 'flex',
                     flexDirection: 'column',
@@ -296,24 +316,23 @@ export default function HorizontalScroll() {
                       <h3 style={{
                         fontFamily: 'Bebas Neue, sans-serif',
                         fontSize: '1.75rem',
-                        lineHeight: 0.9,
-                        color: '#FFFEF9',
-                        marginBottom: '8px',
+                        lineHeight: 1.2,
+                        color: '#F5F1E8',
+                        marginBottom: '12px',
+                        letterSpacing: '0.05em',
+                        fontWeight: 400,
                       }}>
-                        {item.name.split(' ')[0]}
-                        <br />
-                        <span style={{ color: item.color }}>
-                          {item.name.split(' ').slice(1).join(' ')}
-                        </span>
+                        {item.name}
                       </h3>
 
                       <p style={{
-                        color: 'rgba(255, 254, 249, 0.7)',
+                        color: 'rgba(245, 241, 232, 0.6)',
                         fontSize: '0.875rem',
-                        lineHeight: 1.5,
+                        lineHeight: 1.6,
+                        fontWeight: 300,
                       }}>
-                        {item.description.length > 80 
-                          ? item.description.substring(0, 80) + '...' 
+                        {item.description.length > 100 
+                          ? item.description.substring(0, 100) + '...' 
                           : item.description}
                       </p>
                     </div>
@@ -322,14 +341,15 @@ export default function HorizontalScroll() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      color: item.color,
-                      fontFamily: 'Bebas Neue, sans-serif',
-                      fontSize: '1rem',
+                      color: '#B87333',
+                      fontSize: '0.875rem',
                       letterSpacing: '0.1em',
-                      marginTop: '12px',
+                      marginTop: '20px',
+                      textTransform: 'uppercase',
+                      fontFamily: 'Bebas Neue, sans-serif',
                     }}>
-                      TAP TO ORDER
-                      <ArrowRight size={18} />
+                      View Details
+                      <ArrowRight size={16} strokeWidth={1.5} />
                     </div>
                   </div>
                 </motion.div>
@@ -338,7 +358,6 @@ export default function HorizontalScroll() {
           </div>
         </div>
 
-        {/* Hide scrollbar */}
         <style jsx global>{`
           .scrollbar-hide::-webkit-scrollbar {
             display: none;
@@ -352,11 +371,9 @@ export default function HorizontalScroll() {
     );
   }
 
-  // Desktop version - separate component to avoid hydration issues
   return <DesktopHorizontalScroll items={items} handleItemClick={handleItemClick} />;
 }
 
-// Separate desktop component that only renders on client
 function DesktopHorizontalScroll({ 
   items, 
   handleItemClick 
@@ -366,7 +383,6 @@ function DesktopHorizontalScroll({
 }) {
   const targetRef = useRef<HTMLElement>(null);
 
-  // Only call useScroll in desktop component after mount
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start start", "end start"],
@@ -384,83 +400,108 @@ function DesktopHorizontalScroll({
       }}
     >
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        {/* Header - Fixed */}
-        <div className="absolute top-16 sm:top-24 left-0 right-0 z-20 px-4 sm:px-6">
+        <div className="absolute top-24 left-0 right-0 z-20 px-8">
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             className="text-center"
           >
             <p style={{
-              color: '#B87333',
-              fontSize: 'clamp(0.75rem, 2vw, 0.875rem)',
-              letterSpacing: '0.3em',
-              fontWeight: 700,
-              marginBottom: '1rem',
+              color: '#8B6F47',
+              fontSize: '0.75rem',
+              letterSpacing: '0.2em',
+              fontWeight: 400,
+              marginBottom: '1.5rem',
+              textTransform: 'uppercase',
             }}>
-              SCROLL TO EXPLORE
+              Signature Collection
             </p>
             
             <h2 style={{
               fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(2.5rem, 8vw, 6rem)',
-              lineHeight: 0.9,
-              color: '#FFFEF9',
+              fontSize: 'clamp(3rem, 8vw, 6rem)',
+              lineHeight: 1.1,
+              fontWeight: 400,
+              letterSpacing: '0.05em',
             }}>
               <span style={{
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
+                textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
+                position: 'relative',
+                display: 'inline-block',
               }}>
-                SIGNATURE
+                Featured Selections
+                {/* Glow effect behind text */}
+                <motion.span
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 blur-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: -1,
+                  }}
+                >
+                  Featured Selections
+                </motion.span>
               </span>
-              {' '}COLLECTION
             </h2>
           </motion.div>
         </div>
 
-        {/* Horizontal scrolling container */}
         <motion.div
           style={{ x }}
-          className="flex gap-4 sm:gap-8 px-4 sm:px-6 mt-64 sm:mt-72"
+          className="flex gap-8 px-8 mt-80"
         >
           {items.map((item, index) => (
             <div
               key={item._id}
               className="flex-shrink-0"
               style={{
-                width: 'min(85vw, 350px)',
+                width: 'min(90vw, 400px)',
               }}
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                whileHover={{ scale: 1.05, y: -10 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
+                className="group cursor-pointer"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.9), rgba(26, 17, 16, 0.9))',
-                  border: `3px solid ${item.color}`,
+                  background: 'rgba(26, 17, 16, 0.6)',
+                  border: `1px solid rgba(184, 115, 51, 0.2)`,
                   overflow: 'hidden',
-                  cursor: 'pointer',
-                  height: '420px',
+                  height: '520px',
                   display: 'flex',
                   flexDirection: 'column',
                   transition: 'all 0.3s ease',
                 }}
                 onClick={() => handleItemClick(item._id)}
               >
-                {/* Image */}
                 <div style={{
                   position: 'relative',
-                  height: '55%',
+                  height: '65%',
                   overflow: 'hidden',
+                  background: '#1A1110',
                 }}>
-                  <img
+                  <motion.img
                     src={item.image}
                     alt={item.name}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.6 }}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -470,35 +511,37 @@ function DesktopHorizontalScroll({
                   
                   <div style={{
                     position: 'absolute',
-                    inset: 0,
-                    background: `linear-gradient(180deg, transparent 0%, ${item.color}30 100%)`,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '40%',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                   }} />
 
                   {(item.isBestseller || item.isTrending) && (
                     <div style={{
                       position: 'absolute',
-                      top: '16px',
-                      left: '16px',
-                      background: item.isBestseller ? '#B87333' : '#CD7F32',
+                      top: '20px',
+                      left: '20px',
+                      background: 'rgba(0, 0, 0, 0.7)',
                       padding: '8px 16px',
+                      fontSize: '0.75rem',
+                      color: '#D4A574',
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
                       fontFamily: 'Bebas Neue, sans-serif',
-                      fontSize: '0.875rem',
-                      color: '#000000',
-                      letterSpacing: '0.1em',
                     }}>
-                      {item.isBestseller ? '⭐ BESTSELLER' : '🔥 TRENDING'}
+                      {item.isBestseller ? 'Bestseller' : 'Trending'}
                     </div>
                   )}
 
                   <div style={{
                     position: 'absolute',
-                    top: '16px',
-                    right: '16px',
-                    background: item.color,
-                    padding: '12px 24px',
+                    bottom: '20px',
+                    right: '20px',
                     fontFamily: 'Bebas Neue, sans-serif',
-                    fontSize: 'clamp(1.5rem, 4vw, 2rem)',
-                    color: '#000000',
+                    fontSize: '1.75rem',
+                    color: '#F5F1E8',
                     letterSpacing: '0.05em',
                   }}>
                     ₹{item.price}
@@ -506,7 +549,7 @@ function DesktopHorizontalScroll({
                 </div>
 
                 <div style={{
-                  padding: 'clamp(20px, 4vw, 32px)',
+                  padding: '32px',
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
@@ -515,22 +558,21 @@ function DesktopHorizontalScroll({
                   <div>
                     <h3 style={{
                       fontFamily: 'Bebas Neue, sans-serif',
-                      fontSize: 'clamp(1.75rem, 4vw, 2.6rem)',
-                      lineHeight: 0.9,
-                      color: '#FFFEF9',
-                      marginBottom: 'clamp(8px, 2vw, 12px)',
+                      fontSize: 'clamp(1.875rem, 4vw, 2.25rem)',
+                      lineHeight: 1.2,
+                      color: '#F5F1E8',
+                      marginBottom: '16px',
+                      letterSpacing: '0.05em',
+                      fontWeight: 400,
                     }}>
-                      {item.name.split(' ')[0]}
-                      <br />
-                      <span style={{ color: item.color }}>
-                        {item.name.split(' ').slice(1).join(' ')}
-                      </span>
+                      {item.name}
                     </h3>
 
                     <p style={{
-                      color: 'rgba(255, 254, 249, 0.7)',
-                      fontSize: 'clamp(0.875rem, 2vw, 1.125rem)',
-                      lineHeight: 1.6,
+                      color: 'rgba(245, 241, 232, 0.6)',
+                      fontSize: 'clamp(0.9375rem, 2vw, 1.0625rem)',
+                      lineHeight: 1.7,
+                      fontWeight: 300,
                     }}>
                       {item.description}
                     </p>
@@ -539,15 +581,16 @@ function DesktopHorizontalScroll({
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    color: item.color,
-                    fontFamily: 'Bebas Neue, sans-serif',
-                    fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                    gap: '10px',
+                    color: '#B87333',
+                    fontSize: '0.9375rem',
                     letterSpacing: '0.1em',
-                    marginTop: '16px',
+                    marginTop: '24px',
+                    textTransform: 'uppercase',
+                    fontFamily: 'Bebas Neue, sans-serif',
                   }}>
-                    ORDER NOW
-                    <ArrowRight size={20} />
+                    View Details
+                    <ArrowRight size={18} strokeWidth={1.5} />
                   </div>
                 </div>
               </motion.div>

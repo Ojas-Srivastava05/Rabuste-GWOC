@@ -39,6 +39,16 @@ body {
   --foreground: #F5F1E8;
 }
 
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @layer base {
   * {
     margin: 0;
@@ -190,6 +200,9 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   
   .btn-primary {

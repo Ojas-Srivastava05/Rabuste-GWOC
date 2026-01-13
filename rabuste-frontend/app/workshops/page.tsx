@@ -416,10 +416,13 @@ export default function WorkshopsPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 }}
-                className="p-6 rounded-xl lg:sticky lg:top-32"
+                className="p-4 sm:p-6 rounded-xl lg:sticky lg:top-32"
                 style={{
                   background: 'rgba(61, 43, 31, 0.6)',
                   border: '2px solid rgba(184, 115, 51, 0.4)',
+                  overflow: 'hidden',
+                  width: '100%',
+                  boxSizing: 'border-box',
                   ...(isDesktop
                     ? { height: 'fit-content', maxHeight: 'calc(100vh - 180px)' }
                     : { height: 'auto', maxHeight: 'none' }),
@@ -518,14 +521,26 @@ export default function WorkshopsPage() {
                 </div>
                 
                 {/* Legend */}
-                <div className="mt-8 pt-5 border-t border-[#B87333]/20 space-y-3">
-                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
-                    <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
-                    <span>Has workshops</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs" style={{ color: '#8B6F47' }}>
-                    <div className="w-3 h-3 rounded-full" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
-                    <span>Today</span>
+                <div className="mt-4 pt-3 border-t border-[#B87333]/20">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
+                      <span 
+                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis" 
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                      >
+                        Has workshops
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
+                      <span 
+                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis" 
+                        style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                      >
+                        Today
+                      </span>
+                    </div>
                   </div>
                 </div>
               </motion.div>

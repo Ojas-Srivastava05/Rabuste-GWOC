@@ -1,24 +1,48 @@
 "use client";
 
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
+import DynamicBackground from "@/components/DynamicBackground";
 import HeroRevamped from "@/components/sections/HeroRevamped";
-import HorizontalScroll from "@/components/sections/HorizontalScroll";
-import ExperienceSection from "@/components/sections/ExperienceSection";
-import BenefitsShowcase from "@/components/sections/BenefitsShowcase";
-import VRExperienceSection from "@/components/sections/VRExperienceSection";
-import ProcessSectionRevamped from "@/components/sections/ProcessSectionRevamped";
-import CallToAction from "@/components/sections/CallToAction";
-import TestimonialsSection from "@/components/sections/TestimonialsSection";
-import InstagramShowcase from "@/components/sections/InstagramShowcase";
-import ContactSection from "@/components/sections/ContactSection";
-import Footer from "@/components/sections/footer";
 import FloatingCart from "@/components/FloatingCart";
 import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
 import WelcomePopup from "@/components/WelcomePopup";
 import PersonalizedComboPopup from "@/components/PersonalizedComboPopup";
 import SectionTracker from "@/components/SectionTracker";
 import { useUser } from "@/contexts/UserContext";
+
+// Lazy load below-the-fold components for better initial load performance
+const HorizontalScroll = dynamic(() => import("@/components/sections/HorizontalScroll"), {
+  loading: () => <div style={{ minHeight: '100vh' }} />,
+});
+const ExperienceSection = dynamic(() => import("@/components/sections/ExperienceSection"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const BenefitsShowcase = dynamic(() => import("@/components/sections/BenefitsShowcase"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const VRExperienceSection = dynamic(() => import("@/components/sections/VRExperienceSection"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const ProcessSectionRevamped = dynamic(() => import("@/components/sections/ProcessSectionRevamped"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const CallToAction = dynamic(() => import("@/components/sections/CallToAction"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const TestimonialsSection = dynamic(() => import("@/components/sections/TestimonialsSection"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const InstagramShowcase = dynamic(() => import("@/components/sections/InstagramShowcase"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const ContactSection = dynamic(() => import("@/components/sections/ContactSection"), {
+  loading: () => <div style={{ minHeight: '50vh' }} />,
+});
+const Footer = dynamic(() => import("@/components/sections/footer"), {
+  loading: () => <div style={{ minHeight: '200px' }} />,
+});
 
 export default function Home() {
   const { user, showWelcomePopup, setShowWelcomePopup } = useUser();
@@ -35,6 +59,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      <DynamicBackground />
       <FloatingCart />
       <FloatingMoodBrewer />
 

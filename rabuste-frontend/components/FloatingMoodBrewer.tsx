@@ -195,11 +195,14 @@ export default function FloatingMoodBrewer() {
                   className="absolute left-full ml-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap"
                 >
                   <div
+                    className="md:block hidden"
                     style={{
-                      background: "rgba(0, 0, 0, 0.9)",
+                      background: "rgba(0, 0, 0, 0.95)",
                       border: "2px solid rgba(184, 115, 51, 0.6)",
                       padding: "8px 16px",
                       backdropFilter: "blur(10px)",
+                      borderRadius: "4px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.8)",
                     }}
                   >
                     <p
@@ -260,9 +263,11 @@ export default function FloatingMoodBrewer() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: "-100%", y: "-100%" }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-0 top-0 z-50 w-full sm:w-[95vw] md:w-[500px] lg:w-[550px] h-full sm:h-[95vh] md:h-[90vh] flex flex-col"
+            className="fixed left-0 z-50 w-full sm:w-[95vw] md:w-[500px] lg:w-[550px] flex flex-col"
             style={{
-              maxHeight: "100vh",
+              top: "70px",
+              height: "calc(100vh - 70px)",
+              maxHeight: "calc(100vh - 70px)",
             }}
             ref={botRef}
           >
@@ -283,7 +288,7 @@ export default function FloatingMoodBrewer() {
                   background: "linear-gradient(90deg, rgba(184, 115, 51, 0.1), transparent)",
                 }}
               >
-                <div className="flex items-center gap-3 pr-12 sm:pr-12 md:pr-12">
+                <div className="flex items-center gap-3 pr-14 sm:pr-14 md:pr-14">
                   <div
                     className="w-10 h-10 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0"
                     style={{
@@ -314,30 +319,47 @@ export default function FloatingMoodBrewer() {
 
                 {/* Enhanced close button - bigger and more accessible on mobile */}
                 <button
-                  onClick={() => setOpen(false)}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Close button clicked');
+                    setOpen(false);
+                  }}
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                  }}
                   onTouchEnd={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Close button touched');
                     setOpen(false);
                   }}
                   className="absolute top-3 right-3 sm:top-4 sm:right-4 rounded-full transition-all active:scale-95 touch-manipulation"
                   style={{
-                    background: "rgba(184, 115, 51, 0.3)",
-                    border: "2px solid rgba(184, 115, 51, 0.6)",
+                    background: "rgba(184, 115, 51, 0.9)",
+                    border: "2px solid rgba(184, 115, 51, 1)",
                     padding: "10px",
                     minWidth: "44px",
                     minHeight: "44px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    cursor: "pointer",
+                    pointerEvents: "auto",
+                    zIndex: 100,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.5), 0 0 8px rgba(184, 115, 51, 0.6)",
                   }}
                   aria-label="Close Brew AI"
                 >
-                  <X className="w-5 h-5 sm:w-5 sm:h-5 md:w-4 md:h-4" style={{ color: "#D4A574" }} />
+                  <X className="w-6 h-6 sm:w-6 sm:h-6 md:w-5 md:h-5" style={{ color: "#000000", strokeWidth: 3 }} />
                 </button>
               </div>
 
-              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch" }}>
-                <MoodBrewerChat />
+              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch", paddingTop: "1rem" }}>
+                <div style={{ paddingTop: "1rem" }}>
+                  <MoodBrewerChat />
+                </div>
               </div>
             </div>
           </motion.div>

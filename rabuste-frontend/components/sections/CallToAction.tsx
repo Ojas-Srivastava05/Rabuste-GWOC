@@ -182,8 +182,8 @@ export default function CallToAction() {
               transition={{ duration: 0.6 }}
               className="inline-flex items-center gap-3 px-6 py-3 mb-8"
               style={{
-                background: 'rgba(184, 115, 51, 0.2)',
-                border: '2px solid #B87333',
+                background: 'rgba(26, 17, 16, 0.6)',
+                border: '1px solid rgba(184, 115, 51, 0.3)',
               }}
             >
               <Zap size={20} color="#B87333" />
@@ -191,7 +191,8 @@ export default function CallToAction() {
                 color: '#B87333',
                 fontSize: '0.875rem',
                 letterSpacing: '0.2em',
-                fontWeight: 700,
+                fontWeight: 400,
+                fontFamily: 'Bebas Neue, sans-serif',
               }}>
                 OPENING 2025
               </span>
@@ -200,20 +201,45 @@ export default function CallToAction() {
             {/* Headline */}
             <h2 style={{
               fontFamily: 'Bebas Neue, sans-serif',
-              fontSize: 'clamp(3.5rem, 8vw, 7rem)',
-              lineHeight: 0.85,
-              color: '#FFFEF9',
+              fontSize: 'clamp(4rem, 10vw, 8rem)',
+              lineHeight: 0.9,
+              color: '#F5F1E8',
               marginBottom: '1.5rem',
+              fontWeight: 400,
+              letterSpacing: '0.02em',
             }}>
               VISIT
               <br />
               <span style={{
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
+                textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
+                position: 'relative',
+                display: 'inline-block',
               }}>
                 RABUSTE
+                {/* Glow effect behind text */}
+                <motion.span
+                  animate={{
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-0 blur-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: -1,
+                  }}
+                >
+                  RABUSTE
+                </motion.span>
               </span>
               <br />
               COFFEE
@@ -221,8 +247,8 @@ export default function CallToAction() {
 
             <p style={{
               fontSize: 'clamp(1.125rem, 2vw, 1.375rem)',
-              color: 'rgba(255, 254, 249, 0.85)',
-              lineHeight: 1.6,
+              color: 'rgba(245, 241, 232, 0.7)',
+              lineHeight: 1.7,
               marginBottom: '3rem',
               fontWeight: 300,
             }}>
@@ -253,12 +279,14 @@ export default function CallToAction() {
                         fontSize: '1.75rem',
                         color: '#B87333',
                         lineHeight: 1,
+                        fontWeight: 400,
                       }}>
                         {stat.value}
                       </div>
                       <div style={{
                         fontSize: '0.875rem',
-                        color: 'rgba(255, 254, 249, 0.6)',
+                        color: 'rgba(245, 241, 232, 0.6)',
+                        fontWeight: 300,
                       }}>
                         {stat.label}
                       </div>
@@ -273,20 +301,21 @@ export default function CallToAction() {
               onClick={() => router.push('/menu')}
               whileHover={{ scale: 1.05, x: 5 }}
               whileTap={{ scale: 0.95 }}
-              className="group inline-flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl lg:text-2xl font-bold transition-all w-full sm:w-auto"
+              className="group inline-flex items-center justify-center gap-3 sm:gap-4 px-8 sm:px-12 py-5 sm:py-6 text-lg sm:text-xl lg:text-2xl transition-all w-full sm:w-auto"
               style={{
-                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                background: '#B87333',
                 color: '#000000',
                 fontFamily: 'Bebas Neue, sans-serif',
                 letterSpacing: '0.15em',
-                boxShadow: '0 20px 60px rgba(184, 115, 51, 0.5)',
+                fontWeight: 400,
+                border: 'none',
               }}
             >
               EXPLORE MENU
               <ArrowRight 
                 size={32} 
                 className="group-hover:translate-x-2 transition-transform" 
-                strokeWidth={3}
+                strokeWidth={2.5}
               />
             </motion.button>
 

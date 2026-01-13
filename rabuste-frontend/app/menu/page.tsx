@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
+import { useUser } from "@/contexts/UserContext";
 
 type MenuItem = {
   _id: string;
@@ -112,6 +113,7 @@ import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } f
 
 export default function MenuPage() {
   const router = useRouter();
+  const { user } = useUser();
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
   const [aiDiscount, setAiDiscount] = useState<{ enableDiscountAI: boolean; discountItemId: string | null; discountPercent: number }>(
@@ -126,47 +128,90 @@ export default function MenuPage() {
   const [upsellModal, setUpsellModal] = useState<{ item: MenuItem; suggestions: MenuItem[] } | null>(null);
   const [quickFilter, setQuickFilter] = useState<"all" | "trending" | "bestseller" | "limited">("all");
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [addedToast, setAddedToast] = useState<{ show: boolean; itemName: string }>({ show: false, itemName: '' });
   const [additionCount, setAdditionCount] = useState(0);
 
   useEffect(() => {
-    fetchMenu();
-    fetchCart();
-    fetchAIDiscount();
+    // Parallel fetch for better performance
+    Promise.all([
+      fetchMenu(),
+      fetchCart(),
+      fetchAIDiscount(),
+    ]).catch(err => console.error('Failed to fetch initial data:', err));
     
     // Load addition count from session storage
     const count = sessionStorage.getItem('additionCount');
     if (count) {
       setAdditionCount(parseInt(count, 10));
     }
-  }, []);
+
+    // Load favorites from localStorage based on user ID
+    if (user?.id) {
+      const storedFavorites = localStorage.getItem(`favorites_${user.id}`);
+      if (storedFavorites) {
+        setFavorites(JSON.parse(storedFavorites));
+      } else {
+        setFavorites([]);
+      }
+    } else {
+      setFavorites([]);
+    }
+  }, [user?.id]);
 
   // Handle scrolling to specific item from hash
   useEffect(() => {
-    if (menu.length > 0 && typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash.startsWith('#item-')) {
-        const itemId = hash.replace('#item-', '');
-        // Wait for DOM to render
-        setTimeout(() => {
-          const element = document.getElementById(`item-${itemId}`);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Set highlighted item for premium animation
-            setHighlightedItemId(itemId);
-            // Remove highlight after 4 seconds
-            setTimeout(() => {
-              setHighlightedItemId(null);
-            }, 4000);
-          }
-        }, 500);
+    const handleHashScroll = () => {
+      if (menu.length > 0 && typeof window !== 'undefined') {
+        const hash = window.location.hash;
+        if (hash.startsWith('#item-')) {
+          const itemId = hash.replace('#item-', '');
+          // Wait for DOM to render and ensure menu items are loaded
+          setTimeout(() => {
+            const element = document.getElementById(`item-${itemId}`);
+            if (element) {
+              // Scroll to element with offset for navbar
+              const elementPosition = element.getBoundingClientRect().top;
+              const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset for navbar
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+              
+              // Set highlighted item for premium animation
+              setHighlightedItemId(itemId);
+              // Remove highlight after 4 seconds
+              setTimeout(() => {
+                setHighlightedItemId(null);
+              }, 4000);
+            }
+          }, 800); // Increased timeout to ensure DOM is ready
+        }
       }
-    }
+    };
+
+    // Handle initial hash
+    handleHashScroll();
+
+    // Handle hash changes
+    const handleHashChange = () => {
+      handleHashScroll();
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
   }, [menu]);
 
   async function fetchMenu() {
     try {
-      const res = await fetch("/api/menu");
+      const res = await fetch("/api/menu", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       setMenu(data);
     } catch (err) {
@@ -176,7 +221,10 @@ export default function MenuPage() {
 
   async function fetchCart() {
     try {
-      const res = await fetch("/api/cart");
+      const res = await fetch("/api/cart", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       setCart(data);
     } catch (err) {
@@ -186,7 +234,10 @@ export default function MenuPage() {
 
   async function fetchAIDiscount() {
     try {
-      const res = await fetch("/api/ai-discount");
+      const res = await fetch("/api/ai-discount", { 
+        cache: 'no-store',
+        next: { revalidate: 0 }
+      });
       const data = await res.json();
       // Ensure discountItemId is converted to string
       setAiDiscount({
@@ -282,7 +333,8 @@ export default function MenuPage() {
 
   function getDiscountedPrice(item: MenuItem): number {
     if (hasAIDiscount(item._id)) {
-      return item.price * (1 - aiDiscount.discountPercent / 100);
+      const discounted = item.price * (1 - aiDiscount.discountPercent / 100);
+      return Math.ceil(discounted); // Round up to nearest integer
     }
     return item.price;
   }
@@ -290,6 +342,33 @@ export default function MenuPage() {
   function getOriginalPrice(item: MenuItem): number {
     return item.price;
   }
+
+  // Favorite functions - user-specific
+  const toggleFavorite = (itemId: string) => {
+    if (!user?.id) {
+      // If not logged in, redirect to login
+      router.push('/auth?redirect=/menu');
+      return;
+    }
+
+    const storageKey = `favorites_${user.id}`;
+    const storedFavorites = localStorage.getItem(storageKey);
+    let favoriteIds: string[] = storedFavorites ? JSON.parse(storedFavorites) : [];
+    
+    if (favoriteIds.includes(itemId)) {
+      favoriteIds = favoriteIds.filter(id => id !== itemId);
+    } else {
+      favoriteIds.push(itemId);
+    }
+    
+    localStorage.setItem(storageKey, JSON.stringify(favoriteIds));
+    setFavorites(favoriteIds);
+  };
+
+  const isFavorite = (itemId: string): boolean => {
+    if (!user?.id) return false;
+    return favorites.includes(itemId);
+  };
 
   const totalItems = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + i.quantity, 0) || 0;
   const totalPrice = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + (i.price * i.quantity), 0) || 0;
@@ -374,8 +453,8 @@ export default function MenuPage() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        <div className="container px-4 md:px-6">
+      <div className="min-h-screen" style={{ paddingTop: 'clamp(80px, 15vw, 120px)', paddingBottom: 'clamp(40px, 10vw, 80px)', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+        <div className="container px-3 sm:px-4 md:px-6">
           {/* Header */}
           <div className="text-center mb-12">
             <motion.div
@@ -394,7 +473,7 @@ export default function MenuPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl mb-4"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-4"
               style={{
                 fontFamily: 'var(--font-heading)',
                 lineHeight: 0.9,
@@ -407,7 +486,7 @@ export default function MenuPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-lg"
+              className="text-sm sm:text-base md:text-lg px-2"
               style={{ color: '#B87333' }}
             >
               Premium Robusta Coffee - {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available. Buy the best Robusta coffee online with 2x caffeine.
@@ -448,18 +527,20 @@ export default function MenuPage() {
                       setLastSearchQuery(searchQuery);
                     }
                   }}
-                  className="w-full pl-11 pr-10 py-3 bg-transparent outline-none text-sm"
+                  className="w-full pl-11 pr-12 py-3.5 sm:py-3 bg-transparent outline-none text-base sm:text-sm"
                   style={{
                     color: '#F5F1E8',
                     fontFamily: 'var(--font-body)',
+                    minHeight: '44px', // Touch-friendly height
                   }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 -mr-2 transition-transform active:scale-90"
+                    style={{ minWidth: '44px', minHeight: '44px' }}
                   >
-                    <X size={16} style={{ color: '#B87333' }} />
+                    <X size={18} style={{ color: '#B87333' }} />
                   </button>
                 )}
               </div>
@@ -476,35 +557,40 @@ export default function MenuPage() {
                 >
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`px-4 py-3 transition-colors ${viewMode === "grid" ? 'bg-copper-gradient' : ''}`}
+                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors ${viewMode === "grid" ? 'bg-copper-gradient' : ''}`}
                     style={{
                       background: viewMode === "grid" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
+                      minWidth: '48px',
+                      minHeight: '44px',
                     }}
                   >
-                    <Grid3x3 size={18} style={{ color: viewMode === "grid" ? '#D4A574' : '#B87333' }} />
+                    <Grid3x3 size={20} style={{ color: viewMode === "grid" ? '#D4A574' : '#B87333' }} />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`px-4 py-3 transition-colors`}
+                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors`}
                     style={{
                       background: viewMode === "list" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
                       borderLeft: '1px solid rgba(184, 115, 51, 0.2)',
+                      minWidth: '48px',
+                      minHeight: '44px',
                     }}
                   >
-                    <List size={18} style={{ color: viewMode === "list" ? '#D4A574' : '#B87333' }} />
+                    <List size={20} style={{ color: viewMode === "list" ? '#D4A574' : '#B87333' }} />
                   </button>
                 </div>
 
                 {/* Filters Button */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="px-4 py-3 flex items-center gap-2"
+                  className="px-4 sm:px-4 py-3.5 sm:py-3 flex items-center gap-2"
                   style={{
                     background: showFilters ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
                     border: '1px solid rgba(184, 115, 51, 0.3)',
+                    minHeight: '44px',
                   }}
                 >
-                  <SlidersHorizontal size={18} style={{ color: '#B87333' }} />
+                  <SlidersHorizontal size={20} style={{ color: '#B87333' }} />
                   <span className="text-sm hidden sm:inline" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
                     Filters
                   </span>
@@ -593,67 +679,116 @@ export default function MenuPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 flex flex-wrap gap-3"
+            className="mb-6 space-y-4"
           >
-            <button
-              onClick={() => setQuickFilter("all")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "all" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "all" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "all" ? '#D4A574' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              ALL ITEMS
-            </button>
-            <button
-              onClick={() => setQuickFilter("bestseller")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Star size={16} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
-              BESTSELLERS
-            </button>
-            <button
-              onClick={() => setQuickFilter("trending")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Flame size={16} />
-              TRENDING
-            </button>
-            <button
-              onClick={() => setQuickFilter("limited")}
-              className={`px-4 py-2 flex items-center gap-2 transition-all`}
-              style={{
-                background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                border: `2px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '14px',
-                letterSpacing: '0.05em',
-              }}
-            >
-              <Clock size={16} />
-              LIMITED STOCK
-            </button>
+            {/* Special Filters Row */}
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:flex-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <button
+                onClick={() => {
+                  setQuickFilter("all");
+                  setActiveCategory("All");
+                }}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "all" && activeCategory === "All" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                ALL ITEMS
+              </button>
+              <button
+                onClick={() => setQuickFilter("bestseller")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Star size={16} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
+                BESTSELLERS
+              </button>
+              <button
+                onClick={() => setQuickFilter("trending")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Flame size={16} />
+                TRENDING
+              </button>
+              <button
+                onClick={() => setQuickFilter("limited")}
+                className={`px-4 py-2 flex items-center gap-2 transition-all`}
+                style={{
+                  background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `2px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '14px',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                <Clock size={16} />
+                LIMITED STOCK
+              </button>
+            </div>
+
+            {/* Category Filters Row */}
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <div 
+                  className="h-px flex-1"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.3))' }}
+                />
+                <span 
+                  className="text-xs uppercase tracking-wider whitespace-nowrap"
+                  style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                >
+                  BROWSE BY CATEGORY
+                </span>
+                <div 
+                  className="h-px flex-1"
+                  style={{ background: 'linear-gradient(90deg, rgba(184, 115, 51, 0.3), transparent)' }}
+                />
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                {categories.filter(c => c !== "All").map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => {
+                      setActiveCategory(category);
+                      setQuickFilter("all");
+                    }}
+                    className={`px-4 py-2 transition-all whitespace-nowrap flex-shrink-0`}
+                    style={{
+                      background: activeCategory === category ? 'rgba(205, 127, 50, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                      border: `2px solid ${activeCategory === category ? 'rgba(205, 127, 50, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                      color: activeCategory === category ? '#F5F1E8' : '#B87333',
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: '14px',
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
           </motion.div>
 
           {/* Cart Float Button */}
@@ -687,7 +822,7 @@ export default function MenuPage() {
           {filtered.length > 0 ? (
             viewMode === "grid" ? (
               activeCategory === "All" ? (
-                // Show category-separated grid view for "All"
+                // Show horizontal scrolling view for "All" category on mobile
                 <div className="space-y-12">
                   {categories.filter(c => c !== "All").map((category) => {
                     const categoryItems = filtered.filter(item => item.category === category);
@@ -726,15 +861,39 @@ export default function MenuPage() {
                           </p>
                         </div>
 
-                        {/* Category Items Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                           {categoryItems.map((item, index) => (
+                        {/* Category Items - Horizontal scrolling on mobile, grid on desktop */}
+                        <div className="md:hidden flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                          {categoryItems.map((item, index) => (
+                            <div key={item._id} className="flex-shrink-0 snap-start" style={{ width: 'calc(50% - 6px)' }}>
+                              <GridMenuItem
+                                item={item}
+                                quantity={getQty(item._id)}
+                                onAdd={() => addToCart(item._id)}
+                                onRemove={() => removeFromCart(item._id)}
+                                onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
+                                isFavorite={isFavorite(item._id)}
+                                index={index}
+                                flags={getItemFlags(item)}
+                                isHighlighted={highlightedItemId === item._id}
+                                hasAIDiscount={hasAIDiscount(item._id)}
+                                discountedPrice={getDiscountedPrice(item)}
+                                originalPrice={getOriginalPrice(item)}
+                                discountPercent={aiDiscount.discountPercent}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {/* Desktop grid view */}
+                        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {categoryItems.map((item, index) => (
                             <GridMenuItem
                               key={item._id}
                               item={item}
                               quantity={getQty(item._id)}
                               onAdd={() => addToCart(item._id)}
                               onRemove={() => removeFromCart(item._id)}
+                              onFavorite={() => toggleFavorite(item._id)}
+                              isFavorite={isFavorite(item._id)}
                               index={index}
                               flags={getItemFlags(item)}
                               isHighlighted={highlightedItemId === item._id}
@@ -750,8 +909,8 @@ export default function MenuPage() {
                   })}
                 </div>
               ) : (
-                // Show normal grid for specific category
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                // Show grid for specific category (2 cols on mobile, more on desktop)
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
                   {filtered.map((item, index) => (
                     <GridMenuItem
                       key={item._id}
@@ -759,6 +918,8 @@ export default function MenuPage() {
                       quantity={getQty(item._id)}
                       onAdd={() => addToCart(item._id)}
                       onRemove={() => removeFromCart(item._id)}
+                      onFavorite={() => toggleFavorite(item._id)}
+                      isFavorite={isFavorite(item._id)}
                       index={index}
                       flags={getItemFlags(item)}
                       isHighlighted={highlightedItemId === item._id}
@@ -780,6 +941,8 @@ export default function MenuPage() {
                     quantity={getQty(item._id)}
                     onAdd={() => addToCart(item._id)}
                     onRemove={() => removeFromCart(item._id)}
+                    onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
+                    isFavorite={isFavorite(item._id)}
                     index={index}
                     flags={getItemFlags(item)}
                     isHighlighted={highlightedItemId === item._id}
@@ -998,6 +1161,8 @@ function GridMenuItem({
   quantity,
   onAdd,
   onRemove,
+  onFavorite,
+  isFavorite,
   index,
   flags,
   isHighlighted,
@@ -1010,6 +1175,8 @@ function GridMenuItem({
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
+  onFavorite?: () => void;
+  isFavorite: boolean;
   index: number;
   flags: any;
   isHighlighted?: boolean;
@@ -1031,8 +1198,8 @@ function GridMenuItem({
         delay: index * 0.03,
         scale: { duration: 0.6, ease: "easeOut" }
       }}
-      whileHover={{ y: -4 }}
-      className="group relative"
+      whileHover={{ scale: 1.02 }}
+      className="group relative flex flex-col h-full"
       style={{
         ...(isHighlighted ? {
           backgroundImage: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
@@ -1081,13 +1248,40 @@ function GridMenuItem({
         </>
       )}
       {/* Image */}
-      <div className="aspect-[4/3] overflow-hidden relative">
+      <div className="w-full h-40 overflow-hidden relative flex-shrink-0">
         <img
           src={item.image}
           alt={item.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         
+        {/* Favorite Button - Only show if logged in */}
+        {onFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onFavorite();
+            }}
+            className="absolute top-2 right-2 p-2.5 sm:p-2 rounded-full transition-all active:scale-95"
+            style={{
+              background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+              border: `2px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
+              backdropFilter: 'blur(10px)',
+              zIndex: 20,
+              pointerEvents: 'auto',
+              cursor: 'pointer',
+              minWidth: '44px',
+              minHeight: '44px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Heart size={18} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+          </button>
+        )}
+
         {/* Top Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {hasAIDiscount && (
@@ -1153,7 +1347,7 @@ function GridMenuItem({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1" style={{ position: 'relative', zIndex: 10 }}>
         <h3
           className="text-base mb-1 line-clamp-1"
           style={{
@@ -1164,12 +1358,12 @@ function GridMenuItem({
         >
           {item.name}
         </h3>
-        <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47', lineHeight: 1.4 }}>
+        <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47', lineHeight: 1.4, minHeight: '32px' }}>
           {item.description}
         </p>
 
         {/* Activity Indicators */}
-        <div className="flex flex-wrap gap-2 mb-3 text-xs">
+        <div className="flex flex-wrap gap-2 mb-3 text-xs min-h-[20px]">
           {flags.soldToday && (
             <div className="flex items-center gap-1" style={{ color: '#B87333' }}>
               <TrendingUp size={12} />
@@ -1185,7 +1379,7 @@ function GridMenuItem({
         </div>
 
         {/* Price and Action */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mt-auto">
           <div className="flex flex-col">
             {hasAIDiscount ? (
               <>
@@ -1193,7 +1387,7 @@ function GridMenuItem({
                   className="text-xl gradient-text"
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
-                  ₹{Math.round(discountedPrice || 0)}
+                  ₹{Math.ceil(discountedPrice || 0)}
                 </span>
                 <span
                   className="text-sm line-through opacity-60"
@@ -1214,27 +1408,66 @@ function GridMenuItem({
 
           {quantity > 0 ? (
             <div
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 sm:gap-2"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
-                padding: '4px 8px',
+                padding: '6px 10px',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
+                position: 'relative',
+                zIndex: 10,
+                borderRadius: '8px',
               }}
             >
-              <button onClick={onRemove} className="text-[#B87333] hover:text-[#D4A574]">
-                <Minus size={14} />
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onRemove();
+                }} 
+                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                style={{ 
+                  cursor: 'pointer', 
+                  pointerEvents: 'auto',
+                  minWidth: '36px',
+                  minHeight: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Minus size={18} />
               </button>
-              <span className="text-sm font-bold gradient-text" style={{ minWidth: '16px', textAlign: 'center' }}>
+              <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
                 {quantity}
               </span>
-              <button onClick={onAdd} className="text-[#B87333] hover:text-[#D4A574]">
-                <Plus size={14} />
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onAdd();
+                }} 
+                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                style={{ 
+                  cursor: 'pointer', 
+                  pointerEvents: 'auto',
+                  minWidth: '36px',
+                  minHeight: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Plus size={18} />
               </button>
             </div>
           ) : (
             <button
-              onClick={onAdd}
-              className="px-3 py-1.5 text-xs flex items-center gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onAdd();
+              }}
+              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-sm sm:text-xs flex items-center gap-1.5 sm:gap-1"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
@@ -1242,9 +1475,21 @@ function GridMenuItem({
                 fontFamily: 'var(--font-body)',
                 letterSpacing: '0.05em',
                 transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                position: 'relative',
+                zIndex: 10,
+                minHeight: '44px',
+                borderRadius: '8px',
+              }}
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+              }}
+              onTouchEnd={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              <Plus size={12} />
+              <Plus size={16} />
               ADD
             </button>
           )}
@@ -1260,6 +1505,8 @@ function ListMenuItem({
   quantity,
   onAdd,
   onRemove,
+  onFavorite,
+  isFavorite,
   index,
   flags,
   isHighlighted,
@@ -1272,6 +1519,8 @@ function ListMenuItem({
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
+  onFavorite?: () => void;
+  isFavorite: boolean;
   index: number;
   flags: any;
   isHighlighted?: boolean;
@@ -1293,7 +1542,7 @@ function ListMenuItem({
         delay: index * 0.03,
         scale: { duration: 0.6, ease: "easeOut" }
       }}
-      whileHover={{ x: 4 }}
+      whileHover={{ scale: 1.01 }}
       className="group relative"
       style={{
         ...(isHighlighted ? {
@@ -1341,18 +1590,44 @@ function ListMenuItem({
           />
         </>
       )}
-      <div className="flex gap-4 p-4">
+      <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
         {/* Image */}
-        <div className="w-24 h-24 flex-shrink-0 overflow-hidden relative">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden relative">
           <img
             src={item.image}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
+          {/* Favorite Button - Only show if logged in */}
+          {onFavorite && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onFavorite();
+              }}
+              className="absolute top-1 right-1 p-2.5 sm:p-1.5 rounded-full transition-all active:scale-95"
+              style={{
+                background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
+                border: `1.5px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
+                backdropFilter: 'blur(10px)',
+                zIndex: 20,
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+                minWidth: '40px',
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Heart size={16} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0" style={{ position: 'relative', zIndex: 10 }}>
           <div className="flex items-start justify-between gap-4 mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -1447,7 +1722,7 @@ function ListMenuItem({
                     className="text-xl gradient-text"
                     style={{ fontFamily: 'var(--font-heading)' }}
                   >
-                    ₹{discountedPrice}
+                    ₹{Math.ceil(discountedPrice || 0)}
                   </span>
                 </div>
               ) : (
@@ -1462,36 +1737,87 @@ function ListMenuItem({
           </div>
 
           {/* Action */}
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-3">
             {quantity > 0 ? (
               <div
-                className="flex items-center gap-3"
+                className="flex items-center gap-3 sm:gap-3"
                 style={{
                   background: 'rgba(184, 115, 51, 0.2)',
-                  padding: '6px 12px',
+                  padding: '8px 14px',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
+                  position: 'relative',
+                  zIndex: 10,
+                  borderRadius: '8px',
                 }}
               >
-                <button onClick={onRemove} className="text-[#B87333] hover:text-[#D4A574]">
-                  <Minus size={16} />
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onRemove();
+                  }} 
+                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                  style={{ 
+                    cursor: 'pointer', 
+                    pointerEvents: 'auto',
+                    minWidth: '36px',
+                    minHeight: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Minus size={18} />
                 </button>
-                <span className="text-sm font-bold gradient-text" style={{ minWidth: '20px', textAlign: 'center' }}>
+                <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
                   {quantity}
                 </span>
-                <button onClick={onAdd} className="text-[#B87333] hover:text-[#D4A574]">
-                  <Plus size={16} />
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    onAdd();
+                  }} 
+                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
+                  style={{ 
+                    cursor: 'pointer', 
+                    pointerEvents: 'auto',
+                    minWidth: '36px',
+                    minHeight: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Plus size={18} />
                 </button>
               </div>
             ) : (
               <button
-                onClick={onAdd}
-                className="px-4 py-2 text-xs"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  onAdd();
+                }}
+                className="px-5 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-xs"
                 style={{
                   background: 'rgba(184, 115, 51, 0.2)',
                   border: '1px solid rgba(184, 115, 51, 0.4)',
                   color: '#D4A574',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  zIndex: 10,
                   fontFamily: 'var(--font-body)',
                   letterSpacing: '0.05em',
+                  minHeight: '44px',
+                  borderRadius: '8px',
+                }}
+                onTouchStart={(e) => {
+                  e.currentTarget.style.transform = 'scale(0.95)';
+                }}
+                onTouchEnd={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
                 ADD TO CART

@@ -241,8 +241,9 @@ export default function HeroRevamped() {
                   }}
                 >
                   RABUSTE
-                  {/* Glow effect behind text */}
+                  {/* Glow effect behind text - deferred to prevent LCP delay */}
                   <motion.span
+                    initial={{ opacity: 0.3 }}
                     animate={{
                       opacity: [0.3, 0.6, 0.3],
                     }}
@@ -250,12 +251,14 @@ export default function HeroRevamped() {
                       duration: 3,
                       repeat: Infinity,
                       ease: "easeInOut",
+                      delay: 2, // Delay animation start to not block LCP
                     }}
                     className="absolute inset-0 blur-2xl"
                     style={{
                       background: 'linear-gradient(135deg, #D4A574, #B87333)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
                       zIndex: -1,
                     }}
                   >

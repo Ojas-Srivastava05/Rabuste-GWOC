@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Coffee, Sparkles, ArrowRight, Palette } from "lucide-react";
+import { X, Coffee, Sparkles, ArrowRight, Palette, Zap, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface PersonalizedComboPopupProps {
@@ -8,34 +8,166 @@ interface PersonalizedComboPopupProps {
   isLoggedIn: boolean;
 }
 
+type MenuItem = {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  image?: string;
+};
+
+type ComboMessage = {
+  icon: typeof Coffee;
+  title: string;
+  description: string;
+  cta: string;
+  route: string;
+  color: string;
+};
+
 export default function PersonalizedComboPopup({ userName, isLoggedIn }: PersonalizedComboPopupProps) {
   const router = useRouter();
   const [isMinimized, setIsMinimized] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [aiSuggestions, setAiSuggestions] = useState<ComboMessage[]>([]);
 
-  // Show popup after 3 seconds on mount
+  // Fetch menu items and generate AI suggestions
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
+    const fetchMenuAndSuggestions = async () => {
+      try {
+        // Fetch menu items
+        const menuRes = await fetch("/api/menu");
+        if (menuRes.ok) {
+          const menuData = await menuRes.json();
+          const items = Array.isArray(menuData) ? menuData : menuData?.items || [];
+          setMenuItems(items);
+          
+          // Generate AI-powered suggestions for guests
+          if (!isLoggedIn && items.length > 0) {
+            generateAISuggestions(items);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch menu:", error);
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    fetchMenuAndSuggestions();
+  }, [isLoggedIn]);
 
-  // Rotate messages every 8 seconds
-  useEffect(() => {
-    if (!isVisible || isMinimized) return;
+  // Generate AI-powered combo suggestions based on menu data
+  const generateAISuggestions = (items: MenuItem[]) => {
+    // Get popular items (by price range - mid-range items are often popular)
+    const popularItems = items
+      .filter(item => item.price >= 100 && item.price <= 300)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 3);
 
-    const messages = isLoggedIn ? loggedInMessages : guestMessages;
-    const interval = setInterval(() => {
-      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 8000);
+    // Get premium items
+    const premiumItems = items
+      .filter(item => item.price > 300)
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 2);
 
-    return () => clearInterval(interval);
-  }, [isVisible, isMinimized, isLoggedIn]);
+    // Get budget-friendly items
+    const budgetItems = items
+      .filter(item => item.price < 150)
+      .sort((a, b) => a.price - b.price)
+      .slice(0, 2);
 
-  const guestMessages = [
+    // Get trending categories
+    const categories = [...new Set(items.map(item => item.category))];
+    const trendingCategory = categories[Math.floor(Math.random() * categories.length)] || "Coffee";
+
+    const suggestions: ComboMessage[] = [];
+
+    // Suggestion 1: Popular combo
+    if (popularItems.length > 0) {
+      const item = popularItems[0];
+      suggestions.push({
+        icon: TrendingUp,
+        title: `Trending: ${item.name}`,
+        description: `Join ${Math.floor(Math.random() * 50) + 20} others who loved this today!`,
+        cta: "Try It Now",
+        route: `/menu#item-${item._id}`,
+        color: "#B87333",
+      });
+    }
+
+    // Suggestion 2: Premium experience
+    if (premiumItems.length > 0) {
+      const item = premiumItems[0];
+      suggestions.push({
+        icon: Zap,
+        title: `Premium: ${item.name}`,
+        description: "Elevate your coffee experience with our finest selection.",
+        cta: "Explore Premium",
+        route: `/menu#item-${item._id}`,
+        color: "#CD7F32",
+      });
+    }
+
+    // Suggestion 3: Budget-friendly
+    if (budgetItems.length > 0) {
+      const item = budgetItems[0];
+      suggestions.push({
+        icon: Coffee,
+        title: `Great Value: ${item.name}`,
+        description: `Amazing taste at just ₹${item.price}. Perfect for daily coffee!`,
+        cta: "Get It Now",
+        route: `/menu#item-${item._id}`,
+        color: "#D4A574",
+      });
+    }
+
+    // Suggestion 4: Category-based
+    suggestions.push({
+      icon: Palette,
+      title: `Explore ${trendingCategory}`,
+      description: `Discover our curated ${trendingCategory.toLowerCase()} collection.`,
+      cta: "View Collection",
+      route: `/menu?category=${trendingCategory}`,
+      color: "#B87333",
+    });
+
+    // Fallback suggestions
+    if (suggestions.length === 0) {
+      suggestions.push(
+        {
+          icon: Coffee,
+          title: "Discover Bold Coffee",
+          description: "2X caffeine. Zero compromises.",
+          cta: "Explore Menu",
+          route: "/menu",
+          color: "#B87333",
+        },
+        {
+          icon: Palette,
+          title: "Explore Art Gallery",
+          description: "Where coffee meets creativity.",
+          cta: "View Collection",
+          route: "/art",
+          color: "#CD7F32",
+        },
+        {
+          icon: Sparkles,
+          title: "Join the Movement",
+          description: "Sign up for exclusive perks!",
+          cta: "Sign Up Now",
+          route: "/auth",
+          color: "#D4A574",
+        }
+      );
+    }
+
+    setAiSuggestions(suggestions);
+  };
+
+  // Base guest messages (fallback)
+  const baseGuestMessages: ComboMessage[] = [
     {
       icon: Coffee,
       title: "Discover Bold Coffee",
@@ -57,7 +189,7 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
       title: "Join the Movement",
       description: "Sign up for exclusive perks!",
       cta: "Sign Up Now",
-      route: "/auth/login",
+      route: "/auth",
       color: "#D4A574",
     },
   ];
@@ -89,7 +221,45 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
     },
   ];
 
-  const messages = isLoggedIn ? loggedInMessages : guestMessages;
+  // Get current messages array
+  const getMessages = () => {
+    const guestMessages = aiSuggestions.length > 0 ? aiSuggestions : baseGuestMessages;
+    return isLoggedIn ? loggedInMessages : guestMessages;
+  };
+
+  // Navigation functions
+  const goToPrevious = () => {
+    const messages = getMessages();
+    setCurrentMessageIndex((prev) => (prev - 1 + messages.length) % messages.length);
+  };
+
+  const goToNext = () => {
+    const messages = getMessages();
+    setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+  };
+
+  // Show popup after 3 seconds on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Rotate messages every 8 seconds (autoplay)
+  useEffect(() => {
+    if (!isVisible || isMinimized) return;
+
+    const interval = setInterval(() => {
+      const messages = getMessages();
+      setCurrentMessageIndex((prev) => (prev + 1) % messages.length);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [isVisible, isMinimized, isLoggedIn, aiSuggestions.length]);
+
+  const messages = getMessages();
   const currentMessage = messages[currentMessageIndex];
   const Icon = currentMessage.icon;
 
@@ -102,7 +272,13 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
   };
 
   const handleCTAClick = () => {
-    router.push(currentMessage.route);
+    // If route contains #item-, scroll to that item after navigation
+    if (currentMessage.route.includes('#item-')) {
+      router.push(currentMessage.route);
+      // The menu page will handle the highlighting via hash change
+    } else {
+      router.push(currentMessage.route);
+    }
   };
 
   if (!isVisible) return null;
@@ -119,10 +295,10 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
         }}
         exit={{ opacity: 0, y: 100, scale: 0.8 }}
         transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-        className="fixed bottom-6 right-6 z-[9997]"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9997]"
         style={{
-          maxWidth: isMinimized ? '60px' : '320px',
-          width: isMinimized ? '60px' : '90%',
+          maxWidth: isMinimized ? '60px' : '280px',
+          width: isMinimized ? '60px' : 'calc(100vw - 2rem)',
         }}
       >
         {/* Minimized View */}
@@ -177,10 +353,10 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
           <div
             className="relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-              border: '3px solid rgba(184, 115, 51, 0.5)',
+              background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.98) 0%, rgba(42, 24, 16, 0.95) 100%)',
+              border: '1px solid rgba(184, 115, 51, 0.3)',
               backdropFilter: 'blur(20px)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(184, 115, 51, 0.3)',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(184, 115, 51, 0.2), inset 0 1px 0 rgba(184, 115, 51, 0.1)',
             }}
           >
             {/* Animated Glow Background */}
@@ -245,6 +421,82 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
               </div>
             </div>
 
+            {/* Navigation Arrows */}
+            <div className="relative z-10 flex items-center justify-between px-2 pb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                className="p-1.5 rounded-full transition-all active:scale-95"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.3)',
+                  border: '1px solid rgba(184, 115, 51, 0.6)',
+                  color: '#D4A574',
+                  minWidth: '32px',
+                  minHeight: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                }}
+                aria-label="Previous"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="flex gap-1">
+                {getMessages().map((_, index) => (
+                  <div
+                    key={index}
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      background: index === currentMessageIndex 
+                        ? currentMessage.color 
+                        : 'rgba(255, 254, 249, 0.3)',
+                      width: index === currentMessageIndex ? '20px' : '6px',
+                    }}
+                  />
+                ))}
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                className="p-1.5 rounded-full transition-all active:scale-95"
+                style={{
+                  background: 'rgba(184, 115, 51, 0.3)',
+                  border: '1px solid rgba(184, 115, 51, 0.6)',
+                  color: '#D4A574',
+                  minWidth: '32px',
+                  minHeight: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                }}
+                aria-label="Next"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+
             {/* Content */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -257,16 +509,40 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
               >
                 {/* Title */}
                 <h3
-                  className="mb-1.5"
+                  className="mb-1.5 relative"
                   style={{
                     fontFamily: 'var(--font-heading)',
                     fontSize: 'clamp(16px, 4vw, 18px)',
-                    color: '#FFFEF9',
+                    background: 'linear-gradient(135deg, #FFFEF9 0%, #D4A574 50%, #FFFEF9 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
                     letterSpacing: '0.05em',
                     lineHeight: 1.2,
+                    textShadow: '0 0 40px rgba(212, 165, 116, 0.3)',
                   }}
                 >
                   {currentMessage.title}
+                  {/* Glow effect behind text */}
+                  <motion.span
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 blur-xl"
+                    style={{
+                      background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      zIndex: -1,
+                    }}
+                  >
+                    {currentMessage.title}
+                  </motion.span>
                 </h3>
 
                 {/* Description */}
@@ -307,24 +583,6 @@ export default function PersonalizedComboPopup({ userName, isLoggedIn }: Persona
                 </motion.button>
               </motion.div>
             </AnimatePresence>
-
-            {/* Progress Indicators */}
-            <div className="relative z-10 flex gap-1 px-3 pb-2.5">
-              {messages.map((_, index) => (
-                <div
-                  key={index}
-                  className="flex-1 h-0.5 transition-all duration-300"
-                  style={{
-                    background: index === currentMessageIndex 
-                      ? currentMessage.color 
-                      : 'rgba(255, 254, 249, 0.2)',
-                    boxShadow: index === currentMessageIndex 
-                      ? `0 0 10px ${currentMessage.color}` 
-                      : 'none',
-                  }}
-                />
-              ))}
-            </div>
 
             {/* Corner Decorations */}
             <div
