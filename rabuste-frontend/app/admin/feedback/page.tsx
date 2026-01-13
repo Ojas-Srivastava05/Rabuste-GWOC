@@ -157,7 +157,7 @@ export default function AdminFeedbackPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Feedback Management</h1>
-          <p className="text-gray-600 mt-1">AI-analyzed customer feedback with sentiment analysis</p>
+          <p className="text-black mt-1">AI-analyzed customer feedback with sentiment analysis</p>
         </div>
       </div>
 
@@ -167,7 +167,7 @@ export default function AdminFeedbackPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Feedback</p>
+                <p className="text-sm text-black mb-1">Total Feedback</p>
                 <p className="text-2xl font-bold text-black">{stats.total}</p>
               </div>
               <div className="p-3 bg-black rounded-lg">
@@ -178,7 +178,7 @@ export default function AdminFeedbackPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Avg Rating</p>
+                <p className="text-sm text-black mb-1">Avg Rating</p>
                 <p className="text-2xl font-bold text-green-600">{stats.averageRating.toFixed(1)}/5</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -189,7 +189,7 @@ export default function AdminFeedbackPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Flagged</p>
+                <p className="text-sm text-black mb-1">Flagged</p>
                 <p className="text-2xl font-bold text-red-600">{stats.flagged}</p>
               </div>
               <div className="p-3 bg-red-100 rounded-lg">
@@ -200,7 +200,7 @@ export default function AdminFeedbackPage() {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Positive</p>
+                <p className="text-sm text-black mb-1">Positive</p>
                 <p className="text-2xl font-bold text-green-600">{stats.bySentiment.positive}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-lg">
@@ -215,7 +215,7 @@ export default function AdminFeedbackPage() {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" />
             <input
               type="text"
               placeholder="Search feedback..."
@@ -272,13 +272,13 @@ export default function AdminFeedbackPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading feedback...</p>
+            <p className="text-black">Loading feedback...</p>
           </div>
         </div>
       ) : feedbacks.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <MessageSquare size={64} className="mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">No feedback found</p>
+          <MessageSquare size={64} className="mx-auto mb-4 text-black" />
+          <p className="text-black">No feedback found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -293,7 +293,7 @@ export default function AdminFeedbackPage() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <p className="font-semibold text-black mb-1">{feedback.userName}</p>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-black mb-2">
                     {new Date(feedback.createdAt).toLocaleDateString()}
                   </p>
                 </div>
@@ -302,7 +302,7 @@ export default function AdminFeedbackPage() {
                     <Star
                       key={i}
                       size={14}
-                      className={i < feedback.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}
+                      className={i < feedback.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-400'}
                     />
                   ))}
                 </div>
@@ -330,12 +330,12 @@ export default function AdminFeedbackPage() {
               </div>
 
               <div className="mb-3 p-3 bg-gray-50 rounded-lg">
-                <p className="text-xs font-bold text-gray-700 mb-1">AI SUMMARY:</p>
+                <p className="text-xs font-bold text-black mb-1">AI SUMMARY:</p>
                 <p className="text-xs text-black line-clamp-2">{feedback.summary}</p>
               </div>
 
               {feedback.comments && (
-                <p className="text-xs text-gray-600 line-clamp-2 mb-3">{feedback.comments}</p>
+                <p className="text-xs text-black line-clamp-2 mb-3">{feedback.comments}</p>
               )}
 
               <div className="pt-3 border-t border-gray-200">
@@ -379,30 +379,30 @@ export default function AdminFeedbackPage() {
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <p className="text-sm text-gray-600 mb-1">User</p>
+                <p className="text-sm text-black mb-1">User</p>
                 <p className="text-lg font-semibold text-black">{selectedFeedback.userName}</p>
-                <p className="text-sm text-gray-600">{selectedFeedback.userEmail}</p>
+                <p className="text-sm text-black">{selectedFeedback.userEmail}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Rating</p>
+                <p className="text-sm text-black mb-1">Rating</p>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       size={20}
-                      className={i < selectedFeedback.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300'}
+                      className={i < selectedFeedback.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-400'}
                     />
                   ))}
                   <span className="ml-2 text-black font-semibold">{selectedFeedback.rating}/5</span>
                 </div>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">AI Summary</p>
+                <p className="text-sm text-black mb-1">AI Summary</p>
                 <p className="text-black bg-gray-50 p-3 rounded-lg">{selectedFeedback.summary}</p>
               </div>
               {selectedFeedback.comments && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Comments</p>
+                  <p className="text-sm text-black mb-1">Comments</p>
                   <p className="text-black bg-gray-50 p-3 rounded-lg">{selectedFeedback.comments}</p>
                 </div>
               )}

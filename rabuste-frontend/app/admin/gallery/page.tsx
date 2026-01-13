@@ -156,7 +156,7 @@ export default function AdminGalleryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Gallery Management</h1>
-          <p className="text-gray-600 mt-1">Manage artwork and gallery items</p>
+          <p className="text-black mt-1">Manage artwork and gallery items</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -172,7 +172,7 @@ export default function AdminGalleryPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Items</p>
+              <p className="text-sm text-black mb-1">Total Items</p>
               <p className="text-2xl font-bold text-black">{stats.total}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -183,7 +183,7 @@ export default function AdminGalleryPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Available</p>
+              <p className="text-sm text-black mb-1">Available</p>
               <p className="text-2xl font-bold text-green-600">{stats.available}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -194,7 +194,7 @@ export default function AdminGalleryPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Disabled</p>
+              <p className="text-sm text-black mb-1">Disabled</p>
               <p className="text-2xl font-bold text-red-600">{stats.disabled}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -205,11 +205,11 @@ export default function AdminGalleryPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">In Stock</p>
+              <p className="text-sm text-black mb-1">In Stock</p>
               <p className="text-2xl font-bold text-black">{stats.inStock}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-lg">
-              <Palette size={20} className="text-gray-600" />
+              <Palette size={20} className="text-black" />
             </div>
           </div>
         </div>
@@ -259,8 +259,8 @@ export default function AdminGalleryPage() {
               <label className="block text-sm font-semibold text-black mb-2">Images * (at least one required)</label>
               <div className="space-y-3">
                 <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
-                  <Upload size={20} className="mr-2 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                  <Upload size={20} className="mr-2 text-black" />
+                  <span className="text-sm text-black">
                     {uploading ? "Uploading..." : "Click to upload images or drag and drop"}
                   </span>
                   <input
@@ -399,7 +399,7 @@ export default function AdminGalleryPage() {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
             <input
               type="text"
               placeholder="Search artwork..."
@@ -426,13 +426,13 @@ export default function AdminGalleryPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading gallery...</p>
+            <p className="text-black">Loading gallery...</p>
           </div>
         </div>
       ) : filteredGallery.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <Palette size={64} className="mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">No artworks found</p>
+          <Palette size={64} className="mx-auto mb-4 text-black" />
+          <p className="text-black">No artworks found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -448,7 +448,7 @@ export default function AdminGalleryPage() {
                   <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <ImagePlus size={48} className="text-gray-400" />
+                    <ImagePlus size={48} className="text-black" />
                   </div>
                 )}
                 {!item.isAvailable && (
@@ -464,12 +464,12 @@ export default function AdminGalleryPage() {
               </div>
               <div className="p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.category}</span>
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">{item.category}</span>
                   <span className="text-xs font-semibold text-black">Stock: {item.stock}</span>
                 </div>
                 <h3 className="font-bold text-black mb-1">{item.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">by {item.artist}</p>
-                <p className="text-xs text-gray-500 mb-3 line-clamp-2">{item.description}</p>
+                <p className="text-sm text-black mb-2">by {item.artist}</p>
+                <p className="text-xs text-black mb-3 line-clamp-2">{item.description}</p>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold text-black">₹{item.price.toLocaleString()}</span>
                 </div>

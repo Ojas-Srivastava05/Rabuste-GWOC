@@ -76,7 +76,7 @@ export default function AdminLayout({ children }: Props) {
       >
         <div className="p-6 border-b border-gray-800">
           <Link href="/" className="block mb-4">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-white rounded-lg">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-white rounded-lg p-2">
               <Image
                 src="/Rabuste logo.png"
                 alt="Rabuste Logo"
@@ -84,6 +84,7 @@ export default function AdminLayout({ children }: Props) {
                 height={32}
                 className="object-contain"
                 priority
+                style={{ filter: 'none' }}
               />
             </div>
           </Link>

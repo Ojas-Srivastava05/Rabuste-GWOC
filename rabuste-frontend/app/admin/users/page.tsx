@@ -119,7 +119,7 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">User Management</h1>
-          <p className="text-gray-600 mt-1">Manage users and their access</p>
+          <p className="text-black mt-1">Manage users and their access</p>
         </div>
       </div>
 
@@ -128,7 +128,7 @@ export default function AdminUsersPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Users</p>
+              <p className="text-sm text-black mb-1">Total Users</p>
               <p className="text-2xl font-bold text-black">{stats.total}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -139,7 +139,7 @@ export default function AdminUsersPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Admins</p>
+              <p className="text-sm text-black mb-1">Admins</p>
               <p className="text-2xl font-bold text-blue-600">{stats.admins}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -150,18 +150,18 @@ export default function AdminUsersPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Regular Users</p>
+              <p className="text-sm text-black mb-1">Regular Users</p>
               <p className="text-2xl font-bold text-black">{stats.regularUsers}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-lg">
-              <User size={20} className="text-gray-600" />
+              <User size={20} className="text-black" />
             </div>
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Active</p>
+              <p className="text-sm text-black mb-1">Active</p>
               <p className="text-2xl font-bold text-green-600">{stats.active}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -172,7 +172,7 @@ export default function AdminUsersPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Blocked</p>
+              <p className="text-sm text-black mb-1">Blocked</p>
               <p className="text-2xl font-bold text-red-600">{stats.blocked}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -186,7 +186,7 @@ export default function AdminUsersPage() {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
             <input
               type="text"
               placeholder="Search by name or email..."
@@ -222,7 +222,7 @@ export default function AdminUsersPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   <button
                     onClick={() => handleSort('name')}
                     className="flex items-center gap-2 hover:text-black"
@@ -231,7 +231,7 @@ export default function AdminUsersPage() {
                     <ArrowUpDown size={14} />
                   </button>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   <button
                     onClick={() => handleSort('email')}
                     className="flex items-center gap-2 hover:text-black"
@@ -240,10 +240,10 @@ export default function AdminUsersPage() {
                     <ArrowUpDown size={14} />
                   </button>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   <button
                     onClick={() => handleSort('date')}
                     className="flex items-center gap-2 hover:text-black"
@@ -252,10 +252,10 @@ export default function AdminUsersPage() {
                     <ArrowUpDown size={14} />
                   </button>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -264,12 +264,12 @@ export default function AdminUsersPage() {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-black" />
                   </td>
                 </tr>
               ) : sortedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-black">
                     No users found
                   </td>
                 </tr>
@@ -284,7 +284,7 @@ export default function AdminUsersPage() {
                           {user.role === 'admin' ? (
                             <Shield size={18} className="text-blue-600" />
                           ) : (
-                            <User size={18} className="text-gray-600" />
+                            <User size={18} className="text-black" />
                           )}
                         </div>
                         <div>
@@ -297,8 +297,8 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Mail size={14} className="text-gray-400" />
-                        <p className="text-sm text-gray-700">{user.email}</p>
+                        <Mail size={14} className="text-black" />
+                        <p className="text-sm text-black">{user.email}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -306,7 +306,7 @@ export default function AdminUsersPage() {
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           user.role === 'admin'
                             ? 'bg-blue-100 text-blue-700'
-                            : 'bg-gray-100 text-gray-700'
+                            : 'bg-gray-100 text-black'
                         }`}
                       >
                         {user.role}
@@ -314,8 +314,8 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-gray-400" />
-                        <p className="text-sm text-gray-700">
+                        <Calendar size={14} className="text-black" />
+                        <p className="text-sm text-black">
                           {new Date(user.createdAt).toLocaleDateString()}
                         </p>
                       </div>

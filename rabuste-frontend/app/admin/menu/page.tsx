@@ -146,7 +146,7 @@ export default function AdminMenuPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Menu Management</h1>
-          <p className="text-gray-600 mt-1">Manage your menu items and categories</p>
+          <p className="text-black mt-1">Manage your menu items and categories</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -162,7 +162,7 @@ export default function AdminMenuPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Items</p>
+              <p className="text-sm text-black mb-1">Total Items</p>
               <p className="text-2xl font-bold text-black">{stats.total}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -173,7 +173,7 @@ export default function AdminMenuPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Available</p>
+              <p className="text-sm text-black mb-1">Available</p>
               <p className="text-2xl font-bold text-green-600">{stats.available}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -184,7 +184,7 @@ export default function AdminMenuPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Disabled</p>
+              <p className="text-sm text-black mb-1">Disabled</p>
               <p className="text-2xl font-bold text-red-600">{stats.disabled}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -195,11 +195,11 @@ export default function AdminMenuPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Categories</p>
+              <p className="text-sm text-black mb-1">Categories</p>
               <p className="text-2xl font-bold text-black">{stats.categories}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-lg">
-              <Filter size={20} className="text-gray-600" />
+              <Filter size={20} className="text-black" />
             </div>
           </div>
         </div>
@@ -213,53 +213,53 @@ export default function AdminMenuPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-black mb-2">Item Name *</label>
-                <input
-                  placeholder="e.g., Espresso"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-black mb-2">Category *</label>
-                <input
-                  placeholder="e.g., Coffee, Snacks"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-black mb-2">Description *</label>
               <input
-                placeholder="Brief description of the item"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g., Espresso"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
               />
             </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Category *</label>
+              <input
+                placeholder="e.g., Coffee, Snacks"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+          </div>
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Description *</label>
+            <input
+              placeholder="Brief description of the item"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-black mb-2">Price (₹) *</label>
-                <input
-                  placeholder="e.g., 150"
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
+              <input
+                placeholder="e.g., 150"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
+              />
+            </div>
               <div>
                 <label className="block text-sm font-semibold text-black mb-2">Image *</label>
                 <div className="space-y-2">
                   <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
-                    <Upload size={20} className="mr-2 text-gray-400" />
-                    <span className="text-sm text-gray-600">
+                    <Upload size={20} className="mr-2 text-black" />
+                    <span className="text-sm text-black">
                       {uploading ? "Uploading..." : imageFile ? imageFile.name : "Click to upload or drag and drop"}
                     </span>
                     <input
@@ -286,23 +286,23 @@ export default function AdminMenuPage() {
                       </button>
                     </div>
                   )}
-                  <div className="text-xs text-gray-500">Or enter image URL:</div>
-                  <input
+                  <div className="text-xs text-black">Or enter image URL:</div>
+              <input
                     type="url"
-                    placeholder="https://example.com/image.jpg"
-                    value={image}
+                placeholder="https://example.com/image.jpg"
+                value={image}
                     onChange={(e) => {
                       setImage(e.target.value);
                       setImagePreview(e.target.value);
                     }}
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
-                  />
-                </div>
-              </div>
+              />
+            </div>
+          </div>
             </div>
             <div className="flex gap-4">
-              <button
-                type="submit"
+          <button 
+            type="submit" 
                 className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
               >
                 Add Item
@@ -320,17 +320,17 @@ export default function AdminMenuPage() {
                 className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
               >
                 Cancel
-              </button>
+          </button>
             </div>
-          </form>
-        </div>
+        </form>
+      </div>
       )}
 
       {/* Filters */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
             <input
               type="text"
               placeholder="Search menu items..."
@@ -352,33 +352,33 @@ export default function AdminMenuPage() {
           <div className="flex gap-2 border border-gray-200 rounded-lg p-1">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-600'}`}
+              className={`p-2 rounded ${viewMode === 'grid' ? 'bg-black text-white' : 'text-black'}`}
             >
               <Grid size={18} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded ${viewMode === 'list' ? 'bg-black text-white' : 'text-gray-600'}`}
+              className={`p-2 rounded ${viewMode === 'list' ? 'bg-black text-white' : 'text-black'}`}
             >
               <List size={18} />
             </button>
           </div>
         </div>
-      </div>
+        </div>
 
       {/* Menu Items */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading menu...</p>
+            <p className="text-black">Loading menu...</p>
           </div>
         </div>
       ) : filteredMenu.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <Coffee size={64} className="mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">No menu items found</p>
-        </div>
+          <Coffee size={64} className="mx-auto mb-4 text-black" />
+          <p className="text-black">No menu items found</p>
+          </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredMenu.map((item) => (
@@ -395,11 +395,11 @@ export default function AdminMenuPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Item</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Price</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Actions</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase">Item</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase">Price</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-black uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -412,18 +412,18 @@ export default function AdminMenuPage() {
                           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <ImageIcon size={20} className="text-gray-400" />
+                            <ImageIcon size={20} className="text-black" />
                           </div>
                         )}
-                      </div>
-                      <div>
+      </div>
+      <div>
                         <p className="font-semibold text-black">{item.name}</p>
-                        <p className="text-sm text-gray-500 line-clamp-1">{item.description}</p>
+                        <p className="text-sm text-black line-clamp-1">{item.description}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">{item.category}</span>
+                    <span className="px-2 py-1 bg-gray-100 text-black rounded text-sm">{item.category}</span>
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-semibold text-black">₹{item.price}</p>
@@ -459,15 +459,15 @@ export default function AdminMenuPage() {
                       >
                         <Trash2 size={16} />
                       </button>
-                    </div>
+          </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
-    </div>
+          </div>
+        )}
+            </div>
   );
 }
 
@@ -489,26 +489,26 @@ function MenuItemCard({
           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ImageIcon size={48} className="text-gray-400" />
+            <ImageIcon size={48} className="text-black" />
           </div>
         )}
-        {!item.isAvailable && (
+                {!item.isAvailable && (
           <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
-            Disabled
-          </div>
-        )}
-      </div>
+                    Disabled
+                  </div>
+                )}
+                </div>
       <div className="p-4">
         <div className="mb-2">
           <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.category}</span>
-        </div>
+                </div>
         <h3 className="font-bold text-black mb-1">{item.name}</h3>
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
         <div className="flex items-center justify-between mb-3">
           <p className="text-lg font-bold text-black">₹{item.price}</p>
-        </div>
-        <div className="flex gap-2">
-          <button
+                </div>
+                <div className="flex gap-2">
+                  <button
             onClick={() => onToggleAvailability(item._id, item.isAvailable)}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
               item.isAvailable
@@ -517,14 +517,14 @@ function MenuItemCard({
             }`}
           >
             {item.isAvailable ? "Disable" : "Enable"}
-          </button>
-          <button
+                  </button>
+                  <button
             onClick={() => onDelete(item._id)}
             className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
           >
             <Trash2 size={16} />
-          </button>
-        </div>
+                  </button>
+                </div>
       </div>
     </div>
   );

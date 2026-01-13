@@ -103,6 +103,7 @@ export default function AdminInstagramPage() {
       return;
     }
 
+    // Validate Instagram URL format
     if (!manualForm.permalink.includes('instagram.com')) {
       setError("Please provide a valid Instagram post URL");
       return;
@@ -209,7 +210,7 @@ export default function AdminInstagramPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Instagram Management</h1>
-          <p className="text-gray-600 mt-1">Manage Instagram posts and gallery</p>
+          <p className="text-black mt-1">Manage Instagram posts and gallery</p>
         </div>
         <div className="flex gap-2">
           <button

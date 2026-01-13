@@ -252,7 +252,7 @@ export default function WorkshopsAdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Workshop Management</h1>
-          <p className="text-gray-600 mt-1">Manage workshops and registrations</p>
+          <p className="text-black mt-1">Manage workshops and registrations</p>
         </div>
       </div>
 
@@ -261,7 +261,7 @@ export default function WorkshopsAdminPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total</p>
+              <p className="text-sm text-black mb-1">Total</p>
               <p className="text-2xl font-bold text-black">{workshops.length}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -272,7 +272,7 @@ export default function WorkshopsAdminPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Upcoming</p>
+              <p className="text-sm text-black mb-1">Upcoming</p>
               <p className="text-2xl font-bold text-green-600">{upcomingWorkshops.length}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -283,18 +283,18 @@ export default function WorkshopsAdminPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Past</p>
-              <p className="text-2xl font-bold text-gray-600">{pastWorkshops.length}</p>
+              <p className="text-sm text-black mb-1">Past</p>
+              <p className="text-2xl font-bold text-black">{pastWorkshops.length}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-lg">
-              <Clock size={20} className="text-gray-600" />
+              <Clock size={20} className="text-black" />
             </div>
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Registrations</p>
+              <p className="text-sm text-black mb-1">Registrations</p>
               <p className="text-2xl font-bold text-blue-600">{totalRegistrations}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -437,7 +437,7 @@ export default function WorkshopsAdminPage() {
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
             <input
               type="text"
               placeholder="Search workshops..."
@@ -450,7 +450,7 @@ export default function WorkshopsAdminPage() {
             <button
               onClick={() => setFilterStatus('all')}
               className={`px-4 py-2 rounded-lg transition-all ${
-                filterStatus === 'all' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'all' ? 'bg-black text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               All
@@ -458,7 +458,7 @@ export default function WorkshopsAdminPage() {
             <button
               onClick={() => setFilterStatus('upcoming')}
               className={`px-4 py-2 rounded-lg transition-all ${
-                filterStatus === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'upcoming' ? 'bg-green-600 text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               Upcoming
@@ -466,7 +466,7 @@ export default function WorkshopsAdminPage() {
             <button
               onClick={() => setFilterStatus('past')}
               className={`px-4 py-2 rounded-lg transition-all ${
-                filterStatus === 'past' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'past' ? 'bg-gray-600 text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               Past
@@ -474,7 +474,7 @@ export default function WorkshopsAdminPage() {
             <button
               onClick={() => setFilterStatus('registrations')}
               className={`px-4 py-2 rounded-lg transition-all ${
-                filterStatus === 'registrations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterStatus === 'registrations' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               With Registrations
@@ -505,7 +505,7 @@ export default function WorkshopsAdminPage() {
 
         <div className="grid grid-cols-7 gap-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="text-center text-xs font-semibold text-gray-700 py-2">
+            <div key={day} className="text-center text-xs font-semibold text-black py-2">
               {day}
             </div>
           ))}
@@ -526,7 +526,7 @@ export default function WorkshopsAdminPage() {
                 className={`h-12 rounded-lg flex items-center justify-center cursor-pointer font-semibold transition-all hover:scale-105 ${
                   workshop 
                     ? "bg-black text-white" 
-                    : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                    : "bg-gray-50 text-black hover:bg-gray-100"
                 }`}
               >
                 {day}
@@ -561,10 +561,10 @@ export default function WorkshopsAdminPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-black mb-2">{ws.title}</h3>
-                    <p className="text-sm text-gray-600 mb-1">
+                    <p className="text-sm text-black mb-1">
                       {ws.date} at {ws.time}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-black">
                       📍 {ws.location} | 👤 {ws.instructor}
                     </p>
                   </div>
@@ -679,19 +679,19 @@ export default function WorkshopsAdminPage() {
             ) : (
               <div className="p-6 space-y-4">
                 <h3 className="text-2xl font-bold text-black mb-4">{selectedWorkshop.title}</h3>
-                <p className="text-gray-600 mb-6">{selectedWorkshop.description}</p>
+                <p className="text-black mb-6">{selectedWorkshop.description}</p>
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <Clock size={18} className="text-gray-600" />
+                    <Clock size={18} className="text-black" />
                     <span className="text-black">{selectedWorkshop.time}</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <MapPin size={18} className="text-gray-600" />
+                    <MapPin size={18} className="text-black" />
                     <span className="text-black">{selectedWorkshop.location}</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <User size={18} className="text-gray-600" />
+                    <User size={18} className="text-black" />
                     <span className="text-black">{selectedWorkshop.instructor}</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
@@ -717,8 +717,8 @@ export default function WorkshopsAdminPage() {
                           className="p-3 bg-gray-50 rounded-lg border border-gray-200"
                         >
                           <p className="font-semibold text-black mb-1">{reg.name}</p>
-                          <p className="text-sm text-gray-600 mb-1">{reg.email}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-sm text-black mb-1">{reg.email}</p>
+                          <p className="text-xs text-black">
                             Registered: {new Date(reg.registeredAt).toLocaleString()}
                           </p>
                         </div>

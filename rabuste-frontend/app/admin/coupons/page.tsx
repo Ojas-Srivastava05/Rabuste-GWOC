@@ -162,7 +162,7 @@ export default function AdminCouponsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Coupon Management</h1>
-          <p className="text-gray-600 mt-1">Create and manage discount coupons</p>
+          <p className="text-black mt-1">Create and manage discount coupons</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -178,7 +178,7 @@ export default function AdminCouponsPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Coupons</p>
+              <p className="text-sm text-black mb-1">Total Coupons</p>
               <p className="text-2xl font-bold text-black">{stats.total}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -189,7 +189,7 @@ export default function AdminCouponsPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Active</p>
+              <p className="text-sm text-black mb-1">Active</p>
               <p className="text-2xl font-bold text-green-600">{stats.active}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -200,7 +200,7 @@ export default function AdminCouponsPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Inactive</p>
+              <p className="text-sm text-black mb-1">Inactive</p>
               <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -213,7 +213,7 @@ export default function AdminCouponsPage() {
       {/* Search */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
           <input
             type="text"
             placeholder="Search coupons..."
@@ -254,15 +254,15 @@ export default function AdminCouponsPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mb-3">
-                    <Percent size={16} className="text-gray-400" />
+                    <Percent size={16} className="text-black" />
                     <span className="text-lg font-bold text-black">{coupon.discountPercentage}% OFF</span>
                   </div>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{coupon.description || "No description"}</p>
+              <p className="text-sm text-black mb-4 line-clamp-2">{coupon.description || "No description"}</p>
 
-              <div className="space-y-2 mb-4 text-xs text-gray-500">
+              <div className="space-y-2 mb-4 text-xs text-black">
                 <div className="flex items-center gap-2">
                   <Calendar size={14} />
                   <span>Valid until: {new Date(coupon.validUntil).toLocaleDateString()}</span>
@@ -294,7 +294,7 @@ export default function AdminCouponsPage() {
                 </button>
                 <button
                   onClick={() => handleEdit(coupon)}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-3 py-2 bg-gray-100 text-black rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   <Edit2 size={16} />
                 </button>
@@ -311,8 +311,8 @@ export default function AdminCouponsPage() {
 
         {filteredCoupons.length === 0 && (
           <div className="col-span-full bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <Ticket size={64} className="mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600">No coupons found</p>
+            <Ticket size={64} className="mx-auto mb-4 text-black" />
+            <p className="text-black">No coupons found</p>
           </div>
         )}
       </div>

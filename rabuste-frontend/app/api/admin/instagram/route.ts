@@ -43,10 +43,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
-    // Validate imageUrl (Cloudinary URL)
+    // Validate imageUrl (can be Cloudinary URL, regular URL, or base64 data URL)
     if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.trim()) {
       return NextResponse.json(
-        { error: "Cloudinary image URL is required" },
+        { error: "Image is required" },
         { status: 400 }
       );
     }
@@ -59,10 +59,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate Cloudinary URL format
-    if (!imageUrl.includes('cloudinary.com') && !imageUrl.match(/^https?:\/\/.+/)) {
+    // Validate image URL format (accepts Cloudinary, regular URLs, or base64 data URLs)
+    const trimmedImageUrl = imageUrl.trim();
+    const isBase64 = trimmedImageUrl.startsWith('data:image/');
+    const isHttpUrl = trimmedImageUrl.match(/^https?:\/\/.+/);
+    const isCloudinary = trimmedImageUrl.includes('cloudinary.com');
+    
+    if (!isBase64 && !isHttpUrl && !isCloudinary) {
       return NextResponse.json(
-        { error: "Please provide a valid Cloudinary image URL" },
+        { error: "Please provide a valid image URL or upload an image" },
         { status: 400 }
       );
     }

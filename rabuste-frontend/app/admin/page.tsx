@@ -146,7 +146,7 @@ export default function AdminPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-black">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -174,11 +174,11 @@ export default function AdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Business overview and analytics</p>
+          <p className="text-black mt-1">Business overview and analytics</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Clock size={16} />
-          <span>Last updated: {new Date().toLocaleTimeString()}</span>
+        <div className="flex items-center gap-2 text-sm text-black">
+          <Clock size={16} className="text-black" />
+          <span className="text-black">Last updated: {new Date().toLocaleTimeString()}</span>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export default function AdminPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <div className="flex items-center justify-center h-[300px] text-black">
               No revenue data available
             </div>
           )}
@@ -269,7 +269,7 @@ export default function AdminPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <div className="flex items-center justify-center h-[300px] text-black">
               No orders data available
             </div>
           )}
@@ -303,7 +303,7 @@ export default function AdminPage() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <div className="flex items-center justify-center h-[300px] text-black">
               No hourly data available
             </div>
           )}
@@ -332,7 +332,7 @@ export default function AdminPage() {
               </RechartsPieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <div className="flex items-center justify-center h-[300px] text-black">
               No sales data available
             </div>
           )}
@@ -375,7 +375,7 @@ function StatCard({
         )}
       </div>
       <h3 className="text-2xl font-bold text-black mb-1">{value}</h3>
-      <p className="text-sm text-gray-600">{title}</p>
+      <p className="text-sm text-black">{title}</p>
     </div>
   );
 }
@@ -415,22 +415,22 @@ function InsightsCard({ data }: { data: DashboardData }) {
         {data.insights.mostSoldItem && (
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
-              <p className="text-sm text-gray-600">Most Sold Item</p>
+              <p className="text-sm text-black">Most Sold Item</p>
               <p className="text-lg font-semibold text-black">{data.insights.mostSoldItem.name}</p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-black">{data.insights.mostSoldItem.count}</p>
-              <p className="text-xs text-gray-500">units sold</p>
+              <p className="text-xs text-black">units sold</p>
             </div>
           </div>
         )}
         {data.insights.peakHour && (
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="text-sm text-gray-600">Peak Order Time</p>
-              <p className="text-lg font-semibold text-black">{data.insights.peakHour}</p>
-            </div>
-            <Clock size={24} className="text-gray-400" />
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div>
+                <p className="text-sm text-black">Peak Order Time</p>
+                <p className="text-lg font-semibold text-black">{data.insights.peakHour}</p>
+              </div>
+              <Clock size={24} className="text-black" />
           </div>
         )}
       </div>
@@ -457,7 +457,7 @@ function LowStockCard({ items }: { items: Array<{ _id: string; name: string; sto
           ))}
         </div>
       ) : (
-        <p className="text-gray-500 text-center py-4">All items in stock</p>
+        <p className="text-black text-center py-4">All items in stock</p>
       )}
     </div>
   );
