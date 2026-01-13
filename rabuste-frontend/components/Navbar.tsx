@@ -286,7 +286,11 @@ export default function Navbar() {
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
           <NavButton href="/menu">MENU</NavButton>
-          {user && <NavButton href="/user/favorites">FAVORITES</NavButton>}
+          {user && (
+            <NavButton href="/user/favorites">
+              FAVORITES
+            </NavButton>
+          )}
           <NavButton href="/art">GALLERY</NavButton>
           {user ? (
             <div className="relative" ref={dropdownRef}>
