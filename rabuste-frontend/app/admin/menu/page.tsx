@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Power, PowerOff, Coffee } from "lucide-react";
+import { Plus, Trash2, Power, PowerOff, Coffee, Search, Filter, Grid, List, Image as ImageIcon } from "lucide-react";
 
 type MenuItem = {
   _id: string;
@@ -16,12 +16,16 @@ type MenuItem = {
 export default function AdminMenuPage() {
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
   const [category, setCategory] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     fetchMenu();
@@ -57,11 +61,12 @@ export default function AdminMenuPage() {
     setPrice("");
     setImage("");
     setCategory("");
-
+    setShowAddForm(false);
     fetchMenu();
   }
 
   async function deleteItem(id: string) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
     await fetch(`/api/menu/${id}`, {
       method: "DELETE",
     });
@@ -77,338 +82,372 @@ export default function AdminMenuPage() {
     fetchMenu();
   }
 
+  const categories = Array.from(new Set(menu.map(m => m.category)));
+
+  const filteredMenu = menu.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !categoryFilter || item.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const stats = {
+    total: menu.length,
+    available: menu.filter(m => m.isAvailable).length,
+    disabled: menu.filter(m => !m.isAvailable).length,
+    categories: categories.length,
+  };
+
   return (
-    <div
-      className="min-h-screen p-4 sm:p-6 lg:p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center gap-4 mb-4 sm:mb-6">
-          <div className="copper-line" />
-          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">Menu Management</h1>
+          <p className="text-gray-600 mt-1">Manage your menu items and categories</p>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
         >
-          MENU <span className="gradient-text">MANAGEMENT</span>
-        </h1>
-      </div>
-
-      {/* Add Form */}
-      <div className="brutal-card p-4 sm:p-6 lg:p-8 mb-8 sm:mb-12 border border-[#B87333]/20 shadow-2xl">
-        <h2
-          className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-3"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-            <Plus size={16} style={{ color: '#1A1110' }} />
-          </div>
-          ADD NEW ITEM
-        </h2>
-
-        <form onSubmit={handleAddItem} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div className="group">
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Item Name *
-              </label>
-              <input
-                placeholder="e.g., Espresso"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-              />
-            </div>
-
-            <div className="group">
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Category *
-              </label>
-              <input
-                placeholder="e.g., Coffee, Snacks"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-              />
-            </div>
-          </div>
-
-          <div className="group">
-            <label
-              className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]"
-              style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-            >
-              Description *
-            </label>
-            <input
-              placeholder="Brief description of the item"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-              className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div className="group">
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Price (₹) *
-              </label>
-              <input
-                placeholder="e.g., 150"
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-              />
-            </div>
-
-            <div className="group">
-              <label
-                className="block text-sm font-bold mb-3 uppercase tracking-wide transition-colors group-hover:text-[#CD7F32]"
-                style={{ color: '#B87333', fontFamily: 'var(--font-heading)' }}
-              >
-                Image URL *
-              </label>
-              <input
-                placeholder="https://example.com/image.jpg"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                required
-                className="w-full bg-[#1A1110] border-2 border-[#B87333]/30 rounded-xl px-4 sm:px-5 py-3 sm:py-4 text-[#F5F1E8] focus:outline-none focus:border-[#B87333] focus:shadow-lg focus:shadow-[#B87333]/20 transition-all duration-300 placeholder-[#8B6F47]"
-              />
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary w-full sm:w-auto transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
-            style={{
-              background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-              boxShadow: '0 4px 16px rgba(184, 115, 51, 0.4)',
-            }}
-          >
-            <Plus size={20} />
-            ADD ITEM TO MENU
-          </button>
-        </form>
+          <Plus size={18} />
+          Add Item
+        </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Coffee size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">TOTAL</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Items</p>
+              <p className="text-2xl font-bold text-black">{stats.total}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <Coffee size={20} className="text-white" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
-            {menu.length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Power size={20} className="text-[#5E7D4C]" />
-            <span className="section-label text-xs">AVAILABLE</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Available</p>
+              <p className="text-2xl font-bold text-green-600">{stats.available}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Power size={20} className="text-green-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
-            {menu.filter(m => m.isAvailable).length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <PowerOff size={20} className="text-red-500" />
-            <span className="section-label text-xs">DISABLED</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Disabled</p>
+              <p className="text-2xl font-bold text-red-600">{stats.disabled}</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-lg">
+              <PowerOff size={20} className="text-red-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#EF4444' }}>
-            {menu.filter(m => !m.isAvailable).length}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Coffee size={20} className="text-[#D4A574]" />
-            <span className="section-label text-xs">CATEGORIES</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Categories</p>
+              <p className="text-2xl font-bold text-black">{stats.categories}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <Filter size={20} className="text-gray-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
-            {new Set(menu.map(m => m.category)).size}
-          </p>
         </div>
       </div>
 
-      {/* Menu List */}
-      <div>
-        <h2
-          className="text-2xl sm:text-3xl mb-6 sm:mb-8 flex items-center gap-3"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            letterSpacing: '0.1em',
-          }}
-        >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#B87333] to-[#CD7F32] flex items-center justify-center">
-            <Coffee size={16} style={{ color: '#1A1110' }} />
-          </div>
-          CURRENT MENU ITEMS
-        </h2>
-
-        {loading && (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="section-label">Loading menu...</p>
-          </div>
-        )}
-
-        {!loading && menu.length === 0 && (
-          <div className="brutal-card p-8 sm:p-12 text-center border border-[#B87333]/20">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#B87333]/20 to-[#CD7F32]/20 flex items-center justify-center mx-auto mb-4">
-              <Coffee size={32} className="text-[#B87333]" />
-            </div>
-            <p className="text-base sm:text-xl" style={{ color: '#8B6F47' }}>No menu items yet. Add your first item above.</p>
-          </div>
-        )}
-
-        {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {menu.map((item) => (
-              <div
-                key={item._id}
-                className="group brutal-card p-3 sm:p-4 border border-[#B87333]/20 hover:border-[#B87333]/40 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-2xl"
-                style={{
-                  opacity: item.isAvailable ? 1 : 0.6,
-                  position: 'relative',
-                }}
-              >
-                {!item.isAvailable && (
-                  <div
-                    className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.4))',
-                      border: '2px solid rgba(220, 38, 38, 0.5)',
-                      color: '#FCA5A5',
-                    }}
-                  >
-                    Disabled
-                  </div>
-                )}
-
-                <div className="aspect-square overflow-hidden mb-3 rounded-lg group-hover:shadow-lg transition-all duration-300">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-
-                <div className="mb-1">
-                  <span
-                    className="text-xs uppercase tracking-widest px-2 py-1 rounded-full"
-                    style={{ 
-                      color: '#8B6F47', 
-                      fontFamily: 'var(--font-heading)',
-                      background: 'rgba(184, 115, 51, 0.1)',
-                      border: '1px solid rgba(184, 115, 51, 0.2)'
-                    }}
-                  >
-                    {item.category}
-                  </span>
-                </div>
-
-                <h3
-                  className="text-lg sm:text-xl mb-1 group-hover:text-[#CD7F32] transition-colors duration-300"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#F5F1E8',
-                  }}
-                >
-                  {item.name}
-                </h3>
-
-                <p className="text-xs sm:text-sm mb-3 line-clamp-2" style={{ color: '#8B6F47' }}>
-                  {item.description}
-                </p>
-
-                <div className="flex justify-between items-center mb-4">
-                  <span
-                    className="text-lg sm:text-xl gradient-text font-bold"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
-                    ₹{item.price}
-                  </span>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => toggleAvailability(item._id, item.isAvailable)}
-                    className="flex-1 btn btn-secondary transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg text-xs"
-                    style={{
-                      padding: '8px 12px',
-                      fontSize: '10px sm:12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    {item.isAvailable ? (
-                      <>
-                        <PowerOff size={14} />
-                        <span className="hidden sm:inline">DISABLE</span>
-                        <span className="sm:hidden">OFF</span>
-                      </>
-                    ) : (
-                      <>
-                        <Power size={14} />
-                        <span className="hidden sm:inline">ENABLE</span>
-                        <span className="sm:hidden">ON</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => deleteItem(item._id)}
-                    className="btn transition-all duration-300 hover:scale-105 active:scale-95 shadow-md hover:shadow-lg text-xs"
-                    style={{
-                      padding: '8px 12px',
-                      background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.2), rgba(185, 28, 28, 0.3))',
-                      border: '2px solid rgba(220, 38, 38, 0.4)',
-                      color: '#FCA5A5',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
+      {/* Add Form */}
+      {showAddForm && (
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-black mb-6">Add New Menu Item</h2>
+          <form onSubmit={handleAddItem} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Item Name *</label>
+                <input
+                  placeholder="e.g., Espresso"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Category *</label>
+                <input
+                  placeholder="e.g., Coffee, Snacks"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Description *</label>
+              <input
+                placeholder="Brief description of the item"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Price (₹) *</label>
+                <input
+                  placeholder="e.g., 150"
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Image URL *</label>
+                <input
+                  placeholder="https://example.com/image.jpg"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  required
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                />
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
+              >
+                Add Item
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddForm(false);
+                  setName("");
+                  setDescription("");
+                  setPrice("");
+                  setImage("");
+                  setCategory("");
+                }}
+                className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <input
+              type="text"
+              placeholder="Search menu items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            />
+          </div>
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Categories</option>
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
             ))}
+          </select>
+          <div className="flex gap-2 border border-gray-200 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-600'}`}
+            >
+              <Grid size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded ${viewMode === 'list' ? 'bg-black text-white' : 'text-gray-600'}`}
+            >
+              <List size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600">Loading menu...</p>
+          </div>
+        </div>
+      ) : filteredMenu.length === 0 ? (
+        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+          <Coffee size={64} className="mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600">No menu items found</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredMenu.map((item) => (
+            <MenuItemCard
+              key={item._id}
+              item={item}
+              onToggleAvailability={toggleAvailability}
+              onDelete={deleteItem}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Item</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Price</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredMenu.map((item) => (
+                <tr key={item._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ImageIcon size={20} className="text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-black">{item.name}</p>
+                        <p className="text-sm text-gray-500 line-clamp-1">{item.description}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">{item.category}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <p className="font-semibold text-black">₹{item.price}</p>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        item.isAvailable
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {item.isAvailable ? "Available" : "Disabled"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                        className={`p-2 rounded-lg transition-colors ${
+                          item.isAvailable
+                            ? "bg-red-100 text-red-600 hover:bg-red-200"
+                            : "bg-green-100 text-green-600 hover:bg-green-200"
+                        }`}
+                        title={item.isAvailable ? "Disable" : "Enable"}
+                      >
+                        {item.isAvailable ? <PowerOff size={16} /> : <Power size={16} />}
+                      </button>
+                      <button
+                        onClick={() => deleteItem(item._id)}
+                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MenuItemCard({
+  item,
+  onToggleAvailability,
+  onDelete,
+}: {
+  item: MenuItem;
+  onToggleAvailability: (id: string, current: boolean) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
+      item.isAvailable ? 'border-gray-200' : 'border-red-200 opacity-75'
+    }`}>
+      <div className="aspect-square bg-gray-100 overflow-hidden">
+        {item.image ? (
+          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <ImageIcon size={48} className="text-gray-400" />
           </div>
         )}
+        {!item.isAvailable && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
+            Disabled
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <div className="mb-2">
+          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.category}</span>
+        </div>
+        <h3 className="font-bold text-black mb-1">{item.name}</h3>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-lg font-bold text-black">₹{item.price}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onToggleAvailability(item._id, item.isAvailable)}
+            className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              item.isAvailable
+                ? "bg-red-100 text-red-700 hover:bg-red-200"
+                : "bg-green-100 text-green-700 hover:bg-green-200"
+            }`}
+          >
+            {item.isAvailable ? "Disable" : "Enable"}
+          </button>
+          <button
+            onClick={() => onDelete(item._id)}
+            className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

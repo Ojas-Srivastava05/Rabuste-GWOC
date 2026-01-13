@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User, Shield, Ban, CheckCircle, Mail, Calendar, Search, Loader2 } from "lucide-react";
+import { User, Shield, Ban, CheckCircle, Mail, Calendar, Search, Loader2, ArrowUpDown, MoreVertical } from "lucide-react";
 
 type UserType = {
   _id: string;
@@ -18,6 +18,8 @@ export default function AdminUsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState<"all" | "admin" | "user">("all");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "blocked">("all");
+  const [sortBy, setSortBy] = useState<'name' | 'email' | 'date'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const fetchUsers = async () => {
     try {
@@ -81,124 +83,131 @@ export default function AdminUsersPage() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
+  // Sort users
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    let comparison = 0;
+    if (sortBy === 'name') {
+      comparison = a.name.localeCompare(b.name);
+    } else if (sortBy === 'email') {
+      comparison = a.email.localeCompare(b.email);
+    } else if (sortBy === 'date') {
+      comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    }
+    return sortOrder === 'asc' ? comparison : -comparison;
+  });
+
+  const handleSort = (field: 'name' | 'email' | 'date') => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
+  };
+
   const stats = {
     total: users.length,
     admins: users.filter((u) => u.role === "admin").length,
-    users: users.filter((u) => u.role === "user").length,
+    regularUsers: users.filter((u) => u.role === "user").length,
     active: users.filter((u) => !u.isBlocked).length,
     blocked: users.filter((u) => u.isBlocked).length,
   };
 
   return (
-    <div
-      className="min-h-screen p-4 sm:p-6 lg:p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8 sm:mb-12">
-        <div className="flex items-center gap-4 mb-4 sm:mb-6">
-          <div className="copper-line" />
-          <span className="section-label text-sm sm:text-base">ADMIN PANEL</span>
-          <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">User Management</h1>
+          <p className="text-gray-600 mt-1">Manage users and their access</p>
         </div>
-        <h1
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 0.9,
-          }}
-        >
-          USER <span className="gradient-text">MANAGEMENT</span>
-        </h1>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 sm:gap-6 mb-8">
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <User size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">TOTAL</span>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Users</p>
+              <p className="text-2xl font-bold text-black">{stats.total}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <User size={20} className="text-white" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl gradient-text font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-            {stats.total}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Shield size={20} className="text-[#5E7D4C]" />
-            <span className="section-label text-xs">ADMINS</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Admins</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.admins}</p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-lg">
+              <Shield size={20} className="text-blue-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
-            {stats.admins}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <User size={20} className="text-[#B87333]" />
-            <span className="section-label text-xs">USERS</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Regular Users</p>
+              <p className="text-2xl font-bold text-black">{stats.regularUsers}</p>
+            </div>
+            <div className="p-3 bg-gray-100 rounded-lg">
+              <User size={20} className="text-gray-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl gradient-text font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
-            {stats.users}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <CheckCircle size={20} className="text-[#5E7D4C]" />
-            <span className="section-label text-xs">ACTIVE</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Active</p>
+              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <CheckCircle size={20} className="text-green-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
-            {stats.active}
-          </p>
         </div>
-
-        <div className="brutal-card p-4 sm:p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Ban size={20} className="text-red-500" />
-            <span className="section-label text-xs">BLOCKED</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Blocked</p>
+              <p className="text-2xl font-bold text-red-600">{stats.blocked}</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-lg">
+              <Ban size={20} className="text-red-600" />
+            </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#EF4444' }}>
-            {stats.blocked}
-          </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="brutal-card p-4 sm:p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: '#8B6F47' }} />
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg text-[#F5F1E8] focus:outline-none focus:border-[#B87333] placeholder-[#8B6F47]"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             />
           </div>
-
-          {/* Role Filter */}
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value as any)}
-            className="w-full px-4 py-3 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="all">All Roles</option>
             <option value="admin">Admins</option>
             <option value="user">Users</option>
           </select>
-
-          {/* Status Filter */}
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="w-full px-4 py-3 bg-[#1A1110] border-2 border-[#B87333]/30 rounded-lg text-[#F5F1E8] focus:outline-none focus:border-[#B87333]"
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -207,133 +216,152 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* Users List */}
-      {loading ? (
-        <div className="text-center py-12">
-          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4" style={{ color: '#B87333' }} />
-          <p className="section-label">Loading users...</p>
-        </div>
-      ) : filteredUsers.length === 0 ? (
-        <div className="brutal-card p-12 text-center">
-          <User size={64} className="text-[#B87333] mx-auto mb-6" />
-          <p className="text-xl" style={{ color: '#8B6F47' }}>
-            No users found
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {filteredUsers.map((user) => (
-            <div
-              key={user._id}
-              className="brutal-card p-6"
-              style={{
-                background: user.isBlocked
-                  ? 'linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(42, 24, 16, 0.8))'
-                  : user.role === 'admin'
-                  ? 'linear-gradient(135deg, rgba(94, 125, 76, 0.15), rgba(42, 24, 16, 0.8))'
-                  : 'linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(42, 24, 16, 0.8))',
-                border: user.isBlocked
-                  ? '2px solid rgba(220, 38, 38, 0.4)'
-                  : user.role === 'admin'
-                  ? '2px solid rgba(94, 125, 76, 0.4)'
-                  : '2px solid rgba(184, 115, 51, 0.4)',
-              }}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-xl sm:text-2xl font-bold" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)' }}>
-                      {user.name}
-                    </h3>
-                    {user.role === 'admin' && (
-                      <Shield size={18} className="text-[#5E7D4C]" />
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm mb-2" style={{ color: '#8B6F47' }}>
-                    <Mail size={14} />
-                    {user.email}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs" style={{ color: '#8B6F47' }}>
-                    <Calendar size={12} />
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-
-              {/* Badges */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span
-                  className="px-3 py-1 rounded-full text-xs font-bold uppercase"
-                  style={{
-                    background: user.role === 'admin' ? 'rgba(94, 125, 76, 0.3)' : 'rgba(184, 115, 51, 0.3)',
-                    color: user.role === 'admin' ? '#5E7D4C' : '#B87333',
-                    border: `1px solid ${user.role === 'admin' ? 'rgba(94, 125, 76, 0.5)' : 'rgba(184, 115, 51, 0.5)'}`,
-                    fontFamily: 'var(--font-heading)',
-                  }}
-                >
-                  {user.role}
-                </span>
-                {user.isBlocked ? (
-                  <span
-                    className="px-3 py-1 rounded-full text-xs font-bold uppercase"
-                    style={{
-                      background: 'rgba(220, 38, 38, 0.3)',
-                      color: '#FCA5A5',
-                      border: '1px solid rgba(220, 38, 38, 0.5)',
-                      fontFamily: 'var(--font-heading)',
-                    }}
+      {/* Users Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <button
+                    onClick={() => handleSort('name')}
+                    className="flex items-center gap-2 hover:text-black"
                   >
-                    BLOCKED
-                  </span>
-                ) : (
-                  <span
-                    className="px-3 py-1 rounded-full text-xs font-bold uppercase"
-                    style={{
-                      background: 'rgba(94, 125, 76, 0.3)',
-                      color: '#5E7D4C',
-                      border: '1px solid rgba(94, 125, 76, 0.5)',
-                      fontFamily: 'var(--font-heading)',
-                    }}
+                    User
+                    <ArrowUpDown size={14} />
+                  </button>
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <button
+                    onClick={() => handleSort('email')}
+                    className="flex items-center gap-2 hover:text-black"
                   >
-                    ACTIVE
-                  </span>
-                )}
-              </div>
-
-              {/* Actions */}
-              {user.role !== "admin" && (
-                <button
-                  onClick={() => toggleBlock(user._id, !user.isBlocked)}
-                  className="w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all hover:scale-105"
-                  style={{
-                    background: user.isBlocked
-                      ? 'linear-gradient(135deg, #5E7D4C, #4A6741)'
-                      : 'linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.4))',
-                    border: user.isBlocked
-                      ? '2px solid #5E7D4C'
-                      : '2px solid rgba(220, 38, 38, 0.5)',
-                    color: user.isBlocked ? '#FFFFFF' : '#FCA5A5',
-                    fontFamily: 'var(--font-heading)',
-                  }}
-                >
-                  {user.isBlocked ? (
-                    <>
-                      <CheckCircle size={16} className="inline mr-2" />
-                      UNBLOCK USER
-                    </>
-                  ) : (
-                    <>
-                      <Ban size={16} className="inline mr-2" />
-                      BLOCK USER
-                    </>
-                  )}
-                    </button>
-                  )}
-            </div>
-          ))}
+                    Email
+                    <ArrowUpDown size={14} />
+                  </button>
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  <button
+                    onClick={() => handleSort('date')}
+                    className="flex items-center gap-2 hover:text-black"
+                  >
+                    Joined
+                    <ArrowUpDown size={14} />
+                  </button>
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <Loader2 className="w-8 h-8 animate-spin mx-auto text-gray-400" />
+                  </td>
+                </tr>
+              ) : sortedUsers.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                    No users found
+                  </td>
+                </tr>
+              ) : (
+                sortedUsers.map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          user.role === 'admin' ? 'bg-blue-100' : 'bg-gray-100'
+                        }`}>
+                          {user.role === 'admin' ? (
+                            <Shield size={18} className="text-blue-600" />
+                          ) : (
+                            <User size={18} className="text-gray-600" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-black">{user.name}</p>
+                          {user.role === 'admin' && (
+                            <p className="text-xs text-blue-600">Administrator</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Mail size={14} className="text-gray-400" />
+                        <p className="text-sm text-gray-700">{user.email}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          user.role === 'admin'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} className="text-gray-400" />
+                        <p className="text-sm text-gray-700">
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          user.isBlocked
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {user.isBlocked ? 'Blocked' : 'Active'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {user.role !== "admin" && (
+                        <button
+                          onClick={() => toggleBlock(user._id, !user.isBlocked)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            user.isBlocked
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : 'bg-red-600 text-white hover:bg-red-700'
+                          }`}
+                        >
+                          {user.isBlocked ? (
+                            <>
+                              <CheckCircle size={14} className="inline mr-1" />
+                              Unblock
+                            </>
+                          ) : (
+                            <>
+                              <Ban size={14} className="inline mr-1" />
+                              Block
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
     </div>
   );
 }

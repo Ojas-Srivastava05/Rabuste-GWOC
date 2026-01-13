@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Edit2, Ticket, Calendar, Percent, Check, X } from "lucide-react";
+import { Plus, Trash2, Edit2, Ticket, Calendar, Percent, Check, X, Search } from "lucide-react";
 
 interface Coupon {
   _id: string;
@@ -21,6 +21,7 @@ export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     code: "",
     discountPercentage: 10,
@@ -144,154 +145,124 @@ export default function AdminCouponsPage() {
     setShowModal(false);
   };
 
+  const filteredCoupons = coupons.filter(coupon =>
+    coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    coupon.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const stats = {
+    total: coupons.length,
+    active: coupons.filter(c => c.isActive).length,
+    inactive: coupons.filter(c => !c.isActive).length,
+  };
+
   return (
-    <div
-      className="min-h-screen p-8"
-      style={{
-        background: 'linear-gradient(180deg, #1A1110 0%, #0A0A0A 100%)',
-        color: '#F5F1E8',
-      }}
-    >
+    <div className="space-y-6">
       {/* Header */}
-      <div className="mb-12">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-4 mb-6">
-              <div className="copper-line" />
-              <span className="section-label">ADMIN PANEL</span>
-              <div className="copper-line" style={{ transform: 'scaleX(-1)' }} />
-            </div>
-            <h1
-              className="text-5xl md:text-7xl"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                lineHeight: 0.9,
-              }}
-            >
-              COUPON <span className="gradient-text">MANAGEMENT</span>
-            </h1>
-          </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="btn btn-primary flex items-center gap-2"
-            style={{ alignSelf: 'flex-start' }}
-          >
-            <Plus size={20} />
-            CREATE COUPON
-          </button>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-black">Coupon Management</h1>
+          <p className="text-gray-600 mt-1">Create and manage discount coupons</p>
         </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
+        >
+          <Plus size={18} />
+          Create Coupon
+        </button>
       </div>
 
       {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl">
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <Ticket size={28} className="text-[#B87333]" />
-            <span className="section-label">TOTAL</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Total Coupons</p>
+              <p className="text-2xl font-bold text-black">{stats.total}</p>
+            </div>
+            <div className="p-3 bg-black rounded-lg">
+              <Ticket size={20} className="text-white" />
+            </div>
           </div>
-          <p
-            className="text-5xl gradient-text"
-            style={{ fontFamily: 'var(--font-heading)' }}
-          >
-            {coupons.length}
-          </p>
         </div>
-
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <Check size={28} className="text-[#5E7D4C]" />
-            <span className="section-label">ACTIVE</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Active</p>
+              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-lg">
+              <Check size={20} className="text-green-600" />
+            </div>
           </div>
-          <p
-            className="text-5xl"
-            style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}
-          >
-            {coupons.filter(c => c.isActive).length}
-          </p>
         </div>
-
-        <div className="brutal-card p-6">
-          <div className="flex items-center gap-4 mb-3">
-            <X size={28} className="text-[#ef4444]" />
-            <span className="section-label">INACTIVE</span>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600 mb-1">Inactive</p>
+              <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-lg">
+              <X size={20} className="text-red-600" />
+            </div>
           </div>
-          <p
-            className="text-5xl"
-            style={{ fontFamily: 'var(--font-heading)', color: '#ef4444' }}
-          >
-            {coupons.filter(c => !c.isActive).length}
-          </p>
         </div>
       </div>
 
-      {/* Coupons List - Card Grid */}
+      {/* Search */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search coupons..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+          />
+        </div>
+      </div>
+
+      {/* Coupons Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {coupons.map((coupon) => {
+        {filteredCoupons.map((coupon) => {
           const isExpired = new Date(coupon.validUntil) < new Date();
           const isLimitReached = coupon.usageLimit && coupon.usageCount >= coupon.usageLimit;
 
           return (
             <div
               key={coupon._id}
-              className="brutal-card p-6 flex flex-col"
-              style={{
-                background: coupon.isActive && !isExpired
-                  ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(42, 24, 16, 0.8))'
-                  : 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(42, 24, 16, 0.8))',
-                opacity: !coupon.isActive || isExpired ? 0.6 : 1,
-              }}
+              className={`bg-white rounded-lg border-2 p-6 ${
+                coupon.isActive && !isExpired
+                  ? 'border-gray-200'
+                  : 'border-red-200 opacity-75'
+              }`}
             >
-              {/* Header */}
-              <div className="mb-4">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h2
-                    className="text-xl sm:text-2xl font-bold flex-1"
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      color: '#F5F1E8',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {coupon.code}
-                  </h2>
-                  <div
-                    className="px-3 py-1 rounded-full uppercase tracking-widest text-xs font-bold whitespace-nowrap"
-                    style={{
-                      fontFamily: 'var(--font-heading)',
-                      background: coupon.isActive
-                        ? 'linear-gradient(135deg, #B87333, #CD7F32)'
-                        : 'rgba(139, 111, 71, 0.3)',
-                      color: coupon.isActive ? '#000000' : '#8B6F47',
-                      border: !coupon.isActive ? '2px solid #8B6F47' : 'none',
-                    }}
-                  >
-                    {coupon.isActive ? 'ACTIVE' : 'INACTIVE'}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h2 className="text-xl font-bold text-black">{coupon.code}</h2>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        coupon.isActive && !isExpired
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      {coupon.isActive && !isExpired ? 'Active' : 'Inactive'}
+                    </span>
                   </div>
-                </div>
-                
-                <div
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg mb-3"
-                  style={{
-                    background: coupon.isActive && !isExpired
-                      ? 'rgba(94, 125, 76, 0.3)'
-                      : 'rgba(139, 111, 71, 0.3)',
-                    border: `2px solid ${coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47'}`,
-                  }}
-                >
-                  <Percent size={16} style={{ color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47' }} />
-                  <span className="text-base font-bold" style={{ color: coupon.isActive && !isExpired ? '#5E7D4C' : '#8B6F47', fontFamily: 'var(--font-heading)' }}>
-                    {coupon.discountPercentage}% OFF
-                  </span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Percent size={16} className="text-gray-400" />
+                    <span className="text-lg font-bold text-black">{coupon.discountPercentage}% OFF</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="text-sm mb-4 line-clamp-2" style={{ color: '#D4A574' }}>
-                {coupon.description || "No description"}
-              </p>
+              <p className="text-sm text-gray-600 mb-4 line-clamp-2">{coupon.description || "No description"}</p>
 
-              {/* Details */}
-              <div className="space-y-2 mb-4 text-xs" style={{ color: '#8B6F47' }}>
+              <div className="space-y-2 mb-4 text-xs text-gray-500">
                 <div className="flex items-center gap-2">
                   <Calendar size={14} />
                   <span>Valid until: {new Date(coupon.validUntil).toLocaleDateString()}</span>
@@ -299,54 +270,37 @@ export default function AdminCouponsPage() {
                 {coupon.usageLimit && (
                   <div>
                     Used: {coupon.usageCount} / {coupon.usageLimit}
-                    {isLimitReached && <span style={{ color: '#ef4444' }}> (Full)</span>}
+                    {isLimitReached && <span className="text-red-600 ml-1">(Full)</span>}
                   </div>
                 )}
                 {coupon.minOrderAmount > 0 && (
                   <div>Min Order: ₹{coupon.minOrderAmount}</div>
                 )}
                 {isExpired && (
-                  <p className="text-red-400 font-semibold">
-                    ⚠️ Expired
-                  </p>
+                  <p className="text-red-600 font-semibold">⚠️ Expired</p>
                 )}
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2 mt-auto">
+              <div className="flex gap-2 pt-4 border-t border-gray-200">
                 <button
                   onClick={() => handleToggleActive(coupon)}
-                  className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all hover:scale-105"
-                  style={{
-                    background: coupon.isActive
-                      ? 'rgba(220, 38, 38, 0.2)'
-                      : 'rgba(94, 125, 76, 0.3)',
-                    border: `2px solid ${coupon.isActive ? 'rgba(220, 38, 38, 0.5)' : 'rgba(94, 125, 76, 0.5)'}`,
-                    color: coupon.isActive ? '#FCA5A5' : '#5E7D4C',
-                    fontFamily: 'var(--font-heading)',
-                  }}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    coupon.isActive
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200'
+                  }`}
                 >
-                  {coupon.isActive ? 'DEACTIVATE' : 'ACTIVATE'}
+                  {coupon.isActive ? 'Deactivate' : 'Activate'}
                 </button>
                 <button
                   onClick={() => handleEdit(coupon)}
-                  className="py-2 px-3 rounded-lg transition-all hover:scale-105"
-                  style={{
-                    background: 'rgba(184, 115, 51, 0.2)',
-                    border: '2px solid rgba(184, 115, 51, 0.4)',
-                    color: '#D4A574',
-                  }}
+                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
                   <Edit2 size={16} />
                 </button>
                 <button
                   onClick={() => handleDelete(coupon._id)}
-                  className="py-2 px-3 rounded-lg transition-all hover:scale-105"
-                  style={{
-                    background: 'rgba(220, 38, 38, 0.2)',
-                    border: '2px solid rgba(220, 38, 38, 0.5)',
-                    color: '#FCA5A5',
-                  }}
+                  className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -355,61 +309,45 @@ export default function AdminCouponsPage() {
           );
         })}
 
-        {coupons.length === 0 && (
-          <div className="brutal-card p-12 text-center">
-            <Ticket size={64} className="text-[#B87333] mx-auto mb-6" />
-            <p className="text-xl" style={{ color: '#8B6F47' }}>
-              No coupons yet. Create your first coupon to get started.
-            </p>
+        {filteredCoupons.length === 0 && (
+          <div className="col-span-full bg-white rounded-lg border border-gray-200 p-12 text-center">
+            <Ticket size={64} className="mx-auto mb-4 text-gray-400" />
+            <p className="text-gray-600">No coupons found</p>
           </div>
         )}
       </div>
 
       {/* Modal */}
       {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{
-            background: 'rgba(0, 0, 0, 0.9)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <div
-            className="brutal-card p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            style={{
-              background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-            }}
-          >
-            <h2
-              className="text-3xl mb-8"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                color: '#F5F1E8',
-                letterSpacing: '0.1em',
-              }}
-            >
-              {editingCoupon ? 'EDIT COUPON' : 'CREATE COUPON'}
-            </h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-black">
+                {editingCoupon ? 'Edit Coupon' : 'Create Coupon'}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                ×
+              </button>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  COUPON CODE *
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Coupon Code *</label>
                 <input
                   type="text"
                   required
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors uppercase"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black uppercase"
                   placeholder="SAVE20"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  DISCOUNT PERCENTAGE * (Menu Items Only)
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Discount Percentage *</label>
                 <input
                   type="number"
                   required
@@ -417,74 +355,69 @@ export default function AdminCouponsPage() {
                   max="100"
                   value={formData.discountPercentage}
                   onChange={(e) => setFormData({ ...formData, discountPercentage: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  DESCRIPTION
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   rows={3}
                   placeholder="Get 20% off on all menu items"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  VALID UNTIL *
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Valid Until *</label>
                 <input
                   type="date"
                   required
                   value={formData.validUntil}
                   onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  USAGE LIMIT (Leave empty for unlimited)
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Usage Limit (Leave empty for unlimited)</label>
                 <input
                   type="number"
                   min="1"
                   value={formData.usageLimit}
                   onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   placeholder="100"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-2" style={{ color: '#B87333' }}>
-                  MINIMUM ORDER AMOUNT (₹)
-                </label>
+                <label className="block text-sm font-semibold text-black mb-2">Minimum Order Amount (₹)</label>
                 <input
                   type="number"
                   min="0"
                   value={formData.minOrderAmount || 0}
                   onChange={(e) => setFormData({ ...formData, minOrderAmount: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 bg-black/40 border-2 border-[#B87333]/40 text-[#F5F1E8] focus:border-[#B87333] transition-colors"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                   placeholder="0"
                 />
               </div>
 
-              <div className="flex gap-4">
-                <button type="submit" className="btn btn-primary flex-1">
-                  {editingCoupon ? 'UPDATE COUPON' : 'CREATE COUPON'}
+              <div className="flex gap-4 pt-4">
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-900 transition-all"
+                >
+                  {editingCoupon ? 'Update Coupon' : 'Create Coupon'}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="btn btn-secondary"
+                  className="px-6 py-2 bg-gray-200 text-black rounded-lg hover:bg-gray-300 transition-all"
                 >
-                  CANCEL
+                  Cancel
                 </button>
               </div>
             </form>
