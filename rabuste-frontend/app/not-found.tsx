@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 export default function NotFound() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [sparklePositions, setSparklePositions] = useState<Array<{ left: number; top: number }>>([]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -16,6 +17,16 @@ export default function NotFound() {
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  // Generate sparkle positions only on client side to avoid hydration mismatch
+  useEffect(() => {
+    setSparklePositions(
+      Array.from({ length: 20 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+      }))
+    );
   }, []);
 
   return (
@@ -84,13 +95,13 @@ export default function NotFound() {
       ))}
 
       {/* Sparkle Effects */}
-      {[...Array(20)].map((_, i) => (
+      {sparklePositions.map((pos, i) => (
         <motion.div
           key={`sparkle-${i}`}
           className="absolute"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${pos.left}%`,
+            top: `${pos.top}%`,
           }}
           animate={{
             scale: [0, 1, 0],
