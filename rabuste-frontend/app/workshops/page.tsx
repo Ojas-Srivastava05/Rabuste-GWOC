@@ -38,14 +38,19 @@ type Workshop = {
 };
 
 export default function WorkshopsPage() {
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
+  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
-  const [registrationForm, setRegistrationForm] = useState({ name: "", email: "" });
+  const [registrationForm, setRegistrationForm] = useState({
+    name: "",
+    email: "",
+  });
   const [registrationMessage, setRegistrationMessage] = useState<string>("");
   const [showSuccessPopup, setShowSuccessPopup] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -91,66 +96,82 @@ export default function WorkshopsPage() {
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     };
   }, [isModalOpen]);
 
   const handleAddToCalendar = (workshop: Workshop) => {
     // Format date and time for Google Calendar
     const workshopDate = new Date(workshop.date);
-    const [hours, minutes] = workshop.time.split(':').map(num => parseInt(num));
-    
+    const [hours, minutes] = workshop.time
+      .split(":")
+      .map((num) => parseInt(num));
+
     // Set start time
     const startTime = new Date(workshopDate);
     startTime.setHours(hours, minutes, 0);
-    
+
     // Set end time (assuming 2 hour duration)
     const endTime = new Date(startTime);
     endTime.setHours(startTime.getHours() + 2);
-    
+
     // Format dates for Google Calendar (YYYYMMDDTHHmmss)
     const formatGoogleDate = (date: Date) => {
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hour = String(date.getHours()).padStart(2, '0');
-      const minute = String(date.getMinutes()).padStart(2, '0');
-      const second = String(date.getSeconds()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hour = String(date.getHours()).padStart(2, "0");
+      const minute = String(date.getMinutes()).padStart(2, "0");
+      const second = String(date.getSeconds()).padStart(2, "0");
       return `${year}${month}${day}T${hour}${minute}${second}`;
     };
-    
+
     const startDateFormatted = formatGoogleDate(startTime);
     const endDateFormatted = formatGoogleDate(endTime);
-    
+
     // Build Google Calendar URL
-    const googleCalendarUrl = new URL('https://calendar.google.com/calendar/render');
-    googleCalendarUrl.searchParams.append('action', 'TEMPLATE');
-    googleCalendarUrl.searchParams.append('text', workshop.title);
-    googleCalendarUrl.searchParams.append('dates', `${startDateFormatted}/${endDateFormatted}`);
-    googleCalendarUrl.searchParams.append('details', `${workshop.description}\n\nInstructor: ${workshop.instructor}`);
-    googleCalendarUrl.searchParams.append('location', workshop.location);
-    
-    
-    window.open(googleCalendarUrl.toString(), '_blank');
+    const googleCalendarUrl = new URL(
+      "https://calendar.google.com/calendar/render"
+    );
+    googleCalendarUrl.searchParams.append("action", "TEMPLATE");
+    googleCalendarUrl.searchParams.append("text", workshop.title);
+    googleCalendarUrl.searchParams.append(
+      "dates",
+      `${startDateFormatted}/${endDateFormatted}`
+    );
+    googleCalendarUrl.searchParams.append(
+      "details",
+      `${workshop.description}\n\nInstructor: ${workshop.instructor}`
+    );
+    googleCalendarUrl.searchParams.append("location", workshop.location);
+
+    window.open(googleCalendarUrl.toString(), "_blank");
   };
 
   const handleRegister = async () => {
-    if (!selectedWorkshop || !registrationForm.name || !registrationForm.email) {
+    if (
+      !selectedWorkshop ||
+      !registrationForm.name ||
+      !registrationForm.email
+    ) {
       setRegistrationMessage("Please fill in all fields");
       return;
     }
 
     try {
-      const res = await fetch(`/api/workshops/${selectedWorkshop._id}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(registrationForm),
-      });
+      const res = await fetch(
+        `/api/workshops/${selectedWorkshop._id}/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(registrationForm),
+        }
+      );
 
       const data = await res.json();
 
@@ -180,7 +201,9 @@ export default function WorkshopsPage() {
       });
 
       setWorkshops(processed);
-      const updatedWorkshop = processed.find((w: Workshop) => w._id === selectedWorkshop._id);
+      const updatedWorkshop = processed.find(
+        (w: Workshop) => w._id === selectedWorkshop._id
+      );
       if (updatedWorkshop) setSelectedWorkshop(updatedWorkshop);
 
       // Auto-close success popup after 5 seconds
@@ -195,14 +218,19 @@ export default function WorkshopsPage() {
   };
 
   const isWorkshopFull = (workshop: Workshop) => {
-    return workshop.capacity > 0 && workshop.registrations?.length >= workshop.capacity;
+    return (
+      workshop.capacity > 0 &&
+      workshop.registrations?.length >= workshop.capacity
+    );
   };
 
   // Filter workshops
   const filteredWorkshops = workshops.filter((workshop) => {
-    const matchesSearch = workshop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      workshop.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       workshop.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || workshop.category === categoryFilter;
+    const matchesCategory =
+      categoryFilter === "all" || workshop.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
 
@@ -226,17 +254,17 @@ export default function WorkshopsPage() {
     const startDayOfWeek = firstDay.getDay();
 
     const days: (number | null)[] = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
       days.push(null);
     }
-    
+
     // Add all days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       days.push(i);
     }
-    
+
     return days;
   };
 
@@ -260,16 +288,24 @@ export default function WorkshopsPage() {
   };
 
   const handleDateClick = (day: number) => {
-    const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const newDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
     setSelectedDate(newDate);
   };
 
   const goToPreviousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+    );
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+    setCurrentMonth(
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+    );
   };
 
   const days = getDaysInMonth(currentMonth);
@@ -279,8 +315,16 @@ export default function WorkshopsPage() {
     <>
       <Navbar />
       <DynamicBackground />
-      
-      <div className="min-h-screen" style={{ paddingTop: '140px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+
+      <div
+        className="min-h-screen"
+        style={{
+          paddingTop: "140px",
+          paddingBottom: "80px",
+          background:
+            "linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)",
+        }}
+      >
         <div className="container px-6 max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -290,22 +334,25 @@ export default function WorkshopsPage() {
               className="inline-flex items-center gap-4 mb-6"
             >
               <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
-              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+              <span
+                className="text-xs uppercase tracking-[0.3em]"
+                style={{ color: "#B87333", fontFamily: "var(--font-body)" }}
+              >
                 LEARN & CREATE
               </span>
               <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
             </motion.div>
-            
+
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-7xl lg:text-8xl mb-4"
               style={{
-                fontFamily: 'var(--font-heading)',
+                fontFamily: "var(--font-heading)",
                 lineHeight: 0.9,
-                color: '#FFFEF9',
-                letterSpacing: '0.05em',
+                color: "#FFFEF9",
+                letterSpacing: "0.05em",
               }}
             >
               WORKSHOPS
@@ -315,7 +362,7 @@ export default function WorkshopsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-lg md:text-xl"
-              style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}
+              style={{ color: "#B87333", fontFamily: "var(--font-body)" }}
             >
               Discover hands-on experiences in coffee and art
             </motion.p>
@@ -328,28 +375,51 @@ export default function WorkshopsPage() {
             transition={{ delay: 0.3 }}
             className="mb-8 p-6 rounded-xl"
             style={{
-              background: 'rgba(61, 43, 31, 0.4)',
-              border: '2px solid rgba(184, 115, 51, 0.3)',
+              background: "rgba(61, 43, 31, 0.4)",
+              border: "2px solid rgba(184, 115, 51, 0.3)",
             }}
           >
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
               {/* View Toggle */}
-              <div className="flex gap-2 p-1 rounded-lg" style={{ background: 'rgba(26, 17, 16, 0.6)' }}>
+              <div
+                className="flex gap-2 p-1 rounded-lg"
+                style={{ background: "rgba(26, 17, 16, 0.6)" }}
+              >
+                <button
+                  onClick={() => setViewMode("list")}
+                  className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
+                  style={{
+                    background:
+                      viewMode === "list"
+                        ? "linear-gradient(135deg, #B87333, #CD7F32)"
+                        : "transparent",
+                    color: viewMode === "list" ? "#000" : "#B87333",
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "0.85rem",
+                    letterSpacing: "0.1em",
+                  }}
+                >
+                  <List size={18} />
+                  LIST VIEW
+                </button>
                 <button
                   onClick={() => setViewMode("calendar")}
                   className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
                   style={{
-                    background: viewMode === "calendar" ? 'linear-gradient(135deg, #B87333, #CD7F32)' : 'transparent',
-                    color: viewMode === "calendar" ? '#000' : '#B87333',
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.1em',
+                    background:
+                      viewMode === "calendar"
+                        ? "linear-gradient(135deg, #B87333, #CD7F32)"
+                        : "transparent",
+                    color: viewMode === "calendar" ? "#000" : "#B87333",
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "0.85rem",
+                    letterSpacing: "0.1em",
                   }}
                 >
                   <CalendarCheck size={18} />
                   CALENDAR VIEW
                 </button>
-                <button
+                {/* <button
                   onClick={() => setViewMode("list")}
                   className="px-6 py-3 rounded-lg flex items-center gap-2 transition-all"
                   style={{
@@ -362,13 +432,17 @@ export default function WorkshopsPage() {
                 >
                   <List size={18} />
                   LIST VIEW
-                </button>
+                </button> */}
               </div>
 
               {/* Search & Filters */}
               <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <div className="relative flex-1 md:min-w-[300px]">
-                  <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2" style={{ color: '#B87333' }} />
+                  <Search
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2"
+                    style={{ color: "#B87333" }}
+                  />
                   <input
                     type="text"
                     placeholder="Search events, cities..."
@@ -376,27 +450,34 @@ export default function WorkshopsPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 rounded-lg outline-none transition-all"
                     style={{
-                      background: 'rgba(26, 17, 16, 0.8)',
-                      border: '2px solid rgba(184, 115, 51, 0.3)',
-                      color: '#F5F1E8',
+                      background: "rgba(26, 17, 16, 0.8)",
+                      border: "2px solid rgba(184, 115, 51, 0.3)",
+                      color: "#F5F1E8",
                     }}
                   />
                 </div>
-                
+
                 <div className="flex gap-2">
-                  <button className="p-3 rounded-lg transition-all hover:scale-105" style={{ background: 'rgba(26, 17, 16, 0.8)', border: '2px solid rgba(184, 115, 51, 0.3)', color: '#B87333' }}>
+                  <button
+                    className="p-3 rounded-lg transition-all hover:scale-105"
+                    style={{
+                      background: "rgba(26, 17, 16, 0.8)",
+                      border: "2px solid rgba(184, 115, 51, 0.3)",
+                      color: "#B87333",
+                    }}
+                  >
                     <Filter size={18} />
                   </button>
-                  
+
                   <select
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
                     className="px-4 py-3 rounded-lg outline-none cursor-pointer"
                     style={{
-                      background: 'rgba(26, 17, 16, 0.8)',
-                      border: '2px solid rgba(184, 115, 51, 0.3)',
-                      color: '#F5F1E8',
-                      fontFamily: 'var(--font-body)',
+                      background: "rgba(26, 17, 16, 0.8)",
+                      border: "2px solid rgba(184, 115, 51, 0.3)",
+                      color: "#F5F1E8",
+                      fontFamily: "var(--font-body)",
                     }}
                   >
                     <option value="all">All Categories</option>
@@ -418,18 +499,28 @@ export default function WorkshopsPage() {
                 transition={{ delay: 0.4 }}
                 className="p-4 sm:p-6 rounded-xl lg:sticky lg:top-32"
                 style={{
-                  background: 'rgba(61, 43, 31, 0.6)',
-                  border: '2px solid rgba(184, 115, 51, 0.4)',
-                  overflow: 'hidden',
-                  width: '100%',
-                  boxSizing: 'border-box',
+                  background: "rgba(61, 43, 31, 0.6)",
+                  border: "2px solid rgba(184, 115, 51, 0.4)",
+                  overflow: "hidden",
+                  width: "100%",
+                  boxSizing: "border-box",
                   ...(isDesktop
-                    ? { height: 'fit-content', maxHeight: 'calc(100vh - 180px)' }
-                    : { height: 'auto', maxHeight: 'none' }),
+                    ? {
+                        height: "fit-content",
+                        maxHeight: "calc(100vh - 180px)",
+                      }
+                    : { height: "auto", maxHeight: "none" }),
                 }}
               >
                 <div className="mb-4">
-                  <h3 className="text-base mb-2" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.1em' }}>
+                  <h3
+                    className="text-base mb-2"
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      color: "#D4A574",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
                     SELECT DATE
                   </h3>
                   <div className="h-px bg-gradient-to-r from-[#B87333] to-transparent" />
@@ -440,19 +531,31 @@ export default function WorkshopsPage() {
                   <button
                     onClick={goToPreviousMonth}
                     className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
-                    style={{ color: '#B87333' }}
+                    style={{ color: "#B87333" }}
                   >
                     <ChevronLeft size={18} />
                   </button>
-                  
-                  <h4 className="text-sm md:text-base" style={{ fontFamily: 'var(--font-heading)', color: '#FFFEF9', letterSpacing: '0.1em' }}>
-                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
+
+                  <h4
+                    className="text-sm md:text-base"
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      color: "#FFFEF9",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
+                    {currentMonth
+                      .toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                      .toUpperCase()}
                   </h4>
-                  
+
                   <button
                     onClick={goToNextMonth}
                     className="p-2 hover:bg-[#B87333]/20 rounded-lg transition-all"
-                    style={{ color: '#B87333' }}
+                    style={{ color: "#B87333" }}
                   >
                     <ChevronRight size={18} />
                   </button>
@@ -464,7 +567,11 @@ export default function WorkshopsPage() {
                     <div
                       key={day}
                       className="text-center text-[10px] py-1"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                        letterSpacing: "0.05em",
+                      }}
                     >
                       {day.slice(0, 1)}
                     </div>
@@ -480,7 +587,8 @@ export default function WorkshopsPage() {
 
                     const hasWorkshop = hasWorkshopOnDate(day);
                     const isSelected = isSelectedDate(day);
-                    const isToday = day === new Date().getDate() && 
+                    const isToday =
+                      day === new Date().getDate() &&
                       currentMonth.getMonth() === new Date().getMonth() &&
                       currentMonth.getFullYear() === new Date().getFullYear();
 
@@ -492,51 +600,63 @@ export default function WorkshopsPage() {
                         onClick={() => handleDateClick(day)}
                         className="aspect-square flex items-center justify-center rounded-md relative transition-all text-sm"
                         style={{
-                          background: isSelected 
-                            ? 'linear-gradient(135deg, #B87333, #CD7F32)'
-                            : hasWorkshop 
-                            ? 'rgba(184, 115, 51, 0.2)' 
-                            : 'transparent',
-                          border: isSelected 
-                            ? '2px solid #D4A574'
+                          background: isSelected
+                            ? "linear-gradient(135deg, #B87333, #CD7F32)"
+                            : hasWorkshop
+                            ? "rgba(184, 115, 51, 0.2)"
+                            : "transparent",
+                          border: isSelected
+                            ? "2px solid #D4A574"
                             : isToday
-                            ? '2px solid rgba(184, 115, 51, 0.6)'
-                            : '1px solid rgba(184, 115, 51, 0.1)',
-                          color: isSelected ? '#000' : '#F5F1E8',
-                          fontFamily: 'var(--font-heading)',
-                          cursor: 'pointer',
-                          fontSize: '0.875rem',
+                            ? "2px solid rgba(184, 115, 51, 0.6)"
+                            : "1px solid rgba(184, 115, 51, 0.1)",
+                          color: isSelected ? "#000" : "#F5F1E8",
+                          fontFamily: "var(--font-heading)",
+                          cursor: "pointer",
+                          fontSize: "0.875rem",
                         }}
                       >
                         {day}
                         {hasWorkshop && !isSelected && (
-                          <div 
+                          <div
                             className="absolute bottom-0.5 w-1 h-1 rounded-full"
-                            style={{ background: '#B87333' }}
+                            style={{ background: "#B87333" }}
                           />
                         )}
                       </motion.button>
                     );
                   })}
                 </div>
-                
+
                 {/* Legend */}
                 <div className="mt-4 pt-3 border-t border-[#B87333]/20">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: 'rgba(184, 115, 51, 0.2)' }} />
-                      <span 
-                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis" 
-                        style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                      <div
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{ background: "rgba(184, 115, 51, 0.2)" }}
+                      />
+                      <span
+                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis"
+                        style={{
+                          color: "#8B6F47",
+                          fontFamily: "var(--font-body)",
+                        }}
                       >
                         Has workshops
                       </span>
                     </div>
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ border: '2px solid rgba(184, 115, 51, 0.6)' }} />
-                      <span 
-                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis" 
-                        style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
+                      <div
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        style={{ border: "2px solid rgba(184, 115, 51, 0.6)" }}
+                      />
+                      <span
+                        className="text-[9px] sm:text-[10px] whitespace-nowrap overflow-hidden text-ellipsis"
+                        style={{
+                          color: "#8B6F47",
+                          fontFamily: "var(--font-body)",
+                        }}
                       >
                         Today
                       </span>
@@ -552,32 +672,65 @@ export default function WorkshopsPage() {
                 transition={{ delay: 0.5 }}
                 className="lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto lg:pr-2"
                 style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: '#B87333 transparent',
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#B87333 transparent",
                 }}
               >
-                <div className="mb-6 sticky top-0 z-10 pb-4" style={{ background: 'linear-gradient(180deg, #1A1110 90%, transparent)' }}>
-                  <h3 className="text-xl md:text-2xl" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574', letterSpacing: '0.1em' }}>
-                    {selectedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                <div
+                  className="mb-6 sticky top-0 z-10 pb-4"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #1A1110 90%, transparent)",
+                  }}
+                >
+                  <h3
+                    className="text-xl md:text-2xl"
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      color: "#D4A574",
+                      letterSpacing: "0.1em",
+                    }}
+                  >
+                    {selectedDate
+                      .toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                      .toUpperCase()}
                   </h3>
-                  <p className="text-sm mt-1" style={{ color: '#8B6F47' }}>
-                    {workshopsOnSelectedDate.length} {workshopsOnSelectedDate.length === 1 ? 'workshop' : 'workshops'} scheduled
+                  <p className="text-sm mt-1" style={{ color: "#8B6F47" }}>
+                    {workshopsOnSelectedDate.length}{" "}
+                    {workshopsOnSelectedDate.length === 1
+                      ? "workshop"
+                      : "workshops"}{" "}
+                    scheduled
                   </p>
                 </div>
 
                 {workshopsOnSelectedDate.length === 0 ? (
-                  <div 
+                  <div
                     className="p-12 rounded-xl text-center"
                     style={{
-                      background: 'rgba(61, 43, 31, 0.4)',
-                      border: '2px dashed rgba(184, 115, 51, 0.3)',
+                      background: "rgba(61, 43, 31, 0.4)",
+                      border: "2px dashed rgba(184, 115, 51, 0.3)",
                     }}
                   >
-                    <Calendar size={48} className="mx-auto mb-4" style={{ color: '#8B6F47' }} />
-                    <p className="text-lg mb-2" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                    <Calendar
+                      size={48}
+                      className="mx-auto mb-4"
+                      style={{ color: "#8B6F47" }}
+                    />
+                    <p
+                      className="text-lg mb-2"
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                      }}
+                    >
                       No workshops scheduled
                     </p>
-                    <p className="text-sm" style={{ color: '#8B6F47' }}>
+                    <p className="text-sm" style={{ color: "#8B6F47" }}>
                       Select another date to view available workshops
                     </p>
                   </div>
@@ -602,49 +755,66 @@ export default function WorkshopsPage() {
                             }
                           }}
                           style={{
-                            background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
-                            border: '2px solid rgba(184, 115, 51, 0.5)',
+                            background:
+                              "linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))",
+                            border: "2px solid rgba(184, 115, 51, 0.5)",
                             opacity: isPast ? 0.6 : 1,
                           }}
                         >
                           {/* Category Badge */}
                           <div className="flex items-center gap-2 mb-3">
-                            <div 
+                            <div
                               className="px-3 py-1.5 rounded-full flex items-center gap-2"
-                              style={{ background: 'rgba(184, 115, 51, 0.3)' }}
+                              style={{ background: "rgba(184, 115, 51, 0.3)" }}
                             >
-                              {workshop.category === "coffee" ? <Coffee size={14} /> : <Palette size={14} />}
-                              <span className="text-xs uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+                              {workshop.category === "coffee" ? (
+                                <Coffee size={14} />
+                              ) : (
+                                <Palette size={14} />
+                              )}
+                              <span
+                                className="text-xs uppercase tracking-wider"
+                                style={{
+                                  color: "#D4A574",
+                                  fontFamily: "var(--font-heading)",
+                                }}
+                              >
                                 {workshop.category}
                               </span>
                             </div>
                             {isFull && (
-                              <div 
+                              <div
                                 className="px-3 py-1.5 rounded-full"
-                                style={{ background: 'rgba(255, 107, 107, 0.2)', color: '#ff6b6b' }}
+                                style={{
+                                  background: "rgba(255, 107, 107, 0.2)",
+                                  color: "#ff6b6b",
+                                }}
                               >
-                                <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'var(--font-heading)' }}>
+                                <span
+                                  className="text-xs uppercase tracking-wider"
+                                  style={{ fontFamily: "var(--font-heading)" }}
+                                >
                                   FULL
                                 </span>
                               </div>
                             )}
                           </div>
 
-                          <h4 
+                          <h4
                             className="text-xl md:text-2xl mb-2"
                             style={{
-                              fontFamily: 'var(--font-heading)',
-                              color: '#FFFEF9',
+                              fontFamily: "var(--font-heading)",
+                              color: "#FFFEF9",
                               lineHeight: 1.1,
-                              letterSpacing: '0.05em',
+                              letterSpacing: "0.05em",
                             }}
                           >
                             {workshop.title}
                           </h4>
 
-                          <p 
+                          <p
                             className="mb-4 text-sm leading-relaxed line-clamp-2"
-                            style={{ color: 'rgba(255, 254, 249, 0.7)' }}
+                            style={{ color: "rgba(255, 254, 249, 0.7)" }}
                           >
                             {workshop.description}
                           </p>
@@ -653,44 +823,97 @@ export default function WorkshopsPage() {
                           <div className="grid grid-cols-2 gap-3 mb-4">
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <Calendar size={14} style={{ color: '#B87333' }} />
-                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Date</span>
+                                <Calendar
+                                  size={14}
+                                  style={{ color: "#B87333" }}
+                                />
+                                <span
+                                  className="text-xs uppercase"
+                                  style={{ color: "#8B6F47" }}
+                                >
+                                  Date
+                                </span>
                               </div>
-                              <p className="text-sm" style={{ color: '#FFFEF9' }}>
-                                {new Date(workshop.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              <p
+                                className="text-sm"
+                                style={{ color: "#FFFEF9" }}
+                              >
+                                {new Date(workshop.date).toLocaleDateString(
+                                  "en-US",
+                                  { month: "short", day: "numeric" }
+                                )}
                               </p>
                             </div>
 
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <Clock size={14} style={{ color: '#B87333' }} />
-                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Time</span>
+                                <Clock size={14} style={{ color: "#B87333" }} />
+                                <span
+                                  className="text-xs uppercase"
+                                  style={{ color: "#8B6F47" }}
+                                >
+                                  Time
+                                </span>
                               </div>
-                              <p className="text-sm" style={{ color: '#FFFEF9' }}>{workshop.time}</p>
+                              <p
+                                className="text-sm"
+                                style={{ color: "#FFFEF9" }}
+                              >
+                                {workshop.time}
+                              </p>
                             </div>
 
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <MapPin size={14} style={{ color: '#B87333' }} />
-                                <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Location</span>
+                                <MapPin
+                                  size={14}
+                                  style={{ color: "#B87333" }}
+                                />
+                                <span
+                                  className="text-xs uppercase"
+                                  style={{ color: "#8B6F47" }}
+                                >
+                                  Location
+                                </span>
                               </div>
-                              <p className="text-sm" style={{ color: '#FFFEF9' }}>{workshop.location}</p>
+                              <p
+                                className="text-sm"
+                                style={{ color: "#FFFEF9" }}
+                              >
+                                {workshop.location}
+                              </p>
                             </div>
 
                             {workshop.price && (
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-xs uppercase" style={{ color: '#8B6F47' }}>Price</span>
+                                  <span
+                                    className="text-xs uppercase"
+                                    style={{ color: "#8B6F47" }}
+                                  >
+                                    Price
+                                  </span>
                                 </div>
-                                <p className="text-sm font-bold" style={{ color: '#D4A574' }}>₹{workshop.price}</p>
+                                <p
+                                  className="text-sm font-bold"
+                                  style={{ color: "#D4A574" }}
+                                >
+                                  ₹{workshop.price}
+                                </p>
                               </div>
                             )}
                           </div>
 
                           <div className="flex items-center gap-2 mb-6">
-                            <User size={14} style={{ color: '#B87333' }} />
-                            <span className="text-sm" style={{ color: '#FFFEF9' }}>
-                              <span style={{ color: '#8B6F47' }}>Instructor:</span> {workshop.instructor}
+                            <User size={14} style={{ color: "#B87333" }} />
+                            <span
+                              className="text-sm"
+                              style={{ color: "#FFFEF9" }}
+                            >
+                              <span style={{ color: "#8B6F47" }}>
+                                Instructor:
+                              </span>{" "}
+                              {workshop.instructor}
                             </span>
                           </div>
 
@@ -700,33 +923,39 @@ export default function WorkshopsPage() {
                               onClick={() => handleAddToCalendar(workshop)}
                               className="flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                               style={{
-                                background: 'rgba(26, 17, 16, 0.8)',
-                                border: '2px solid rgba(184, 115, 51, 0.4)',
-                                color: '#B87333',
-                                fontFamily: 'var(--font-heading)',
-                                fontSize: '0.75rem',
-                                letterSpacing: '0.1em',
+                                background: "rgba(26, 17, 16, 0.8)",
+                                border: "2px solid rgba(184, 115, 51, 0.4)",
+                                color: "#B87333",
+                                fontFamily: "var(--font-heading)",
+                                fontSize: "0.75rem",
+                                letterSpacing: "0.1em",
                               }}
                             >
                               <CalendarCheck size={18} />
                               ADD TO CALENDAR
                             </button>
-                            
+
                             {!isPast && (
                               <button
                                 disabled={isFull}
                                 className="flex-1 py-3 rounded-lg flex items-center justify-center gap-2 transition-all hover:scale-105"
                                 style={{
-                                  background: isFull ? 'rgba(139, 111, 71, 0.3)' : 'linear-gradient(135deg, #B87333, #CD7F32)',
-                                  border: `2px solid ${isFull ? 'rgba(139, 111, 71, 0.5)' : 'rgba(184, 115, 51, 0.6)'}`,
-                                  color: isFull ? '#8B6F47' : '#000',
-                                  fontFamily: 'var(--font-heading)',
-                                  fontSize: '0.75rem',
-                                  letterSpacing: '0.1em',
-                                  cursor: isFull ? 'not-allowed' : 'pointer',
+                                  background: isFull
+                                    ? "rgba(139, 111, 71, 0.3)"
+                                    : "linear-gradient(135deg, #B87333, #CD7F32)",
+                                  border: `2px solid ${
+                                    isFull
+                                      ? "rgba(139, 111, 71, 0.5)"
+                                      : "rgba(184, 115, 51, 0.6)"
+                                  }`,
+                                  color: isFull ? "#8B6F47" : "#000",
+                                  fontFamily: "var(--font-heading)",
+                                  fontSize: "0.75rem",
+                                  letterSpacing: "0.1em",
+                                  cursor: isFull ? "not-allowed" : "pointer",
                                 }}
                               >
-                                {isFull ? 'FULLY BOOKED' : 'BOOK NOW'}
+                                {isFull ? "FULLY BOOKED" : "BOOK NOW"}
                                 {!isFull && <ArrowRight size={18} />}
                               </button>
                             )}
@@ -768,8 +997,9 @@ export default function WorkshopsPage() {
                       }
                     }}
                     style={{
-                      background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))',
-                      border: '2px solid rgba(184, 115, 51, 0.5)',
+                      background:
+                        "linear-gradient(135deg, rgba(61, 43, 31, 0.8), rgba(26, 17, 16, 0.8))",
+                      border: "2px solid rgba(184, 115, 51, 0.5)",
                       opacity: isPast ? 0.6 : 1,
                     }}
                   >
@@ -777,93 +1007,119 @@ export default function WorkshopsPage() {
                     <div className="relative h-48 overflow-hidden">
                       <img
                         src={
-                          workshop.category === 'coffee'
-                            ? 'https://images.pexels.com/photos/3889742/pexels-photo-3889742.jpeg'
-                            : 'https://images.pexels.com/photos/1445457/pexels-photo-1445457.jpeg'
+                          workshop.category === "coffee"
+                            ? "https://images.pexels.com/photos/3889742/pexels-photo-3889742.jpeg"
+                            : "https://images.pexels.com/photos/1445457/pexels-photo-1445457.jpeg"
                         }
                         alt={workshop.title}
                         className="w-full h-full object-cover"
-                        style={{ filter: isPast ? 'grayscale(80%)' : 'none' }}
+                        style={{ filter: isPast ? "grayscale(80%)" : "none" }}
                       />
-                      <div 
+                      <div
                         className="absolute inset-0"
                         style={{
-                          background: 'linear-gradient(180deg, transparent 0%, rgba(26, 17, 16, 0.8) 100%)',
+                          background:
+                            "linear-gradient(180deg, transparent 0%, rgba(26, 17, 16, 0.8) 100%)",
                         }}
                       />
-                      
+
                       {/* Badge */}
-                      <div 
+                      <div
                         className="absolute top-4 left-4 px-3 py-1 rounded-full flex items-center gap-2"
-                        style={{ background: 'rgba(184, 115, 51, 0.9)' }}
+                        style={{ background: "rgba(184, 115, 51, 0.9)" }}
                       >
-                        {workshop.category === 'coffee' ? <Coffee size={14} /> : <Palette size={14} />}
-                        <span className="text-xs uppercase" style={{ color: '#000', fontFamily: 'var(--font-heading)' }}>
+                        {workshop.category === "coffee" ? (
+                          <Coffee size={14} />
+                        ) : (
+                          <Palette size={14} />
+                        )}
+                        <span
+                          className="text-xs uppercase"
+                          style={{
+                            color: "#000",
+                            fontFamily: "var(--font-heading)",
+                          }}
+                        >
                           {workshop.category}
                         </span>
                       </div>
-                      
+
                       {/* Date */}
-                      <div 
+                      <div
                         className="absolute top-4 right-4 px-3 py-2 rounded-lg"
-                        style={{ background: 'rgba(0, 0, 0, 0.9)' }}
+                        style={{ background: "rgba(0, 0, 0, 0.9)" }}
                       >
-                        <p className="text-lg leading-none" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+                        <p
+                          className="text-lg leading-none"
+                          style={{
+                            color: "#D4A574",
+                            fontFamily: "var(--font-heading)",
+                          }}
+                        >
                           {new Date(workshop.date).getDate()}
                         </p>
-                        <p className="text-xs" style={{ color: '#B87333' }}>
-                          {new Date(workshop.date).toLocaleDateString('en-US', { month: 'short' })}
+                        <p className="text-xs" style={{ color: "#B87333" }}>
+                          {new Date(workshop.date).toLocaleDateString("en-US", {
+                            month: "short",
+                          })}
                         </p>
                       </div>
                     </div>
 
                     {/* Content */}
                     <div className="p-6">
-                      <h4 
+                      <h4
                         className="text-xl md:text-2xl mb-2"
                         style={{
-                          fontFamily: 'var(--font-heading)',
-                          color: '#FFFEF9',
+                          fontFamily: "var(--font-heading)",
+                          color: "#FFFEF9",
                           lineHeight: 1.1,
-                          letterSpacing: '0.02em',
+                          letterSpacing: "0.02em",
                         }}
                       >
                         {workshop.title}
                       </h4>
 
-                      <p 
+                      <p
                         className="mb-4 text-sm line-clamp-2"
-                        style={{ color: 'rgba(255, 254, 249, 0.7)' }}
+                        style={{ color: "rgba(255, 254, 249, 0.7)" }}
                       >
                         {workshop.description}
                       </p>
 
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm">
-                          <Clock size={14} style={{ color: '#B87333' }} />
-                          <span style={{ color: '#FFFEF9' }}>{workshop.time}</span>
+                          <Clock size={14} style={{ color: "#B87333" }} />
+                          <span style={{ color: "#FFFEF9" }}>
+                            {workshop.time}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
-                          <User size={14} style={{ color: '#B87333' }} />
-                          <span style={{ color: '#FFFEF9' }}>{workshop.instructor}</span>
+                          <User size={14} style={{ color: "#B87333" }} />
+                          <span style={{ color: "#FFFEF9" }}>
+                            {workshop.instructor}
+                          </span>
                         </div>
                         {workshop.capacity > 0 && (
                           <div className="flex items-center gap-2 text-sm">
-                            <span style={{ color: isFull ? '#ff6b6b' : '#FFFEF9' }}>
-                              {workshop.registrations?.length || 0} / {workshop.capacity} seats
-                              {isFull && ' (FULL)'}
+                            <span
+                              style={{ color: isFull ? "#ff6b6b" : "#FFFEF9" }}
+                            >
+                              {workshop.registrations?.length || 0} /{" "}
+                              {workshop.capacity} seats
+                              {isFull && " (FULL)"}
                             </span>
                           </div>
                         )}
                       </div>
 
                       {!isPast && (
-                        <div 
+                        <div
                           className="flex items-center gap-2 text-sm"
                           style={{
-                            color: '#B87333',
-                            fontFamily: 'var(--font-heading)',
-                            letterSpacing: '0.1em',
+                            color: "#B87333",
+                            fontFamily: "var(--font-heading)",
+                            letterSpacing: "0.1em",
                           }}
                         >
                           VIEW DETAILS
@@ -897,10 +1153,11 @@ export default function WorkshopsPage() {
               onClick={(e) => e.stopPropagation()}
               onTouchStart={(e) => e.stopPropagation()}
               style={{
-                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-                border: '3px solid rgba(184, 115, 51, 0.6)',
-                backdropFilter: 'blur(20px)',
-                WebkitOverflowScrolling: 'touch',
+                background:
+                  "linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))",
+                border: "3px solid rgba(184, 115, 51, 0.6)",
+                backdropFilter: "blur(20px)",
+                WebkitOverflowScrolling: "touch",
               }}
             >
               <button
@@ -910,16 +1167,16 @@ export default function WorkshopsPage() {
                   setIsModalOpen(false);
                 }}
                 className="absolute top-3 right-3 sm:top-6 sm:right-6 rounded-full transition-all active:scale-95 touch-manipulation"
-                style={{ 
-                  color: '#B87333',
-                  padding: '10px',
-                  minWidth: '44px',
-                  minHeight: '44px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(184, 115, 51, 0.1)',
-                  border: '1px solid rgba(184, 115, 51, 0.3)',
+                style={{
+                  color: "#B87333",
+                  padding: "10px",
+                  minWidth: "44px",
+                  minHeight: "44px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(184, 115, 51, 0.1)",
+                  border: "1px solid rgba(184, 115, 51, 0.3)",
                 }}
                 aria-label="Close workshop modal"
               >
@@ -931,18 +1188,22 @@ export default function WorkshopsPage() {
                   <div
                     className="w-14 h-14 flex items-center justify-center rounded-lg"
                     style={{
-                      background: 'rgba(184, 115, 51, 0.2)',
-                      border: '2px solid rgba(184, 115, 51, 0.4)',
-                      color: '#B87333',
+                      background: "rgba(184, 115, 51, 0.2)",
+                      border: "2px solid rgba(184, 115, 51, 0.4)",
+                      color: "#B87333",
                     }}
                   >
-                    {selectedWorkshop.category === "coffee" ? <Coffee size={28} /> : <Palette size={28} />}
+                    {selectedWorkshop.category === "coffee" ? (
+                      <Coffee size={28} />
+                    ) : (
+                      <Palette size={28} />
+                    )}
                   </div>
                   <span
                     className="text-xs uppercase tracking-[0.2em]"
                     style={{
-                      color: '#B87333',
-                      fontFamily: 'var(--font-heading)',
+                      color: "#B87333",
+                      fontFamily: "var(--font-heading)",
                     }}
                   >
                     {selectedWorkshop.category} WORKSHOP
@@ -952,9 +1213,9 @@ export default function WorkshopsPage() {
                 <h3
                   className="text-3xl md:text-4xl mb-6"
                   style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#FFFEF9',
-                    letterSpacing: '0.05em',
+                    fontFamily: "var(--font-heading)",
+                    color: "#FFFEF9",
+                    letterSpacing: "0.05em",
                     lineHeight: 1.1,
                   }}
                 >
@@ -964,7 +1225,7 @@ export default function WorkshopsPage() {
 
               <p
                 className="text-base md:text-lg mb-10"
-                style={{ color: '#B87333', lineHeight: 1.8 }}
+                style={{ color: "#B87333", lineHeight: 1.8 }}
               >
                 {selectedWorkshop.description}
               </p>
@@ -973,46 +1234,55 @@ export default function WorkshopsPage() {
                 <div
                   className="p-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   <div className="flex items-center gap-4 mb-3">
-                    <Calendar size={20} style={{ color: '#B87333' }} />
+                    <Calendar size={20} style={{ color: "#B87333" }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                      }}
                     >
                       DATE
                     </span>
                   </div>
-                  <p className="text-lg" style={{ color: '#FFFEF9' }}>
-                    {new Date(selectedWorkshop.date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                  <p className="text-lg" style={{ color: "#FFFEF9" }}>
+                    {new Date(selectedWorkshop.date).toLocaleDateString(
+                      "en-US",
+                      {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )}
                   </p>
                 </div>
 
                 <div
                   className="p-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   <div className="flex items-center gap-4 mb-3">
-                    <Clock size={20} style={{ color: '#B87333' }} />
+                    <Clock size={20} style={{ color: "#B87333" }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                      }}
                     >
                       TIME
                     </span>
                   </div>
-                  <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                  <p className="text-lg" style={{ color: "#FFFEF9" }}>
                     {selectedWorkshop.time}
                   </p>
                 </div>
@@ -1020,20 +1290,23 @@ export default function WorkshopsPage() {
                 <div
                   className="p-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   <div className="flex items-center gap-4 mb-3">
-                    <User size={20} style={{ color: '#B87333' }} />
+                    <User size={20} style={{ color: "#B87333" }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                      }}
                     >
                       INSTRUCTOR
                     </span>
                   </div>
-                  <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                  <p className="text-lg" style={{ color: "#FFFEF9" }}>
                     {selectedWorkshop.instructor}
                   </p>
                 </div>
@@ -1041,20 +1314,23 @@ export default function WorkshopsPage() {
                 <div
                   className="p-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   <div className="flex items-center gap-4 mb-3">
-                    <MapPin size={20} style={{ color: '#B87333' }} />
+                    <MapPin size={20} style={{ color: "#B87333" }} />
                     <span
                       className="text-xs uppercase tracking-wider"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
+                      style={{
+                        color: "#8B6F47",
+                        fontFamily: "var(--font-heading)",
+                      }}
                     >
                       LOCATION
                     </span>
                   </div>
-                  <p className="text-lg" style={{ color: '#FFFEF9' }}>
+                  <p className="text-lg" style={{ color: "#FFFEF9" }}>
                     {selectedWorkshop.location}
                   </p>
                 </div>
@@ -1065,19 +1341,22 @@ export default function WorkshopsPage() {
                 <div
                   className="p-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   {isWorkshopFull(selectedWorkshop) ? (
                     <div className="text-center">
                       <p
                         className="text-lg mb-2"
-                        style={{ color: '#ff6b6b', fontFamily: 'var(--font-heading)' }}
+                        style={{
+                          color: "#ff6b6b",
+                          fontFamily: "var(--font-heading)",
+                        }}
                       >
                         WORKSHOP IS FULL
                       </p>
-                      <p style={{ color: '#8B6F47' }}>
+                      <p style={{ color: "#8B6F47" }}>
                         All seats have been taken. Please check other workshops.
                       </p>
                     </div>
@@ -1088,10 +1367,11 @@ export default function WorkshopsPage() {
                           onClick={() => setIsRegistering(true)}
                           className="w-full py-4 text-lg uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                           style={{
-                            background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                            border: '2px solid rgba(184, 115, 51, 0.4)',
-                            color: '#000',
-                            fontFamily: 'var(--font-heading)',
+                            background:
+                              "linear-gradient(135deg, #B87333, #CD7F32)",
+                            border: "2px solid rgba(184, 115, 51, 0.4)",
+                            color: "#000",
+                            fontFamily: "var(--font-heading)",
                           }}
                         >
                           REGISTER FOR THIS WORKSHOP
@@ -1101,9 +1381,9 @@ export default function WorkshopsPage() {
                           <h4
                             className="text-lg mb-4"
                             style={{
-                              color: '#FFFEF9',
-                              fontFamily: 'var(--font-heading)',
-                              letterSpacing: '0.1em',
+                              color: "#FFFEF9",
+                              fontFamily: "var(--font-heading)",
+                              letterSpacing: "0.1em",
                             }}
                           >
                             REGISTER NOW
@@ -1114,25 +1394,37 @@ export default function WorkshopsPage() {
                               placeholder="Your Name"
                               value={registrationForm.name}
                               onChange={(e) =>
-                                setRegistrationForm({ ...registrationForm, name: e.target.value })
+                                setRegistrationForm({
+                                  ...registrationForm,
+                                  name: e.target.value,
+                                })
                               }
                               className="w-full p-3 bg-transparent rounded-lg text-[#FFFEF9] placeholder-[#8B6F47] outline-none"
-                              style={{ border: '2px solid rgba(184, 115, 51, 0.4)' }}
+                              style={{
+                                border: "2px solid rgba(184, 115, 51, 0.4)",
+                              }}
                             />
                             <input
                               type="email"
                               placeholder="Your Email"
                               value={registrationForm.email}
                               onChange={(e) =>
-                                setRegistrationForm({ ...registrationForm, email: e.target.value })
+                                setRegistrationForm({
+                                  ...registrationForm,
+                                  email: e.target.value,
+                                })
                               }
                               className="w-full p-3 bg-transparent rounded-lg text-[#FFFEF9] placeholder-[#8B6F47] outline-none"
-                              style={{ border: '2px solid rgba(184, 115, 51, 0.4)' }}
+                              style={{
+                                border: "2px solid rgba(184, 115, 51, 0.4)",
+                              }}
                             />
                             {registrationMessage && (
                               <p
                                 style={{
-                                  color: registrationMessage.includes('Success') ? '#4ade80' : '#ff6b6b',
+                                  color: registrationMessage.includes("Success")
+                                    ? "#4ade80"
+                                    : "#ff6b6b",
                                 }}
                               >
                                 {registrationMessage}
@@ -1143,10 +1435,11 @@ export default function WorkshopsPage() {
                                 onClick={handleRegister}
                                 className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                                 style={{
-                                  background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                                  border: '2px solid rgba(184, 115, 51, 0.4)',
-                                  color: '#000',
-                                  fontFamily: 'var(--font-heading)',
+                                  background:
+                                    "linear-gradient(135deg, #B87333, #CD7F32)",
+                                  border: "2px solid rgba(184, 115, 51, 0.4)",
+                                  color: "#000",
+                                  fontFamily: "var(--font-heading)",
                                 }}
                               >
                                 CONFIRM
@@ -1159,10 +1452,10 @@ export default function WorkshopsPage() {
                                 }}
                                 className="flex-1 py-3 uppercase tracking-wider transition-all hover:scale-105 rounded-lg"
                                 style={{
-                                  background: 'rgba(139, 111, 71, 0.2)',
-                                  border: '2px solid rgba(139, 111, 71, 0.4)',
-                                  color: '#8B6F47',
-                                  fontFamily: 'var(--font-heading)',
+                                  background: "rgba(139, 111, 71, 0.2)",
+                                  border: "2px solid rgba(139, 111, 71, 0.4)",
+                                  color: "#8B6F47",
+                                  fontFamily: "var(--font-heading)",
                                 }}
                               >
                                 CANCEL
@@ -1195,17 +1488,19 @@ export default function WorkshopsPage() {
               className="w-full max-w-md p-8 relative rounded-xl"
               onClick={(e) => e.stopPropagation()}
               style={{
-                background: 'linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))',
-                border: '3px solid rgba(184, 115, 51, 0.8)',
-                backdropFilter: 'blur(20px)',
-                boxShadow: '0 20px 80px rgba(184, 115, 51, 0.4), 0 0 60px rgba(184, 115, 51, 0.3)',
+                background:
+                  "linear-gradient(135deg, rgba(61, 43, 31, 0.98), rgba(26, 17, 16, 0.98))",
+                border: "3px solid rgba(184, 115, 51, 0.8)",
+                backdropFilter: "blur(20px)",
+                boxShadow:
+                  "0 20px 80px rgba(184, 115, 51, 0.4), 0 0 60px rgba(184, 115, 51, 0.3)",
               }}
             >
               {/* Close Button */}
               <button
                 onClick={() => setShowSuccessPopup(false)}
                 className="absolute top-4 right-4 p-2 hover:bg-white/10 transition-all rounded-lg"
-                style={{ color: '#B87333' }}
+                style={{ color: "#B87333" }}
               >
                 <X size={20} />
               </button>
@@ -1220,8 +1515,9 @@ export default function WorkshopsPage() {
                 <div
                   className="w-20 h-20 rounded-full flex items-center justify-center"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
-                    border: '3px solid rgba(184, 115, 51, 0.8)',
+                    background:
+                      "linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))",
+                    border: "3px solid rgba(184, 115, 51, 0.8)",
                   }}
                 >
                   <motion.div
@@ -1255,9 +1551,9 @@ export default function WorkshopsPage() {
                 <h3
                   className="text-xl md:text-2xl mb-3"
                   style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#FFFEF9',
-                    letterSpacing: '0.1em',
+                    fontFamily: "var(--font-heading)",
+                    color: "#FFFEF9",
+                    letterSpacing: "0.1em",
                   }}
                 >
                   REGISTRATION SUCCESSFUL!
@@ -1265,7 +1561,7 @@ export default function WorkshopsPage() {
                 <p
                   className="text-base mb-4"
                   style={{
-                    color: 'rgba(255, 254, 249, 0.8)',
+                    color: "rgba(255, 254, 249, 0.8)",
                     lineHeight: 1.6,
                   }}
                 >
@@ -1277,17 +1573,24 @@ export default function WorkshopsPage() {
               <div
                 className="p-4 mb-6 rounded-lg"
                 style={{
-                  background: 'rgba(184, 115, 51, 0.1)',
-                  border: '2px solid rgba(184, 115, 51, 0.3)',
+                  background: "rgba(184, 115, 51, 0.1)",
+                  border: "2px solid rgba(184, 115, 51, 0.3)",
                 }}
               >
                 <div className="flex items-start gap-3">
-                  <CalendarCheck size={20} style={{ color: '#D4A574', flexShrink: 0, marginTop: '2px' }} />
+                  <CalendarCheck
+                    size={20}
+                    style={{
+                      color: "#D4A574",
+                      flexShrink: 0,
+                      marginTop: "2px",
+                    }}
+                  />
                   <div>
                     <p
                       className="text-sm mb-1"
                       style={{
-                        color: '#D4A574',
+                        color: "#D4A574",
                         fontWeight: 600,
                       }}
                     >
@@ -1296,11 +1599,12 @@ export default function WorkshopsPage() {
                     <p
                       className="text-sm"
                       style={{
-                        color: 'rgba(255, 254, 249, 0.7)',
+                        color: "rgba(255, 254, 249, 0.7)",
                         lineHeight: 1.5,
                       }}
                     >
-                      A confirmation email with workshop details has been sent to your email address.
+                      A confirmation email with workshop details has been sent
+                      to your email address.
                     </p>
                   </div>
                 </div>
@@ -1311,15 +1615,15 @@ export default function WorkshopsPage() {
                 <div
                   className="p-4 mb-6 rounded-lg"
                   style={{
-                    background: 'rgba(20, 20, 20, 0.6)',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
+                    background: "rgba(20, 20, 20, 0.6)",
+                    border: "2px solid rgba(184, 115, 51, 0.2)",
                   }}
                 >
                   <p
                     className="text-xs uppercase tracking-wider mb-2"
                     style={{
-                      color: '#8B6F47',
-                      fontFamily: 'var(--font-heading)',
+                      color: "#8B6F47",
+                      fontFamily: "var(--font-heading)",
                     }}
                   >
                     Workshop
@@ -1327,8 +1631,8 @@ export default function WorkshopsPage() {
                   <p
                     className="text-lg mb-1"
                     style={{
-                      color: '#FFFEF9',
-                      fontFamily: 'var(--font-heading)',
+                      color: "#FFFEF9",
+                      fontFamily: "var(--font-heading)",
                     }}
                   >
                     {selectedWorkshop.title}
@@ -1336,14 +1640,18 @@ export default function WorkshopsPage() {
                   <p
                     className="text-sm"
                     style={{
-                      color: 'rgba(255, 254, 249, 0.7)',
+                      color: "rgba(255, 254, 249, 0.7)",
                     }}
                   >
-                    {new Date(selectedWorkshop.date).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    })} • {selectedWorkshop.time}
+                    {new Date(selectedWorkshop.date).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      }
+                    )}{" "}
+                    • {selectedWorkshop.time}
                   </p>
                 </div>
               )}
@@ -1353,12 +1661,12 @@ export default function WorkshopsPage() {
                 onClick={() => setShowSuccessPopup(false)}
                 className="w-full py-3 text-center transition-all hover:scale-105 rounded-lg"
                 style={{
-                  background: 'linear-gradient(135deg, #B87333, #CD7F32)',
-                  border: '2px solid rgba(184, 115, 51, 0.6)',
-                  color: '#000',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '1rem',
-                  letterSpacing: '0.15em',
+                  background: "linear-gradient(135deg, #B87333, #CD7F32)",
+                  border: "2px solid rgba(184, 115, 51, 0.6)",
+                  color: "#000",
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "1rem",
+                  letterSpacing: "0.15em",
                 }}
               >
                 CLOSE
@@ -1367,7 +1675,7 @@ export default function WorkshopsPage() {
           </motion.div>
         )}
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 }
