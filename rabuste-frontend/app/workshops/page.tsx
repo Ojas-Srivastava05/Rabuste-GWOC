@@ -437,7 +437,7 @@ export default function WorkshopsPage() {
 
               {/* Search & Filters */}
               <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                <div className="relative flex-1 md:min-w-[300px]">
+                {/* <div className="relative flex-1 md:min-w-[300px]">
                   <Search
                     size={18}
                     className="absolute left-4 top-1/2 -translate-y-1/2"
@@ -455,7 +455,7 @@ export default function WorkshopsPage() {
                       color: "#F5F1E8",
                     }}
                   />
-                </div>
+                </div> */}
 
                 <div className="flex gap-2">
                   <button
