@@ -358,6 +358,7 @@ export default function OrderStatusPage() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [completedOrdersVisible, setCompletedOrdersVisible] = useState(3);
   const [showPickupModal, setShowPickupModal] = useState(false);
+  const [showPastOrders, setShowPastOrders] = useState(false);
 
   useEffect(() => {
     fetchOrders();
@@ -1135,8 +1136,33 @@ export default function OrderStatusPage() {
                 </div>
               )}
 
+              {/* View Past Orders Button */}
+              {completedOrders.length > 0 && !showPastOrders && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-center mt-12"
+                >
+                  <button
+                    onClick={() => setShowPastOrders(true)}
+                    className="px-8 py-4 rounded-lg transition-all hover:scale-105 font-bold uppercase tracking-wide flex items-center gap-3"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(94, 125, 76, 0.3), rgba(94, 125, 76, 0.2))',
+                      border: '2px solid rgba(94, 125, 76, 0.5)',
+                      color: '#5E7D4C',
+                      fontFamily: 'var(--font-heading)',
+                      letterSpacing: '0.1em',
+                      boxShadow: '0 4px 15px rgba(94, 125, 76, 0.2)',
+                    }}
+                  >
+                    <Trophy size={20} />
+                    View Past Orders ({completedOrders.length})
+                  </button>
+                </motion.div>
+              )}
+
               {/* Completed Orders Section */}
-              {completedOrders.length > 0 && (
+              {completedOrders.length > 0 && showPastOrders && (
                 <div className="space-y-6 mt-12">
                   <div className="flex items-center gap-4">
                     <div 
@@ -1371,14 +1397,12 @@ export default function OrderStatusPage() {
                     ))}
                   </AnimatePresence>
                   
-                  {/* View More Button */}
-                  {completedOrders.length > completedOrdersVisible && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex justify-center mt-6"
-                    >
-                      <button
+                  {/* View More / Hide Buttons */}
+                  <div className="flex justify-center gap-4 mt-6">
+                    {completedOrders.length > completedOrdersVisible && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
                         onClick={() => setCompletedOrdersVisible(prev => prev + 3)}
                         className="px-8 py-4 rounded-lg transition-all hover:scale-105 font-bold uppercase tracking-wide"
                         style={{
@@ -1390,9 +1414,28 @@ export default function OrderStatusPage() {
                         }}
                       >
                         View More ({completedOrders.length - completedOrdersVisible} remaining)
-                      </button>
-                    </motion.div>
-                  )}
+                      </motion.button>
+                    )}
+                    
+                    <motion.button
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      onClick={() => {
+                        setShowPastOrders(false);
+                        setCompletedOrdersVisible(3);
+                      }}
+                      className="px-8 py-4 rounded-lg transition-all hover:scale-105 font-bold uppercase tracking-wide"
+                      style={{
+                        background: 'rgba(139, 111, 71, 0.2)',
+                        border: '2px solid rgba(139, 111, 71, 0.4)',
+                        color: '#8B6F47',
+                        fontFamily: 'var(--font-heading)',
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      Hide Past Orders
+                    </motion.button>
+                  </div>
                 </div>
               )}
             </div>
