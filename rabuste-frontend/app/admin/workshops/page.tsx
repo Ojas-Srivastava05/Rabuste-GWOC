@@ -31,6 +31,9 @@ export default function WorkshopsAdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'all' | 'upcoming' | 'past' | 'registrations'>('all');
 
   const [newWorkshop, setNewWorkshop] = useState({
     title: "",
@@ -98,62 +101,137 @@ export default function WorkshopsAdminPage() {
 
   /* -------------------- CRUD -------------------- */
   const handleAddWorkshop = async () => {
-    const res = await fetch("/api/workshops", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: newWorkshop.title,
-        category: newWorkshop.category,
-        date: newWorkshop.date,
-        time: `${newWorkshop.hour}:${newWorkshop.minute || "00"} ${
-          newWorkshop.ampm
-        }`,
-        description: newWorkshop.description,
-        instructor: newWorkshop.instructor,
-        location: newWorkshop.location,
-        capacity: Number(newWorkshop.capacity),
-      }),
-    });
+    // Validation
+    if (!newWorkshop.title.trim()) {
+      setMessage({ type: 'error', text: 'Please enter a workshop title' });
+      return;
+    }
+    if (!newWorkshop.date) {
+      setMessage({ type: 'error', text: 'Please select a date' });
+      return;
+    }
+    if (!newWorkshop.hour || !newWorkshop.minute) {
+      setMessage({ type: 'error', text: 'Please enter a valid time' });
+      return;
+    }
+    if (!newWorkshop.instructor.trim()) {
+      setMessage({ type: 'error', text: 'Please enter instructor name' });
+      return;
+    }
+    if (!newWorkshop.location.trim()) {
+      setMessage({ type: 'error', text: 'Please enter location' });
+      return;
+    }
+    if (!newWorkshop.description.trim()) {
+      setMessage({ type: 'error', text: 'Please enter description' });
+      return;
+    }
 
-    const saved = await res.json();
-    setWorkshops((p) => [...p, saved]);
+    setIsLoading(true);
+    setMessage(null);
 
-    setNewWorkshop({
-      title: "",
-      category: "coffee",
-      date: "",
-      hour: "",
-      minute: "",
-      ampm: "AM",
-      description: "",
-      instructor: "",
-      location: "",
-      capacity: 0,
-    });
+    try {
+      const res = await fetch("/api/workshops", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newWorkshop.title,
+          category: newWorkshop.category,
+          date: newWorkshop.date,
+          time: `${newWorkshop.hour}:${newWorkshop.minute || "00"} ${
+            newWorkshop.ampm
+          }`,
+          description: newWorkshop.description,
+          instructor: newWorkshop.instructor,
+          location: newWorkshop.location,
+          capacity: Number(newWorkshop.capacity),
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to add workshop');
+      }
+
+      const saved = await res.json();
+      setWorkshops((p) => [...p, saved]);
+
+      setNewWorkshop({
+        title: "",
+        category: "coffee",
+        date: "",
+        hour: "",
+        minute: "",
+        ampm: "AM",
+        description: "",
+        instructor: "",
+        location: "",
+        capacity: 0,
+      });
+
+      setMessage({ type: 'success', text: 'Workshop added successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to add workshop' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleUpdateWorkshop = async () => {
     if (!editWorkshop) return;
 
-    const res = await fetch(`/api/workshops/${editWorkshop._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editWorkshop),
-    });
+    setIsLoading(true);
+    setMessage(null);
 
-    const updated = await res.json();
+    try {
+      const res = await fetch(`/api/workshops/${editWorkshop._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editWorkshop),
+      });
 
-    setWorkshops((p) => p.map((w) => (w._id === updated._id ? updated : w)));
+      if (!res.ok) {
+        throw new Error('Failed to update workshop');
+      }
 
-    setSelectedWorkshop(updated);
-    setIsEditing(false);
+      const updated = await res.json();
+
+      setWorkshops((p) => p.map((w) => (w._id === updated._id ? updated : w)));
+
+      setSelectedWorkshop(updated);
+      setIsEditing(false);
+      setMessage({ type: 'success', text: 'Workshop updated successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to update workshop' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteWorkshop = async (id: string) => {
-    await fetch(`/api/workshops/${id}`, { method: "DELETE" });
-    setWorkshops((p) => p.filter((w) => w._id !== id));
-    setIsModalOpen(false);
-    setIsEditing(false);
+    if (!confirm('Are you sure you want to delete this workshop?')) return;
+
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/workshops/${id}`, { method: "DELETE" });
+      
+      if (!res.ok) {
+        throw new Error('Failed to delete workshop');
+      }
+
+      setWorkshops((p) => p.filter((w) => w._id !== id));
+      setIsModalOpen(false);
+      setIsEditing(false);
+      setMessage({ type: 'success', text: 'Workshop deleted successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Failed to delete workshop' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   /* -------------------- UI -------------------- */
@@ -192,7 +270,14 @@ export default function WorkshopsAdminPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <div className="brutal-card p-4 sm:p-6">
+        <button
+          onClick={() => setFilterStatus('all')}
+          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'all' ? 'ring-2 ring-[#B87333]' : ''}`}
+          style={{
+            background: filterStatus === 'all' ? 'rgba(184, 115, 51, 0.2)' : undefined,
+            cursor: 'pointer',
+          }}
+        >
           <div className="flex items-center gap-3 mb-2">
             <Clock size={20} className="text-[#B87333]" />
             <span className="section-label text-xs">TOTAL</span>
@@ -200,9 +285,16 @@ export default function WorkshopsAdminPage() {
           <p className="text-2xl sm:text-3xl font-bold gradient-text" style={{ fontFamily: 'var(--font-heading)' }}>
             {workshops.length}
           </p>
-        </div>
+        </button>
 
-        <div className="brutal-card p-4 sm:p-6">
+        <button
+          onClick={() => setFilterStatus('upcoming')}
+          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'upcoming' ? 'ring-2 ring-[#5E7D4C]' : ''}`}
+          style={{
+            background: filterStatus === 'upcoming' ? 'rgba(94, 125, 76, 0.2)' : undefined,
+            cursor: 'pointer',
+          }}
+        >
           <div className="flex items-center gap-3 mb-2">
             <Clock size={20} className="text-[#5E7D4C]" />
             <span className="section-label text-xs">UPCOMING</span>
@@ -210,9 +302,16 @@ export default function WorkshopsAdminPage() {
           <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#5E7D4C' }}>
             {upcomingWorkshops.length}
           </p>
-        </div>
+        </button>
 
-        <div className="brutal-card p-4 sm:p-6">
+        <button
+          onClick={() => setFilterStatus('past')}
+          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'past' ? 'ring-2 ring-[#8B6F47]' : ''}`}
+          style={{
+            background: filterStatus === 'past' ? 'rgba(139, 111, 71, 0.2)' : undefined,
+            cursor: 'pointer',
+          }}
+        >
           <div className="flex items-center gap-3 mb-2">
             <Clock size={20} className="text-[#8B6F47]" />
             <span className="section-label text-xs">PAST</span>
@@ -220,9 +319,16 @@ export default function WorkshopsAdminPage() {
           <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#8B6F47' }}>
             {pastWorkshops.length}
           </p>
-        </div>
+        </button>
 
-        <div className="brutal-card p-4 sm:p-6">
+        <button
+          onClick={() => setFilterStatus('registrations')}
+          className={`brutal-card p-4 sm:p-6 transition-all ${filterStatus === 'registrations' ? 'ring-2 ring-[#D4A574]' : ''}`}
+          style={{
+            background: filterStatus === 'registrations' ? 'rgba(212, 165, 116, 0.2)' : undefined,
+            cursor: 'pointer',
+          }}
+        >
           <div className="flex items-center gap-3 mb-2">
             <User size={20} className="text-[#D4A574]" />
             <span className="section-label text-xs">REGISTRATIONS</span>
@@ -230,11 +336,23 @@ export default function WorkshopsAdminPage() {
           <p className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-heading)', color: '#D4A574' }}>
             {totalRegistrations}
           </p>
-        </div>
+        </button>
       </div>
 
       {/* Add Workshop */}
       <div className="brutal-card p-6 sm:p-8 mb-8 sm:mb-12">
+        {message && (
+          <div
+            className={`mb-6 p-4 rounded-lg font-semibold flex items-center gap-3 ${
+              message.type === 'success' 
+                ? 'bg-[#5E7D4C]/20 border-2 border-[#5E7D4C]/50 text-[#B8D5A2]' 
+                : 'bg-[#DC2626]/20 border-2 border-[#DC2626]/50 text-[#FCA5A5]'
+            }`}
+          >
+            {message.type === 'success' ? '✓' : '✕'} {message.text}
+          </div>
+        )}
+        
         <h2 
           className="text-2xl sm:text-3xl mb-6 flex items-center gap-3"
           style={{
@@ -390,10 +508,11 @@ export default function WorkshopsAdminPage() {
 
         <button
           onClick={handleAddWorkshop}
-          className="mt-6 btn btn-primary w-full sm:w-auto"
+          disabled={isLoading}
+          className="mt-6 btn btn-primary w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus size={20} />
-          ADD WORKSHOP
+          {isLoading ? 'ADDING...' : 'ADD WORKSHOP'}
         </button>
       </div>
 
@@ -477,6 +596,80 @@ export default function WorkshopsAdminPage() {
           })}
         </div>
       </div>
+
+      {/* Filtered Workshops List */}
+      {filterStatus !== '' && (
+        <div className="brutal-card p-6 sm:p-8 mt-8 sm:mt-12">
+          <h2 
+            className="text-2xl sm:text-3xl mb-6"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              letterSpacing: '0.1em',
+              color: '#F5F1E8',
+            }}
+          >
+            {filterStatus === 'all' ? 'ALL WORKSHOPS' : filterStatus === 'upcoming' ? 'UPCOMING WORKSHOPS' : filterStatus === 'past' ? 'PAST WORKSHOPS' : 'WORKSHOPS WITH REGISTRATIONS'}
+          </h2>
+          
+          {(() => {
+            const filteredWs = filterStatus === 'all'
+              ? workshops
+              : filterStatus === 'registrations' 
+                ? workshops.filter(w => (w.registrations?.length || 0) > 0)
+                : filterStatus === 'upcoming' 
+                  ? upcomingWorkshops 
+                  : pastWorkshops;
+            
+            return filteredWs.length === 0 ? (
+              <p style={{ color: '#8B6F47' }}>No workshops to display</p>
+            ) : (
+              <div className="space-y-4">
+                {filteredWs.map((ws) => (
+                  <button
+                    key={ws._id}
+                    onClick={() => {
+                      setSelectedWorkshop(ws);
+                      setEditWorkshop({ ...ws });
+                      setIsEditing(false);
+                      setIsModalOpen(true);
+                    }}
+                    className="w-full p-4 rounded-lg transition-all hover:bg-opacity-80 text-left"
+                    style={{
+                      background: 'rgba(184, 115, 51, 0.15)',
+                      border: '2px solid rgba(184, 115, 51, 0.3)',
+                  }}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)' }}>
+                        {ws.title}
+                      </h3>
+                      <p className="text-sm mt-2" style={{ color: '#D4A574' }}>
+                        {ws.date} at {ws.time}
+                      </p>
+                      <p className="text-sm" style={{ color: '#8B6F47' }}>
+                        📍 {ws.location} | 👤 {ws.instructor}
+                      </p>
+                    </div>
+                    <span
+                      className="px-3 py-1 rounded text-xs font-bold whitespace-nowrap"
+                      style={{
+                        background: 'rgba(94, 125, 76, 0.3)',
+                        color: '#5E7D4C',
+                        marginLeft: '1rem',
+                      }}
+                    >
+                      {ws.registrations?.length || 0}
+                      {ws.capacity > 0 && `/${ws.capacity}`}
+                    </span>
+                  </div>
+                </button>
+              ))}
+              </div>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && selectedWorkshop && (
@@ -598,13 +791,15 @@ export default function WorkshopsAdminPage() {
                 <div className="flex gap-4 pt-4">
                   <button
                     onClick={handleUpdateWorkshop}
-                    className="btn btn-primary flex-1"
+                    disabled={isLoading}
+                    className="btn btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    SAVE CHANGES
+                    {isLoading ? 'SAVING...' : 'SAVE CHANGES'}
                   </button>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="btn btn-secondary"
+                    disabled={isLoading}
+                    className="btn btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     CANCEL
                   </button>
@@ -690,14 +885,15 @@ export default function WorkshopsAdminPage() {
                   </button>
                   <button
                     onClick={() => handleDeleteWorkshop(selectedWorkshop._id)}
-                    className="btn"
+                    disabled={isLoading}
+                    className="btn disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       background: 'rgba(220, 38, 38, 0.2)',
                       border: '2px solid rgba(220, 38, 38, 0.5)',
                       color: '#FCA5A5',
                     }}
                   >
-                    DELETE
+                    {isLoading ? 'DELETING...' : 'DELETE'}
                   </button>
                 </div>
               </>
