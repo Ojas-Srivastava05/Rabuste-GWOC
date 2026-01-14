@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, LayoutDashboard, ShoppingBag, Utensils, ImageIcon, GraduationCap, Ticket, Users, MessageSquare, Instagram, Brain, LogOut, Bell } from "lucide-react";
+import { Menu, X, LayoutDashboard, ShoppingBag, Utensils, ImageIcon, GraduationCap, Ticket, Users, MessageSquare, Instagram, Brain, LogOut, Bell, BarChart3 } from "lucide-react";
 
 type Props = {
   children: React.ReactNode;
@@ -19,6 +19,7 @@ const navItems = [
   { href: "/admin/workshops", label: "Workshops", icon: GraduationCap },
   { href: "/admin/coupons", label: "Coupons", icon: Ticket },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/feedback", label: "Feedback", icon: MessageSquare },
   { href: "/admin/instagram", label: "Instagram", icon: Instagram },
   { href: "/admin/ai-settings", label: "AI Settings", icon: Brain },
@@ -76,7 +77,7 @@ export default function AdminLayout({ children }: Props) {
       >
         <div className="p-6 border-b border-gray-800">
           <Link href="/" className="block mb-4">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-white rounded-lg p-2">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-black rounded-lg p-2">
               <Image
                 src="/Rabuste logo.png"
                 alt="Rabuste Logo"
@@ -89,7 +90,7 @@ export default function AdminLayout({ children }: Props) {
             </div>
           </Link>
           <h1 className="text-xl font-bold text-center text-white">RABUSTE</h1>
-          <p className="text-xs text-center text-gray-400 mt-1">ADMIN PANEL</p>
+          <p className="text-xs text-center text-white mt-1">ADMIN PANEL</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -153,7 +154,7 @@ function NavLink({
       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
         isActive
           ? 'bg-white text-black font-semibold'
-          : 'text-gray-300 hover:bg-gray-900 hover:text-white'
+          : 'text-white hover:bg-gray-900 hover:text-white'
       }`}
     >
       {children}

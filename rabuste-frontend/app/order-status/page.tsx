@@ -363,6 +363,7 @@ export default function OrderStatusPage() {
   useEffect(() => {
     fetchOrders();
     getUserLocation();
+    fetchGameStats();
     
     // Poll for order updates every 5 seconds
     const orderPollInterval = setInterval(() => {
@@ -385,6 +386,60 @@ export default function OrderStatusPage() {
       clearInterval(tipInterval);
     };
   }, []);
+
+  async function fetchGameStats() {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch("/api/games/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+        const stats = await res.json();
+        setGameStats({
+          memory: stats.memory || 0,
+          trivia: stats.trivia || 0,
+          origin: stats.origin || 0,
+        });
+      }
+    } catch (err) {
+      console.error("Failed to fetch game stats", err);
+    }
+  }
+
+  async function recordGameCompletion(gameType: 'memory' | 'trivia' | 'origin') {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch("/api/games/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ gameType }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        
+        // Show coupon notification if generated
+        if (data.couponGenerated && data.couponCode) {
+          alert(`🎉 Congratulations! You've completed 3 games and earned a coupon!\n\nCoupon Code: ${data.couponCode}\nDiscount: ₹50 OFF\n\nCheck your email for details!`);
+        }
+        
+        // Update stats
+        await fetchGameStats();
+      }
+    } catch (err) {
+      console.error("Failed to record game completion", err);
+    }
+  }
 
   // Show pickup modal when there are pending orders (first time only)
   useEffect(() => {
@@ -1576,17 +1631,26 @@ export default function OrderStatusPage() {
                   >
                     {activeGame === 'memory' && (
                       <MemoryGame
-                        onWin={() => setGameStats(prev => ({ ...prev, memory: prev.memory + 1 }))}
+                        onWin={async () => {
+                          setGameStats(prev => ({ ...prev, memory: prev.memory + 1 }));
+                          await recordGameCompletion('memory');
+                        }}
                       />
                     )}
                     {activeGame === 'trivia' && (
                       <TriviaQuiz
-                        onWin={() => setGameStats(prev => ({ ...prev, trivia: prev.trivia + 1 }))}
+                        onWin={async () => {
+                          setGameStats(prev => ({ ...prev, trivia: prev.trivia + 1 }));
+                          await recordGameCompletion('trivia');
+                        }}
                       />
                     )}
                     {activeGame === 'origin' && (
                       <OriginGame
-                        onWin={() => setGameStats(prev => ({ ...prev, origin: prev.origin + 1 }))}
+                        onWin={async () => {
+                          setGameStats(prev => ({ ...prev, origin: prev.origin + 1 }));
+                          await recordGameCompletion('origin');
+                        }}
                       />
                     )}
                   </motion.div>

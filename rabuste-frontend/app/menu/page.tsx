@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle, Heart } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import Script from "next/script";
 import { useUser } from "@/contexts/UserContext";
 
@@ -111,8 +112,9 @@ import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
 import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } from "@/lib/analytics";
 
-export default function MenuPage() {
+function MenuPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useUser();
   const [menu, setMenu] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
@@ -157,7 +159,16 @@ export default function MenuPage() {
     } else {
       setFavorites([]);
     }
-  }, [user?.id]);
+
+    // Auto-redirect to cart with coupon if coming from email
+    const couponCode = searchParams.get('coupon');
+    if (couponCode) {
+      // Store coupon code in sessionStorage for cart page to auto-apply
+      sessionStorage.setItem('autoApplyCoupon', couponCode);
+      // Redirect to cart
+      router.push('/cart');
+    }
+  }, [user?.id, searchParams, router]);
 
   // Handle scrolling to specific item from hash
   useEffect(() => {
@@ -1827,5 +1838,20 @@ function ListMenuItem({
         </div>
       </div>
     </motion.div>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#B87333] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-lg" style={{ color: '#B87333' }}>Loading menu...</p>
+        </div>
+      </div>
+    }>
+      <MenuPageContent />
+    </Suspense>
   );
 }

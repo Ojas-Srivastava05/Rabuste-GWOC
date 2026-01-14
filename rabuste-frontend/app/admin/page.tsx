@@ -224,14 +224,16 @@ export default function AdminPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="date" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
+                <XAxis dataKey="date" stroke="#000000" />
+                <YAxis stroke="#000000" />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px'
+                    border: '1px solid #000000',
+                    borderRadius: '8px',
+                    color: '#000000'
                   }}
+                  labelStyle={{ color: '#000000' }}
                 />
                 <Area 
                   type="monotone" 
@@ -256,14 +258,16 @@ export default function AdminPage() {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={data.charts.ordersByDay}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="date" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
+                <XAxis dataKey="date" stroke="#000000" />
+                <YAxis stroke="#000000" />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px'
+                    border: '1px solid #000000',
+                    borderRadius: '8px',
+                    color: '#000000'
                   }}
+                  labelStyle={{ color: '#000000' }}
                 />
                 <Bar dataKey="orders" fill="#000000" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -284,14 +288,16 @@ export default function AdminPage() {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={data.charts.ordersByHour}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="hour" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
+                <XAxis dataKey="hour" stroke="#000000" />
+                <YAxis stroke="#000000" />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#fff', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px'
+                    border: '1px solid #000000',
+                    borderRadius: '8px',
+                    color: '#000000'
                   }}
+                  labelStyle={{ color: '#000000' }}
                 />
                 <Line 
                   type="monotone" 
@@ -328,7 +334,15 @@ export default function AdminPage() {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: '#fff', 
+                    border: '1px solid #000000',
+                    borderRadius: '8px',
+                    color: '#000000'
+                  }}
+                  labelStyle={{ color: '#000000' }}
+                />
               </RechartsPieChart>
             </ResponsiveContainer>
           ) : (

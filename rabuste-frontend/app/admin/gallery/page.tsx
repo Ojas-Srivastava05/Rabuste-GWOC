@@ -135,13 +135,19 @@ export default function AdminGalleryPage() {
   const categories = ["painting", "sculpture", "photography", "digital", "mixed-media", "print"];
   const allCategories = Array.from(new Set(gallery.map(g => g.category)));
 
-  const filteredGallery = gallery.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !categoryFilter || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredGallery = gallery
+    .filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = !categoryFilter || item.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      // Sort: available items first, then disabled items at bottom
+      if (a.isAvailable === b.isAvailable) return 0;
+      return a.isAvailable ? -1 : 1;
+    });
 
   const stats = {
     total: gallery.length,
@@ -405,7 +411,7 @@ export default function AdminGalleryPage() {
               placeholder="Search artwork..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-black"
             />
           </div>
           <select
@@ -440,8 +446,12 @@ export default function AdminGalleryPage() {
             <div
               key={item._id}
               className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
-                item.isAvailable ? 'border-gray-200' : 'border-red-200 opacity-75'
+                item.isAvailable ? 'border-gray-200' : 'border-gray-300 opacity-50'
               }`}
+              style={!item.isAvailable ? { 
+                filter: 'grayscale(100%)',
+                textDecoration: 'line-through'
+              } : {}}
             >
               <div className="aspect-square bg-gray-100 overflow-hidden relative">
                 {item.images[0] ? (

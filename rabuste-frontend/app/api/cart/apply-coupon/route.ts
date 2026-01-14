@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No session" }, { status: 400 });
     }
 
-    const { couponCode, discountPercentage } = await req.json();
+    const { couponCode, discountType, discountPercentage, discountAmount } = await req.json();
 
     const cart = await Cart.findOne({ sessionId });
 
@@ -27,8 +27,13 @@ export async function POST(req: Request) {
       .filter((item: any) => item.itemType === "menu")
       .reduce((sum: number, item: any) => sum + item.price * item.quantity, 0);
 
-    // Calculate discount
-    const discount = Math.round((menuItemsTotal * discountPercentage) / 100);
+    // Calculate discount based on type
+    let discount = 0;
+    if (discountType === "flat" && discountAmount) {
+      discount = Math.min(discountAmount, menuItemsTotal); // Can't discount more than the total
+    } else if (discountType === "percentage" && discountPercentage) {
+      discount = Math.round((menuItemsTotal * discountPercentage) / 100);
+    }
     
     // Update cart with coupon
     cart.couponCode = couponCode;

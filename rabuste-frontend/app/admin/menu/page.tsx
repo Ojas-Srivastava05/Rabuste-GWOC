@@ -126,12 +126,18 @@ export default function AdminMenuPage() {
 
   const categories = Array.from(new Set(menu.map(m => m.category)));
 
-  const filteredMenu = menu.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = !categoryFilter || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredMenu = menu
+    .filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = !categoryFilter || item.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      // Sort: available items first, then disabled items at bottom
+      if (a.isAvailable === b.isAvailable) return 0;
+      return a.isAvailable ? -1 : 1;
+    });
 
   const stats = {
     total: menu.length,
@@ -336,7 +342,7 @@ export default function AdminMenuPage() {
               placeholder="Search menu items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-black"
             />
           </div>
           <select
@@ -482,8 +488,11 @@ function MenuItemCard({
 }) {
   return (
     <div className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
-      item.isAvailable ? 'border-gray-200' : 'border-red-200 opacity-75'
-    }`}>
+      item.isAvailable ? 'border-gray-200' : 'border-gray-300 opacity-50'
+    }`} style={!item.isAvailable ? { 
+      filter: 'grayscale(100%)',
+      textDecoration: 'line-through'
+    } : {}}>
       <div className="aspect-square bg-gray-100 overflow-hidden">
         {item.image ? (
           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -500,10 +509,10 @@ function MenuItemCard({
                 </div>
       <div className="p-4">
         <div className="mb-2">
-          <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.category}</span>
+          <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">{item.category}</span>
                 </div>
         <h3 className="font-bold text-black mb-1">{item.name}</h3>
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
+        <p className="text-sm text-black mb-3 line-clamp-2">{item.description}</p>
         <div className="flex items-center justify-between mb-3">
           <p className="text-lg font-bold text-black">₹{item.price}</p>
                 </div>

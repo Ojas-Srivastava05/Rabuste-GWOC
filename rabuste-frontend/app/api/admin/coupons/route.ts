@@ -45,15 +45,30 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { code, discountPercentage, description, validUntil, usageLimit, minOrderAmount } = body;
+    const { code, discountType, discountPercentage, discountAmount, description, validUntil, usageLimit, minOrderAmount } = body;
 
-    if (!code || discountPercentage === undefined || !validUntil) {
+    if (!code || !validUntil) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Validate discount fields based on type
+    if (discountType === "percentage") {
+      if (discountPercentage === undefined || discountPercentage <= 0 || discountPercentage > 100) {
+        return NextResponse.json({ error: "Invalid discount percentage" }, { status: 400 });
+      }
+    } else if (discountType === "flat") {
+      if (discountAmount === undefined || discountAmount <= 0) {
+        return NextResponse.json({ error: "Invalid discount amount" }, { status: 400 });
+      }
+    } else {
+      return NextResponse.json({ error: "Invalid discount type" }, { status: 400 });
     }
 
     const coupon = await Coupon.create({
       code: code.toUpperCase(),
-      discountPercentage,
+      discountType: discountType || "percentage",
+      discountPercentage: discountType === "percentage" ? discountPercentage : null,
+      discountAmount: discountType === "flat" ? discountAmount : null,
       description,
       validUntil: new Date(validUntil),
       usageLimit,

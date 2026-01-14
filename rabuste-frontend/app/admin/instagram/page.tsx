@@ -248,7 +248,7 @@ export default function AdminInstagramPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Posts</p>
+              <p className="text-sm text-black mb-1">Total Posts</p>
               <p className="text-2xl font-bold text-black">{stats.total}</p>
             </div>
             <div className="p-3 bg-black rounded-lg">
@@ -259,7 +259,7 @@ export default function AdminInstagramPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Auto Sync</p>
+              <p className="text-sm text-black mb-1">Auto Sync</p>
               <p className="text-2xl font-bold text-purple-600">{stats.autoSync}</p>
             </div>
             <div className="p-3 bg-purple-100 rounded-lg">
@@ -270,11 +270,11 @@ export default function AdminInstagramPage() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Manual</p>
-              <p className="text-2xl font-bold text-gray-600">{stats.manual}</p>
+              <p className="text-sm text-black mb-1">Manual</p>
+              <p className="text-2xl font-bold text-black">{stats.manual}</p>
             </div>
             <div className="p-3 bg-gray-100 rounded-lg">
-              <Upload size={20} className="text-gray-600" />
+              <Upload size={20} className="text-black" />
             </div>
           </div>
         </div>
@@ -306,8 +306,8 @@ export default function AdminInstagramPage() {
               </label>
               <div className="space-y-2">
                 <label className="flex items-center justify-center w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-black transition-colors">
-                  <Upload size={20} className="mr-2 text-gray-400" />
-                  <span className="text-sm text-gray-600">
+                  <Upload size={20} className="mr-2 text-black" />
+                  <span className="text-sm text-black">
                     {uploading ? "Uploading..." : "Click to upload image"}
                   </span>
                   <input
@@ -333,7 +333,7 @@ export default function AdminInstagramPage() {
                     </button>
                   </div>
                 )}
-                <div className="text-xs text-gray-500">Or enter image URL:</div>
+                <div className="text-xs text-black">Or enter image URL:</div>
                 <input
                   type="url"
                   value={manualForm.imageUrl}
@@ -417,13 +417,13 @@ export default function AdminInstagramPage() {
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading Instagram posts...</p>
+            <p className="text-black">Loading Instagram posts...</p>
           </div>
         </div>
       ) : posts.length === 0 ? (
         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <Instagram size={64} className="mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">No Instagram posts yet</p>
+          <Instagram size={64} className="mx-auto mb-4 text-black" />
+          <p className="text-black">No Instagram posts yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -441,7 +441,7 @@ export default function AdminInstagramPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Instagram size={48} className="text-gray-400" />
+                    <Instagram size={48} className="text-black" />
                   </div>
                 )}
                 {post.isManual && (
@@ -452,10 +452,10 @@ export default function AdminInstagramPage() {
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-black">
                     {new Date(post.timestamp).toLocaleDateString()}
                   </span>
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                  <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">
                     {post.mediaType}
                   </span>
                 </div>

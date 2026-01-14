@@ -9,11 +9,21 @@ const CouponSchema = new Schema(
       uppercase: true,
       trim: true,
     },
+    discountType: {
+      type: String,
+      enum: ["percentage", "flat"],
+      default: "percentage",
+    },
     discountPercentage: {
       type: Number,
-      required: true,
+      required: false,
       min: 0,
       max: 100,
+    },
+    discountAmount: {
+      type: Number,
+      required: false,
+      min: 0,
     },
     description: {
       type: String,

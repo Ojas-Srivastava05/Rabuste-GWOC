@@ -40,6 +40,20 @@ export default function CartPage() {
 
   useEffect(() => {
     fetchCart();
+    
+    // Auto-apply coupon if coming from email
+    const autoApplyCoupon = sessionStorage.getItem('autoApplyCoupon');
+    if (autoApplyCoupon) {
+      sessionStorage.removeItem('autoApplyCoupon');
+      // Wait for cart to load, then apply coupon
+      setTimeout(() => {
+        setCouponCode(autoApplyCoupon);
+        // Auto-apply after a short delay to ensure cart is loaded
+        setTimeout(() => {
+          applyCouponWithCode(autoApplyCoupon);
+        }, 500);
+      }, 500);
+    }
   }, []);
 
   async function fetchCart() {
@@ -51,6 +65,65 @@ export default function CartPage() {
       setCouponSuccess(`Coupon ${data.couponCode} applied!`);
     }
     setLoading(false);
+  }
+
+  async function applyCouponWithCode(code: string) {
+    if (!cart) return;
+    
+    setCouponApplying(true);
+    setCouponError("");
+    setCouponSuccess("");
+
+    try {
+      // Calculate menu items total only (coupons don't apply to art)
+      const menuItemsTotal = cart.items
+        .filter(item => item.itemType === "menu")
+        .reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      // Validate coupon
+      const validateRes = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          code: code.toUpperCase(),
+          orderAmount: menuItemsTotal
+        }),
+      });
+
+      if (!validateRes.ok) {
+        const error = await validateRes.json();
+        setCouponError(error.error || "Invalid coupon code");
+        setCouponApplying(false);
+        return;
+      }
+
+      const couponData = await validateRes.json();
+
+      // Apply coupon to cart
+      const applyRes = await fetch("/api/cart/apply-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          couponCode: couponData.code,
+          discountType: couponData.discountType || "percentage",
+          discountPercentage: couponData.discountPercentage || 0,
+          discountAmount: couponData.discountAmount || 0,
+        }),
+      });
+
+      if (applyRes.ok) {
+        const updatedCart = await applyRes.json();
+        setCart(updatedCart);
+        const discountText = couponData.discountType === "flat" 
+          ? `₹${couponData.discountAmount} off`
+          : `${couponData.discountPercentage}% off`;
+        setCouponSuccess(`Coupon ${couponData.code} applied! ${discountText} on menu items`);
+      }
+    } catch (error) {
+      setCouponError("Failed to apply coupon");
+    } finally {
+      setCouponApplying(false);
+    }
   }
 
   async function applyCoupon() {
@@ -94,14 +167,19 @@ export default function CartPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           couponCode: couponData.code,
-          discountPercentage: couponData.discountPercentage
+          discountType: couponData.discountType || "percentage",
+          discountPercentage: couponData.discountPercentage || 0,
+          discountAmount: couponData.discountAmount || 0,
         }),
       });
 
       if (applyRes.ok) {
         const updatedCart = await applyRes.json();
         setCart(updatedCart);
-        setCouponSuccess(`Coupon ${couponData.code} applied! ${couponData.discountPercentage}% off on menu items`);
+        const discountText = couponData.discountType === "flat" 
+          ? `₹${couponData.discountAmount} off`
+          : `${couponData.discountPercentage}% off`;
+        setCouponSuccess(`Coupon ${couponData.code} applied! ${discountText} on menu items`);
       }
     } catch (error) {
       setCouponError("Failed to apply coupon");

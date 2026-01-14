@@ -182,7 +182,7 @@ export default function AISettingsPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading AI Settings...</p>
+          <p className="text-black">Loading AI Settings...</p>
         </div>
       </div>
     );
@@ -194,7 +194,7 @@ export default function AISettingsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">AI Settings</h1>
-          <p className="text-gray-600 mt-1">Configure AI-powered business intelligence</p>
+          <p className="text-black mt-1">Configure AI-powered business intelligence</p>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export default function AISettingsPage() {
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 placeholder="Enter stock limit..."
               />
-              <p className="text-xs mt-2 text-gray-500">
+              <p className="text-xs mt-2 text-black">
                 Alert when stock falls below this number
               </p>
             </div>
@@ -269,7 +269,7 @@ export default function AISettingsPage() {
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                 placeholder="Enter number of days..."
               />
-              <p className="text-xs mt-2 text-gray-500">
+              <p className="text-xs mt-2 text-black">
                 Flag items not sold for this many days
               </p>
             </div>
@@ -319,7 +319,7 @@ export default function AISettingsPage() {
                           <span className="font-medium text-black">
                             {index + 1}. {suggestion.name}
                           </span>
-                          <span className="text-gray-600">
+                          <span className="text-black">
                             {suggestion.soldLast7Days} sold (7 days)
                           </span>
                         </div>
@@ -389,7 +389,7 @@ export default function AISettingsPage() {
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
                       placeholder="Enter percentage..."
                     />
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black">%</span>
                   </div>
                 </div>
               </div>

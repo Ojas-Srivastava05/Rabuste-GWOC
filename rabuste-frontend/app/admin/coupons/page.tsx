@@ -6,7 +6,9 @@ import { Plus, Trash2, Edit2, Ticket, Calendar, Percent, Check, X, Search } from
 interface Coupon {
   _id: string;
   code: string;
-  discountPercentage: number;
+  discountType?: "percentage" | "flat";
+  discountPercentage?: number;
+  discountAmount?: number;
   description: string;
   isActive: boolean;
   validFrom: string;
@@ -22,9 +24,12 @@ export default function AdminCouponsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<"all" | "general" | "specific">("all");
   const [formData, setFormData] = useState({
     code: "",
+    discountType: "percentage" as "percentage" | "flat",
     discountPercentage: 10,
+    discountAmount: 50,
     description: "",
     validUntil: "",
     usageLimit: "",
@@ -123,7 +128,9 @@ export default function AdminCouponsPage() {
     setEditingCoupon(coupon);
     setFormData({
       code: coupon.code,
-      discountPercentage: coupon.discountPercentage,
+      discountType: coupon.discountType || "percentage",
+      discountPercentage: coupon.discountPercentage || 10,
+      discountAmount: coupon.discountAmount || 50,
       description: coupon.description,
       validUntil: new Date(coupon.validUntil).toISOString().split("T")[0],
       usageLimit: coupon.usageLimit?.toString() || "",
@@ -135,7 +142,9 @@ export default function AdminCouponsPage() {
   const resetForm = () => {
     setFormData({
       code: "",
+      discountType: "percentage",
       discountPercentage: 10,
+      discountAmount: 50,
       description: "",
       validUntil: "",
       usageLimit: "",
@@ -145,10 +154,18 @@ export default function AdminCouponsPage() {
     setShowModal(false);
   };
 
-  const filteredCoupons = coupons.filter(coupon =>
-    coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    coupon.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredCoupons = coupons.filter(coupon => {
+    const matchesSearch = coupon.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      coupon.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by type: general (usageLimit > 1 or null) vs specific (usageLimit === 1)
+    const isSpecific = coupon.usageLimit === 1;
+    const matchesType = filterType === "all" || 
+      (filterType === "general" && !isSpecific) ||
+      (filterType === "specific" && isSpecific);
+    
+    return matchesSearch && matchesType;
+  });
 
   const stats = {
     total: coupons.length,
@@ -210,17 +227,28 @@ export default function AdminCouponsPage() {
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search and Filter */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
-          <input
-            type="text"
-            placeholder="Search coupons..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-          />
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black" size={18} />
+            <input
+              type="text"
+              placeholder="Search coupons..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-black"
+            />
+          </div>
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as "all" | "general" | "specific")}
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
+          >
+            <option value="all">All Coupons</option>
+            <option value="general">General Coupons</option>
+            <option value="specific">Specific Coupons</option>
+          </select>
         </div>
       </div>
 
@@ -255,7 +283,11 @@ export default function AdminCouponsPage() {
                   </div>
                   <div className="flex items-center gap-2 mb-3">
                     <Percent size={16} className="text-black" />
-                    <span className="text-lg font-bold text-black">{coupon.discountPercentage}% OFF</span>
+                    <span className="text-lg font-bold text-black">
+                      {coupon.discountType === "flat" 
+                        ? `₹${coupon.discountAmount} OFF`
+                        : `${coupon.discountPercentage}% OFF`}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -347,17 +379,43 @@ export default function AdminCouponsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-black mb-2">Discount Percentage *</label>
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  max="100"
-                  value={formData.discountPercentage}
-                  onChange={(e) => setFormData({ ...formData, discountPercentage: parseInt(e.target.value) || 0 })}
+                <label className="block text-sm font-semibold text-black mb-2">Discount Type *</label>
+                <select
+                  value={formData.discountType}
+                  onChange={(e) => setFormData({ ...formData, discountType: e.target.value as "percentage" | "flat" })}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-                />
+                >
+                  <option value="percentage">Percentage Off</option>
+                  <option value="flat">Flat Amount Off</option>
+                </select>
               </div>
+
+              {formData.discountType === "percentage" ? (
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Discount Percentage *</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    max="100"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData({ ...formData, discountPercentage: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Discount Amount (₹) *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.discountAmount}
+                    onChange={(e) => setFormData({ ...formData, discountAmount: parseInt(e.target.value) || 0 })}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-semibold text-black mb-2">Description</label>

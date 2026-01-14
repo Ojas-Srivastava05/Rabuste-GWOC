@@ -348,9 +348,9 @@ export default function AdminOrdersPage() {
             <input
               type="text"
               placeholder="Search by name, email, or order ID..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-black"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
             />
           </div>
           <div className="flex gap-2">
@@ -359,7 +359,7 @@ export default function AdminOrdersPage() {
               className={`px-4 py-2 rounded-lg transition-all ${
                 activeFilter === 'all' 
                   ? 'bg-black text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               All
@@ -369,7 +369,7 @@ export default function AdminOrdersPage() {
               className={`px-4 py-2 rounded-lg transition-all ${
                 activeFilter === 'pending' 
                   ? 'bg-orange-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               Pending
@@ -379,7 +379,7 @@ export default function AdminOrdersPage() {
               className={`px-4 py-2 rounded-lg transition-all ${
                 activeFilter === 'completed' 
                   ? 'bg-green-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 text-black hover:bg-gray-200'
               }`}
             >
               Completed
@@ -491,7 +491,7 @@ export default function AdminOrdersPage() {
                           <div className="mt-2 space-y-1">
                             {order.items.slice(0, 3).map((item, idx) => (
                               <div key={idx} className="text-xs text-black bg-gray-50 px-2 py-1 rounded">
-                                <span className="font-semibold">{item.name}</span>
+                                <span className="font-semibold text-black">{item.name}</span>
                                 <span className="text-black"> × {item.quantity}</span>
                                 {item.itemType === 'art' && (
                                   <span className="ml-1 text-orange-600">🎨</span>
@@ -615,7 +615,7 @@ function OrderDetailModal({
             <div className="space-y-2">
               <p className="text-black"><strong className="text-black">Name:</strong> {order.customerName}</p>
               <p className="text-black"><strong className="text-black">Email:</strong> {order.customerEmail}</p>
-              <p className="text-black"><strong className="text-black">Order ID:</strong> <span className="font-mono text-sm">{order._id}</span></p>
+              <p className="text-black"><strong className="text-black">Order ID:</strong> <span className="font-mono text-sm text-black">{order._id}</span></p>
               <p className="text-black"><strong className="text-black">Date:</strong> {new Date(order.createdAt).toLocaleString()}</p>
             </div>
           </div>
@@ -644,7 +644,7 @@ function OrderDetailModal({
               <p className="text-sm font-semibold text-green-700 mb-2">Coupon Applied</p>
               <p className="text-sm text-black">Discount: ₹{discountAmount}</p>
               {order.couponCode && (
-                <p className="text-sm text-black">Code: <span className="font-mono font-bold">{order.couponCode}</span></p>
+                <p className="text-sm text-black">Code: <span className="font-mono font-bold text-black">{order.couponCode}</span></p>
               )}
                           </div>
                         )}
@@ -728,8 +728,8 @@ function OrderDetailModal({
               {/* Total Estimated Time */}
               {(order.estimatedTimeToCafe || order.preparationTime) && (
                 <div className="mt-4 p-3 bg-black text-white rounded-lg">
-                  <p className="text-sm font-semibold mb-1">Total Estimated Time</p>
-                  <p className="text-2xl font-bold">
+                  <p className="text-sm font-semibold mb-1 text-white">Total Estimated Time</p>
+                  <p className="text-2xl font-bold text-white">
                     {(order.preparationTime || 0) + (order.estimatedTimeToCafe || 0)} minutes
                   </p>
                   <p className="text-xs text-white mt-1">

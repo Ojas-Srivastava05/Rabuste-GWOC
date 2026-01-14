@@ -39,9 +39,20 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    // Validate discount type fields
+    const discountType = coupon.discountType || "percentage";
+    if (discountType === "percentage" && (!coupon.discountPercentage || coupon.discountPercentage <= 0)) {
+      return NextResponse.json({ error: "Invalid percentage discount" }, { status: 400 });
+    }
+    if (discountType === "flat" && (!coupon.discountAmount || coupon.discountAmount <= 0)) {
+      return NextResponse.json({ error: "Invalid flat discount" }, { status: 400 });
+    }
+
     return NextResponse.json({
       code: coupon.code,
-      discountPercentage: coupon.discountPercentage,
+      discountType: coupon.discountType || "percentage",
+      discountPercentage: coupon.discountPercentage || 0,
+      discountAmount: coupon.discountAmount || 0,
       description: coupon.description,
     });
   } catch (error) {
