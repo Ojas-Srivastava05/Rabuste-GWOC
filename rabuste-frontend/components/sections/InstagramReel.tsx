@@ -120,7 +120,9 @@ export default function InstagramReel() {
               // Method 3: Reprocess embeds to ensure they're active
               if (isLoaded && window.instgrm) {
                 setTimeout(() => {
-                  window.instgrm.Embeds.process();
+                  if (window.instgrm) {
+                    window.instgrm.Embeds.process();
+                  }
                 }, 200);
               }
               
