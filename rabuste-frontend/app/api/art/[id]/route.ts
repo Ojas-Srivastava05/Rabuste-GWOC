@@ -38,11 +38,30 @@ export async function PATCH(
 
     const body = await req.json();
 
+    // If isAvailable is being updated, handle it explicitly
+    const updateData: any = {};
+    if (body.isAvailable !== undefined) {
+      updateData.isAvailable = body.isAvailable;
+    }
+    // Allow other fields to be updated as well
+    Object.keys(body).forEach(key => {
+      if (key !== 'isAvailable') {
+        updateData[key] = body[key];
+      }
+    });
+
     const updated = await Art.findByIdAndUpdate(
       id,
-      body,
+      updateData,
       { new: true }
     );
+
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Art item not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

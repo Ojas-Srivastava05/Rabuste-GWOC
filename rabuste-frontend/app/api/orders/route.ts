@@ -28,9 +28,20 @@ export async function POST(req: Request) {
     const userId = decoded.id;
 
     // Fetch user data from database
-    const user = await User.findById(userId).select('name email');
+    const user = await User.findById(userId).select('name email isVerified');
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Check if user's email is verified
+    if (!user.isVerified) {
+      return NextResponse.json(
+        { 
+          error: "Email verification required",
+          message: "Please verify your email address before placing an order. Check your inbox for the verification link."
+        },
+        { status: 403 }
+      );
     }
 
     const data = await req.json();

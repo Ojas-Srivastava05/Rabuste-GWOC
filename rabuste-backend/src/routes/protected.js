@@ -46,6 +46,7 @@ router.get("/verify", async (req, res) => {
         phone: user.phone,
         role: req.userRole,
         isAdmin: req.isAdmin,
+        isVerified: user.isVerified || false,
       },
     });
   } catch (error) {
