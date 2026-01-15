@@ -3,7 +3,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Zap, Brain, Dumbbell, Clock, TrendingUp, Award } from 'lucide-react';
-import ComparisonSection from './ComparisonSection';
 import Balatro from '../bg';
 
 const benefits = [
@@ -565,10 +564,6 @@ export default function BenefitsShowcase() {
               }} />
             </div>
           </motion.div>
-        </div>
-
-        <div id="comparison" className="mt-16">
-          <ComparisonSection />
         </div>
       </div>
     </section>

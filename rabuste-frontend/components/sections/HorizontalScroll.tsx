@@ -84,14 +84,32 @@ export default function HorizontalScroll() {
       
       if (!res.ok) {
         console.error('Menu API error:', res.status, res.statusText);
+        // Don't crash - just show empty state
+        setItems([]);
         setLoading(false);
         return;
       }
       
       const data = await res.json();
       
+      // Handle error response
+      if (data.error) {
+        console.error('Menu API returned error:', data.error, data.message);
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+      
       if (!Array.isArray(data)) {
         console.error('Invalid response from menu API:', data);
+        setItems([]);
+        setLoading(false);
+        return;
+      }
+      
+      // If no items, return empty
+      if (data.length === 0) {
+        setItems([]);
         setLoading(false);
         return;
       }
@@ -112,6 +130,8 @@ export default function HorizontalScroll() {
       setLoading(false);
     } catch (err) {
       console.error('Failed to fetch featured items', err);
+      // Don't crash - show empty state
+      setItems([]);
       setLoading(false);
     }
   }
