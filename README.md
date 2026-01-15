@@ -1,6 +1,6 @@
 <div align="center">
 
-# ☕️RABUSTE
+# ☕️ RABUSTE
 
 ### *Premium Coffee Experience Meets Digital Art Gallery*
 
