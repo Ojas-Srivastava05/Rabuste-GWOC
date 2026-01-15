@@ -135,8 +135,12 @@ export default function AdminMenuPage() {
     })
     .sort((a, b) => {
       // Sort: available items first, then disabled items at bottom
-      if (a.isAvailable === b.isAvailable) return 0;
-      return a.isAvailable ? -1 : 1;
+      // If one is available and the other isn't, available comes first
+      if (a.isAvailable !== b.isAvailable) {
+        return a.isAvailable ? -1 : 1;
+      }
+      // If both have same availability, sort by name alphabetically
+      return a.name.localeCompare(b.name);
     });
 
   const stats = {
