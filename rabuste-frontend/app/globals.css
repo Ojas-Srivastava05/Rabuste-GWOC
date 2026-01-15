@@ -37,6 +37,10 @@ body {
 :root {
   --background: #1A1110;
   --foreground: #F5F1E8;
+  /* Typography - Ensure CSS variables are available globally */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'Work Sans', sans-serif;
 }
 
 /* Hide scrollbar for horizontal scroll containers */
