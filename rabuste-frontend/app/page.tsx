@@ -3,16 +3,27 @@
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
-import DynamicBackground from "@/components/DynamicBackground";
 import HeroRevamped from "@/components/sections/HeroRevamped";
-import FloatingCart from "@/components/FloatingCart";
-import FloatingMoodBrewer from "@/components/FloatingMoodBrewer";
-import WelcomePopup from "@/components/WelcomePopup";
-import PersonalizedComboPopup from "@/components/PersonalizedComboPopup";
 import SectionTracker from "@/components/SectionTracker";
 import { useUser } from "@/contexts/UserContext";
 
 // Lazy load below-the-fold components for better initial load performance
+const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), {
+  loading: () => null,
+});
+const FloatingCart = dynamic(() => import("@/components/FloatingCart"), {
+  loading: () => null,
+});
+const FloatingMoodBrewer = dynamic(() => import("@/components/FloatingMoodBrewer"), {
+  loading: () => null,
+});
+const WelcomePopup = dynamic(() => import("@/components/WelcomePopup"), {
+  loading: () => null,
+});
+const PersonalizedComboPopup = dynamic(() => import("@/components/PersonalizedComboPopup"), {
+  loading: () => null,
+});
+
 const HorizontalScroll = dynamic(() => import("@/components/sections/HorizontalScroll"), {
   loading: () => <div style={{ minHeight: '100vh' }} />,
 });

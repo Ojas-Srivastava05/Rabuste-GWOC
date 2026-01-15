@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Bebas_Neue, Work_Sans } from "next/font/google";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -71,6 +72,20 @@ export const metadata: Metadata = {
   },
 };
 
+const bebasNeue = Bebas_Neue({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-display",
+});
+
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-body",
+});
+
 export default function RootLayout({
   children,
 }: {
@@ -107,24 +122,11 @@ export default function RootLayout({
         )}
         <link
           rel="preconnect"
-          href="https://fonts.googleapis.com"
-        />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preconnect"
           href="https://www.googletagmanager.com"
         />
         <link
           rel="dns-prefetch"
           href="https://checkout.razorpay.com"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
         />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo.svg" />
@@ -133,7 +135,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body
-        className="antialiased"
+        className={`${workSans.variable} ${bebasNeue.variable} antialiased`}
         suppressHydrationWarning
       >
         <StructuredData />

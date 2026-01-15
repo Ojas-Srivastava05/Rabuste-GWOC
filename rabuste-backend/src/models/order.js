@@ -1,46 +1,53 @@
 import mongoose from "mongoose";
 
-const orderSchema=new mongoose.Schema(
+const orderSchema = new mongoose.Schema(
   {
-    userId:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"User",
-      required:true,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    items:[
+
+    items: [
       {
-        itemId:String,
-        quantity:Number,
+        itemId: String,
+        quantity: Number,
       },
     ],
-    userLocation:{
-      lat:Number,
-      lng:Number,
+
+    userLocation: {
+      lat: Number,
+      lng: Number,
     },
-    price:{type:Number,required:true},
-    totalAmount:{type:Number},
+
+    price: { type: Number, required: true },
+    totalAmount: { type: Number },
+
     instructions: String,
     couponCode: String,
     couponDiscount: Number,
+
     paymentId: String,
     paymentStatus: String,
-    assignedStoreId:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Store",
+
+    assignedStoreId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
     },
+
     pickupSlot: String,
-    
-    // Time estimation fields
+
+    // ⏱ Time estimation fields
     estimatedTimeToCafe: {
-      type: Number, // in minutes
+      type: Number,
       default: null,
     },
     preparationTime: {
-      type: Number, // in minutes, admin configurable
+      type: Number,
       default: null,
     },
     distanceFromCafe: {
-      type: Number, // in km
+      type: Number,
       default: null,
     },
 
@@ -49,9 +56,25 @@ const orderSchema=new mongoose.Schema(
       enum: ["pending", "assigned", "completed"],
       default: "pending",
     },
+
+    /* 
+        PETPOOJA INTEGRATION
+    */
+    // petpoojaOrderId: {
+    //   type: String,
+    //   default: null,
+    // },
+
+    /* 
+        EXTERNAL SYNC STATUS
+    */
+    // externalSync: {
+    //   petpooja: { type: Boolean, default: false },
+    //   reelo: { type: Boolean, default: false },
+    // },
+
   },
   { timestamps: true }
-  
 );
 
-export default mongoose.model("Order",orderSchema);
+export default mongoose.model("Order", orderSchema);
