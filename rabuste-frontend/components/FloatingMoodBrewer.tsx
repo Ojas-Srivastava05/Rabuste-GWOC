@@ -76,19 +76,15 @@ export default function FloatingMoodBrewer() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Bottom Right */}
       <AnimatePresence>
         {showFloating && !open && (
           <motion.div
-            initial={{ opacity: 0, x: -100, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -100, scale: 0.8 }}
+            initial={{ opacity: 0, x: 100, y: 100, scale: 0.8 }}
+            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 100, y: 100, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="fixed left-4 sm:left-6 z-50"
-            style={{
-              top: "50%",
-              transform: "translateY(-50%)",
-            }}
+            className="fixed right-4 sm:right-6 bottom-6 sm:bottom-8 z-50"
           >
             {/* Glow */}
             <motion.div
@@ -184,15 +180,15 @@ export default function FloatingMoodBrewer() {
               </motion.div>
             </motion.button>
 
-            {/* Label - Shows ONLY for 3 seconds */}
+            {/* Label - Shows ONLY for 3 seconds - positioned to the left of button */}
             <AnimatePresence>
               {showLabel && (
                 <motion.div
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
+                  exit={{ opacity: 0, x: 10 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute left-full ml-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap"
+                  className="absolute right-full mr-4 top-1/2 -translate-y-1/2 pointer-events-none whitespace-nowrap"
                 >
                   <div
                     className="md:block hidden"
@@ -220,14 +216,14 @@ export default function FloatingMoodBrewer() {
                   <div
                     style={{
                       position: "absolute",
-                      left: "-8px",
+                      right: "-8px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       width: "0",
                       height: "0",
                       borderTop: "6px solid transparent",
                       borderBottom: "6px solid transparent",
-                      borderRight: "8px solid rgba(184, 115, 51, 0.6)",
+                      borderLeft: "8px solid rgba(184, 115, 51, 0.6)",
                     }}
                   />
                 </motion.div>
@@ -255,19 +251,18 @@ export default function FloatingMoodBrewer() {
         )}
       </AnimatePresence>
 
-      {/* Bot Window */}
+      {/* Bot Window - Bottom Right */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, x: "-100%", y: "-100%" }}
+            initial={{ opacity: 0, x: "100%", y: "100%" }}
             animate={{ opacity: 1, x: 0, y: 0 }}
-            exit={{ opacity: 0, x: "-100%", y: "-100%" }}
+            exit={{ opacity: 0, x: "100%", y: "100%" }}
             transition={{ type: "spring", stiffness: 260, damping: 25 }}
-            className="fixed left-0 z-50 w-full sm:w-[95vw] md:w-[500px] lg:w-[550px] flex flex-col"
+            className="fixed right-4 bottom-4 sm:right-6 sm:bottom-6 z-50 w-[calc(100%-2rem)] sm:w-[450px] md:w-[480px] lg:w-[500px] flex flex-col"
             style={{
-              top: "70px",
-              height: "calc(100vh - 70px)",
-              maxHeight: "calc(100vh - 70px)",
+              height: "calc(100vh - 150px)",
+              maxHeight: "650px",
             }}
             ref={botRef}
           >
@@ -276,54 +271,80 @@ export default function FloatingMoodBrewer() {
               style={{
                 background: "linear-gradient(135deg, rgba(26, 17, 16, 0.98), rgba(42, 24, 16, 0.98))",
                 border: "2px solid rgba(184, 115, 51, 0.6)",
-                borderRadius: "0 16px 16px 0",
+                borderRadius: "16px",
                 backdropFilter: "blur(20px)",
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.8), 0 0 80px rgba(184, 115, 51, 0.3)",
               }}
             >
+              {/* Enhanced Header with better visual hierarchy */}
               <div
-                className="relative p-4 sm:p-4 md:p-4 border-b"
+                className="relative border-b"
                 style={{
-                  borderColor: "rgba(184, 115, 51, 0.3)",
-                  background: "linear-gradient(90deg, rgba(184, 115, 51, 0.1), transparent)",
+                  borderColor: "rgba(184, 115, 51, 0.4)",
+                  background: "linear-gradient(135deg, rgba(184, 115, 51, 0.15), rgba(184, 115, 51, 0.05))",
+                  padding: "16px 20px",
                 }}
               >
-                <div className="flex items-center gap-3 pr-14 sm:pr-14 md:pr-14">
+                {/* Decorative accent line at top */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "2px",
+                    background: "linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)",
+                  }}
+                />
+
+                <div className="flex items-center gap-3 pr-10">
+                  {/* Icon with better styling */}
                   <div
-                    className="w-10 h-10 sm:w-10 sm:h-10 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                     style={{
                       background: "linear-gradient(135deg, #B87333, #CD7F32)",
-                      boxShadow: "0 0 20px rgba(184, 115, 51, 0.5)",
+                      boxShadow: "0 4px 12px rgba(184, 115, 51, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+                      border: "1px solid rgba(212, 165, 116, 0.5)",
                     }}
                   >
                     <Brain size={20} style={{ color: "#000000" }} />
                   </div>
+
+                  {/* Title section with better spacing */}
                   <div className="flex-1 min-w-0">
                     <h3
                       style={{
                         fontFamily: "Bebas Neue, sans-serif",
-                        fontSize: "1.125rem sm:text-1.25rem md:text-1.25rem",
+                        fontSize: "1.25rem",
                         color: "#FFFEF9",
-                        letterSpacing: "0.1em",
+                        letterSpacing: "0.12em",
                         margin: 0,
-                        lineHeight: "1.2",
+                        lineHeight: "1",
+                        textShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
                       }}
                     >
                       BREW AI
                     </h3>
-                    <p style={{ fontSize: "0.7rem sm:text-0.75rem md:text-0.75rem", color: "#B87333", margin: 0 }}>
+                    <p 
+                      style={{ 
+                        fontSize: "0.7rem", 
+                        color: "#D4A574", 
+                        margin: "4px 0 0 0", 
+                        lineHeight: "1.2",
+                        fontWeight: 500,
+                      }}
+                    >
                       Your AI Coffee Sommelier
                     </p>
                   </div>
                 </div>
 
-                {/* Enhanced close button - bigger and more accessible on mobile */}
+                {/* Enhanced close button with better visual feedback */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Close button clicked');
                     setOpen(false);
                   }}
                   onTouchStart={(e) => {
@@ -332,35 +353,65 @@ export default function FloatingMoodBrewer() {
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Close button touched');
                     setOpen(false);
                   }}
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 rounded-full transition-all active:scale-95 touch-manipulation"
+                  className="absolute top-4 right-4 rounded-full transition-all hover:scale-110 active:scale-95 touch-manipulation"
                   style={{
-                    background: "rgba(184, 115, 51, 0.9)",
-                    border: "2px solid rgba(184, 115, 51, 1)",
-                    padding: "10px",
-                    minWidth: "44px",
-                    minHeight: "44px",
+                    background: "linear-gradient(135deg, rgba(184, 115, 51, 0.9), rgba(205, 127, 50, 0.9))",
+                    border: "1px solid rgba(212, 165, 116, 0.8)",
+                    padding: "8px",
+                    minWidth: "36px",
+                    minHeight: "36px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
                     pointerEvents: "auto",
                     zIndex: 100,
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.5), 0 0 8px rgba(184, 115, 51, 0.6)",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
                   }}
                   aria-label="Close Brew AI"
                 >
-                  <X className="w-6 h-6 sm:w-6 sm:h-6 md:w-5 md:h-5" style={{ color: "#000000", strokeWidth: 3 }} />
+                  <X className="w-5 h-5" style={{ color: "#000000", strokeWidth: 2.5 }} />
                 </button>
               </div>
 
-              <div className="overflow-y-auto p-4 sm:p-6 flex-1" style={{ WebkitOverflowScrolling: "touch", paddingTop: "1rem" }}>
-                <div style={{ paddingTop: "1rem" }}>
+              {/* Chat content area with subtle texture */}
+              <div 
+                className="overflow-y-auto flex-1" 
+                style={{ 
+                  WebkitOverflowScrolling: "touch",
+                  padding: "20px",
+                  position: "relative",
+                }}
+              >
+                {/* Subtle texture overlay */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(184, 115, 51, 0.02) 2px, rgba(184, 115, 51, 0.02) 4px)",
+                    pointerEvents: "none",
+                  }}
+                />
+                
+                <div style={{ position: "relative", zIndex: 1 }}>
                   <MoodBrewerChat />
                 </div>
               </div>
+
+              {/* Decorative bottom accent */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "2px",
+                  background: "linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)",
+                  opacity: 0.6,
+                }}
+              />
             </div>
           </motion.div>
         )}

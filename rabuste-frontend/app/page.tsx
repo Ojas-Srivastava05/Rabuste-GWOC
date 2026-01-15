@@ -72,10 +72,6 @@ export default function Home() {
       )}
 
       {/* Personalized Combo Popup - Always visible at bottom-right */}
-      <PersonalizedComboPopup
-        userName={user?.name}
-        isLoggedIn={!!user}
-      />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
