@@ -21,7 +21,14 @@ export async function GET() {
       createdAt: -1,
     });
 
-    return NextResponse.json(art, { status: 200 });
+    return NextResponse.json(art, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'CDN-Cache-Control': 'public, s-maxage=60',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=60',
+      },
+    });
   } catch (error) {
     console.error("Error fetching art:", error);
     return NextResponse.json(

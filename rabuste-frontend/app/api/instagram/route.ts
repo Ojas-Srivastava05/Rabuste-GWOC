@@ -17,7 +17,14 @@ export async function GET() {
       .lean();
 
     // Return empty array if no posts found (don't throw error)
-    return NextResponse.json(posts || [], { status: 200 });
+    return NextResponse.json(posts || [], {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        'CDN-Cache-Control': 'public, s-maxage=300',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=300',
+      },
+    });
   } catch (error: any) {
     console.error("Error fetching Instagram posts:", error);
     // Return empty array instead of error to prevent frontend crashes

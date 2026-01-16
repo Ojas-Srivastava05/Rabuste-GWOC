@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Coffee, Palette, Users, Wifi, ArrowRight } from 'lucide-react';
 
 export default function ExperienceSection() {
@@ -239,10 +240,14 @@ export default function ExperienceSection() {
               aspectRatio: '4/3',
             }}
           >
-            <img
+            <Image
               src="https://images.pexels.com/photos/1449773/pexels-photo-1449773.jpeg"
               alt="Cafe interior by Asad Photo Maldives on Pexels"
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              loading="lazy"
+              quality={85}
             />
             <div
               style={{
@@ -279,10 +284,14 @@ export default function ExperienceSection() {
               aspectRatio: '4/3',
             }}
           >
-            <img
+            <Image
               src="https://images.pexels.com/photos/6612601/pexels-photo-6612601.jpeg"
               alt="Coffee preparation by Pavel Danilyuk on Pexels"
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              loading="lazy"
+              quality={85}
             />
             <div
               style={{

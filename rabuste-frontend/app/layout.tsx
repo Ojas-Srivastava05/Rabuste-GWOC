@@ -128,8 +128,28 @@ export default function RootLayout({
           rel="dns-prefetch"
           href="https://checkout.razorpay.com"
         />
+        <link
+          rel="dns-prefetch"
+          href="https://www.instagram.com"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://static.cdninstagram.com"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+          crossOrigin="anonymous"
+        />
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo.svg" />
+        {/* Preload critical logo for LCP */}
+        <link
+          rel="preload"
+          href="/Rabuste logo.png"
+          as="image"
+          type="image/png"
+        />
         <meta name="theme-color" content="#FE7400" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />

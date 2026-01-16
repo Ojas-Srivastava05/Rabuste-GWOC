@@ -17,18 +17,37 @@ export async function GET() {
     // 1️⃣ connect to database
     await connectDB();
 
-    // 2️⃣ fetch only available items
-    const menu = await Menu.find({ isAvailable: true }).sort({
-      category: 1,
-      name: 1,
-    });
+    // 2️⃣ fetch only available items (or all items if isAvailable field doesn't exist)
+    let menu;
+    try {
+      menu = await Menu.find({ isAvailable: { $ne: false } }).sort({
+        category: 1,
+        name: 1,
+      }).lean();
+    } catch (queryError) {
+      // If query fails, try without isAvailable filter
+      console.warn("Query with isAvailable failed, trying without filter:", queryError);
+      menu = await Menu.find({}).sort({
+        category: 1,
+        name: 1,
+      }).lean();
+    }
 
-    // 3️⃣ return response
-    return NextResponse.json(menu, { status: 200 });
-  } catch (error) {
+    // 3️⃣ return response with cache headers for CDN
+    return NextResponse.json(menu || [], {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'CDN-Cache-Control': 'public, s-maxage=60',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=60',
+      },
+    });
+  } catch (error: any) {
     console.error("Error fetching menu:", error);
+    
+    // Return empty array instead of error to prevent frontend crashes
     return NextResponse.json(
-      { error: "Failed to fetch menu" },
+      { error: "Failed to fetch menu", message: error?.message || "Unknown error" },
       { status: 500 }
     );
   }

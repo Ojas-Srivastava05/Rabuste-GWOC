@@ -142,6 +142,10 @@ export default function AdminMenuPage() {
       // If both have same availability, sort by name alphabetically
       return a.name.localeCompare(b.name);
     });
+  
+  // Separate available and disabled items for better organization
+  const availableItems = filteredMenu.filter(item => item.isAvailable);
+  const disabledItems = filteredMenu.filter(item => !item.isAvailable);
 
   const stats = {
     total: menu.length,
@@ -390,15 +394,40 @@ export default function AdminMenuPage() {
           <p className="text-black">No menu items found</p>
           </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredMenu.map((item) => (
-            <MenuItemCard
-              key={item._id}
-              item={item}
-              onToggleAvailability={toggleAvailability}
-              onDelete={deleteItem}
-            />
-          ))}
+        <div className="space-y-8">
+          {/* Available Items */}
+          {availableItems.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-black mb-4">Available Items</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {availableItems.map((item) => (
+                  <MenuItemCard
+                    key={item._id}
+                    item={item}
+                    onToggleAvailability={toggleAvailability}
+                    onDelete={deleteItem}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Disabled Items */}
+          {disabledItems.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-500 mb-4">Disabled Items</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {disabledItems.map((item) => (
+                  <MenuItemCard
+                    key={item._id}
+                    item={item}
+                    onToggleAvailability={toggleAvailability}
+                    onDelete={deleteItem}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -413,7 +442,7 @@ export default function AdminMenuPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredMenu.map((item) => (
+              {availableItems.map((item) => (
                 <tr key={item._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -425,8 +454,8 @@ export default function AdminMenuPage() {
                             <ImageIcon size={20} className="text-black" />
                           </div>
                         )}
-      </div>
-      <div>
+                      </div>
+                      <div>
                         <p className="font-semibold text-black">{item.name}</p>
                         <p className="text-sm text-black line-clamp-1">{item.description}</p>
                       </div>
@@ -469,10 +498,69 @@ export default function AdminMenuPage() {
                       >
                         <Trash2 size={16} />
                       </button>
-          </div>
+                    </div>
                   </td>
                 </tr>
               ))}
+              {disabledItems.length > 0 && (
+                <>
+                  <tr>
+                    <td colSpan={5} className="px-6 py-3 bg-gray-100">
+                      <h3 className="text-sm font-semibold text-gray-600">Disabled Items</h3>
+                    </td>
+                  </tr>
+                  {disabledItems.map((item) => (
+                    <tr key={item._id} className="bg-gray-50 hover:bg-gray-100" style={{ filter: 'grayscale(100%)', opacity: 0.7 }}>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
+                            {item.image ? (
+                              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <ImageIcon size={20} className="text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-500">{item.name}</p>
+                            <p className="text-sm text-gray-400 line-clamp-1">{item.description}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-sm">{item.category}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-gray-500">₹{item.price}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                          Disabled
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                            className="p-2 rounded-lg transition-colors bg-green-100 text-green-600 hover:bg-green-200"
+                            title="Enable"
+                          >
+                            <Power size={16} />
+                          </button>
+                          <button
+                            onClick={() => deleteItem(item._id)}
+                            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              )}
             </tbody>
           </table>
           </div>
@@ -491,37 +579,48 @@ function MenuItemCard({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
-      item.isAvailable ? 'border-gray-200' : 'border-gray-300 opacity-50'
+    <div className={`bg-white rounded-lg border-2 overflow-hidden transition-all ${
+      item.isAvailable 
+        ? 'border-gray-200 hover:shadow-lg' 
+        : 'border-gray-400 bg-gray-100 opacity-75'
     }`} style={!item.isAvailable ? { 
       filter: 'grayscale(100%)',
-      textDecoration: 'line-through'
     } : {}}>
-      <div className="aspect-square bg-gray-100 overflow-hidden">
+      <div className="aspect-square bg-gray-100 overflow-hidden relative">
         {item.image ? (
           <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ImageIcon size={48} className="text-black" />
+            <ImageIcon size={48} className={item.isAvailable ? "text-black" : "text-gray-400"} />
           </div>
         )}
-                {!item.isAvailable && (
-          <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
-                    Disabled
-                  </div>
-                )}
-                </div>
+        {!item.isAvailable && (
+          <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded shadow-lg">
+            Disabled
+          </div>
+        )}
+      </div>
       <div className="p-4">
         <div className="mb-2">
-          <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">{item.category}</span>
-                </div>
-        <h3 className="font-bold text-black mb-1">{item.name}</h3>
-        <p className="text-sm text-black mb-3 line-clamp-2">{item.description}</p>
+          <span className={`text-xs px-2 py-1 rounded ${
+            item.isAvailable 
+              ? 'bg-gray-100 text-black' 
+              : 'bg-gray-200 text-gray-600'
+          }`}>{item.category}</span>
+        </div>
+        <h3 className={`font-bold mb-1 ${
+          item.isAvailable ? 'text-black' : 'text-gray-500'
+        }`}>{item.name}</h3>
+        <p className={`text-sm mb-3 line-clamp-2 ${
+          item.isAvailable ? 'text-black' : 'text-gray-500'
+        }`}>{item.description}</p>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-lg font-bold text-black">₹{item.price}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
+          <p className={`text-lg font-bold ${
+            item.isAvailable ? 'text-black' : 'text-gray-500'
+          }`}>₹{item.price}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
             onClick={() => onToggleAvailability(item._id, item.isAvailable)}
             className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
               item.isAvailable
@@ -530,14 +629,14 @@ function MenuItemCard({
             }`}
           >
             {item.isAvailable ? "Disable" : "Enable"}
-                  </button>
-                  <button
+          </button>
+          <button
             onClick={() => onDelete(item._id)}
             className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
           >
             <Trash2 size={16} />
-                  </button>
-                </div>
+          </button>
+        </div>
       </div>
     </div>
   );

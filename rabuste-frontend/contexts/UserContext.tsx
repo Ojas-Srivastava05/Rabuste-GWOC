@@ -13,6 +13,7 @@ interface User {
     fullNumber: string;
   };
   role: string;
+  isVerified?: boolean;
 }
 
 interface UserContextType {

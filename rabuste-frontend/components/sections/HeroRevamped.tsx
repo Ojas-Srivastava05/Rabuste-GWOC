@@ -10,6 +10,7 @@ export default function HeroRevamped() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -20,6 +21,7 @@ export default function HeroRevamped() {
   const y = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
 
   useEffect(() => {
+    setIsMounted(true);
     // Ensure page starts at top on initial load
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'auto' });
@@ -145,9 +147,9 @@ export default function HeroRevamped() {
             />
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-              animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.8, rotate: isLoaded ? 0 : -10 }}
-              transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1], delay: 0.8 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: isLoaded ? 1 : 0, scale: isLoaded ? 1 : 0.9 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               className="relative w-[280px] h-[280px] sm:w-[360px] sm:h-[360px] lg:w-[480px] lg:h-[480px]"
             >
               {/* Pulsing glow effect */}
@@ -225,7 +227,7 @@ export default function HeroRevamped() {
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1, delay: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
                   style={{ 
                     fontFamily: 'var(--font-heading)', 
                     fontSize: 'clamp(5rem, 12vw, 9rem)', 
@@ -241,29 +243,33 @@ export default function HeroRevamped() {
                   }}
                 >
                   RABUSTE
-                  {/* Glow effect behind text - deferred to prevent LCP delay */}
-                  <motion.span
-                    initial={{ opacity: 0.3 }}
-                    animate={{
-                      opacity: [0.3, 0.6, 0.3],
-                    }}
-                    transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 2, // Delay animation start to not block LCP
-                    }}
-                    className="absolute inset-0 blur-2xl"
-                    style={{
-                      background: 'linear-gradient(135deg, #D4A574, #B87333)',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      backgroundClip: 'text',
-                      zIndex: -1,
-                    }}
-                  >
-                    RABUSTE
-                  </motion.span>
+                  {/* Glow effect behind text - optimized for performance - Client only */}
+                  {isMounted && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: [0, 0.4, 0],
+                      }}
+                      transition={{
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 3, // Delay animation start to not block LCP
+                      }}
+                      className="absolute inset-0 blur-xl"
+                      style={{
+                        background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        zIndex: -1,
+                        willChange: 'opacity',
+                        transform: 'translateZ(0)',
+                      }}
+                    >
+                      RABUSTE
+                    </motion.span>
+                  )}
                 </motion.h1>
                 
                 <motion.div

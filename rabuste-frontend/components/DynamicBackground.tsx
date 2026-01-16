@@ -5,22 +5,32 @@ import { motion } from 'framer-motion';
 
 export default function DynamicBackground() {
   const [key, setKey] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Listen for VR close event to force re-render
+  // Set mounted state after component mounts (client-only)
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Listen for VR close event to force re-render (client-only)
+  useEffect(() => {
+    if (!isMounted) return;
+
     const handleVRClose = () => {
       // Force component to re-render
       setKey(prev => prev + 1);
     };
 
-    window.addEventListener('vr-closed', handleVRClose);
-    window.addEventListener('resize', handleVRClose);
-    
-    return () => {
-      window.removeEventListener('vr-closed', handleVRClose);
-      window.removeEventListener('resize', handleVRClose);
-    };
-  }, []);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('vr-closed', handleVRClose);
+      window.addEventListener('resize', handleVRClose);
+      
+      return () => {
+        window.removeEventListener('vr-closed', handleVRClose);
+        window.removeEventListener('resize', handleVRClose);
+      };
+    }
+  }, [isMounted]);
 
   return (
     <div 

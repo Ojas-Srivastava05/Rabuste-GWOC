@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { ArrowRight, Zap, TrendingUp, Award } from 'lucide-react';
 
 export default function CallToAction() {
@@ -43,15 +44,7 @@ export default function CallToAction() {
           style={{ scale }}
           className="relative w-full lg:w-[60%] min-h-[60vh] lg:min-h-screen flex items-center justify-center p-6 sm:p-8 lg:p-16"
         >
-          {/* Background Pattern */}
-          <div 
-            className="absolute inset-0 opacity-5"
-            style={{
-              backgroundImage: 'url(https://images.pexels.com/photos/3914189/pexels-photo-3914189.jpeg)',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
+          {/* Background Pattern - Removed to improve performance */}
 
           <div className="relative z-10 w-full max-w-2xl">
             {/* Main Hero Image */}
@@ -130,10 +123,14 @@ export default function CallToAction() {
                   border: '3px solid rgba(184, 115, 51, 0.3)',
                 }}
               >
-                <img
+                <Image
                   src="https://images.pexels.com/photos/6278746/pexels-photo-6278746.jpeg"
                   alt="Hand holding coffee by Artem Podrez on Pexels"
-                  className="w-full h-48 object-cover hover:scale-110 transition-transform duration-700"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  quality={85}
                 />
               </motion.div>
 
@@ -147,10 +144,14 @@ export default function CallToAction() {
                   border: '3px solid rgba(184, 115, 51, 0.3)',
                 }}
               >
-                <img
+                <Image
                   src="https://images.pexels.com/photos/25547393/pexels-photo-25547393.jpeg"
                   alt="Coffee beans by Yunus Kılıç on Pexels"
-                  className="w-full h-48 object-cover hover:scale-110 transition-transform duration-700"
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  quality={85}
                 />
               </motion.div>
             </div>

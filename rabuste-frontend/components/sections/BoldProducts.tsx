@@ -126,9 +126,9 @@ export default function BoldProducts() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{
                     objectFit: 'cover',
-                    transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
-                  className="group-hover:scale-110"
+                  className="group-hover:scale-105"
                   loading={index === 0 ? "eager" : "lazy"}
                   quality={75}
                   priority={index === 0}

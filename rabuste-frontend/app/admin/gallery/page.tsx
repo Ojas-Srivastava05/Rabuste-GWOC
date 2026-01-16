@@ -152,6 +152,10 @@ export default function AdminGalleryPage() {
       // If both have same availability, sort by title alphabetically
       return a.title.localeCompare(b.title);
     });
+  
+  // Separate available and disabled items for better organization
+  const availableItems = filteredGallery.filter(item => item.isAvailable);
+  const disabledItems = filteredGallery.filter(item => !item.isAvailable);
 
   const stats = {
     total: gallery.length,
@@ -445,69 +449,122 @@ export default function AdminGalleryPage() {
           <p className="text-black">No artworks found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredGallery.map((item) => (
-            <div
-              key={item._id}
-              className={`bg-white rounded-lg border-2 overflow-hidden transition-all hover:shadow-lg ${
-                item.isAvailable ? 'border-gray-200' : 'border-gray-300 opacity-50'
-              }`}
-              style={!item.isAvailable ? { 
-                filter: 'grayscale(100%)',
-                textDecoration: 'line-through'
-              } : {}}
-            >
-              <div className="aspect-square bg-gray-100 overflow-hidden relative">
-                {item.images[0] ? (
-                  <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImagePlus size={48} className="text-black" />
-                  </div>
-                )}
-                {!item.isAvailable && (
-                  <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
-                    Disabled
-                  </div>
-                )}
-                {item.images.length > 1 && (
-                  <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
-                    +{item.images.length - 1} more
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">{item.category}</span>
-                  <span className="text-xs font-semibold text-black">Stock: {item.stock}</span>
-                </div>
-                <h3 className="font-bold text-black mb-1">{item.title}</h3>
-                <p className="text-sm text-black mb-2">by {item.artist}</p>
-                <p className="text-xs text-black mb-3 line-clamp-2">{item.description}</p>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xl font-bold text-black">₹{item.price.toLocaleString()}</span>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => toggleAvailability(item._id, item.isAvailable)}
-                    className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                      item.isAvailable
-                        ? "bg-red-100 text-red-700 hover:bg-red-200"
-                        : "bg-green-100 text-green-700 hover:bg-green-200"
-                    }`}
+        <div className="space-y-8">
+          {/* Available Items */}
+          {availableItems.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-black mb-4">Available Items</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {availableItems.map((item) => (
+                  <div
+                    key={item._id}
+                    className="bg-white rounded-lg border-2 border-gray-200 overflow-hidden transition-all hover:shadow-lg"
                   >
-                    {item.isAvailable ? "Disable" : "Enable"}
-                  </button>
-                  <button
-                    onClick={() => deleteItem(item._id)}
-                    className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
+                    <div className="aspect-square bg-gray-100 overflow-hidden relative">
+                      {item.images[0] ? (
+                        <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ImagePlus size={48} className="text-black" />
+                        </div>
+                      )}
+                      {item.images.length > 1 && (
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                          +{item.images.length - 1} more
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs px-2 py-1 bg-gray-100 text-black rounded">{item.category}</span>
+                        <span className="text-xs font-semibold text-black">Stock: {item.stock}</span>
+                      </div>
+                      <h3 className="font-bold text-black mb-1">{item.title}</h3>
+                      <p className="text-sm text-black mb-2">by {item.artist}</p>
+                      <p className="text-xs text-black mb-3 line-clamp-2">{item.description}</p>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xl font-bold text-black">₹{item.price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                          className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors bg-red-100 text-red-700 hover:bg-red-200"
+                        >
+                          Disable
+                        </button>
+                        <button
+                          onClick={() => deleteItem(item._id)}
+                          className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          )}
+          
+          {/* Disabled Items */}
+          {disabledItems.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-500 mb-4">Disabled Items</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {disabledItems.map((item) => (
+                  <div
+                    key={item._id}
+                    className="bg-white rounded-lg border-2 border-gray-400 overflow-hidden bg-gray-100 opacity-75"
+                    style={{ filter: 'grayscale(100%)' }}
+                  >
+                    <div className="aspect-square bg-gray-200 overflow-hidden relative">
+                      {item.images[0] ? (
+                        <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ImagePlus size={48} className="text-gray-400" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded shadow-lg">
+                        Disabled
+                      </div>
+                      {item.images.length > 1 && (
+                        <div className="absolute top-2 left-2 px-2 py-1 bg-gray-600 text-white text-xs rounded">
+                          +{item.images.length - 1} more
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs px-2 py-1 bg-gray-200 text-gray-600 rounded">{item.category}</span>
+                        <span className="text-xs font-semibold text-gray-500">Stock: {item.stock}</span>
+                      </div>
+                      <h3 className="font-bold text-gray-500 mb-1">{item.title}</h3>
+                      <p className="text-sm text-gray-500 mb-2">by {item.artist}</p>
+                      <p className="text-xs text-gray-500 mb-3 line-clamp-2">{item.description}</p>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xl font-bold text-gray-500">₹{item.price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => toggleAvailability(item._id, item.isAvailable)}
+                          className="flex-1 px-3 py-2 rounded-lg text-sm font-semibold transition-colors bg-green-100 text-green-700 hover:bg-green-200"
+                        >
+                          Enable
+                        </button>
+                        <button
+                          onClick={() => deleteItem(item._id)}
+                          className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

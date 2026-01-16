@@ -21,6 +21,11 @@ export default function InstagramShowcase() {
   const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchInstagramPosts = async () => {
@@ -100,26 +105,30 @@ export default function InstagramShowcase() {
                 display: 'inline-block',
               }}>
                 INSTAGRAM
-                {/* Glow effect behind text */}
-                <motion.span
-                  animate={{
-                    opacity: [0.3, 0.6, 0.3],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute inset-0 blur-2xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #D4A574, #B87333)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    zIndex: -1,
-                  }}
-                >
-                  INSTAGRAM
-                </motion.span>
+                {/* Glow effect behind text - Client only to prevent hydration mismatch */}
+                {isMounted && (
+                  <motion.span
+                    animate={{
+                      opacity: [0.3, 0.6, 0.3],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                    className="absolute inset-0 blur-xl"
+                    style={{
+                      background: 'linear-gradient(135deg, #D4A574, #B87333)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      zIndex: -1,
+                      willChange: 'opacity',
+                      transform: 'translateZ(0)',
+                    }}
+                  >
+                    INSTAGRAM
+                  </motion.span>
+                )}
               </span>
             </motion.h2>
 
