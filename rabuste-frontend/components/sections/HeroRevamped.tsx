@@ -12,6 +12,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import Balatro from '../bg';
+import { videoUrls } from '@/lib/videoUrls';
 
 export default function HeroRevamped() {
   const router = useRouter();
@@ -161,7 +162,8 @@ export default function HeroRevamped() {
                 }
               }}
             >
-              <source src="/gallery/herocafe.mp4" type="video/mp4" />
+              <source src={videoUrls.heroVideo} type="video/quicktime" />
+              <source src={videoUrls.heroVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
             
@@ -514,7 +516,8 @@ export default function HeroRevamped() {
                   video.play().catch(() => {});
                 }}
               >
-                <source src="/gallery/herocafe.mp4" type="video/mp4" />
+                <source src={videoUrls.rightVideo} type="video/quicktime" />
+                <source src={videoUrls.rightVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             )}

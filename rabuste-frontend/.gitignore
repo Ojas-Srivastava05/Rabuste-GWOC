@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Video files (too large for git - use Cloudinary instead)
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+public/gallery/*.mp4
+public/gallery/*.mov
