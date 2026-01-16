@@ -248,6 +248,7 @@ export default function ExperienceSection() {
               className="object-cover"
               loading="lazy"
               quality={85}
+              unoptimized
             />
             <div
               style={{
@@ -292,6 +293,7 @@ export default function ExperienceSection() {
               className="object-cover"
               loading="lazy"
               quality={85}
+              unoptimized
             />
             <div
               style={{

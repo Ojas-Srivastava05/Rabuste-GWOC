@@ -191,13 +191,13 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
     `;
   };
 
-  // Calculate label position
+  // Calculate label position - Round to prevent hydration mismatches
   const getLabelPosition = (index: number, radius: number) => {
     const angle = index * anglePerSector + anglePerSector / 2;
     const rad = (angle - 90) * (Math.PI / 180);
     return {
-      x: centerX + radius * Math.cos(rad),
-      y: centerY + radius * Math.sin(rad),
+      x: Math.round((centerX + radius * Math.cos(rad)) * 100) / 100,
+      y: Math.round((centerY + radius * Math.sin(rad)) * 100) / 100,
     };
   };
 
