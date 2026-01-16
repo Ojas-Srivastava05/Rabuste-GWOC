@@ -149,9 +149,9 @@ export default function FranchisePage() {
 
         {/* Terms & Conditions Card */}
         <div className="max-w-7xl mx-auto px-6 pb-24">
-          <div className="bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950/60 backdrop-blur-xl border border-amber-900/30 rounded-3xl p-10 md:p-14 shadow-2xl">
+          <div className="backdrop-blur-xl rounded-3xl p-10 md:p-14 shadow-2xl" style={{ background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.2), rgba(39, 39, 42, 0.6), rgba(9, 9, 11, 0.6))', border: '1px solid rgba(184, 115, 51, 0.3)' }}>
             <div className="flex items-start gap-5 mb-10">
-              <div className="bg-gradient-to-br from-amber-700 to-amber-900 p-5 rounded-2xl shadow-xl shadow-amber-900/40">
+              <div className="p-5 rounded-2xl shadow-xl" style={{ background: 'linear-gradient(to bottom right, #CD7F32, #B87333)', boxShadow: '0 20px 25px -5px rgba(184, 115, 51, 0.4)' }}>
                 <FileText className="w-9 h-9 text-white" />
               </div>
               <div>
@@ -166,10 +166,10 @@ export default function FranchisePage() {
 
             {/* Key Highlights */}
             <div className="grid md:grid-cols-2 gap-8 mb-10">
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
+              <div className="group rounded-2xl p-8 transition-all duration-300 hover:shadow-xl" style={{ background: 'linear-gradient(to bottom right, rgba(39, 39, 42, 0.9), rgba(9, 9, 11, 0.9))', border: '2px solid rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(184, 115, 51, 0.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <IndianRupee className="w-7 h-7 text-amber-600" />
+                  <div className="p-3 rounded-xl transition-colors" style={{ background: 'rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.3)'; }}>
+                    <IndianRupee className="w-7 h-7" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     INVESTMENT RANGE
@@ -181,10 +181,10 @@ export default function FranchisePage() {
                 <p className="text-zinc-400">Including setup, equipment, and initial inventory</p>
               </div>
 
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
+              <div className="group rounded-2xl p-8 transition-all duration-300 hover:shadow-xl" style={{ background: 'linear-gradient(to bottom right, rgba(39, 39, 42, 0.9), rgba(9, 9, 11, 0.9))', border: '2px solid rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(184, 115, 51, 0.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <Building2 className="w-7 h-7 text-amber-600" />
+                  <div className="p-3 rounded-xl transition-colors" style={{ background: 'rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.3)'; }}>
+                    <Building2 className="w-7 h-7" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     SPACE REQUIREMENTS
@@ -196,10 +196,10 @@ export default function FranchisePage() {
                 <p className="text-zinc-400">Prime location with high footfall preferred</p>
               </div>
 
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
+              <div className="group rounded-2xl p-8 transition-all duration-300 hover:shadow-xl" style={{ background: 'linear-gradient(to bottom right, rgba(39, 39, 42, 0.9), rgba(9, 9, 11, 0.9))', border: '2px solid rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(184, 115, 51, 0.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <Users className="w-7 h-7 text-amber-600" />
+                  <div className="p-3 rounded-xl transition-colors" style={{ background: 'rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.3)'; }}>
+                    <Users className="w-7 h-7" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     TRAINING & SUPPORT
@@ -211,10 +211,10 @@ export default function FranchisePage() {
                 <p className="text-zinc-400">Ongoing operational and marketing support</p>
               </div>
 
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
+              <div className="group rounded-2xl p-8 transition-all duration-300 hover:shadow-xl" style={{ background: 'linear-gradient(to bottom right, rgba(39, 39, 42, 0.9), rgba(9, 9, 11, 0.9))', border: '2px solid rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(184, 115, 51, 0.3)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)'; e.currentTarget.style.boxShadow = 'none'; }}>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <CheckCircle2 className="w-7 h-7 text-amber-600" />
+                  <div className="p-3 rounded-xl transition-colors" style={{ background: 'rgba(184, 115, 51, 0.3)' }} onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.4)'; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(184, 115, 51, 0.3)'; }}>
+                    <CheckCircle2 className="w-7 h-7" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     FRANCHISE TERM
@@ -228,7 +228,7 @@ export default function FranchisePage() {
             </div>
 
             {/* Benefits List */}
-            <div className="bg-gradient-to-br from-amber-950/30 to-zinc-950/30 border-2 border-amber-900/30 rounded-2xl p-10 mb-10">
+            <div className="rounded-2xl p-10 mb-10" style={{ background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.3), rgba(9, 9, 11, 0.3))', border: '2px solid rgba(184, 115, 51, 0.3)' }}>
               <h3 className="text-3xl mb-8" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
                 WHAT YOU GET
               </h3>
@@ -244,7 +244,7 @@ export default function FranchisePage() {
                   'Ongoing operational & business support'
                 ].map((benefit, idx) => (
                   <div key={idx} className="flex items-start gap-3 text-zinc-200 group">
-                    <CheckCircle2 className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                    <CheckCircle2 className="w-6 h-6 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" style={{ color: '#B87333' }} />
                     <span className="leading-relaxed text-base">{benefit}</span>
                   </div>
                 ))}
@@ -254,8 +254,21 @@ export default function FranchisePage() {
             {/* CTA Button */}
             <button
               onClick={openFranchisePDF}
-              className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] group uppercase tracking-widest text-lg"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
+              className="w-full text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl hover:scale-[1.02] group uppercase tracking-widest text-lg"
+              style={{ 
+                fontFamily: 'var(--font-heading)', 
+                letterSpacing: '0.1em',
+                background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                boxShadow: '0 25px 50px -12px rgba(184, 115, 51, 0.5)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #CD7F32 0%, #D4A574 50%, #E8C39E 100%)';
+                e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(184, 115, 51, 0.7)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)';
+                e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(184, 115, 51, 0.5)';
+              }}
             >
               <FileText className="w-7 h-7 group-hover:rotate-12 transition-transform" />
               View Complete Terms & Conditions
@@ -266,11 +279,11 @@ export default function FranchisePage() {
 
         {/* Franchise Enquiry Form */}
         <div className="max-w-6xl mx-auto px-6 pb-32">
-          <div className="bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950/60 backdrop-blur-xl border border-amber-900/30 rounded-3xl p-10 md:p-14 shadow-2xl">
+          <div className="backdrop-blur-xl rounded-3xl p-10 md:p-14 shadow-2xl" style={{ background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.2), rgba(39, 39, 42, 0.6), rgba(9, 9, 11, 0.6))', border: '1px solid rgba(184, 115, 51, 0.3)' }}>
             <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-950/30 border border-amber-800/40 rounded-full mb-8">
-                <Mail className="w-5 h-5 text-amber-600" />
-                <span className="text-amber-600 text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.15em' }}>
+              <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-8" style={{ background: 'rgba(26, 17, 16, 0.3)', border: '1px solid rgba(184, 115, 51, 0.4)' }}>
+                <Mail className="w-5 h-5" style={{ color: '#B87333' }} />
+                <span className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.15em', color: '#B87333' }}>
                   GET STARTED
                 </span>
               </div>
@@ -286,9 +299,9 @@ export default function FranchisePage() {
             <div className="space-y-10">
               {/* Personal Information */}
               <div className="space-y-6">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <User className="w-6 h-6 text-amber-600" />
+                <div className="flex items-center gap-4 pb-5" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                  <div className="p-3 rounded-xl" style={{ background: 'rgba(184, 115, 51, 0.3)' }}>
+                    <User className="w-6 h-6" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     PERSONAL INFORMATION
@@ -298,7 +311,7 @@ export default function FranchisePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      FULL NAME <span className="text-amber-600">*</span>
+                      FULL NAME <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <input
                       type="text"
@@ -306,14 +319,21 @@ export default function FranchisePage() {
                       value={formData.fullName}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                       placeholder="Enter your full name"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      EMAIL ADDRESS <span className="text-amber-600">*</span>
+                      EMAIL ADDRESS <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <input
                       type="email"
@@ -321,14 +341,21 @@ export default function FranchisePage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                       placeholder="your.email@example.com"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      PHONE NUMBER <span className="text-amber-600">*</span>
+                      PHONE NUMBER <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <input
                       type="tel"
@@ -336,21 +363,35 @@ export default function FranchisePage() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                       placeholder="+91 XXXXX XXXXX"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      APPLYING AS <span className="text-amber-600">*</span>
+                      APPLYING AS <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <select
                       name="organizationType"
                       value={formData.organizationType}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <option value="individual">Individual</option>
                       <option value="company">Company</option>
@@ -363,22 +404,29 @@ export default function FranchisePage() {
                   <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
                     ORGANIZATION/COMPANY NAME
                   </label>
-                  <input
-                    type="text"
-                    name="organizationName"
-                    value={formData.organizationName}
-                    onChange={handleChange}
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    placeholder="If applicable"
-                  />
+                    <input
+                      type="text"
+                      name="organizationName"
+                      value={formData.organizationName}
+                      onChange={handleChange}
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      placeholder="If applicable"
+                    />
                 </div>
               </div>
 
               {/* Location Details */}
-              <div className="space-y-6 pt-10 border-t-2 border-amber-900/30">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <MapPin className="w-6 h-6 text-amber-600" />
+              <div className="space-y-6 pt-10" style={{ borderTop: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                <div className="flex items-center gap-4 pb-5" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                  <div className="p-3 rounded-xl" style={{ background: 'rgba(184, 115, 51, 0.3)' }}>
+                    <MapPin className="w-6 h-6" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     LOCATION DETAILS
@@ -388,7 +436,7 @@ export default function FranchisePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      CITY <span className="text-amber-600">*</span>
+                      CITY <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <input
                       type="text"
@@ -396,14 +444,21 @@ export default function FranchisePage() {
                       value={formData.city}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                       placeholder="Enter city"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      STATE <span className="text-amber-600">*</span>
+                      STATE <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <input
                       type="text"
@@ -411,33 +466,47 @@ export default function FranchisePage() {
                       value={formData.state}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                       placeholder="Enter state"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                    PREFERRED LOCATION/AREA <span className="text-amber-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="preferredLocation"
-                    value={formData.preferredLocation}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    placeholder="e.g., MG Road, Indiranagar, etc."
-                  />
+                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                      PREFERRED LOCATION/AREA <span style={{ color: '#B87333' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="preferredLocation"
+                      value={formData.preferredLocation}
+                      onChange={handleChange}
+                      required
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      placeholder="e.g., MG Road, Indiranagar, etc."
+                    />
                 </div>
               </div>
 
               {/* Business Details */}
-              <div className="space-y-6 pt-10 border-t-2 border-amber-900/30">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <Building2 className="w-6 h-6 text-amber-600" />
+              <div className="space-y-6 pt-10" style={{ borderTop: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                <div className="flex items-center gap-4 pb-5" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                  <div className="p-3 rounded-xl" style={{ background: 'rgba(184, 115, 51, 0.3)' }}>
+                    <Building2 className="w-6 h-6" style={{ color: '#B87333' }} />
                   </div>
                   <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
                     BUSINESS DETAILS
@@ -447,14 +516,21 @@ export default function FranchisePage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      INVESTMENT CAPACITY <span className="text-amber-600">*</span>
+                      INVESTMENT CAPACITY <span style={{ color: '#B87333' }}>*</span>
                     </label>
                     <select
                       name="investmentCapacity"
                       value={formData.investmentCapacity}
                       onChange={handleChange}
                       required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <option value="">Select range</option>
                       <option value="25-35">₹25 - 35 Lakhs</option>
@@ -471,7 +547,14 @@ export default function FranchisePage() {
                       name="experience"
                       value={formData.experience}
                       onChange={handleChange}
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >
                       <option value="">Select experience</option>
                       <option value="none">No prior experience</option>
@@ -486,14 +569,21 @@ export default function FranchisePage() {
                   <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
                     ADDITIONAL MESSAGE
                   </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={5}
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all resize-none"
-                    placeholder="Tell us more about your franchise plans and why you'd like to partner with Rabuste Coffee..."
-                  />
+                    <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={5}
+                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none transition-all resize-none"
+                      style={{ 
+                        borderColor: 'rgba(39, 39, 42, 1)',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = '#B87333'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(184, 115, 51, 0.3)'; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(39, 39, 42, 1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                      placeholder="Tell us more about your franchise plans and why you'd like to partner with Rabuste Coffee..."
+                    />
                 </div>
               </div>
 
@@ -502,8 +592,25 @@ export default function FranchisePage() {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] disabled:hover:scale-100 group uppercase tracking-widest text-lg"
-                  style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
+                  className="w-full text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl hover:scale-[1.02] disabled:hover:scale-100 group uppercase tracking-widest text-lg disabled:cursor-not-allowed"
+                  style={{ 
+                    fontFamily: 'var(--font-heading)', 
+                    letterSpacing: '0.1em',
+                    background: isSubmitting ? 'linear-gradient(135deg, #3F3F46, #3F3F46)' : 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                    boxShadow: isSubmitting ? 'none' : '0 25px 50px -12px rgba(184, 115, 51, 0.5)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSubmitting) {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #CD7F32 0%, #D4A574 50%, #E8C39E 100%)';
+                      e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(184, 115, 51, 0.7)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSubmitting) {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)';
+                      e.currentTarget.style.boxShadow = '0 25px 50px -12px rgba(184, 115, 51, 0.5)';
+                    }
+                  }}
                 >
                   {isSubmitting ? (
                     <>
