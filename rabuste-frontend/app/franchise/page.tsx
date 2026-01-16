@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { FileText, Building2, MapPin, User, Mail, Phone, IndianRupee, Users, ArrowRight, CheckCircle2, Zap, Shield, Target } from 'lucide-react';
+import { FileText, Building2, MapPin, User, Mail, Phone, IndianRupee, Users, ArrowRight, CheckCircle2, Zap, Shield, Target, Sparkles } from 'lucide-react';
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
+import { motion } from 'framer-motion';
 
 export default function FranchisePage() {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ export default function FranchisePage() {
     message: ''
   });
 
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
 
@@ -82,25 +84,180 @@ export default function FranchisePage() {
     window.open('/franchise-terms-conditions.pdf', '_blank');
   };
 
+  // Modern Input Component
+  const ModernInput = ({ 
+    label, 
+    name, 
+    type = 'text', 
+    required = false, 
+    placeholder, 
+    value, 
+    onChange,
+    icon: Icon,
+    options
+  }: any) => {
+    const isFocused = focusedField === name;
+    const hasValue = value && value.toString().length > 0;
+
+    if (type === 'select') {
+      return (
+        <div className="relative group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+            <Icon className="w-5 h-5 transition-colors" style={{ color: isFocused || hasValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+          </div>
+          <label 
+            className={`absolute left-12 transition-all duration-300 pointer-events-none ${
+              isFocused || hasValue 
+                ? 'top-2 text-xs text-[#B87333] font-semibold' 
+                : 'top-1/2 -translate-y-1/2 text-base text-zinc-400'
+            }`}
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            {label} {required && <span className="text-[#B87333]">*</span>}
+          </label>
+          <select
+            name={name}
+            value={value}
+            onChange={onChange}
+            onFocus={() => setFocusedField(name)}
+            onBlur={() => setFocusedField(null)}
+            required={required}
+            className="w-full h-16 pl-12 pr-4 pt-6 bg-transparent border-2 rounded-xl transition-all duration-300 appearance-none cursor-pointer"
+            style={{
+              borderColor: isFocused ? '#B87333' : 'rgba(39, 39, 42, 0.6)',
+              color: '#F5F1E8',
+              fontFamily: 'var(--font-body)',
+              boxShadow: isFocused ? '0 0 0 4px rgba(184, 115, 51, 0.1)' : 'none',
+            }}
+          >
+            {options?.map((opt: any) => (
+              <option key={opt.value} value={opt.value} style={{ background: '#1A1110', color: '#F5F1E8' }}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <ArrowRight className="w-4 h-4 rotate-90" style={{ color: isFocused ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+          </div>
+        </div>
+      );
+    }
+
+    if (type === 'textarea') {
+      return (
+        <div className="relative group">
+          <div className="absolute left-4 top-6 z-10">
+            <Icon className="w-5 h-5 transition-colors" style={{ color: isFocused || hasValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+          </div>
+          <label 
+            className={`absolute left-12 transition-all duration-300 pointer-events-none ${
+              isFocused || hasValue 
+                ? 'top-2 text-xs text-[#B87333] font-semibold' 
+                : 'top-6 text-base text-zinc-400'
+            }`}
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            {label}
+          </label>
+          <textarea
+            name={name}
+            value={value}
+            onChange={onChange}
+            onFocus={() => setFocusedField(name)}
+            onBlur={() => setFocusedField(null)}
+            rows={5}
+            className="w-full pl-12 pr-4 pt-8 pb-4 bg-transparent border-2 rounded-xl transition-all duration-300 resize-none"
+            style={{
+              borderColor: isFocused ? '#B87333' : 'rgba(39, 39, 42, 0.6)',
+              color: '#F5F1E8',
+              fontFamily: 'var(--font-body)',
+              boxShadow: isFocused ? '0 0 0 4px rgba(184, 115, 51, 0.1)' : 'none',
+            }}
+            placeholder={isFocused ? placeholder : ''}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+          <Icon className="w-5 h-5 transition-colors" style={{ color: isFocused || hasValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+        </div>
+        <label 
+          className={`absolute left-12 transition-all duration-300 pointer-events-none ${
+            isFocused || hasValue 
+              ? 'top-2 text-xs text-[#B87333] font-semibold' 
+              : 'top-1/2 -translate-y-1/2 text-base text-zinc-400'
+          }`}
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          {label} {required && <span className="text-[#B87333]">*</span>}
+        </label>
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setFocusedField(name)}
+          onBlur={() => setFocusedField(null)}
+          required={required}
+          className="w-full h-16 pl-12 pr-4 pt-6 bg-transparent border-2 rounded-xl transition-all duration-300"
+          style={{
+            borderColor: isFocused ? '#B87333' : 'rgba(39, 39, 42, 0.6)',
+            color: '#F5F1E8',
+            fontFamily: 'var(--font-body)',
+            boxShadow: isFocused ? '0 0 0 4px rgba(184, 115, 51, 0.1)' : 'none',
+          }}
+          placeholder={isFocused ? placeholder : ''}
+        />
+        {isFocused && (
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            className="absolute bottom-0 left-0 right-0 h-0.5 origin-left"
+            style={{ background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)' }}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
       <Navbar />
       <DynamicBackground />
       
-      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+      <div className="min-h-screen relative" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+        {/* Premium Copper Accent Line */}
+        <div 
+          className="fixed top-0 left-0 right-0 h-1 pointer-events-none z-50"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)',
+            boxShadow: '0 0 20px rgba(184, 115, 51, 0.5)',
+          }}
+        />
 
         {/* Hero Header */}
-        <div className="relative pt-40 pb-20 px-6 overflow-hidden">
-          <div className="max-w-6xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-4 mb-8">
-              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
-              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
+        <div className="relative pt-32 pb-16 px-6 overflow-hidden">
+          <div className="max-w-7xl mx-auto text-center relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-4 mb-8"
+            >
+              <div className="h-px w-20 bg-gradient-to-r from-transparent to-[#B87333]" />
+              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)', fontWeight: 600 }}>
                 EXPANSION OPPORTUNITY
               </span>
-              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
-            </div>
+              <div className="h-px w-20 bg-gradient-to-l from-transparent to-[#B87333]" />
+            </motion.div>
             
-            <h1 
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
               className="text-6xl md:text-7xl lg:text-8xl mb-8"
               style={{
                 fontFamily: 'var(--font-heading)',
@@ -112,445 +269,463 @@ export default function FranchisePage() {
               <span style={{ color: '#FFFEF9' }}>BUILD AN</span>
               <br />
               <span className="gradient-copper">EMPIRE</span>
-            </h1>
+            </motion.h1>
             
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto mb-16" style={{ color: '#B87333', lineHeight: 1.7 }}>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl md:text-2xl max-w-3xl mx-auto mb-16" 
+              style={{ color: '#B87333', lineHeight: 1.7, fontFamily: 'var(--font-body)' }}
+            >
               Partner with Rabuste Coffee. Dominate your market.
-            </p>
+            </motion.p>
 
             {/* Stats Section */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: <Target size={32} />, value: '50+', label: 'LOCATIONS' },
-                { icon: <Zap size={32} />, value: '25%', label: 'AVERAGE ROI' },
-                { icon: <Shield size={32} />, value: '100K+', label: 'DAILY CUPS' },
-              ].map((stat, i) => (
-                <div key={i} className="brutal-card p-8 group hover:scale-105 transition-transform">
-                  <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center transition-transform group-hover:scale-110"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(115, 54, 53, 0.3))',
-                      border: '2px solid rgba(184, 115, 51, 0.4)',
-                      color: '#B87333',
-                    }}
+                { icon: Target, value: '50+', label: 'LOCATIONS' },
+                { icon: Zap, value: '25%', label: 'AVERAGE ROI' },
+                { icon: Shield, value: '100K+', label: 'DAILY CUPS' },
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
+                    className="brutal-card p-8 group hover:scale-105 transition-transform"
                   >
-                    {stat.icon}
-                  </div>
-                  <div className="text-5xl font-bold mb-2 gradient-copper" style={{ fontFamily: 'var(--font-heading)' }}>
-                    {stat.value}
-                  </div>
-                  <div className="text-sm uppercase tracking-[0.2em]" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+                    <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center transition-transform group-hover:scale-110 rounded-xl"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.2))',
+                        border: '2px solid rgba(184, 115, 51, 0.4)',
+                      }}
+                    >
+                      <Icon size={32} style={{ color: '#B87333' }} />
+                    </div>
+                    <div className="text-5xl font-bold mb-2 gradient-copper" style={{ fontFamily: 'var(--font-heading)' }}>
+                      {stat.value}
+                    </div>
+                    <div className="text-sm uppercase tracking-[0.2em]" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
+                      {stat.label}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Terms & Conditions Card */}
-        <div className="max-w-7xl mx-auto px-6 pb-24">
-          <div className="bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950/60 backdrop-blur-xl border border-amber-900/30 rounded-3xl p-10 md:p-14 shadow-2xl">
-            <div className="flex items-start gap-5 mb-10">
-              <div className="bg-gradient-to-br from-amber-700 to-amber-900 p-5 rounded-2xl shadow-xl shadow-amber-900/40">
-                <FileText className="w-9 h-9 text-white" />
-              </div>
-              <div>
-                <h2 className="text-4xl md:text-5xl mb-3" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                  FRANCHISE OVERVIEW
-                </h2>
-                <p className="text-zinc-300 text-lg">
-                  Everything you need to know about partnering with Rabuste Coffee
-                </p>
-              </div>
+        {/* Franchise Overview Card */}
+        <div className="max-w-7xl mx-auto px-6 pb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
+            style={{ 
+              background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.4), rgba(39, 39, 42, 0.6), rgba(9, 9, 11, 0.6))', 
+              border: '1px solid rgba(184, 115, 51, 0.3)',
+            }}
+          >
+            {/* Animated background gradient */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+              <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl" style={{ background: 'radial-gradient(circle, #B87333, transparent)' }} />
             </div>
 
-            {/* Key Highlights */}
-            <div className="grid md:grid-cols-2 gap-8 mb-10">
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <IndianRupee className="w-7 h-7 text-amber-600" />
-                  </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    INVESTMENT RANGE
-                  </h3>
+            <div className="relative z-10">
+              <div className="flex items-start gap-5 mb-10">
+                <div className="p-5 rounded-2xl shadow-xl" style={{ background: 'linear-gradient(to bottom right, #CD7F32, #B87333)', boxShadow: '0 20px 25px -5px rgba(184, 115, 51, 0.4)' }}>
+                  <FileText className="w-9 h-9 text-white" />
                 </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                  ₹25 - 50 LAKHS
-                </p>
-                <p className="text-zinc-400">Including setup, equipment, and initial inventory</p>
+                <div>
+                  <h2 className="text-4xl md:text-5xl mb-3" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                    FRANCHISE OVERVIEW
+                  </h2>
+                  <p className="text-zinc-300 text-lg" style={{ fontFamily: 'var(--font-body)' }}>
+                    Everything you need to know about partnering with Rabuste Coffee
+                  </p>
+                </div>
               </div>
 
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <Building2 className="w-7 h-7 text-amber-600" />
-                  </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    SPACE REQUIREMENTS
-                  </h3>
-                </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                  800 - 1200 SQ.FT
-                </p>
-                <p className="text-zinc-400">Prime location with high footfall preferred</p>
-              </div>
-
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <Users className="w-7 h-7 text-amber-600" />
-                  </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    TRAINING & SUPPORT
-                  </h3>
-                </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                  2-WEEK PROGRAM
-                </p>
-                <p className="text-zinc-400">Ongoing operational and marketing support</p>
-              </div>
-
-              <div className="group bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 border-2 border-amber-900/30 hover:border-amber-700/50 rounded-2xl p-8 transition-all duration-300 hover:shadow-xl hover:shadow-amber-900/30">
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="bg-amber-900/30 p-3 rounded-xl group-hover:bg-amber-900/40 transition-colors">
-                    <CheckCircle2 className="w-7 h-7 text-amber-600" />
-                  </div>
-                  <h3 className="text-xl font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    FRANCHISE TERM
-                  </h3>
-                </div>
-                <p className="text-3xl font-bold mb-3" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                  5 YEARS
-                </p>
-                <p className="text-zinc-400">Renewable with exclusive territory rights</p>
-              </div>
-            </div>
-
-            {/* Benefits List */}
-            <div className="bg-gradient-to-br from-amber-950/30 to-zinc-950/30 border-2 border-amber-900/30 rounded-2xl p-10 mb-10">
-              <h3 className="text-3xl mb-8" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                WHAT YOU GET
-              </h3>
-              <div className="grid md:grid-cols-2 gap-5">
+              {/* Key Highlights */}
+              <div className="grid md:grid-cols-2 gap-6 mb-10">
                 {[
-                  'Proven business model with track record',
-                  'Brand recognition & marketing support',
-                  'Premium coffee supply chain access',
-                  'Complete interior design assistance',
-                  'Advanced POS & technology systems',
-                  'Standardized recipes & quality control',
-                  'Comprehensive staff training programs',
-                  'Ongoing operational & business support'
-                ].map((benefit, idx) => (
-                  <div key={idx} className="flex items-start gap-3 text-zinc-200 group">
-                    <CheckCircle2 className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
-                    <span className="leading-relaxed text-base">{benefit}</span>
-                  </div>
-                ))}
+                  { icon: IndianRupee, title: 'INVESTMENT RANGE', value: '₹25 - 50 LAKHS', desc: 'Including setup, equipment, and initial inventory' },
+                  { icon: Building2, title: 'SPACE REQUIREMENTS', value: '800 - 1200 SQ.FT', desc: 'Prime location with high footfall preferred' },
+                  { icon: Users, title: 'TRAINING & SUPPORT', value: '2-WEEK PROGRAM', desc: 'Ongoing operational and marketing support' },
+                  { icon: CheckCircle2, title: 'FRANCHISE TERM', value: '5 YEARS', desc: 'Renewable with exclusive territory rights' },
+                ].map((item, i) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.1 }}
+                      className="group rounded-2xl p-6 transition-all duration-300 hover:shadow-xl relative overflow-hidden"
+                      style={{ 
+                        background: 'linear-gradient(to bottom right, rgba(39, 39, 42, 0.6), rgba(9, 9, 11, 0.6))', 
+                        border: '2px solid rgba(184, 115, 51, 0.3)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.6)';
+                        e.currentTarget.style.boxShadow = '0 20px 25px -5px rgba(184, 115, 51, 0.2)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)';
+                        e.currentTarget.style.boxShadow = 'none';
+                      }}
+                    >
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 rounded-xl transition-colors" style={{ background: 'rgba(184, 115, 51, 0.2)' }}>
+                          <Icon className="w-6 h-6" style={{ color: '#B87333' }} />
+                        </div>
+                        <h3 className="text-lg font-bold uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                          {item.title}
+                        </h3>
+                      </div>
+                      <p className="text-2xl font-bold mb-2" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                        {item.value}
+                      </p>
+                      <p className="text-zinc-400 text-sm" style={{ fontFamily: 'var(--font-body)' }}>{item.desc}</p>
+                    </motion.div>
+                  );
+                })}
               </div>
-            </div>
 
-            {/* CTA Button */}
-            <button
-              onClick={openFranchisePDF}
-              className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] group uppercase tracking-widest text-lg"
-              style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
-            >
-              <FileText className="w-7 h-7 group-hover:rotate-12 transition-transform" />
-              View Complete Terms & Conditions
-              <ArrowRight className="w-7 h-7 group-hover:translate-x-2 transition-transform" />
-            </button>
-          </div>
+              {/* Benefits List */}
+              <div className="rounded-2xl p-8 mb-8" style={{ background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.3), rgba(9, 9, 11, 0.3))', border: '2px solid rgba(184, 115, 51, 0.2)' }}>
+                <h3 className="text-2xl mb-6" style={{ color: '#D4A574', textAlign: 'left', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  WHAT YOU GET
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    'Proven business model with track record',
+                    'Brand recognition & marketing support',
+                    'Premium coffee supply chain access',
+                    'Complete interior design assistance',
+                    'Advanced POS & technology systems',
+                    'Standardized recipes & quality control',
+                    'Comprehensive staff training programs',
+                    'Ongoing operational & business support'
+                  ].map((benefit, idx) => (
+                    <div key={idx} className="flex items-start gap-3 text-zinc-200 group">
+                      <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" style={{ color: '#B87333' }} />
+                      <span className="leading-relaxed text-sm" style={{ fontFamily: 'var(--font-body)' }}>{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={openFranchisePDF}
+                className="w-full text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl group uppercase tracking-widest"
+                style={{ 
+                  fontFamily: 'var(--font-heading)', 
+                  letterSpacing: '0.1em',
+                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                  boxShadow: '0 25px 50px -12px rgba(184, 115, 51, 0.5)'
+                }}
+              >
+                <FileText className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                View Complete Terms & Conditions
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              </motion.button>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Franchise Enquiry Form */}
-        <div className="max-w-6xl mx-auto px-6 pb-32">
-          <div className="bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950/60 backdrop-blur-xl border border-amber-900/30 rounded-3xl p-10 md:p-14 shadow-2xl">
-            <div className="text-center mb-14">
-              <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-950/30 border border-amber-800/40 rounded-full mb-8">
-                <Mail className="w-5 h-5 text-amber-600" />
-                <span className="text-amber-600 text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.15em' }}>
-                  GET STARTED
-                </span>
-              </div>
-              
-              <h2 className="text-5xl md:text-6xl mb-6" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                FRANCHISE ENQUIRY
-              </h2>
-              <p className="text-zinc-300 text-lg max-w-2xl mx-auto">
-                Fill in your details and we'll get back to you within 2-3 business days
-              </p>
+        {/* Premium Franchise Enquiry Form */}
+        <div className="max-w-5xl mx-auto px-6 pb-32">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="backdrop-blur-xl rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden"
+            style={{ 
+              background: 'linear-gradient(to bottom right, rgba(26, 17, 16, 0.4), rgba(39, 39, 42, 0.6), rgba(9, 9, 11, 0.6))', 
+              border: '1px solid rgba(184, 115, 51, 0.3)',
+            }}
+          >
+            {/* Animated background gradient */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+              <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full blur-3xl" style={{ background: 'radial-gradient(circle, #CD7F32, transparent)' }} />
             </div>
 
-            <div className="space-y-10">
-              {/* Personal Information */}
-              <div className="space-y-6">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <User className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    PERSONAL INFORMATION
-                  </h3>
-                </div>
+            <div className="relative z-10">
+              <div className="text-center mb-12">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full mb-8"
+                  style={{ background: 'rgba(26, 17, 16, 0.5)', border: '1px solid rgba(184, 115, 51, 0.4)' }}
+                >
+                  <Mail className="w-5 h-5" style={{ color: '#B87333' }} />
+                  <span className="text-sm font-bold tracking-widest uppercase" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.15em', color: '#B87333' }}>
+                    GET STARTED
+                  </span>
+                </motion.div>
+                
+                <h2 className="text-5xl md:text-6xl mb-4" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                  FRANCHISE ENQUIRY
+                </h2>
+                <p className="text-zinc-300 text-lg max-w-2xl mx-auto" style={{ fontFamily: 'var(--font-body)' }}>
+                  Fill in your details and we'll get back to you within 2-3 business days
+                </p>
+              </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      FULL NAME <span className="text-amber-600">*</span>
-                    </label>
-                    <input
-                      type="text"
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Personal Information */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 pb-4" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                    <div className="p-2.5 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.2)' }}>
+                      <User className="w-5 h-5" style={{ color: '#B87333' }} />
+                    </div>
+                    <h3 className="text-xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                      PERSONAL INFORMATION
+                    </h3>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <ModernInput
+                      label="Full Name"
                       name="fullName"
+                      type="text"
+                      required
+                      placeholder="John Doe"
                       value={formData.fullName}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                      placeholder="Enter your full name"
+                      icon={User}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      EMAIL ADDRESS <span className="text-amber-600">*</span>
-                    </label>
-                    <input
-                      type="email"
+                    <ModernInput
+                      label="Email Address"
                       name="email"
+                      type="email"
+                      required
+                      placeholder="john@example.com"
                       value={formData.email}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                      placeholder="your.email@example.com"
+                      icon={Mail}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      PHONE NUMBER <span className="text-amber-600">*</span>
-                    </label>
-                    <input
-                      type="tel"
+                    <ModernInput
+                      label="Phone Number"
                       name="phone"
+                      type="tel"
+                      required
+                      placeholder="+91 98765 43210"
                       value={formData.phone}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                      placeholder="+91 XXXXX XXXXX"
+                      icon={Phone}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      APPLYING AS <span className="text-amber-600">*</span>
-                    </label>
-                    <select
+                    <ModernInput
+                      label="Applying As"
                       name="organizationType"
+                      type="select"
+                      required
                       value={formData.organizationType}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    >
-                      <option value="individual">Individual</option>
-                      <option value="company">Company</option>
-                      <option value="partnership">Partnership</option>
-                    </select>
+                      icon={Building2}
+                      options={[
+                        { value: 'individual', label: 'Individual' },
+                        { value: 'company', label: 'Company' },
+                        { value: 'partnership', label: 'Partnership' },
+                      ]}
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                    ORGANIZATION/COMPANY NAME
-                  </label>
-                  <input
-                    type="text"
+                  <ModernInput
+                    label="Organization/Company Name"
                     name="organizationName"
+                    type="text"
+                    placeholder="If applicable"
                     value={formData.organizationName}
                     onChange={handleChange}
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    placeholder="If applicable"
+                    icon={Building2}
                   />
                 </div>
-              </div>
 
-              {/* Location Details */}
-              <div className="space-y-6 pt-10 border-t-2 border-amber-900/30">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <MapPin className="w-6 h-6 text-amber-600" />
+                {/* Location Details */}
+                <div className="space-y-6 pt-6" style={{ borderTop: '2px solid rgba(184, 115, 51, 0.2)' }}>
+                  <div className="flex items-center gap-4 pb-4" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                    <div className="p-2.5 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.2)' }}>
+                      <MapPin className="w-5 h-5" style={{ color: '#B87333' }} />
+                    </div>
+                    <h3 className="text-xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                      LOCATION DETAILS
+                    </h3>
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    LOCATION DETAILS
-                  </h3>
-                </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      CITY <span className="text-amber-600">*</span>
-                    </label>
-                    <input
-                      type="text"
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <ModernInput
+                      label="City"
                       name="city"
+                      type="text"
+                      required
+                      placeholder="Mumbai"
                       value={formData.city}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                      placeholder="Enter city"
+                      icon={MapPin}
                     />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      STATE <span className="text-amber-600">*</span>
-                    </label>
-                    <input
-                      type="text"
+                    <ModernInput
+                      label="State"
                       name="state"
+                      type="text"
+                      required
+                      placeholder="Maharashtra"
                       value={formData.state}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                      placeholder="Enter state"
+                      icon={MapPin}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                    PREFERRED LOCATION/AREA <span className="text-amber-600">*</span>
-                  </label>
-                  <input
-                    type="text"
+                  <ModernInput
+                    label="Preferred Location/Area"
                     name="preferredLocation"
+                    type="text"
+                    required
+                    placeholder="e.g., MG Road, Indiranagar, etc."
                     value={formData.preferredLocation}
                     onChange={handleChange}
-                    required
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    placeholder="e.g., MG Road, Indiranagar, etc."
+                    icon={MapPin}
                   />
                 </div>
-              </div>
 
-              {/* Business Details */}
-              <div className="space-y-6 pt-10 border-t-2 border-amber-900/30">
-                <div className="flex items-center gap-4 pb-5 border-b-2 border-amber-900/30">
-                  <div className="bg-amber-900/30 p-3 rounded-xl">
-                    <Building2 className="w-6 h-6 text-amber-600" />
+                {/* Business Details */}
+                <div className="space-y-6 pt-6" style={{ borderTop: '2px solid rgba(184, 115, 51, 0.2)' }}>
+                  <div className="flex items-center gap-4 pb-4" style={{ borderBottom: '2px solid rgba(184, 115, 51, 0.3)' }}>
+                    <div className="p-2.5 rounded-lg" style={{ background: 'rgba(184, 115, 51, 0.2)' }}>
+                      <Building2 className="w-5 h-5" style={{ color: '#B87333' }} />
+                    </div>
+                    <h3 className="text-xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                      BUSINESS DETAILS
+                    </h3>
                   </div>
-                  <h3 className="text-2xl font-bold uppercase tracking-wider" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                    BUSINESS DETAILS
-                  </h3>
-                </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      INVESTMENT CAPACITY <span className="text-amber-600">*</span>
-                    </label>
-                    <select
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <ModernInput
+                      label="Investment Capacity"
                       name="investmentCapacity"
+                      type="select"
+                      required
                       value={formData.investmentCapacity}
                       onChange={handleChange}
-                      required
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    >
-                      <option value="">Select range</option>
-                      <option value="25-35">₹25 - 35 Lakhs</option>
-                      <option value="35-45">₹35 - 45 Lakhs</option>
-                      <option value="45+">₹45+ Lakhs</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                      PREVIOUS BUSINESS EXPERIENCE
-                    </label>
-                    <select
+                      icon={IndianRupee}
+                      options={[
+                        { value: '', label: 'Select range' },
+                        { value: '25-35', label: '₹25 - 35 Lakhs' },
+                        { value: '35-45', label: '₹35 - 45 Lakhs' },
+                        { value: '45+', label: '₹45+ Lakhs' },
+                      ]}
+                    />
+                    <ModernInput
+                      label="Previous Business Experience"
                       name="experience"
+                      type="select"
                       value={formData.experience}
                       onChange={handleChange}
-                      className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all"
-                    >
-                      <option value="">Select experience</option>
-                      <option value="none">No prior experience</option>
-                      <option value="retail">Retail/F&B</option>
-                      <option value="hospitality">Hospitality</option>
-                      <option value="other">Other business</option>
-                    </select>
+                      icon={Sparkles}
+                      options={[
+                        { value: '', label: 'Select experience' },
+                        { value: 'none', label: 'No prior experience' },
+                        { value: 'retail', label: 'Retail/F&B' },
+                        { value: 'hospitality', label: 'Hospitality' },
+                        { value: 'other', label: 'Other business' },
+                      ]}
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-zinc-300 mb-3 uppercase tracking-wide" style={{ fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
-                    ADDITIONAL MESSAGE
-                  </label>
-                  <textarea
+                  <ModernInput
+                    label="Additional Message"
                     name="message"
+                    type="textarea"
+                    placeholder="Tell us more about your franchise plans..."
                     value={formData.message}
                     onChange={handleChange}
-                    rows={5}
-                    className="w-full bg-zinc-950/70 border-2 border-zinc-800 hover:border-amber-900/50 focus:border-amber-600 rounded-xl px-5 py-4 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-600/30 transition-all resize-none"
-                    placeholder="Tell us more about your franchise plans and why you'd like to partner with Rabuste Coffee..."
+                    icon={FileText}
                   />
                 </div>
-              </div>
 
-              {/* Submit Button */}
-              <div className="pt-10">
-                <button
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 hover:from-amber-600 hover:via-amber-500 hover:to-amber-600 disabled:from-zinc-700 disabled:to-zinc-700 disabled:cursor-not-allowed text-white font-bold py-6 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl shadow-amber-900/50 hover:shadow-amber-900/70 hover:scale-[1.02] disabled:hover:scale-100 group uppercase tracking-widest text-lg"
-                  style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-7 h-7 border-3 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Submitting Your Enquiry...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-7 h-7 group-hover:scale-110 transition-transform" />
-                      <span>Submit Franchise Enquiry</span>
-                    </>
-                  )}
-                </button>
+                {/* Submit Button */}
+                <div className="pt-6">
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
+                    whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
+                    className="w-full text-white font-bold py-5 px-10 rounded-xl transition-all duration-300 flex items-center justify-center gap-4 shadow-2xl group uppercase tracking-widest disabled:cursor-not-allowed"
+                    style={{ 
+                      fontFamily: 'var(--font-heading)', 
+                      letterSpacing: '0.1em',
+                      background: isSubmitting 
+                        ? 'linear-gradient(135deg, #3F3F46, #3F3F46)' 
+                        : 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                      boxShadow: isSubmitting 
+                        ? 'none' 
+                        : '0 25px 50px -12px rgba(184, 115, 51, 0.5)'
+                    }}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Submitting Your Enquiry...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                        <span>Submit Franchise Enquiry</span>
+                        <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                      </>
+                    )}
+                  </motion.button>
 
-                {/* Success/Error Message - Below Submit Button */}
-                {submitStatus.message && (
-                  <div className={`mt-8 p-6 rounded-2xl border-2 ${
-                    submitStatus.type === 'success' 
-                      ? 'bg-gradient-to-br from-green-950/60 to-green-900/40 border-green-700/60 shadow-xl shadow-green-900/30' 
-                      : 'bg-gradient-to-br from-red-950/60 to-red-900/40 border-red-700/60 shadow-xl shadow-red-900/30'
-                  } animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-                    <div className="flex items-start gap-4">
-                      <CheckCircle2 className={`w-7 h-7 flex-shrink-0 mt-0.5 ${
-                        submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'
-                      }`} />
-                      <div>
-                        <p className={`font-bold text-xl mb-2 uppercase tracking-wide ${
-                          submitStatus.type === 'success' ? 'text-green-300' : 'text-red-300'
-                        }`} style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
-                          {submitStatus.type === 'success' ? 'ENQUIRY SUBMITTED!' : 'SUBMISSION FAILED'}
-                        </p>
-                        <p className={`text-base ${submitStatus.type === 'success' ? 'text-green-200' : 'text-red-200'}`}>
-                          {submitStatus.message}
-                        </p>
+                  {/* Success/Error Message */}
+                  {submitStatus.message && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`mt-6 p-6 rounded-xl border-2 ${
+                        submitStatus.type === 'success' 
+                          ? 'bg-gradient-to-br from-green-950/60 to-green-900/40 border-green-700/60' 
+                          : 'bg-gradient-to-br from-red-950/60 to-red-900/40 border-red-700/60'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <CheckCircle2 className={`w-6 h-6 flex-shrink-0 mt-0.5 ${
+                          submitStatus.type === 'success' ? 'text-green-400' : 'text-red-400'
+                        }`} />
+                        <div>
+                          <p className={`font-bold text-lg mb-1 uppercase tracking-wide ${
+                            submitStatus.type === 'success' ? 'text-green-300' : 'text-red-300'
+                          }`} style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.1em' }}>
+                            {submitStatus.type === 'success' ? 'ENQUIRY SUBMITTED!' : 'SUBMISSION FAILED'}
+                          </p>
+                          <p className={`text-sm ${submitStatus.type === 'success' ? 'text-green-200' : 'text-red-200'}`} style={{ fontFamily: 'var(--font-body)' }}>
+                            {submitStatus.message}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                    </motion.div>
+                  )}
+                </div>
 
-              <p className="text-sm text-zinc-500 text-center pt-6 leading-relaxed">
-                By submitting this form, you agree to our privacy policy and terms of service.
-                <br />
-                We respect your privacy and will never share your information.
-              </p>
+                <p className="text-xs text-zinc-500 text-center pt-4 leading-relaxed" style={{ fontFamily: 'var(--font-body)' }}>
+                  By submitting this form, you agree to our privacy policy and terms of service.
+                  <br />
+                  We respect your privacy and will never share your information.
+                </p>
+              </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
       <Footer />

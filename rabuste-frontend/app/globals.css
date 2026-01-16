@@ -292,6 +292,13 @@ body {
     background-clip: text;
   }
   
+  .gradient-copper {
+    background: linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   .copper-text {
     color: #B87333;
   }

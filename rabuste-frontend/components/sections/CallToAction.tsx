@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -9,10 +9,15 @@ import { ArrowRight, Zap, TrendingUp, Award } from 'lucide-react';
 export default function CallToAction() {
   const router = useRouter();
   const ref = React.useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const y = useTransform(scrollYProgress, [0, 1], [50, -50]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.95, 1, 0.95]);
@@ -131,6 +136,7 @@ export default function CallToAction() {
                   className="object-cover hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                   quality={85}
+                  unoptimized
                 />
               </motion.div>
 
@@ -152,6 +158,7 @@ export default function CallToAction() {
                   className="object-cover hover:scale-105 transition-transform duration-300"
                   loading="lazy"
                   quality={85}
+                  unoptimized
                 />
               </motion.div>
             </div>
@@ -208,6 +215,7 @@ export default function CallToAction() {
               marginBottom: '1.5rem',
               fontWeight: 400,
               letterSpacing: '0.02em',
+              position: 'relative',
             }}>
               VISIT
               <br />
@@ -219,9 +227,12 @@ export default function CallToAction() {
                 textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
                 position: 'relative',
                 display: 'inline-block',
+                zIndex: 1,
               }}>
                 RABUSTE
-                {/* Glow effect behind text */}
+              </span>
+              {/* Glow effect behind text - Client only to prevent hydration mismatch */}
+              {isMounted && (
                 <motion.span
                   animate={{
                     opacity: [0.3, 0.6, 0.3],
@@ -231,17 +242,21 @@ export default function CallToAction() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="absolute inset-0 blur-2xl"
+                  className="absolute blur-2xl pointer-events-none"
                   style={{
                     background: 'linear-gradient(135deg, #D4A574, #B87333)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
-                    zIndex: -1,
+                    zIndex: 0,
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                   }}
                 >
                   RABUSTE
                 </motion.span>
-              </span>
+              )}
               <br />
               COFFEE
             </h2>

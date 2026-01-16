@@ -316,6 +316,7 @@ export default function ProcessSectionRevamped() {
                 }}
                 loading="lazy"
                 quality={85}
+                unoptimized
               />
 
               {/* Gradient overlay */}
