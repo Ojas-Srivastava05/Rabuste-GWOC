@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, Palette, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -932,10 +933,15 @@ function GridArtItem({
           }}
         />
         
-        <img
+        <Image
           src={item.images[0]}
           alt={item.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
+          loading={index < 6 ? "eager" : "lazy"}
+          quality={85}
+          priority={index < 3}
         />
         
         {/* Premium Badges */}
@@ -1122,10 +1128,14 @@ function ListArtItem({
       <div className="flex gap-4 p-4">
         {/* Image */}
         <div className="w-32 h-32 flex-shrink-0 overflow-hidden relative rounded-sm">
-          <img
+          <Image
             src={item.images[0]}
             alt={item.title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            fill
+            sizes="128px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            quality={75}
           />
           {item.images.length > 1 && (
             <div

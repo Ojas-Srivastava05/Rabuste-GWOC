@@ -241,25 +241,27 @@ export default function HeroRevamped() {
                   }}
                 >
                   RABUSTE
-                  {/* Glow effect behind text - deferred to prevent LCP delay */}
+                  {/* Glow effect behind text - optimized for performance */}
                   <motion.span
-                    initial={{ opacity: 0.3 }}
+                    initial={{ opacity: 0 }}
                     animate={{
-                      opacity: [0.3, 0.6, 0.3],
+                      opacity: [0, 0.4, 0],
                     }}
                     transition={{
-                      duration: 3,
+                      duration: 4,
                       repeat: Infinity,
                       ease: "easeInOut",
-                      delay: 2, // Delay animation start to not block LCP
+                      delay: 3, // Delay animation start to not block LCP
                     }}
-                    className="absolute inset-0 blur-2xl"
+                    className="absolute inset-0 blur-xl"
                     style={{
                       background: 'linear-gradient(135deg, #D4A574, #B87333)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       backgroundClip: 'text',
                       zIndex: -1,
+                      willChange: 'opacity',
+                      transform: 'translateZ(0)',
                     }}
                   >
                     RABUSTE

@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import Image from 'next/image';
 import { Flame, Snowflake, Sparkles } from 'lucide-react';
 
 export default function FeaturedProducts() {
@@ -119,10 +120,15 @@ export default function FeaturedProducts() {
               >
                 {/* Image */}
                 <div className="relative h-80 overflow-hidden">
-                  <img
+                  <Image
                     src={product.image}
                     alt={`${product.name} - ${product.attribution}`}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading={index < 3 ? "eager" : "lazy"}
+                    quality={85}
+                    priority={index === 0}
                   />
                   {/* Gradient overlay */}
                   <div 

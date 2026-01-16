@@ -110,12 +110,14 @@ export default function InstagramShowcase() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className="absolute inset-0 blur-2xl"
+                  className="absolute inset-0 blur-xl"
                   style={{
                     background: 'linear-gradient(135deg, #D4A574, #B87333)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     zIndex: -1,
+                    willChange: 'opacity',
+                    transform: 'translateZ(0)',
                   }}
                 >
                   INSTAGRAM

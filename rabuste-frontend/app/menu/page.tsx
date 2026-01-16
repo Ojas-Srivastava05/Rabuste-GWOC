@@ -6,6 +6,7 @@ import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal,
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Script from "next/script";
+import Image from "next/image";
 import { useUser } from "@/contexts/UserContext";
 
 type MenuItem = {
@@ -1063,10 +1064,14 @@ function MenuPageContent() {
                         border: '1px solid rgba(184, 115, 51, 0.3)',
                       }}
                     >
-                      <img
+                      <Image
                         src={suggestion.image}
                         alt={suggestion.name}
-                        className="w-20 h-20 object-cover"
+                        width={80}
+                        height={80}
+                        className="object-cover"
+                        loading="lazy"
+                        quality={75}
                       />
                       <div className="flex-1">
                         <h4
@@ -1260,10 +1265,14 @@ function GridMenuItem({
       )}
       {/* Image */}
       <div className="w-full h-40 overflow-hidden relative flex-shrink-0">
-        <img
+        <Image
           src={item.image}
           alt={item.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+          quality={85}
         />
         
         {/* Favorite Button - Only show if logged in */}
@@ -1604,10 +1613,14 @@ function ListMenuItem({
       <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
         {/* Image */}
         <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden relative">
-          <img
+          <Image
             src={item.image}
             alt={item.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            fill
+            sizes="96px"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            quality={75}
           />
           {/* Favorite Button - Only show if logged in */}
           {onFavorite && (
