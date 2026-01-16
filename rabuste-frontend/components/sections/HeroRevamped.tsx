@@ -1,18 +1,24 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Coffee, Sparkles, ChevronDown } from 'lucide-react';
-import Image from 'next/image';
+import { 
+  ArrowRight, 
+  Sparkles, 
+  ChevronDown,
+  Zap,
+  Coffee,
+  TrendingUp
+} from 'lucide-react';
 import Balatro from '../bg';
 
 export default function HeroRevamped() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -32,18 +38,17 @@ export default function HeroRevamped() {
     }
     const timer = setTimeout(() => setIsLoaded(true), 100);
     
-    // Image carousel
-    const imageInterval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % 9);
-    }, 4000);
+    // Ensure video plays after mount
+    if (isMounted && videoRef.current) {
+      videoRef.current.play().catch(() => {
+        // Autoplay was prevented, user interaction required
+      });
+    }
     
     return () => {
       clearTimeout(timer);
-      clearInterval(imageInterval);
     };
-  }, []);
-
-  const heroImages = Array.from({ length: 9 }, (_, i) => `/hero/img${i + 1}.jpeg`);
+  }, [isMounted]);
 
   return (
     <section
@@ -72,69 +77,73 @@ export default function HeroRevamped() {
         }}
       />
 
-      {/* Modern Split Background with Coffee Images */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Left side - Coffee Image Carousel */}
-        <motion.div
-          className="absolute left-0 top-0 bottom-0 w-full lg:w-1/2"
-          style={{ scale }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentImageIndex}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0"
+      {/* Video Background - Full Width */}
+      {isMounted && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div
+            className="relative w-full h-full"
+            style={{ scale }}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                filter: 'brightness(0.85) contrast(1.1)',
+              }}
             >
-              <div className="relative w-full h-full">
-                <Image
-                  src={heroImages[currentImageIndex]}
-                  alt="Rabuste Coffee"
-                  fill
-                  className="object-cover"
-                  priority={currentImageIndex === 0}
-                  quality={90}
-                />
-                {/* Gradient overlay for text readability */}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.6) 100%)',
-                  }}
-                />
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </motion.div>
+              <source src="/gallery/Cafe_Video_Creation_From_Images.mp4" type="video/mp4" />
+            </video>
+            
+            {/* Premium gradient overlays */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)',
+              }}
+            />
+            
+            {/* Copper accent gradient overlay */}
+            <div 
+              className="absolute inset-0 opacity-20"
+              style={{
+                background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(184, 115, 51, 0.15) 100%)',
+              }}
+            />
+          </motion.div>
+        </div>
+      )}
 
-        {/* Right side - Gradient Background */}
+      {/* Fallback background for SSR */}
+      {!isMounted && (
         <div 
-          className="absolute right-0 top-0 bottom-0 w-full lg:w-1/2 hidden lg:block"
+          className="absolute inset-0 pointer-events-none"
           style={{
             background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
           }}
         />
+      )}
 
-        {/* Subtle animated gradient orbs */}
-        <motion.div
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl hidden lg:block"
-          style={{
-            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.6) 0%, transparent 70%)',
-          }}
-        />
-      </div>
+      {/* Animated gradient orbs */}
+      <motion.div
+        animate={{
+          x: [0, 50, 0],
+          y: [0, 30, 0],
+          scale: [1, 1.15, 1],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-10 blur-3xl hidden lg:block"
+        style={{
+          background: 'radial-gradient(circle, rgba(184, 115, 51, 0.6) 0%, transparent 70%)',
+        }}
+      />
 
       {/* Content Container */}
       <motion.div 
@@ -147,43 +156,19 @@ export default function HeroRevamped() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center min-h-screen py-12 lg:py-20">
           
           {/* Left Column - Content */}
-          <div className="lg:order-2 flex flex-col justify-center space-y-6 sm:space-y-8 lg:space-y-10">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full w-fit"
-              style={{
-                background: 'rgba(184, 115, 51, 0.15)',
-                border: '1px solid rgba(212, 165, 116, 0.3)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
-              <Coffee size={16} style={{ color: '#D4A574' }} />
-              <span style={{ 
-                fontFamily: 'var(--font-heading)', 
-                fontSize: '0.75rem', 
-                color: '#D4A574', 
-                letterSpacing: '0.2em',
-                fontWeight: 600,
-              }}>
-                PREMIUM ROBUSTA
-              </span>
-            </motion.div>
-
+          <div className="flex flex-col justify-center space-y-6 sm:space-y-8 lg:space-y-10">
             {/* Main Heading */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
               className="space-y-4"
             >
               <h1 
                 style={{ 
                   fontFamily: 'var(--font-heading)', 
-                  fontSize: 'clamp(4rem, 10vw, 8rem)', 
-                  lineHeight: 0.9, 
+                  fontSize: 'clamp(4rem, 12vw, 10rem)', 
+                  lineHeight: 0.85, 
                   letterSpacing: '-0.02em', 
                   fontWeight: 400,
                   color: '#FFFEF9',
@@ -196,6 +181,7 @@ export default function HeroRevamped() {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
+                  textShadow: '0 0 80px rgba(212, 165, 116, 0.3)',
                 }}>
                   RABUSTE
                 </span>
@@ -204,16 +190,16 @@ export default function HeroRevamped() {
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, delay: 1.1 }}
+                transition={{ duration: 0.8, delay: 0.9 }}
                 className="flex items-center gap-3"
               >
-                <div className="h-px w-12" style={{
+                <div className="h-px w-16" style={{
                   background: 'linear-gradient(90deg, #D4A574, transparent)',
                 }} />
                 <p 
                   style={{ 
                     fontFamily: 'var(--font-heading)', 
-                    fontSize: 'clamp(1rem, 2vw, 1.5rem)', 
+                    fontSize: 'clamp(1.25rem, 2.5vw, 2rem)', 
                     color: '#D4A574', 
                     letterSpacing: '0.2em',
                     fontWeight: 400,
@@ -228,12 +214,12 @@ export default function HeroRevamped() {
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
               style={{ 
-                fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', 
-                color: 'rgba(255, 254, 249, 0.85)', 
+                fontSize: 'clamp(1.125rem, 2vw, 1.5rem)', 
+                color: 'rgba(255, 254, 249, 0.9)', 
                 lineHeight: 1.8, 
-                maxWidth: '540px',
+                maxWidth: '600px',
                 fontFamily: 'var(--font-body)',
                 fontWeight: 300,
               }}
@@ -246,7 +232,7 @@ export default function HeroRevamped() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.5, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-col sm:flex-row gap-4 pt-4"
             >
               {/* Primary CTA */}
@@ -256,10 +242,10 @@ export default function HeroRevamped() {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 style={{
-                  padding: '18px 40px',
+                  padding: '20px 48px',
                   background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
                   color: '#000000',
-                  fontSize: 'clamp(0.875rem, 1.2vw, 1rem)',
+                  fontSize: 'clamp(1rem, 1.5vw, 1.125rem)',
                   letterSpacing: '0.15em',
                   fontWeight: 600,
                   textTransform: 'uppercase',
@@ -278,7 +264,7 @@ export default function HeroRevamped() {
               >
                 <span className="flex items-center justify-center gap-3 relative z-10">
                   Explore Menu
-                  <ArrowRight size={18} />
+                  <ArrowRight size={20} />
                 </span>
                 
                 {/* Shimmer effect */}
@@ -308,31 +294,31 @@ export default function HeroRevamped() {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 style={{
-                  padding: '18px 40px',
-                  background: 'rgba(184, 115, 51, 0.1)',
+                  padding: '20px 48px',
+                  background: 'rgba(184, 115, 51, 0.15)',
                   color: '#FFFEF9',
-                  fontSize: 'clamp(0.875rem, 1.2vw, 1rem)',
+                  fontSize: 'clamp(1rem, 1.5vw, 1.125rem)',
                   letterSpacing: '0.15em',
                   fontWeight: 600,
                   textTransform: 'uppercase',
-                  border: '1px solid rgba(212, 165, 116, 0.4)',
+                  border: '2px solid rgba(212, 165, 116, 0.5)',
                   cursor: 'pointer',
                   fontFamily: 'var(--font-heading)',
                   backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(184, 115, 51, 0.2)';
-                  e.currentTarget.style.borderColor = 'rgba(212, 165, 116, 0.6)';
+                  e.currentTarget.style.background = 'rgba(184, 115, 51, 0.25)';
+                  e.currentTarget.style.borderColor = 'rgba(212, 165, 116, 0.8)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(184, 115, 51, 0.1)';
-                  e.currentTarget.style.borderColor = 'rgba(212, 165, 116, 0.4)';
+                  e.currentTarget.style.background = 'rgba(184, 115, 51, 0.15)';
+                  e.currentTarget.style.borderColor = 'rgba(212, 165, 116, 0.5)';
                 }}
               >
                 <span className="flex items-center justify-center gap-3 relative z-10">
                   Learn More
-                  <Sparkles size={18} style={{ color: '#D4A574' }} />
+                  <Sparkles size={20} style={{ color: '#D4A574' }} />
                 </span>
               </motion.button>
             </motion.div>
@@ -341,129 +327,207 @@ export default function HeroRevamped() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.7, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 1.5, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-wrap gap-8 pt-4"
             >
               {[
-                { label: '2X', sublabel: 'Caffeine' },
-                { label: '100%', sublabel: 'Robusta' },
-                { label: 'Premium', sublabel: 'Quality' }
-              ].map((stat, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 1.8 + i * 0.1 }}
-                  className="flex flex-col"
-                >
-                  <span style={{ 
-                    fontFamily: 'var(--font-heading)', 
-                    fontSize: 'clamp(1.5rem, 3vw, 2.5rem)', 
-                    color: '#D4A574', 
-                    fontWeight: 400,
-                    lineHeight: 1,
-                  }}>
-                    {stat.label}
-                  </span>
-                  <span style={{ 
-                    fontFamily: 'var(--font-body)', 
-                    fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', 
-                    color: 'rgba(255, 254, 249, 0.6)', 
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    marginTop: '4px',
-                  }}>
-                    {stat.sublabel}
-                  </span>
-                </motion.div>
-              ))}
+                { label: '2X', sublabel: 'Caffeine', icon: Zap },
+                { label: '100%', sublabel: 'Robusta', icon: Coffee },
+                { label: 'Premium', sublabel: 'Quality', icon: TrendingUp }
+              ].map((stat, i) => {
+                const Icon = stat.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 1.6 + i * 0.1 }}
+                    className="flex items-center gap-3 group"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div 
+                      className="p-3 rounded-xl transition-all duration-300"
+                      style={{
+                        background: 'rgba(184, 115, 51, 0.2)',
+                        border: '1px solid rgba(212, 165, 116, 0.3)',
+                      }}
+                    >
+                      <Icon size={24} style={{ color: '#D4A574' }} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span style={{ 
+                        fontFamily: 'var(--font-heading)', 
+                        fontSize: 'clamp(1.75rem, 4vw, 3rem)', 
+                        color: '#D4A574', 
+                        fontWeight: 400,
+                        lineHeight: 1,
+                      }}>
+                        {stat.label}
+                      </span>
+                      <span style={{ 
+                        fontFamily: 'var(--font-body)', 
+                        fontSize: 'clamp(0.75rem, 1.2vw, 0.875rem)', 
+                        color: 'rgba(255, 254, 249, 0.7)', 
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        marginTop: '4px',
+                      }}>
+                        {stat.sublabel}
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
 
-          {/* Right Column - Coffee Image (Desktop) */}
+          {/* Right Column - Premium Stats & Features Card */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:order-1 relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
-            style={{
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
-            }}
+            initial={{ opacity: 0, scale: 0.95, x: 50 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative h-full flex items-center justify-center hidden lg:flex"
           >
-            <AnimatePresence mode="wait">
+            <div 
+              className="relative w-full max-w-md p-8 rounded-3xl backdrop-blur-xl"
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.6), rgba(43, 24, 16, 0.4))',
+                border: '2px solid rgba(184, 115, 51, 0.3)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
+              }}
+            >
+              {/* Animated background glow */}
               <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={heroImages[currentImageIndex]}
-                  alt="Rabuste Coffee"
-                  fill
-                  className="object-cover"
-                  priority={currentImageIndex === 0}
-                  quality={90}
-                />
-                {/* Subtle overlay */}
-                <div 
-                  className="absolute inset-0"
-                  style={{
-                    background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
-                  }}
-                />
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* Image indicator dots */}
-            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-              {heroImages.slice(0, 3).map((_, i) => (
-                <motion.button
-                  key={i}
-                  className="w-2 h-2 rounded-full cursor-pointer focus:outline-none transition-all"
-                  style={{
-                    background: currentImageIndex % 3 === i ? '#D4A574' : 'rgba(255, 255, 255, 0.3)',
-                  }}
-                  whileHover={{ scale: 1.3 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setCurrentImageIndex(i)}
-                  aria-label={`View image ${i + 1}`}
-                />
-              ))}
-            </div>
-          </motion.div>
+                animate={{
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="absolute inset-0 rounded-3xl opacity-20"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(184, 115, 51, 0.4), transparent)',
+                }}
+              />
 
-          {/* Mobile Image Display */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative h-[350px] sm:h-[450px] rounded-2xl overflow-hidden lg:hidden order-first"
-            style={{
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
-            }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentImageIndex}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={heroImages[currentImageIndex]}
-                  alt="Rabuste Coffee"
-                  fill
-                  className="object-cover"
-                  priority={currentImageIndex === 0}
-                  quality={90}
-                />
-              </motion.div>
-            </AnimatePresence>
+              <div className="relative z-10 space-y-8">
+                {/* Premium Stats */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid rgba(184, 115, 51, 0.3)' }}>
+                    <Zap size={24} style={{ color: '#B87333' }} />
+                    <h3 style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: '1.5rem',
+                      color: '#D4A574',
+                      letterSpacing: '0.1em',
+                      fontWeight: 400,
+                    }}>
+                      POWER METRICS
+                    </h3>
+                  </div>
+
+                  {[
+                    { value: '2.7%', label: 'Caffeine Content', desc: 'Double the strength' },
+                    { value: '6-8hrs', label: 'Energy Duration', desc: 'Sustained power' },
+                    { value: '100%', label: 'Robusta Beans', desc: 'Premium quality' },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.6, delay: 1.2 + i * 0.15 }}
+                      className="flex items-start gap-4 group"
+                    >
+                      <div 
+                        className="p-2 rounded-lg transition-all duration-300 group-hover:scale-110"
+                        style={{
+                          background: 'rgba(184, 115, 51, 0.2)',
+                          border: '1px solid rgba(212, 165, 116, 0.2)',
+                        }}
+                      >
+                        <div className="w-2 h-2 rounded-full" style={{ background: '#B87333' }} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2 mb-1">
+                          <span style={{
+                            fontFamily: 'var(--font-heading)',
+                            fontSize: '2rem',
+                            color: '#D4A574',
+                            fontWeight: 400,
+                            lineHeight: 1,
+                          }}>
+                            {stat.value}
+                          </span>
+                        </div>
+                        <p style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.875rem',
+                          color: '#D4A574',
+                          fontWeight: 600,
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase',
+                          marginBottom: '2px',
+                        }}>
+                          {stat.label}
+                        </p>
+                        <p style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.75rem',
+                          color: 'rgba(255, 254, 249, 0.6)',
+                        }}>
+                          {stat.desc}
+                        </p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Premium Divider */}
+                <div className="h-px" style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.5), transparent)',
+                }} />
+
+                {/* Key Features */}
+                <div className="space-y-4">
+                  <h3 style={{
+                    fontFamily: 'var(--font-heading)',
+                    fontSize: '1.25rem',
+                    color: '#D4A574',
+                    letterSpacing: '0.1em',
+                    fontWeight: 400,
+                  }}>
+                    WHY RABUSTE
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      'Double caffeine content',
+                      'Bold, intense flavor',
+                      'Sustained energy boost',
+                      'Premium quality beans'
+                    ].map((feature, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 1.6 + i * 0.1 }}
+                        className="flex items-center gap-3"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#B87333' }} />
+                        <span style={{
+                          fontFamily: 'var(--font-body)',
+                          fontSize: '0.875rem',
+                          color: 'rgba(255, 254, 249, 0.8)',
+                        }}>
+                          {feature}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </motion.div>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Bebas_Neue, Work_Sans } from "next/font/google";
 import "./globals.css";
@@ -61,15 +61,17 @@ export const metadata: Metadata = {
     description: 'Buy premium Robusta coffee online with 2x the caffeine. Best Robusta coffee beans, ground coffee, and instant Robusta coffee.',
     images: [`${(process.env.NEXT_PUBLIC_APP_URL as string) || 'http://localhost:3000'}/Rabuste%20logo.png`],
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   alternates: {
     canonical: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
 };
 
 const bebasNeue = Bebas_Neue({
@@ -153,8 +155,6 @@ export default function RootLayout({
         <meta name="theme-color" content="#FE7400" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        {/* Explicit viewport meta ensures consistent responsive behavior across browsers */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body
         className={`${workSans.variable} ${bebasNeue.variable} antialiased`}
