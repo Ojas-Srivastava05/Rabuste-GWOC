@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Clock, Shield, Coffee, DollarSign, TrendingUp } from 'lucide-react';
 
@@ -124,18 +124,41 @@ const features: Feature[] = [
 interface ComparisonWheelProps {
   size?: number;
   showInfo?: boolean;
+  responsive?: boolean;
 }
 
-export default function ComparisonWheel({ size = 600, showInfo = true }: ComparisonWheelProps) {
+export default function ComparisonWheel({ size = 600, showInfo = true, responsive = true }: ComparisonWheelProps) {
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [computedSize, setComputedSize] = useState<number>(size);
 
-  const svgSize = size + 200;
+  // Responsive resize handling
+  useEffect(() => {
+    if (!responsive || !containerRef.current) return;
+
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width || 0;
+      // derive a base size from container width, clamped
+      const base = Math.max(300, Math.min(700, Math.floor(w * 0.7)));
+      setComputedSize(base);
+    });
+
+    ro.observe(containerRef.current);
+    // initial measure
+    const rect = containerRef.current.getBoundingClientRect();
+    if (rect.width) setComputedSize(Math.max(300, Math.min(700, Math.floor(rect.width * 0.7))));
+
+    return () => ro.disconnect();
+  }, [responsive]);
+
+  const effectiveSize = responsive ? computedSize : size;
+  const svgSize = effectiveSize + 200;
   const centerX = svgSize / 2;
   const centerY = svgSize / 2;
-  const outerRadius = size * 0.38;
-  const middleRadius = size * 0.25;
-  const innerRadius = size * 0.13;
+  const outerRadius = effectiveSize * 0.38;
+  const middleRadius = effectiveSize * 0.25;
+  const innerRadius = effectiveSize * 0.13;
   const anglePerSector = 360 / features.length;
 
   // Create SVG path for a sector
@@ -190,8 +213,9 @@ export default function ComparisonWheel({ size = 600, showInfo = true }: Compari
 
   return (
     <div
+      ref={containerRef}
       className="relative flex flex-col items-center justify-center w-full"
-      style={{ paddingBottom: `${Math.max(140, size * 0.35)}px`, zIndex: 10 }}
+      style={{ paddingBottom: `${Math.max(140, effectiveSize * 0.35)}px`, zIndex: 10 }}
     >
       {/* Wheel Container */}
       <div className="relative" style={{ width: `${svgSize}px`, height: `${svgSize}px`, zIndex: 20 }}>
