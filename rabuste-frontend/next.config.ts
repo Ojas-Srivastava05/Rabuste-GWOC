@@ -19,30 +19,57 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'picsum.photos',
       },
+      {
+        protocol: 'https',
+        hostname: 'instagram.famd5-2.fna.fbcdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.cdninstagram.com',
+      },
     ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 31536000, // 1 year
+    minimumCacheTTL: 31536000, // 1 year - CDN edge cache
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // Add cache headers for static assets
+  // Optimized cache headers for CDN and edge network
   async headers() {
     return [
+      // Static assets - Long-term cache (1 year, immutable)
       {
         source: '/_next/static/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
         ],
       },
+      // Next.js Image optimization cache
+      {
+        source: '/_next/image/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // Static images - Long-term cache
       {
         source: '/images/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
           },
         ],
       },
@@ -51,7 +78,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
           },
         ],
       },
@@ -60,7 +87,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
           },
         ],
       },
@@ -69,7 +96,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
           },
         ],
       },
@@ -78,7 +105,26 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // Logo and icons - Long-term cache
+      {
+        source: '/Rabuste logo.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/logo.svg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
           },
         ],
       },
@@ -87,7 +133,30 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/icon.svg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // Fonts - Long-term cache with CORS
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
           },
         ],
       },
@@ -98,10 +167,12 @@ const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
     optimizeCss: true,
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
+  // Optimize production builds
+  swcMinify: true,
   // Production optimizations
   productionBrowserSourceMaps: false, // Disable source maps in production
-  // Optimize production builds
   output: 'standalone',
   webpack: (config) => {
     config.module.rules.push({

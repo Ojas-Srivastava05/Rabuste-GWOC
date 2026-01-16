@@ -22,7 +22,13 @@ export async function GET() {
       return (coupon.usageCount || 0) < coupon.usageLimit;
     });
 
-    return NextResponse.json({ coupons: availableCoupons });
+    return NextResponse.json({ coupons: availableCoupons }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        'CDN-Cache-Control': 'public, s-maxage=120',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=120',
+      },
+    });
   } catch (error) {
     console.error("Get coupons error:", error);
     return NextResponse.json(
