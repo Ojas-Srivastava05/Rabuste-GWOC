@@ -81,6 +81,7 @@ const hashCode = (str: string): number => {
   return Math.abs(hash);
 };
 
+
 // Generate consistent flags based on item name
 const getItemFlags = (item: MenuItem) => {
   const hash = hashCode(item.name);
@@ -242,6 +243,7 @@ function MenuPageContent() {
         next: { revalidate: 0 }
       });
       const data = await res.json();
+
       setMenu(data);
     } catch (err) {
       console.error("Failed to fetch menu", err);
