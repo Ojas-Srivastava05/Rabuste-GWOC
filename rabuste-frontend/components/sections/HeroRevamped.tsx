@@ -19,6 +19,7 @@ export default function HeroRevamped() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -38,16 +39,38 @@ export default function HeroRevamped() {
     }
     const timer = setTimeout(() => setIsLoaded(true), 100);
     
-    // Ensure video plays after mount
-    if (isMounted && videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Autoplay was prevented, user interaction required
-      });
-    }
-    
     return () => {
       clearTimeout(timer);
     };
+  }, []);
+
+  useEffect(() => {
+    // Ensure video plays after mount
+    if (isMounted && videoRef.current) {
+      const video = videoRef.current;
+      
+      const handleCanPlay = () => {
+        video.play().catch((err) => {
+          console.log('Video autoplay prevented:', err);
+        });
+      };
+
+      const handleError = () => {
+        console.error('Video failed to load');
+        setVideoError(true);
+      };
+
+      video.addEventListener('canplay', handleCanPlay);
+      video.addEventListener('error', handleError);
+      
+      // Try to load and play
+      video.load();
+      
+      return () => {
+        video.removeEventListener('canplay', handleCanPlay);
+        video.removeEventListener('error', handleError);
+      };
+    }
   }, [isMounted]);
 
   return (
@@ -79,10 +102,23 @@ export default function HeroRevamped() {
 
       {/* Video Background - Full Width */}
       {isMounted && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: '100vh',
+            zIndex: 0,
+          }}
+        >
           <motion.div
             className="relative w-full h-full"
-            style={{ scale }}
+            style={{ 
+              scale,
+              width: '100%',
+              height: '100%',
+              minHeight: '100vh',
+            }}
           >
             <video
               ref={videoRef}
@@ -90,19 +126,63 @@ export default function HeroRevamped() {
               loop
               muted
               playsInline
+              preload="auto"
               className="absolute inset-0 w-full h-full object-cover"
               style={{
+                width: '100%',
+                height: '100%',
+                minWidth: '100%',
+                minHeight: '100%',
+                objectFit: 'cover',
                 filter: 'brightness(0.85) contrast(1.1)',
+                zIndex: 1,
+                display: 'block',
+                backgroundColor: '#000000',
+              }}
+              onError={(e) => {
+                console.error('Video error:', e);
+                setVideoError(true);
+              }}
+              onLoadedData={() => {
+                if (videoRef.current) {
+                  videoRef.current.play().catch((err) => {
+                    console.log('Play error:', err);
+                  });
+                }
+              }}
+              onCanPlay={() => {
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+              onLoadedMetadata={() => {
+                if (videoRef.current) {
+                  videoRef.current.play().catch(() => {});
+                }
               }}
             >
               <source src="/gallery/herocafe.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
             </video>
+            
+            {/* Fallback background */}
+            {videoError && (
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{
+                  background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
+                  zIndex: 1,
+                }}
+              />
+            )}
             
             {/* Premium gradient overlays */}
             <div 
               className="absolute inset-0"
               style={{
                 background: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)',
+                zIndex: 2,
+                pointerEvents: 'none',
               }}
             />
             
@@ -111,17 +191,23 @@ export default function HeroRevamped() {
               className="absolute inset-0 opacity-20"
               style={{
                 background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(184, 115, 51, 0.15) 100%)',
+                zIndex: 2,
+                pointerEvents: 'none',
               }}
             />
           </motion.div>
         </div>
       )}
-
-      {/* Fallback background for SSR */}
+      
+      {/* Fallback gradient background for SSR */}
       {!isMounted && (
         <div 
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none overflow-hidden"
           style={{
+            width: '100%',
+            height: '100%',
+            minHeight: '100vh',
+            zIndex: 0,
             background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
           }}
         />
@@ -382,59 +468,77 @@ export default function HeroRevamped() {
           </div>
 
           {/* Right Column - Video */}
-          {isMounted && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, x: 50 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, x: 50 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
+            style={{
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
+              border: '2px solid rgba(184, 115, 51, 0.3)',
+            }}
+          >
+            {/* Fallback gradient background */}
+            <div 
+              className="absolute inset-0 w-full h-full"
               style={{
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
+                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.8), rgba(43, 24, 16, 0.6))',
+                zIndex: 0,
               }}
-            >
+            />
+            
+            {/* Video - only render on client */}
+            {isMounted && (
               <video
                 autoPlay
                 loop
                 muted
                 playsInline
+                preload="auto"
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
                   filter: 'brightness(0.9) contrast(1.05)',
+                  display: 'block',
+                  backgroundColor: '#000000',
+                  zIndex: 1,
+                }}
+                onLoadedData={(e) => {
+                  const video = e.currentTarget;
+                  video.play().catch(() => {});
+                }}
+                onCanPlay={(e) => {
+                  const video = e.currentTarget;
+                  video.play().catch(() => {});
                 }}
               >
-                <source src="/gallery/Screen Recording 2026-01-16 at 11.18.48 PM.mov" type="video/quicktime" />
+                <source src="/gallery/herocafe.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
               </video>
-              
-              {/* Subtle overlay for depth */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
-                }}
-              />
-              
-              {/* Copper accent border glow */}
-              <div 
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  boxShadow: 'inset 0 0 0 2px rgba(184, 115, 51, 0.2)',
-                  borderRadius: 'inherit',
-                }}
-              />
-            </motion.div>
-          )}
-          
-          {/* Fallback for SSR */}
-          {!isMounted && (
+            )}
+            
+            {/* Subtle overlay for depth */}
             <div 
-              className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
+              className="absolute inset-0"
               style={{
-                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.8), rgba(43, 24, 16, 0.6))',
-                border: '2px solid rgba(184, 115, 51, 0.3)',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+                background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
+                pointerEvents: 'none',
+                zIndex: 2,
               }}
             />
-          )}
+            
+            {/* Copper accent border glow */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                boxShadow: 'inset 0 0 0 2px rgba(184, 115, 51, 0.2)',
+                borderRadius: 'inherit',
+                zIndex: 2,
+              }}
+            />
+          </motion.div>
         </div>
       </motion.div>
 
