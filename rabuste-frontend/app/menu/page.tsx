@@ -502,12 +502,16 @@ function MenuPageContent() {
       />
 
       <main style={{ background: 'transparent', position: 'relative', zIndex: 2, minHeight: '100vh' }}>
-        {/* Fixed Hero Section on Left */}
+        {/* Hero Section: Fixed on left (desktop) or top (mobile) */}
         <section 
-          className="fixed top-0 left-0"
+          className="lg:fixed lg:top-0 lg:left-0"
           style={{ 
-            width: '50%',
-            height: '100vh',
+            width: '100%',
+            height: 'auto',
+            ...(typeof window !== 'undefined' && window.innerWidth >= 1024 ? {
+              width: '50%',
+              height: '100vh',
+            } : {}),
             zIndex: 10,
           }}
         >
@@ -531,13 +535,22 @@ function MenuPageContent() {
           )}
         </section>
 
-        {/* Right Carousel Section - Appears on scroll */}
+        {/* Right Carousel Section: Fixed on right (desktop) or scrollable below (mobile) */}
         <motion.section 
           ref={contentRef}
-          className="fixed right-0 top-0 overflow-y-auto"
+          className="lg:fixed lg:right-0 lg:top-0 lg:overflow-y-auto"
           style={{
-            width: '50%',
-            height: '100vh',
+            ...(typeof window !== 'undefined' && window.innerWidth >= 1024 ? {
+              width: '50%',
+              height: '100vh',
+              overflow: 'auto',
+              position: 'fixed',
+              right: 0,
+              top: 0,
+            } : {
+              width: '100%',
+              marginTop: 'auto',
+            }),
             zIndex: 20,
             opacity: carouselOpacity,
             x: carouselX,

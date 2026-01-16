@@ -180,14 +180,13 @@ export default function ArtGalleryPage() {
       <DynamicBackground />
 
       <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        
-        <div className="container px-4 md:px-6 relative z-10">
-          {/* Premium Header */}
+        <div className="container mx-auto px-4 md:px-6 relative z-10 py-6 md:py-8 lg:py-12">
+          {/* Premium Header - Mobile responsive */}
           <motion.div 
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-16 text-center relative"
+            className="mb-8 md:mb-12 lg:mb-16 text-center relative"
           >
             {/* Decorative Lines */}
             <motion.div
@@ -249,14 +248,14 @@ export default function ArtGalleryPage() {
             </motion.div>
           </motion.div>
 
-          {/* Premium Search and Filter Bar */}
+          {/* Premium Search and Filter Bar - Mobile responsive */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-12"
+            className="mb-8 md:mb-12"
           >
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
               {/* Premium Search */}
               {/* <div 
                 className="flex-1 relative group"
@@ -535,14 +534,14 @@ export default function ArtGalleryPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-4xl max-h-[85vh] md:max-h-[90vh] overflow-y-auto mx-auto"
               style={{
                 background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
                 border: '2px solid rgba(184, 115, 51, 0.4)',
                 backdropFilter: 'blur(20px)',
               }}
             >
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 {/* Close Button */}
                 <button
                   onClick={closeArtModal}

@@ -48,7 +48,7 @@ export default function ArtCategoryCarousel({
   };
 
   return (
-    <div className="mb-10">
+    <div className="mb-6 md:mb-8 lg:mb-10">
       {/* Category Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -100,7 +100,7 @@ export default function ArtCategoryCarousel({
       {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4"
+        className="flex gap-2 md:gap-4 overflow-x-auto snap-x snap-mandatory pb-4"
         style={{
           scrollBehavior: "smooth",
           scrollbarWidth: "none",
