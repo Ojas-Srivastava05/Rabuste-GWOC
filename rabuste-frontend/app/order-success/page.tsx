@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle, Hash, Receipt, ArrowRight, Loader2, Coffee } from "lucide-react";
@@ -24,7 +24,7 @@ type Order = {
   couponDiscount?: number;
 };
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -320,5 +320,43 @@ export default function OrderSuccessPage() {
 
       <Footer />
     </>
+  );
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <Navbar />
+          <DynamicBackground />
+          <div className="min-h-screen flex items-center justify-center" style={{ paddingTop: '120px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center"
+            >
+              <Loader2
+                size={48}
+                className="animate-spin mx-auto mb-4"
+                style={{ color: '#B87333' }}
+              />
+              <p
+                className="text-xl"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: '#B87333',
+                  letterSpacing: '0.1em',
+                }}
+              >
+                LOADING...
+              </p>
+            </motion.div>
+          </div>
+        </>
+      }
+    >
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
