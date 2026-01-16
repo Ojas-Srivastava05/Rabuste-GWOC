@@ -95,7 +95,7 @@ export default function HeroRevamped() {
                 filter: 'brightness(0.85) contrast(1.1)',
               }}
             >
-              <source src="/gallery/Cafe_Video_Creation_From_Images.mp4" type="video/mp4" />
+              <source src="/gallery/herocafe.mp4" type="video/mp4" />
             </video>
             
             {/* Premium gradient overlays */}
