@@ -33,17 +33,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user's email is verified
-    if (!user.isVerified) {
-      return NextResponse.json(
-        { 
-          error: "Email verification required",
-          message: "Please verify your email address before placing an order. Check your inbox for the verification link."
-        },
-        { status: 403 }
-      );
-    }
-
     const data = await req.json();
     
     // Log incoming request data for debugging

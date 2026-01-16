@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, ShoppingBag, CheckCircle, Loader2, Package, Mail, AlertCircle } from "lucide-react";
+import { CreditCard, ShoppingBag, CheckCircle, Loader2, Package, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -94,13 +94,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Check if user's email is verified
-    if (!user || !user.isVerified) {
-      alert("Please verify your email address before placing an order. Check your inbox for the verification link or visit the verification page.");
-      router.push("/verify-email");
-      return;
-    }
-
     setIsProcessing(true);
     setPaying(true);
     
@@ -185,12 +178,6 @@ export default function CheckoutPage() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        // Check if it's an email verification error
-        if (res.status === 403 && errorData.error === "Email verification required") {
-          alert(errorData.message || "Please verify your email address before placing an order. Check your inbox for the verification link.");
-          router.push("/verify-email");
-          return;
-        }
         throw new Error(errorData.message || "Order creation failed");
       }
 
@@ -305,25 +292,6 @@ export default function CheckoutPage() {
 
       <div className="min-h-screen" style={{ paddingTop: '120px', paddingBottom: '80px', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
         <div className="container px-6">
-          {/* Email Verification Warning */}
-          {!userLoading && user && !user.isVerified && (
-            <div className="mb-8 p-4 rounded-lg border-2 border-yellow-600 bg-yellow-900/20 flex items-center gap-4">
-              <AlertCircle className="text-yellow-500 flex-shrink-0" size={24} />
-              <div className="flex-1">
-                <p className="text-yellow-200 font-semibold mb-1">Email Verification Required</p>
-                <p className="text-yellow-300 text-sm">
-                  Please verify your email address before placing an order. Check your inbox for the verification link.
-                </p>
-              </div>
-              <button
-                onClick={() => router.push("/verify-email")}
-                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold"
-              >
-                Verify Email
-              </button>
-            </div>
-          )}
-          
           {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-4 mb-8">
