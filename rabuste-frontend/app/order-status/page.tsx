@@ -472,6 +472,46 @@ export default function OrderStatusPage() {
     setShowPickupModal(true);
   };
 
+  const handleSubmitRating = async (orderId: string) => {
+    if (rating === 0 || isSubmittingRating) return;
+
+    setIsSubmittingRating(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          type: "order",
+          userId: user?._id,
+          userEmail: user?.email,
+          userName: user?.name || user?.email,
+          orderId: orderId,
+          rating: rating,
+          comments: ratingComments || undefined,
+        }),
+      });
+
+      if (response.ok) {
+        setRatingSubmitted((prev) => new Set(prev).add(orderId));
+        setRatingOrderId(null);
+        setRating(0);
+        setRatingComments("");
+      } else {
+        console.error("Failed to submit rating");
+        alert("Failed to submit rating. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      alert("Error submitting rating. Please try again.");
+    } finally {
+      setIsSubmittingRating(false);
+    }
+  };
+
   async function getUserLocation() {
     try {
       const location = await getCurrentLocation();
