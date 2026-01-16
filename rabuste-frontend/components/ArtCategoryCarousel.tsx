@@ -9,9 +9,13 @@ type ArtItem = {
   _id: string;
   title: string;
   artist: string;
+  description: string;
   price: number;
   images: string[];
   category: string;
+  medium?: string;
+  dimensions?: string;
+  year?: number;
   stock: number;
 };
 
