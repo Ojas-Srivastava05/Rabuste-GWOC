@@ -240,7 +240,10 @@ export default function InstagramReelWithComparison() {
       className="relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, #000000 0%, #1A1110 50%, #000000 100%)',
-        padding: '120px 0',
+        paddingTop: '120px',
+        paddingBottom: '220px',
+        position: 'relative',
+        zIndex: 2,
       }}
     >
       {/* Background gradient effect */}
@@ -631,7 +634,15 @@ export default function InstagramReelWithComparison() {
             className="space-y-4"
           >
             {/* Comparison Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Subheading for the comparison area */}
+              <h3
+                className="text-lg sm:text-xl md:text-2xl font-semibold mb-4"
+                style={{ color: '#D4A574', fontFamily: 'var(--font-heading)', letterSpacing: '0.06em' }}
+              >
+                Interactive Comparison
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {comparisonData.map((item, index) => {
                 const Icon = item.icon;
                 return (
