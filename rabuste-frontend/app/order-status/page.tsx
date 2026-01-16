@@ -486,7 +486,7 @@ export default function OrderStatusPage() {
         },
         body: JSON.stringify({
           type: "order",
-          userId: user?._id,
+          userId: user?.id,
           userEmail: user?.email,
           userName: user?.name || user?.email,
           orderId: orderId,
