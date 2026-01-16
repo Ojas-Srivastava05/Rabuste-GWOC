@@ -9,11 +9,10 @@ const OrderSchema = new Schema(
       required: true,
     },
 
-    // Order token for daily serial tracking
+    // Order token for daily serial tracking (001, 002, 003... resets daily)
     token: {
       type: String,
       required: true,
-      unique: true,
       index: true,
     },
 

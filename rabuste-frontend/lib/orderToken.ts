@@ -1,7 +1,7 @@
 /**
  * Order Token Generation Utility
- * Generates daily serial tokens in format: YYYYMMDD-XXX
- * Example: 20260117-005
+ * Generates daily serial tokens in format: XXX (001, 002, 003...)
+ * Resets to 001 every day
  */
 
 import connectDB from "@/src/lib/mongodb";
@@ -19,55 +19,73 @@ function getTodayDateString(): string {
 }
 
 /**
+ * Get start and end of today for date range query
+ */
+function getTodayDateRange() {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  return { startOfDay, endOfDay };
+}
+
+/**
  * Generate a unique order token for today
- * Uses retry logic to handle race conditions
+ * Format: XXX (001, 002, 003...)
+ * Resets to 001 every day
  * 
- * @returns Promise<string> - Token in format YYYYMMDD-XXX
+ * @returns Promise<string> - Token in format XXX
  */
 export async function generateOrderToken(): Promise<string> {
   await connectDB();
   
-  const today = getTodayDateString();
-  const tokenPrefix = `${today}-`;
+  const { startOfDay, endOfDay } = getTodayDateRange();
+  
+  console.log('🎫 Generating token for date range:', {
+    start: startOfDay.toISOString(),
+    end: endOfDay.toISOString()
+  });
   
   // Retry up to 5 times to handle race conditions
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      // Find the highest serial number for today
-      const lastOrder = await Order.findOne({
-        token: { $regex: `^${tokenPrefix}` }
-      })
-        .sort({ createdAt: -1, token: -1 })
-        .select('token')
-        .lean()
-        .exec();
-      
-      let serialNumber = 1;
-      
-      if (lastOrder && lastOrder.token) {
-        // Extract the serial number from the last token
-        const parts = lastOrder.token.split('-');
-        if (parts.length === 2) {
-          const lastSerial = parseInt(parts[1], 10);
-          if (!isNaN(lastSerial)) {
-            serialNumber = lastSerial + 1;
-          }
+      // Find all orders created today and get the count
+      const todayOrdersCount = await Order.countDocuments({
+        createdAt: {
+          $gte: startOfDay,
+          $lte: endOfDay
         }
-      }
+      });
       
-      // Format: YYYYMMDD-XXX (pad to 3 digits)
-      const token = `${tokenPrefix}${String(serialNumber).padStart(3, '0')}`;
+      console.log(`🎫 Found ${todayOrdersCount} orders today (attempt ${attempt + 1})`);
       
-      // Verify this token doesn't already exist
-      const existingOrder = await Order.findOne({ token }).lean().exec();
+      // Next serial number is count + 1
+      const serialNumber = todayOrdersCount + 1;
+      
+      // Format: XXX (pad to 3 digits)
+      const token = String(serialNumber).padStart(3, '0');
+      
+      console.log(`🎫 Generated token: ${token}`);
+      
+      // Verify this token doesn't already exist for today
+      const existingOrder = await Order.findOne({
+        token,
+        createdAt: {
+          $gte: startOfDay,
+          $lte: endOfDay
+        }
+      }).lean().exec();
+      
       if (!existingOrder) {
+        console.log(`✅ Token ${token} is unique for today`);
         return token;
       }
+      
+      console.log(`⚠️ Token ${token} already exists, retrying...`);
       
       // If token exists, wait a bit and retry
       await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
     } catch (error) {
-      console.error(`Token generation attempt ${attempt + 1} failed:`, error);
+      console.error(`❌ Token generation attempt ${attempt + 1} failed:`, error);
       if (attempt === 4) {
         throw error;
       }
@@ -75,8 +93,9 @@ export async function generateOrderToken(): Promise<string> {
   }
   
   // Fallback: use timestamp-based token
-  const timestamp = Date.now().toString().slice(-6);
-  return `${tokenPrefix}${timestamp}`;
+  const timestamp = Date.now().toString().slice(-3);
+  console.log(`⚠️ Using fallback token: ${timestamp}`);
+  return timestamp;
 }
 
 /**
@@ -85,25 +104,15 @@ export async function generateOrderToken(): Promise<string> {
  * @returns boolean - True if valid format
  */
 export function validateTokenFormat(token: string): boolean {
-  // Format: YYYYMMDD-XXX
-  const tokenRegex = /^\d{8}-\d{3}$/;
+  // Format: XXX (3 digits)
+  const tokenRegex = /^\d{3}$/;
   return tokenRegex.test(token);
 }
 
 /**
- * Extract date from token
- * @param token - Token to parse
- * @returns Date object or null if invalid
+ * Get today's token prefix for display
+ * @returns string - Today's date in YYYYMMDD format
  */
-export function getDateFromToken(token: string): Date | null {
-  if (!validateTokenFormat(token)) {
-    return null;
-  }
-  
-  const dateString = token.split('-')[0];
-  const year = parseInt(dateString.substring(0, 4), 10);
-  const month = parseInt(dateString.substring(4, 6), 10) - 1; // JS months are 0-indexed
-  const day = parseInt(dateString.substring(6, 8), 10);
-  
-  return new Date(year, month, day);
+export function getTodayTokenPrefix(): string {
+  return getTodayDateString();
 }
