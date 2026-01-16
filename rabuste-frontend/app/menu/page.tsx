@@ -1,13 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle, Heart } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal, TrendingUp, Flame, Star, Clock, CheckCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import Script from "next/script";
 import Image from "next/image";
 import { useUser } from "@/contexts/UserContext";
+import Navbar from "@/components/Navbar";
+import DynamicBackground from "@/components/DynamicBackground";
+import MenuHero from "@/components/MenuHero";
+import MenuCategoryCarousel from "@/components/MenuCategoryCarousel";
+import Footer from "@/components/sections/footer";
+import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } from "@/lib/analytics";
 
 type MenuItem = {
   _id: string;
@@ -108,16 +114,12 @@ const getItemFlags = (item: MenuItem) => {
   return flags;
 };
 
-import Navbar from "@/components/Navbar";
-import DynamicBackground from "@/components/DynamicBackground";
-import Footer from "@/components/sections/footer";
-import { trackAddToCart, trackRemoveFromCart, trackMenuItemView, trackSearch } from "@/lib/analytics";
-
 function MenuPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useUser();
   const [menu, setMenu] = useState<MenuItem[]>([]);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
   const [cart, setCart] = useState<Cart | null>(null);
   const [aiDiscount, setAiDiscount] = useState<{ enableDiscountAI: boolean; discountItemId: string | null; discountPercent: number }>(
     { enableDiscountAI: false, discountItemId: null, discountPercent: 0 }
@@ -125,7 +127,6 @@ function MenuPageContent() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [lastSearchQuery, setLastSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name">("default");
   const [showFilters, setShowFilters] = useState(false);
   const [upsellModal, setUpsellModal] = useState<{ item: MenuItem; suggestions: MenuItem[] } | null>(null);
@@ -134,6 +135,17 @@ function MenuPageContent() {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [addedToast, setAddedToast] = useState<{ show: boolean; itemName: string }>({ show: false, itemName: '' });
   const [additionCount, setAdditionCount] = useState(0);
+  const contentRef = useRef<HTMLElement>(null);
+  
+  // Track scroll position for carousel visibility
+  const { scrollY } = useScroll();
+  const carouselOpacity = useTransform(scrollY, [0, 200], [1, 1]);
+  const carouselX = useTransform(scrollY, [0, 200], [0, 0]);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, []);
 
   useEffect(() => {
     // Parallel fetch for better performance
@@ -171,6 +183,13 @@ function MenuPageContent() {
     }
   }, [user?.id, searchParams, router]);
 
+  // Set initial selected menu item when menu loads
+  useEffect(() => {
+    if (menu.length > 0 && !selectedMenuItem) {
+      setSelectedMenuItem(menu[0]);
+    }
+  }, [menu, selectedMenuItem]);
+
   // Handle scrolling to specific item from hash
   useEffect(() => {
     const handleHashScroll = () => {
@@ -181,13 +200,11 @@ function MenuPageContent() {
           // Wait for DOM to render and ensure menu items are loaded
           setTimeout(() => {
             const element = document.getElementById(`item-${itemId}`);
-            if (element) {
-              // Scroll to element with offset for navbar
-              const elementPosition = element.getBoundingClientRect().top;
-              const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset for navbar
-              
-              window.scrollTo({
-                top: offsetPosition,
+            if (element && contentRef.current) {
+              // Scroll within the content section
+              const elementPosition = element.offsetTop;
+              contentRef.current.scrollTo({
+                top: elementPosition - 20,
                 behavior: 'smooth'
               });
               
@@ -198,7 +215,7 @@ function MenuPageContent() {
                 setHighlightedItemId(null);
               }, 4000);
             }
-          }, 800); // Increased timeout to ensure DOM is ready
+          }, 800);
         }
       }
     };
@@ -382,6 +399,10 @@ function MenuPageContent() {
     return favorites.includes(itemId);
   };
 
+  const handleMenuItemHover = (item: MenuItem) => {
+    setSelectedMenuItem(item);
+  };
+
   const totalItems = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + i.quantity, 0) || 0;
   const totalPrice = cart?.items.filter((i) => i.itemType === "menu").reduce((s, i) => s + (i.price * i.quantity), 0) || 0;
 
@@ -465,56 +486,105 @@ function MenuPageContent() {
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ paddingTop: 'clamp(80px, 15vw, 120px)', paddingBottom: 'clamp(40px, 10vw, 80px)', background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        <div className="container px-3 sm:px-4 md:px-6">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-4 mb-6"
-            >
-              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
-              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
-                PREMIUM ROBUSTA COFFEE
-              </span>
-              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
-            </motion.div>
-            
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl mb-4"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                lineHeight: 0.9,
-                color: '#F5F1E8',
-              }}
-            >
-              <span className="gradient-text">RABUSTE COFFEE MENU</span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-sm sm:text-base md:text-lg px-2"
-              style={{ color: '#B87333' }}
-            >
-              Premium Robusta Coffee - {filtered.length} {filtered.length === 1 ? 'item' : 'items'} available. Buy the best Robusta coffee online with 2x caffeine.
-            </motion.p>
-          </div>
+      {/* Noise overlay */}
+      <div className="noise-overlay" />
+      
+      {/* Premium copper accent line */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-1 pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)',
+          zIndex: 100,
+          boxShadow: '0 0 20px rgba(184, 115, 51, 0.5)',
+        }}
+      />
 
-          {/* Search and Filter Bar */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <div className="flex flex-col md:flex-row gap-3">
-              {/* Search */}
+      <main style={{ background: 'transparent', position: 'relative', zIndex: 2, minHeight: '100vh' }}>
+        {/* Fixed Hero Section on Left */}
+        <section 
+          className="fixed top-0 left-0"
+          style={{ 
+            width: '50%',
+            height: '100vh',
+            zIndex: 10,
+          }}
+        >
+          {/* Left Side Gradient Overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(26, 17, 16, 0.3) 100%)',
+              zIndex: -1,
+            }}
+          />
+          {selectedMenuItem && (
+            <MenuHero 
+              menuItem={selectedMenuItem}
+              onAddToCart={() => addToCart(selectedMenuItem._id)}
+              hasAIDiscount={hasAIDiscount(selectedMenuItem._id)}
+              discountedPrice={getDiscountedPrice(selectedMenuItem)}
+              originalPrice={getOriginalPrice(selectedMenuItem)}
+              discountPercent={aiDiscount.discountPercent}
+            />
+          )}
+        </section>
+
+        {/* Right Carousel Section - Appears on scroll */}
+        <motion.section 
+          ref={contentRef}
+          className="fixed right-0 top-0 overflow-y-auto"
+          style={{
+            width: '50%',
+            height: '100vh',
+            zIndex: 20,
+            opacity: carouselOpacity,
+            x: carouselX,
+          }}
+        >
+          {/* Gradient overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(90deg, rgba(26, 17, 16, 0.5) 0%, transparent 50%, rgba(184, 115, 51, 0.1) 100%)',
+              zIndex: -1,
+            }}
+          />
+
+          <div className="pt-24 md:pt-28 lg:pt-32 px-6 pb-20">
+            {/* Header */}
+            <div className="mb-8">
+              <motion.p
+                className="text-xs uppercase tracking-[0.3em] mb-4"
+                style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                Browse Menu
+              </motion.p>
+              
+              <motion.h1
+                className="text-3xl md:text-4xl lg:text-5xl mb-4"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  lineHeight: 0.9,
+                  color: '#F5F1E8',
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <span className="gradient-text">OUR MENU</span>
+              </motion.h1>
+            </div>
+
+            {/* Search Bar */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
               <div 
-                className="flex-1 relative"
+                className="relative"
                 style={{
                   background: 'rgba(26, 17, 16, 0.8)',
                   border: '1px solid rgba(184, 115, 51, 0.3)',
@@ -539,76 +609,102 @@ function MenuPageContent() {
                       setLastSearchQuery(searchQuery);
                     }
                   }}
-                  className="w-full pl-11 pr-12 py-3.5 sm:py-3 bg-transparent outline-none text-base sm:text-sm"
+                  className="w-full pl-11 pr-12 py-3 bg-transparent outline-none text-sm"
                   style={{
                     color: '#F5F1E8',
                     fontFamily: 'var(--font-body)',
-                    minHeight: '44px', // Touch-friendly height
                   }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 -mr-2 transition-transform active:scale-90"
-                    style={{ minWidth: '44px', minHeight: '44px' }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 transition-transform active:scale-90"
                   >
                     <X size={18} style={{ color: '#B87333' }} />
                   </button>
                 )}
               </div>
+            </motion.div>
 
-              {/* View Toggle and Filter */}
-              <div className="flex gap-2">
-                {/* View Mode */}
-                <div 
-                  className="flex"
-                  style={{
-                    background: 'rgba(26, 17, 16, 0.8)',
-                    border: '1px solid rgba(184, 115, 51, 0.3)',
-                  }}
-                >
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors ${viewMode === "grid" ? 'bg-copper-gradient' : ''}`}
-                    style={{
-                      background: viewMode === "grid" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
-                      minWidth: '48px',
-                      minHeight: '44px',
-                    }}
-                  >
-                    <Grid3x3 size={20} style={{ color: viewMode === "grid" ? '#D4A574' : '#B87333' }} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`px-4 sm:px-4 py-3.5 sm:py-3 transition-colors`}
-                    style={{
-                      background: viewMode === "list" ? 'rgba(184, 115, 51, 0.3)' : 'transparent',
-                      borderLeft: '1px solid rgba(184, 115, 51, 0.2)',
-                      minWidth: '48px',
-                      minHeight: '44px',
-                    }}
-                  >
-                    <List size={20} style={{ color: viewMode === "list" ? '#D4A574' : '#B87333' }} />
-                  </button>
-                </div>
+            {/* Quick Filter Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              <button
+                onClick={() => {
+                  setQuickFilter("all");
+                  setActiveCategory("All");
+                }}
+                className={`px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs`}
+                style={{
+                  background: quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `1px solid ${quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "all" && activeCategory === "All" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                ALL
+              </button>
+              <button
+                onClick={() => setQuickFilter("bestseller")}
+                className={`px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs`}
+                style={{
+                  background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `1px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                <Star size={12} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
+                BEST
+              </button>
+              <button
+                onClick={() => setQuickFilter("trending")}
+                className={`px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs`}
+                style={{
+                  background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `1px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                <Flame size={12} />
+                HOT
+              </button>
+              <button
+                onClick={() => setQuickFilter("limited")}
+                className={`px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs`}
+                style={{
+                  background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                  border: `1px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
+                  color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                <Clock size={12} />
+                LIMITED
+              </button>
+            </motion.div>
 
-                {/* Filters Button */}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="px-4 sm:px-4 py-3.5 sm:py-3 flex items-center gap-2"
-                  style={{
-                    background: showFilters ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                    border: '1px solid rgba(184, 115, 51, 0.3)',
-                    minHeight: '44px',
-                  }}
-                >
-                  <SlidersHorizontal size={20} style={{ color: '#B87333' }} />
-                  <span className="text-sm hidden sm:inline" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
-                    Filters
-                  </span>
-                </button>
-              </div>
-            </div>
+            {/* Filter and Sort Button */}
+            <motion.button
+              onClick={() => setShowFilters(!showFilters)}
+              className="mb-4 px-4 py-2 flex items-center gap-2 text-sm w-full"
+              style={{
+                background: showFilters ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
+                border: '1px solid rgba(184, 115, 51, 0.3)',
+                color: '#B87333',
+                fontFamily: 'var(--font-body)',
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <SlidersHorizontal size={16} />
+              <span>Filters & Sort</span>
+            </motion.button>
 
             {/* Expandable Filters */}
             <AnimatePresence>
@@ -617,10 +713,10 @@ function MenuPageContent() {
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
+                  className="overflow-hidden mb-6"
                 >
                   <div 
-                    className="mt-3 p-4"
+                    className="p-4"
                     style={{
                       background: 'rgba(26, 17, 16, 0.8)',
                       border: '1px solid rgba(184, 115, 51, 0.3)',
@@ -636,14 +732,16 @@ function MenuPageContent() {
                         {categories.map((c) => (
                           <button
                             key={c}
-                            onClick={() => setActiveCategory(c)}
-                            className={`px-3 py-1.5 text-xs transition-all`}
+                            onClick={() => {
+                              setActiveCategory(c);
+                              setQuickFilter("all");
+                            }}
+                            className={`px-2 py-1 text-xs transition-all`}
                             style={{
                               background: activeCategory === c ? 'rgba(184, 115, 51, 0.3)' : 'rgba(61, 43, 31, 0.5)',
                               border: `1px solid ${activeCategory === c ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.2)'}`,
                               color: activeCategory === c ? '#D4A574' : '#B87333',
                               fontFamily: 'var(--font-body)',
-                              fontWeight: activeCategory === c ? '600' : '400',
                             }}
                           >
                             {c}
@@ -660,20 +758,19 @@ function MenuPageContent() {
                       <div className="flex flex-wrap gap-2">
                         {[
                           { value: "default", label: "Default" },
-                          { value: "price-low", label: "Price: Low to High" },
-                          { value: "price-high", label: "Price: High to Low" },
+                          { value: "price-low", label: "Price ↑" },
+                          { value: "price-high", label: "Price ↓" },
                           { value: "name", label: "Name" },
                         ].map((sort) => (
                           <button
                             key={sort.value}
                             onClick={() => setSortBy(sort.value as any)}
-                            className={`px-3 py-1.5 text-xs transition-all`}
+                            className={`px-2 py-1 text-xs transition-all`}
                             style={{
                               background: sortBy === sort.value ? 'rgba(184, 115, 51, 0.3)' : 'rgba(61, 43, 31, 0.5)',
                               border: `1px solid ${sortBy === sort.value ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.2)'}`,
                               color: sortBy === sort.value ? '#D4A574' : '#B87333',
                               fontFamily: 'var(--font-body)',
-                              fontWeight: sortBy === sort.value ? '600' : '400',
                             }}
                           >
                             {sort.label}
@@ -685,312 +782,68 @@ function MenuPageContent() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
 
-          {/* Quick Filter Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 space-y-4"
+            {/* Menu Categories */}
+            {categories.filter(c => c !== "All").map((category) => {
+              const categoryItems = filtered.filter(item => item.category === category);
+              if (categoryItems.length === 0) return null;
+              
+              return (
+                <MenuCategoryCarousel
+                  key={category}
+                  title={category}
+                  items={categoryItems}
+                  getQuantity={getQty}
+                  onAdd={addToCart}
+                  onRemove={removeFromCart}
+                  onHover={handleMenuItemHover}
+                  flags={Object.fromEntries(categoryItems.map(item => [item._id, getItemFlags(item)]))}
+                  hasAIDiscount={hasAIDiscount}
+                  getDiscountedPrice={getDiscountedPrice}
+                  getOriginalPrice={getOriginalPrice}
+                  discountPercent={aiDiscount.discountPercent}
+                />
+              );
+            })}
+          </div>
+        </motion.section>
+      </main>
+
+      {/* Cart Float Button */}
+      <AnimatePresence>
+        {totalItems > 0 && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push("/cart")}
+            className="fixed bottom-6 right-6 z-50 px-6 py-4 flex items-center gap-3"
+            style={{
+              background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
+              boxShadow: '0 10px 40px rgba(184, 115, 51, 0.5)',
+              color: '#000',
+              fontFamily: 'var(--font-heading)',
+              fontSize: '14px',
+              letterSpacing: '0.1em',
+            }}
           >
-            {/* Special Filters Row */}
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:flex-wrap" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <button
-                onClick={() => {
-                  setQuickFilter("all");
-                  setActiveCategory("All");
-                }}
-                className={`px-4 py-2 flex items-center gap-2 transition-all`}
-                style={{
-                  background: quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                  border: `2px solid ${quickFilter === "all" && activeCategory === "All" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                  color: quickFilter === "all" && activeCategory === "All" ? '#D4A574' : '#B87333',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                ALL ITEMS
-              </button>
-              <button
-                onClick={() => setQuickFilter("bestseller")}
-                className={`px-4 py-2 flex items-center gap-2 transition-all`}
-                style={{
-                  background: quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                  border: `2px solid ${quickFilter === "bestseller" ? 'rgba(184, 115, 51, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                  color: quickFilter === "bestseller" ? '#D4A574' : '#B87333',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                <Star size={16} fill={quickFilter === "bestseller" ? '#D4A574' : 'none'} />
-                BESTSELLERS
-              </button>
-              <button
-                onClick={() => setQuickFilter("trending")}
-                className={`px-4 py-2 flex items-center gap-2 transition-all`}
-                style={{
-                  background: quickFilter === "trending" ? 'rgba(255, 107, 107, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                  border: `2px solid ${quickFilter === "trending" ? 'rgba(255, 107, 107, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                  color: quickFilter === "trending" ? '#FF6B6B' : '#B87333',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                <Flame size={16} />
-                TRENDING
-              </button>
-              <button
-                onClick={() => setQuickFilter("limited")}
-                className={`px-4 py-2 flex items-center gap-2 transition-all`}
-                style={{
-                  background: quickFilter === "limited" ? 'rgba(255, 183, 77, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                  border: `2px solid ${quickFilter === "limited" ? 'rgba(255, 183, 77, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                  color: quickFilter === "limited" ? '#FFB74D' : '#B87333',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.05em',
-                }}
-              >
-                <Clock size={16} />
-                LIMITED STOCK
-              </button>
-            </div>
+            <ShoppingCart size={20} />
+            <span className="font-bold">{totalItems}</span>
+            <span>₹{totalPrice}</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-            {/* Category Filters Row */}
-            <div>
-              <div className="flex items-center gap-3 mb-3">
-                <div 
-                  className="h-px flex-1"
-                  style={{ background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.3))' }}
-                />
-                <span 
-                  className="text-xs uppercase tracking-wider whitespace-nowrap"
-                  style={{ color: '#8B6F47', fontFamily: 'var(--font-body)' }}
-                >
-                  BROWSE BY CATEGORY
-                </span>
-                <div 
-                  className="h-px flex-1"
-                  style={{ background: 'linear-gradient(90deg, rgba(184, 115, 51, 0.3), transparent)' }}
-                />
-              </div>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                {categories.filter(c => c !== "All").map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => {
-                      setActiveCategory(category);
-                      setQuickFilter("all");
-                    }}
-                    className={`px-4 py-2 transition-all whitespace-nowrap flex-shrink-0`}
-                    style={{
-                      background: activeCategory === category ? 'rgba(205, 127, 50, 0.3)' : 'rgba(26, 17, 16, 0.8)',
-                      border: `2px solid ${activeCategory === category ? 'rgba(205, 127, 50, 0.6)' : 'rgba(184, 115, 51, 0.3)'}`,
-                      color: activeCategory === category ? '#F5F1E8' : '#B87333',
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: '14px',
-                      letterSpacing: '0.05em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Cart Float Button */}
-          <AnimatePresence>
-            {totalItems > 0 && (
-              <motion.button
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/cart")}
-                className="fixed bottom-6 right-6 z-50 px-6 py-4 flex items-center gap-3"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                  boxShadow: '0 10px 40px rgba(184, 115, 51, 0.5)',
-                  color: '#000',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                <ShoppingCart size={20} />
-                <span className="font-bold">{totalItems}</span>
-                <span>₹{totalPrice}</span>
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          {/* Menu Items */}
-          {filtered.length > 0 ? (
-            viewMode === "grid" ? (
-              activeCategory === "All" ? (
-                // Show horizontal scrolling view for "All" category on mobile
-                <div className="space-y-12">
-                  {categories.filter(c => c !== "All").map((category) => {
-                    const categoryItems = filtered.filter(item => item.category === category);
-                    if (categoryItems.length === 0) return null;
-                    
-                    return (
-                      <motion.div
-                        key={category}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        {/* Category Header */}
-                        <div className="mb-6 text-center">
-                          <div className="inline-flex items-center gap-4">
-                            <div 
-                              className="w-16 h-px"
-                              style={{ background: 'linear-gradient(90deg, transparent, #B87333)' }}
-                            />
-                            <h2
-                              className="text-2xl md:text-4xl"
-                              style={{
-                                fontFamily: 'var(--font-heading)',
-                                color: '#F5F1E8',
-                                letterSpacing: '0.05em',
-                              }}
-                            >
-                              {category}
-                            </h2>
-                            <div 
-                              className="w-16 h-px"
-                              style={{ background: 'linear-gradient(90deg, #B87333, transparent)' }}
-                            />
-                          </div>
-                          <p className="text-xs mt-2" style={{ color: '#8B6F47' }}>
-                            {categoryItems.length} items
-                          </p>
-                        </div>
-
-                        {/* Category Items - Horizontal scrolling on mobile, grid on desktop */}
-                        <div className="md:hidden flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                          {categoryItems.map((item, index) => (
-                            <div key={item._id} className="flex-shrink-0 snap-start" style={{ width: 'calc(50% - 6px)' }}>
-                              <GridMenuItem
-                                item={item}
-                                quantity={getQty(item._id)}
-                                onAdd={() => addToCart(item._id)}
-                                onRemove={() => removeFromCart(item._id)}
-                                onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
-                                isFavorite={isFavorite(item._id)}
-                                index={index}
-                                flags={getItemFlags(item)}
-                                isHighlighted={highlightedItemId === item._id}
-                                hasAIDiscount={hasAIDiscount(item._id)}
-                                discountedPrice={getDiscountedPrice(item)}
-                                originalPrice={getOriginalPrice(item)}
-                                discountPercent={aiDiscount.discountPercent}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        {/* Desktop grid view */}
-                        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                          {categoryItems.map((item, index) => (
-                            <GridMenuItem
-                              key={item._id}
-                              item={item}
-                              quantity={getQty(item._id)}
-                              onAdd={() => addToCart(item._id)}
-                              onRemove={() => removeFromCart(item._id)}
-                              onFavorite={() => toggleFavorite(item._id)}
-                              isFavorite={isFavorite(item._id)}
-                              index={index}
-                              flags={getItemFlags(item)}
-                              isHighlighted={highlightedItemId === item._id}
-                              hasAIDiscount={hasAIDiscount(item._id)}
-                              discountedPrice={getDiscountedPrice(item)}
-                              originalPrice={getOriginalPrice(item)}
-                              discountPercent={aiDiscount.discountPercent}
-                            />
-                          ))}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              ) : (
-                // Show grid for specific category (2 cols on mobile, more on desktop)
-                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-                  {filtered.map((item, index) => (
-                    <GridMenuItem
-                      key={item._id}
-                      item={item}
-                      quantity={getQty(item._id)}
-                      onAdd={() => addToCart(item._id)}
-                      onRemove={() => removeFromCart(item._id)}
-                      onFavorite={() => toggleFavorite(item._id)}
-                      isFavorite={isFavorite(item._id)}
-                      index={index}
-                      flags={getItemFlags(item)}
-                      isHighlighted={highlightedItemId === item._id}
-                      hasAIDiscount={hasAIDiscount(item._id)}
-                      discountedPrice={getDiscountedPrice(item)}
-                      originalPrice={getOriginalPrice(item)}
-                      discountPercent={aiDiscount.discountPercent}
-                    />
-                  ))}
-                </div>
-              )
-            ) : (
-              // List view - works for all categories
-              <div className="space-y-3 max-w-4xl mx-auto">
-                {filtered.map((item, index) => (
-                  <ListMenuItem
-                    key={item._id}
-                    item={item}
-                    quantity={getQty(item._id)}
-                    onAdd={() => addToCart(item._id)}
-                    onRemove={() => removeFromCart(item._id)}
-                    onFavorite={user?.id ? () => toggleFavorite(item._id) : undefined}
-                    isFavorite={isFavorite(item._id)}
-                    index={index}
-                    flags={getItemFlags(item)}
-                    isHighlighted={highlightedItemId === item._id}
-                    hasAIDiscount={hasAIDiscount(item._id)}
-                    discountedPrice={getDiscountedPrice(item)}
-                    originalPrice={getOriginalPrice(item)}
-                    discountPercent={aiDiscount.discountPercent}
-                  />
-                ))}
-              </div>
-            )
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20"
-            >
-              <p className="text-xl mb-2" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
-                NO ITEMS FOUND
-              </p>
-              <p className="text-sm" style={{ color: '#8B6F47' }}>
-                Try adjusting your search or filters
-              </p>
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-          {/* Success Toast */}
+      {/* Success Toast */}
       <AnimatePresence>
         {addedToast.show && (
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-24 right-6 z-[100] flex items-center gap-3 px-6 py-4 pointer-events-none"
+            className="fixed top-24 left-6 z-[100] flex items-center gap-3 px-6 py-4 pointer-events-none"
             style={{
               background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
               border: '2px solid rgba(111, 143, 114, 0.6)',
@@ -1001,13 +854,13 @@ function MenuPageContent() {
           >
             <CheckCircle size={20} style={{ color: '#5E7D4C' }} />
             <p style={{ color: '#F5F1E8', fontFamily: 'var(--font-body)' }}>
-              <strong className="gradient-text">{addedToast.itemName}</strong> added to cart
+              <strong className="gradient-text">{addedToast.itemName}</strong> added
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
-          {/* Upsell Modal */}
+      {/* Upsell Modal */}
       <AnimatePresence>
         {upsellModal && (
           <motion.div
@@ -1171,17 +1024,13 @@ function MenuPageContent() {
   );
 }
 
-// Grid View Component with Flags
-function GridMenuItem({
+// Carousel Menu Item Component for left sidebar
+function CarouselMenuItem({
   item,
   quantity,
   onAdd,
   onRemove,
-  onFavorite,
-  isFavorite,
-  index,
   flags,
-  isHighlighted,
   hasAIDiscount,
   discountedPrice,
   originalPrice,
@@ -1191,11 +1040,7 @@ function GridMenuItem({
   quantity: number;
   onAdd: () => void;
   onRemove: () => void;
-  onFavorite?: () => void;
-  isFavorite: boolean;
-  index: number;
   flags: any;
-  isHighlighted?: boolean;
   hasAIDiscount?: boolean;
   discountedPrice?: number;
   originalPrice?: number;
@@ -1204,213 +1049,99 @@ function GridMenuItem({
   return (
     <motion.div
       id={`item-${item._id}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ 
-        opacity: 1, 
-        y: 0,
-        scale: isHighlighted ? [1, 1.05, 1.02, 1] : 1,
-      }}
-      transition={{ 
-        delay: index * 0.03,
-        scale: { duration: 0.6, ease: "easeOut" }
-      }}
-      whileHover={{ scale: 1.02 }}
-      className="group relative flex flex-col h-full"
+      whileHover={{ scale: 1.02, x: 10 }}
+      className="group relative flex gap-3 cursor-pointer"
       style={{
-        ...(isHighlighted ? {
-          backgroundImage: 'linear-gradient(135deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
-          border: '3px solid transparent',
-          boxShadow: '0 0 0 1px rgba(184, 115, 51, 0.3), 0 0 40px rgba(184, 115, 51, 0.6), 0 0 80px rgba(205, 127, 50, 0.4), 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(184, 115, 51, 0.15)',
-        } : {
-          backgroundImage: 'linear-gradient(135deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
-          border: '1px solid rgba(184, 115, 51, 0.2)',
-        }),
+        backgroundImage: 'linear-gradient(90deg, rgba(42, 24, 16, 0.8), rgba(26, 17, 16, 0.8))',
+        border: '1px solid rgba(184, 115, 51, 0.2)',
         backdropFilter: 'blur(20px)',
+        padding: '12px',
         overflow: 'hidden',
         transition: 'all 0.3s ease',
-        position: 'relative',
       }}
     >
-      {/* Premium Highlight Glow Overlay */}
-      {isHighlighted && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.3, 0.15] }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.4), rgba(184, 115, 51, 0.2), transparent 70%)',
-              zIndex: 1,
-            }}
-          />
-          <motion.div
-            animate={{ 
-              rotate: [0, 360],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{ 
-              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'conic-gradient(from 0deg, transparent, rgba(184, 115, 51, 0.3), transparent, rgba(205, 127, 50, 0.3), transparent)',
-              zIndex: 0,
-            }}
-          />
-        </>
-      )}
       {/* Image */}
-      <div className="w-full h-40 overflow-hidden relative flex-shrink-0">
+      <div className="w-20 h-20 flex-shrink-0 overflow-hidden relative" style={{ borderRadius: '8px' }}>
         <Image
           src={item.image}
           alt={item.name}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
+          sizes="80px"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
-          quality={85}
+          quality={75}
         />
         
-        {/* Favorite Button - Only show if logged in */}
-        {onFavorite && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onFavorite();
-            }}
-            className="absolute top-2 right-2 p-2.5 sm:p-2 rounded-full transition-all active:scale-95"
-            style={{
-              background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
-              border: `2px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
-              backdropFilter: 'blur(10px)',
-              zIndex: 20,
-              pointerEvents: 'auto',
-              cursor: 'pointer',
-              minWidth: '44px',
-              minHeight: '44px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Heart size={18} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
-          </button>
-        )}
-
-        {/* Top Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        {/* Badges */}
+        <div className="absolute top-1 left-1 flex flex-col gap-1">
           {hasAIDiscount && (
             <div
-              className="px-2 py-1 text-xs flex items-center gap-1"
+              className="px-1 py-0.5 text-xs"
               style={{
                 background: 'rgba(76, 175, 80, 0.95)',
                 color: '#000',
                 fontFamily: 'var(--font-heading)',
-                fontSize: '10px',
-                letterSpacing: '0.1em',
+                fontSize: '8px',
+                borderRadius: '4px',
               }}
             >
-              🤖 {discountPercent}% OFF
+              🤖
             </div>
           )}
           {flags.isBestseller && (
             <div
-              className="px-2 py-1 text-xs flex items-center gap-1"
+              className="px-1 py-0.5"
               style={{
                 background: 'rgba(184, 115, 51, 0.95)',
-                color: '#000',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '10px',
-                letterSpacing: '0.1em',
+                borderRadius: '4px',
               }}
             >
-              <Star size={10} fill="#000" />
-              BESTSELLER
+              <Star size={8} fill="#000" color="#000" />
             </div>
           )}
           {flags.isTrending && (
             <div
-              className="px-2 py-1 text-xs flex items-center gap-1"
+              className="px-1 py-0.5"
               style={{
                 background: 'rgba(255, 107, 107, 0.95)',
-                color: '#000',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '10px',
-                letterSpacing: '0.1em',
+                borderRadius: '4px',
               }}
             >
-              <Flame size={10} />
-              TRENDING
+              <Flame size={8} color="#000" />
             </div>
           )}
-        </div>
-
-        {/* Category Badge */}
-        <div
-          className="absolute bottom-2 left-2 px-2 py-1 text-xs"
-          style={{
-            background: 'rgba(0, 0, 0, 0.8)',
-            border: '1px solid rgba(184, 115, 51, 0.4)',
-            color: '#D4A574',
-            fontFamily: 'var(--font-body)',
-            fontSize: '10px',
-            letterSpacing: '0.1em',
-          }}
-        >
-          {item.category}
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1" style={{ position: 'relative', zIndex: 10 }}>
+      <div className="flex-1 min-w-0">
         <h3
-          className="text-base mb-1 line-clamp-1"
+          className="text-sm mb-1 line-clamp-1"
           style={{
             fontFamily: 'var(--font-heading)',
             color: '#F5F1E8',
-            letterSpacing: '0.03em',
+            letterSpacing: '0.02em',
           }}
         >
           {item.name}
         </h3>
-        <p className="text-xs mb-3 line-clamp-2" style={{ color: '#8B6F47', lineHeight: 1.4, minHeight: '32px' }}>
+        <p className="text-xs mb-2 line-clamp-1" style={{ color: '#8B6F47' }}>
           {item.description}
         </p>
 
-        {/* Activity Indicators */}
-        <div className="flex flex-wrap gap-2 mb-3 text-xs min-h-[20px]">
-          {flags.soldToday && (
-            <div className="flex items-center gap-1" style={{ color: '#B87333' }}>
-              <TrendingUp size={12} />
-              <span>{flags.soldToday} sold today</span>
-            </div>
-          )}
-          {flags.stockLeft && (
-            <div className="flex items-center gap-1" style={{ color: '#FF6B6B' }}>
-              <Clock size={12} />
-              <span>Only {flags.stockLeft} left!</span>
-            </div>
-          )}
-        </div>
-
         {/* Price and Action */}
-        <div className="flex justify-between items-center mt-auto">
+        <div className="flex justify-between items-center">
           <div className="flex flex-col">
             {hasAIDiscount ? (
               <>
                 <span
-                  className="text-xl gradient-text"
+                  className="text-base gradient-text"
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
                   ₹{Math.ceil(discountedPrice || 0)}
                 </span>
                 <span
-                  className="text-sm line-through opacity-60"
+                  className="text-xs line-through opacity-60"
                   style={{ color: '#8B6F47' }}
                 >
                   ₹{originalPrice}
@@ -1418,7 +1149,7 @@ function GridMenuItem({
               </>
             ) : (
               <span
-                className="text-xl gradient-text"
+                className="text-base gradient-text"
                 style={{ fontFamily: 'var(--font-heading)' }}
               >
                 ₹{item.price}
@@ -1428,426 +1159,55 @@ function GridMenuItem({
 
           {quantity > 0 ? (
             <div
-              className="flex items-center gap-2 sm:gap-2"
+              className="flex items-center gap-1"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
-                padding: '6px 10px',
+                padding: '4px 8px',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
-                position: 'relative',
-                zIndex: 10,
-                borderRadius: '8px',
+                borderRadius: '6px',
               }}
             >
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  e.preventDefault();
                   onRemove();
                 }} 
-                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
-                style={{ 
-                  cursor: 'pointer', 
-                  pointerEvents: 'auto',
-                  minWidth: '36px',
-                  minHeight: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                className="text-[#B87333] active:scale-95 transition-transform"
               >
-                <Minus size={18} />
+                <Minus size={14} />
               </button>
-              <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
+              <span className="text-xs font-bold gradient-text" style={{ minWidth: '16px', textAlign: 'center' }}>
                 {quantity}
               </span>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  e.preventDefault();
                   onAdd();
                 }} 
-                className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
-                style={{ 
-                  cursor: 'pointer', 
-                  pointerEvents: 'auto',
-                  minWidth: '36px',
-                  minHeight: '36px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                className="text-[#B87333] active:scale-95 transition-transform"
               >
-                <Plus size={18} />
+                <Plus size={14} />
               </button>
             </div>
           ) : (
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                e.preventDefault();
                 onAdd();
               }}
-              className="px-4 sm:px-3 py-2.5 sm:py-1.5 text-sm sm:text-xs flex items-center gap-1.5 sm:gap-1"
+              className="px-3 py-1.5 text-xs flex items-center gap-1"
               style={{
                 background: 'rgba(184, 115, 51, 0.2)',
                 border: '1px solid rgba(184, 115, 51, 0.4)',
                 color: '#D4A574',
                 fontFamily: 'var(--font-body)',
-                letterSpacing: '0.05em',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                position: 'relative',
-                zIndex: 10,
-                minHeight: '44px',
-                borderRadius: '8px',
-              }}
-              onTouchStart={(e) => {
-                e.currentTarget.style.transform = 'scale(0.95)';
-              }}
-              onTouchEnd={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                borderRadius: '6px',
               }}
             >
-              <Plus size={16} />
+              <Plus size={12} />
               ADD
             </button>
           )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// List View Component with Flags
-function ListMenuItem({
-  item,
-  quantity,
-  onAdd,
-  onRemove,
-  onFavorite,
-  isFavorite,
-  index,
-  flags,
-  isHighlighted,
-  hasAIDiscount,
-  discountedPrice,
-  originalPrice,
-  discountPercent,
-}: {
-  item: MenuItem;
-  quantity: number;
-  onAdd: () => void;
-  onRemove: () => void;
-  onFavorite?: () => void;
-  isFavorite: boolean;
-  index: number;
-  flags: any;
-  isHighlighted?: boolean;
-  hasAIDiscount?: boolean;
-  discountedPrice?: number;
-  originalPrice?: number;
-  discountPercent?: number;
-}) {
-  return (
-    <motion.div
-      id={`item-${item._id}`}
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ 
-        opacity: 1, 
-        x: 0,
-        scale: isHighlighted ? [1, 1.02, 1.01, 1] : 1,
-      }}
-      transition={{ 
-        delay: index * 0.03,
-        scale: { duration: 0.6, ease: "easeOut" }
-      }}
-      whileHover={{ scale: 1.01 }}
-      className="group relative"
-      style={{
-        ...(isHighlighted ? {
-          backgroundImage: 'linear-gradient(90deg, rgba(61, 43, 31, 0.95), rgba(42, 24, 16, 0.95)), linear-gradient(135deg, #B87333, #CD7F32, #D4A574, #B87333)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
-          border: '3px solid transparent',
-          boxShadow: '0 0 0 1px rgba(184, 115, 51, 0.3), 0 0 40px rgba(184, 115, 51, 0.6), 0 0 80px rgba(205, 127, 50, 0.4), 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(184, 115, 51, 0.15)',
-        } : {
-          backgroundImage: 'linear-gradient(90deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
-          border: '1px solid rgba(184, 115, 51, 0.2)',
-        }),
-        backdropFilter: 'blur(20px)',
-        transition: 'all 0.3s ease',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Premium Highlight Glow Overlay */}
-      {isHighlighted && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.3, 0.15] }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.4), rgba(184, 115, 51, 0.2), transparent 70%)',
-              zIndex: 1,
-            }}
-          />
-          <motion.div
-            animate={{ 
-              rotate: [0, 360],
-              opacity: [0.3, 0.6, 0.3]
-            }}
-            transition={{ 
-              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-            }}
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'conic-gradient(from 0deg, transparent, rgba(184, 115, 51, 0.3), transparent, rgba(205, 127, 50, 0.3), transparent)',
-              zIndex: 0,
-            }}
-          />
-        </>
-      )}
-      <div className="flex gap-3 sm:gap-4 p-3 sm:p-4">
-        {/* Image */}
-        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden relative">
-          <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            sizes="96px"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            quality={75}
-          />
-          {/* Favorite Button - Only show if logged in */}
-          {onFavorite && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onFavorite();
-              }}
-              className="absolute top-1 right-1 p-2.5 sm:p-1.5 rounded-full transition-all active:scale-95"
-              style={{
-                background: isFavorite ? 'rgba(220, 38, 38, 0.9)' : 'rgba(0, 0, 0, 0.6)',
-                border: `1.5px solid ${isFavorite ? '#DC2626' : 'rgba(184, 115, 51, 0.4)'}`,
-                backdropFilter: 'blur(10px)',
-                zIndex: 20,
-                pointerEvents: 'auto',
-                cursor: 'pointer',
-                minWidth: '40px',
-                minHeight: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Heart size={16} fill={isFavorite ? '#FFFFFF' : 'transparent'} color={isFavorite ? '#FFFFFF' : '#B87333'} strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0" style={{ position: 'relative', zIndex: 10 }}>
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h3
-                  className="text-base"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    color: '#F5F1E8',
-                    letterSpacing: '0.03em',
-                  }}
-                >
-                  {item.name}
-                </h3>
-                {flags.isBestseller && (
-                  <span
-                    className="text-xs px-2 py-0.5 flex items-center gap-1"
-                    style={{
-                      background: 'rgba(184, 115, 51, 0.3)',
-                      border: '1px solid rgba(184, 115, 51, 0.5)',
-                      color: '#D4A574',
-                      fontSize: '10px',
-                    }}
-                  >
-                    <Star size={10} fill="#D4A574" />
-                    BESTSELLER
-                  </span>
-                )}
-                {flags.isTrending && (
-                  <span
-                    className="text-xs px-2 py-0.5 flex items-center gap-1"
-                    style={{
-                      background: 'rgba(255, 107, 107, 0.3)',
-                      border: '1px solid rgba(255, 107, 107, 0.5)',
-                      color: '#FF6B6B',
-                      fontSize: '10px',
-                    }}
-                  >
-                    <Flame size={10} />
-                    TRENDING
-                  </span>
-                )}
-              </div>
-              <p className="text-xs line-clamp-2 mb-2" style={{ color: '#8B6F47', lineHeight: 1.4 }}>
-                {item.description}
-              </p>
-              
-              {/* Activity */}
-              <div className="flex flex-wrap gap-3 text-xs">
-                <span
-                  className="px-2 py-0.5"
-                  style={{
-                    background: 'rgba(184, 115, 51, 0.2)',
-                    color: '#B87333',
-                    fontSize: '10px',
-                  }}
-                >
-                  {item.category}
-                </span>
-                {flags.soldToday && (
-                  <span className="flex items-center gap-1" style={{ color: '#B87333' }}>
-                    <TrendingUp size={10} />
-                    {flags.soldToday} sold today
-                  </span>
-                )}
-                {flags.stockLeft && (
-                  <span className="flex items-center gap-1" style={{ color: '#FF6B6B' }}>
-                    <Clock size={10} />
-                    Only {flags.stockLeft} left!
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex-shrink-0 text-right">
-              {hasAIDiscount ? (
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-sm line-through opacity-70"
-                      style={{ color: '#8B6F47' }}
-                    >
-                      ₹{originalPrice}
-                    </span>
-                    <span
-                      className="text-xs px-2 py-0.5 bg-green-600 text-white rounded-full"
-                      style={{ fontSize: '10px' }}
-                    >
-                      {discountPercent}% OFF
-                    </span>
-                  </div>
-                  <span
-                    className="text-xl gradient-text"
-                    style={{ fontFamily: 'var(--font-heading)' }}
-                  >
-                    ₹{Math.ceil(discountedPrice || 0)}
-                  </span>
-                </div>
-              ) : (
-                <span
-                  className="text-xl gradient-text"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  ₹{item.price}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Action */}
-          <div className="flex justify-end mt-3">
-            {quantity > 0 ? (
-              <div
-                className="flex items-center gap-3 sm:gap-3"
-                style={{
-                  background: 'rgba(184, 115, 51, 0.2)',
-                  padding: '8px 14px',
-                  border: '1px solid rgba(184, 115, 51, 0.4)',
-                  position: 'relative',
-                  zIndex: 10,
-                  borderRadius: '8px',
-                }}
-              >
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onRemove();
-                  }} 
-                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
-                  style={{ 
-                    cursor: 'pointer', 
-                    pointerEvents: 'auto',
-                    minWidth: '36px',
-                    minHeight: '36px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Minus size={18} />
-                </button>
-                <span className="text-base sm:text-sm font-bold gradient-text" style={{ minWidth: '24px', textAlign: 'center' }}>
-                  {quantity}
-                </span>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onAdd();
-                  }} 
-                  className="text-[#B87333] active:text-[#D4A574] active:scale-95 transition-transform"
-                  style={{ 
-                    cursor: 'pointer', 
-                    pointerEvents: 'auto',
-                    minWidth: '36px',
-                    minHeight: '36px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  onAdd();
-                }}
-                className="px-5 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-xs"
-                style={{
-                  background: 'rgba(184, 115, 51, 0.2)',
-                  border: '1px solid rgba(184, 115, 51, 0.4)',
-                  color: '#D4A574',
-                  cursor: 'pointer',
-                  pointerEvents: 'auto',
-                  position: 'relative',
-                  zIndex: 10,
-                  fontFamily: 'var(--font-body)',
-                  letterSpacing: '0.05em',
-                  minHeight: '44px',
-                  borderRadius: '8px',
-                }}
-                onTouchStart={(e) => {
-                  e.currentTarget.style.transform = 'scale(0.95)';
-                }}
-                onTouchEnd={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                ADD TO CART
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </motion.div>
