@@ -55,143 +55,256 @@ export default function OrderReceipt({
     try {
       const doc = new jsPDF();
       
-      // Set font
-      doc.setFont("helvetica");
+      // Background - Dark gradient effect
+      doc.setFillColor(26, 17, 16);
+      doc.rect(0, 0, 210, 297, 'F');
       
-      // Header - Business Name
-      doc.setFontSize(24);
+      // Top accent bar
+      doc.setFillColor(184, 115, 51);
+      doc.rect(0, 0, 210, 3, 'F');
+      
+      // Header Background Box
+      doc.setFillColor(43, 24, 16);
+      doc.rect(10, 10, 190, 35, 'F');
+      
+      // Header Border - Copper
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.8);
+      doc.rect(10, 10, 190, 35);
+      
+      // Business Name - RABUSTE
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(32);
       doc.setTextColor(184, 115, 51);
-      doc.text("RABUSTE", 105, 20, { align: "center" });
+      doc.text("RABUSTE", 105, 26, { align: "center" });
       
+      // Tagline
       doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text("Premium Robusta Coffee", 105, 28, { align: "center" });
-      doc.text("Dimple Row House, 15, Gymkhana Road, Piplod, Surat - 395007", 105, 34, { align: "center" });
+      doc.setTextColor(212, 165, 116);
+      doc.text("PREMIUM ROBUSTA COFFEE", 105, 34, { align: "center" });
       
-      // Divider
+      // Address
+      doc.setFontSize(8);
+      doc.setTextColor(245, 241, 232);
+      doc.text("Dimple Row House, 15, Gymkhana Road, Piplod, Surat - 395007", 105, 40, { align: "center" });
+      
+      // Receipt Title Box
+      let yPos = 55;
+      doc.setFillColor(61, 43, 31);
+      doc.rect(10, yPos, 190, 15, 'F');
       doc.setDrawColor(184, 115, 51);
       doc.setLineWidth(0.5);
-      doc.line(20, 40, 190, 40);
+      doc.rect(10, yPos, 190, 15);
       
-      // Receipt Title
-      doc.setFontSize(16);
-      doc.setTextColor(0, 0, 0);
-      doc.text("ORDER RECEIPT", 105, 50, { align: "center" });
-      
-      // Order Details
-      doc.setFontSize(10);
-      doc.setTextColor(60, 60, 60);
-      
-      let yPos = 60;
-      
-      // Token
       doc.setFont("helvetica", "bold");
-      doc.text("Order Token:", 20, yPos);
-      doc.setFont("helvetica", "normal");
+      doc.setFontSize(18);
+      doc.setTextColor(212, 165, 116);
+      doc.text("ORDER RECEIPT", 105, yPos + 10, { align: "center" });
+      
+      // Order Details Box
+      yPos = 78;
+      doc.setFillColor(43, 24, 16);
+      const detailsBoxHeight = customerName ? 30 : 24;
+      doc.rect(10, yPos, 190, detailsBoxHeight, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.3);
+      doc.rect(10, yPos, 190, detailsBoxHeight);
+      
+      yPos += 8;
+      
+      // Order Token - Prominent Display
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(212, 165, 116);
+      doc.text("ORDER TOKEN:", 15, yPos);
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
       doc.setTextColor(184, 115, 51);
-      doc.text(displayToken, 60, yPos);
+      doc.text(displayToken, 195, yPos, { align: "right" });
       
       yPos += 8;
       
       // Date & Time
-      doc.setTextColor(60, 60, 60);
       doc.setFont("helvetica", "bold");
-      doc.text("Date & Time:", 20, yPos);
+      doc.setFontSize(9);
+      doc.setTextColor(212, 165, 116);
+      doc.text("DATE & TIME:", 15, yPos);
+      
       doc.setFont("helvetica", "normal");
-      doc.text(formatDate(orderDate), 60, yPos);
+      doc.setTextColor(245, 241, 232);
+      doc.text(formatDate(orderDate), 195, yPos, { align: "right" });
       
       yPos += 8;
       
-      // Customer Name (if available)
+      // Customer Name
       if (customerName) {
         doc.setFont("helvetica", "bold");
-        doc.text("Customer:", 20, yPos);
+        doc.setTextColor(212, 165, 116);
+        doc.text("CUSTOMER:", 15, yPos);
+        
         doc.setFont("helvetica", "normal");
-        doc.text(customerName, 60, yPos);
+        doc.setTextColor(245, 241, 232);
+        doc.text(customerName, 195, yPos, { align: "right" });
         yPos += 8;
       }
       
-      // Divider
-      yPos += 5;
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.3);
-      doc.line(20, yPos, 190, yPos);
-      yPos += 10;
-      
-      // Items Header
-      doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      doc.text("Item", 20, yPos);
-      doc.text("Qty", 130, yPos);
-      doc.text("Price", 155, yPos);
-      doc.text("Total", 175, yPos, { align: "right" });
-      
-      yPos += 6;
-      doc.setLineWidth(0.2);
-      doc.line(20, yPos, 190, yPos);
+      // Items Section
       yPos += 8;
       
-      // Items
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(60, 60, 60);
+      // Items Header
+      doc.setFillColor(61, 43, 31);
+      doc.rect(10, yPos, 190, 10, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.rect(10, yPos, 190, 10);
       
-      items.forEach((item) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(212, 165, 116);
+      doc.text("ITEM", 15, yPos + 7);
+      doc.text("QTY", 140, yPos + 7, { align: "center" });
+      doc.text("PRICE", 165, yPos + 7, { align: "right" });
+      doc.text("TOTAL", 195, yPos + 7, { align: "right" });
+      
+      yPos += 10;
+      
+      // Items Background
+      const itemHeight = items.length * 10 + 4;
+      doc.setFillColor(43, 24, 16);
+      doc.rect(10, yPos, 190, itemHeight, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.3);
+      doc.rect(10, yPos, 190, itemHeight);
+      
+      yPos += 7;
+      
+      // Items List
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      
+      items.forEach((item, index) => {
         // Check if we need a new page
         if (yPos > 250) {
           doc.addPage();
+          // Re-apply background
+          doc.setFillColor(26, 17, 16);
+          doc.rect(0, 0, 210, 297, 'F');
           yPos = 20;
         }
         
         // Item name (wrap if too long)
-        const itemName = item.name.length > 40 ? item.name.substring(0, 37) + "..." : item.name;
-        doc.text(itemName, 20, yPos);
-        doc.text(String(item.quantity), 130, yPos);
-        doc.text(`₹${item.price}`, 155, yPos);
-        doc.text(`₹${item.price * item.quantity}`, 190, yPos, { align: "right" });
-        yPos += 8;
+        const itemName = item.name.length > 35 ? item.name.substring(0, 32) + "..." : item.name;
+        
+        doc.setTextColor(245, 241, 232);
+        doc.text(itemName, 15, yPos);
+        
+        doc.setTextColor(212, 165, 116);
+        doc.text(String(item.quantity), 140, yPos, { align: "center" });
+        
+        doc.setTextColor(245, 241, 232);
+        doc.text(`₹${item.price}`, 165, yPos, { align: "right" });
+        
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(184, 115, 51);
+        doc.text(`₹${item.price * item.quantity}`, 195, yPos, { align: "right" });
+        
+        doc.setFont("helvetica", "normal");
+        
+        // Subtle divider between items (except last)
+        if (index < items.length - 1) {
+          doc.setDrawColor(61, 43, 31);
+          doc.setLineWidth(0.2);
+          doc.line(15, yPos + 3, 195, yPos + 3);
+        }
+        
+        yPos += 10;
       });
       
-      // Divider before totals
+      // Totals Section
       yPos += 5;
-      doc.setLineWidth(0.2);
-      doc.line(20, yPos, 190, yPos);
-      yPos += 10;
+      
+      // Totals Background
+      const totalsHeight = couponCode && couponDiscount > 0 ? 35 : 25;
+      doc.setFillColor(61, 43, 31);
+      doc.rect(10, yPos, 190, totalsHeight, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.5);
+      doc.rect(10, yPos, 190, totalsHeight);
+      
+      yPos += 8;
       
       // Subtotal
       doc.setFont("helvetica", "normal");
-      doc.text("Subtotal:", 130, yPos);
-      doc.text(`₹${subtotal}`, 190, yPos, { align: "right" });
-      yPos += 8;
+      doc.setFontSize(10);
+      doc.setTextColor(245, 241, 232);
+      doc.text("Subtotal:", 15, yPos);
+      doc.text(`₹${subtotal}`, 195, yPos, { align: "right" });
       
-      // Coupon Discount (if applicable)
+      yPos += 7;
+      
+      // Coupon Discount
       if (couponCode && couponDiscount > 0) {
         doc.setTextColor(94, 125, 76);
-        doc.text(`Discount (${couponCode}):`, 130, yPos);
-        doc.text(`- ₹${couponDiscount}`, 190, yPos, { align: "right" });
-        yPos += 8;
+        doc.text(`Discount (${couponCode}):`, 15, yPos);
+        doc.text(`- ₹${couponDiscount}`, 195, yPos, { align: "right" });
+        yPos += 7;
       }
       
       // Tax note
-      doc.setTextColor(100, 100, 100);
-      doc.setFontSize(9);
-      doc.text("(All prices inclusive of taxes)", 130, yPos);
-      yPos += 10;
+      doc.setFontSize(8);
+      doc.setTextColor(212, 165, 116);
+      doc.text("(All prices inclusive of taxes)", 15, yPos);
       
-      // Total
-      doc.setFontSize(12);
+      yPos += 5;
+      
+      // Divider
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.5);
+      doc.line(15, yPos, 195, yPos);
+      
+      yPos += 8;
+      
+      // Total Amount Box
+      doc.setFillColor(43, 24, 16);
+      doc.rect(10, yPos, 190, 20, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.8);
+      doc.rect(10, yPos, 190, 20);
+      
+      // TOTAL Label
       doc.setFont("helvetica", "bold");
-      doc.setTextColor(0, 0, 0);
-      doc.text("TOTAL:", 130, yPos);
-      doc.setTextColor(184, 115, 51);
-      doc.text(`₹${totalAmount}`, 190, yPos, { align: "right" });
+      doc.setFontSize(14);
+      doc.setTextColor(212, 165, 116);
+      doc.text("TOTAL:", 15, yPos + 13);
       
-      // Footer
-      yPos = 270;
-      doc.setFontSize(9);
+      // Total Amount
+      doc.setFontSize(18);
+      doc.setTextColor(184, 115, 51);
+      doc.text(`₹${totalAmount}`, 195, yPos + 13, { align: "right" });
+      
+      // Footer Section
+      yPos = 275;
+      
+      // Thank You Box
+      doc.setFillColor(61, 43, 31);
+      doc.rect(10, yPos, 190, 15, 'F');
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.3);
+      doc.rect(10, yPos, 190, 15);
+      
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(212, 165, 116);
+      doc.text("THANK YOU FOR CHOOSING RABUSTE!", 105, yPos + 6, { align: "center" });
+      
       doc.setFont("helvetica", "normal");
-      doc.setTextColor(150, 150, 150);
-      doc.text("Thank you for choosing Rabuste!", 105, yPos, { align: "center" });
-      doc.text("Visit us again soon!", 105, yPos + 5, { align: "center" });
+      doc.setFontSize(9);
+      doc.setTextColor(245, 241, 232);
+      doc.text("Visit us again soon for premium Robusta coffee!", 105, yPos + 11, { align: "center" });
+      
+      // Bottom accent bar
+      doc.setFillColor(184, 115, 51);
+      doc.rect(0, 294, 210, 3, 'F');
       
       // Download
       doc.save(`Receipt_${displayToken}.pdf`);
