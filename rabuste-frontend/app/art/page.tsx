@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, Grid3x3, List, SlidersHorizontal, Palette, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal, Palette, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
+import ArtCategoryCarousel from "@/components/ArtCategoryCarousel";
 import { trackAddToCart, trackRemoveFromCart, trackArtItemView } from "@/lib/analytics";
 
 type ArtItem = {
@@ -45,7 +46,6 @@ export default function ArtGalleryPage() {
   const [cart, setCart] = useState<Cart | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name">("default");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedArt, setSelectedArt] = useState<ArtItem | null>(null);
@@ -180,14 +180,13 @@ export default function ArtGalleryPage() {
       <DynamicBackground />
 
       <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        
-        <div className="container px-4 md:px-6 relative z-10">
-          {/* Premium Header */}
+        <div className="container mx-auto px-4 md:px-6 relative z-10 py-6 md:py-8 lg:py-12">
+          {/* Premium Header - Mobile responsive */}
           <motion.div 
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-16 text-center relative"
+            className="mb-8 md:mb-12 lg:mb-16 text-center relative"
           >
             {/* Decorative Lines */}
             <motion.div
@@ -249,14 +248,14 @@ export default function ArtGalleryPage() {
             </motion.div>
           </motion.div>
 
-          {/* Premium Search and Filter Bar */}
+          {/* Premium Search and Filter Bar - Mobile responsive */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mb-12"
+            className="mb-8 md:mb-12"
           >
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
               {/* Premium Search */}
               {/* <div 
                 className="flex-1 relative group"
@@ -305,41 +304,6 @@ export default function ArtGalleryPage() {
 
               {/* Premium Controls */}
               <div className="flex gap-3">
-                {/* View Mode */}
-                <div 
-                  className="flex overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(26, 17, 16, 0.8))',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
-                    backdropFilter: 'blur(30px)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                  }}
-                >
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className="px-5 py-5 transition-all duration-300"
-                    style={{
-                      background: viewMode === "grid" 
-                        ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.2))' 
-                        : 'transparent',
-                      borderRight: '1px solid rgba(184, 115, 51, 0.2)',
-                    }}
-                  >
-                    <Grid3x3 size={20} style={{ color: viewMode === "grid" ? '#D4A574' : '#8B6F47' }} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className="px-5 py-5 transition-all duration-300"
-                    style={{
-                      background: viewMode === "list" 
-                        ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.2))' 
-                        : 'transparent',
-                    }}
-                  >
-                    <List size={20} style={{ color: viewMode === "list" ? '#D4A574' : '#8B6F47' }} />
-                  </button>
-                </div>
-
                 {/* Filters Button */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
@@ -506,128 +470,36 @@ export default function ArtGalleryPage() {
             )}
           </AnimatePresence>
 
-          {/* Gallery Items */}
+          {/* Gallery Items (carousel per category like menu) */}
           {filtered.length > 0 ? (
-            viewMode === "grid" ? (
-              activeCategory === "All" ? (
-                // Show category-separated grid view for "All"
-                <div className="space-y-12">
-                  {categories.filter(c => c !== "All").map((category) => {
-                    const categoryItems = filtered.filter(item => item.category === category);
-                    if (categoryItems.length === 0) return null;
-                    
-                    return (
-                      <motion.div
-                        key={category}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        {/* Premium Category Header */}
-                        <div className="mb-10 text-center relative">
-                          <motion.div 
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            className="inline-flex items-center gap-6 relative"
-                          >
-                            <div 
-                              className="w-24 h-0.5"
-                              style={{ 
-                                background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.6), #B87333)',
-                                boxShadow: '0 0 10px rgba(184, 115, 51, 0.3)',
-                              }}
-                            />
-                            <div className="relative">
-                              <h2
-                                className="text-3xl md:text-5xl uppercase relative z-10"
-                                style={{
-                                  fontFamily: 'var(--font-heading)',
-                                  background: 'linear-gradient(135deg, #F5F1E8 0%, #D4A574 100%)',
-                                  WebkitBackgroundClip: 'text',
-                                  WebkitTextFillColor: 'transparent',
-                                  letterSpacing: '0.08em',
-                                  fontWeight: 700,
-                                }}
-                              >
-                                {category}
-                              </h2>
-                              {/* Text shadow effect */}
-                              <div 
-                                className="absolute inset-0 blur-xl"
-                                style={{
-                                  background: 'radial-gradient(ellipse, rgba(184, 115, 51, 0.3), transparent 70%)',
-                                }}
-                              />
-                            </div>
-                            <div 
-                              className="w-24 h-0.5"
-                              style={{ 
-                                background: 'linear-gradient(90deg, #B87333, rgba(184, 115, 51, 0.6), transparent)',
-                                boxShadow: '0 0 10px rgba(184, 115, 51, 0.3)',
-                              }}
-                            />
-                          </motion.div>
-                          <p 
-                            className="text-sm mt-4 uppercase tracking-widest" 
-                            style={{ 
-                              color: '#8B6F47',
-                              fontFamily: 'var(--font-heading)',
-                              letterSpacing: '0.2em',
-                            }}
-                          >
-                            {categoryItems.length} Masterpiece{categoryItems.length !== 1 ? 's' : ''}
-                          </p>
-                        </div>
+            activeCategory === "All" ? (
+              categories
+                .filter((c) => c !== "All")
+                .map((category) => {
+                  const categoryItems = filtered.filter((item) => item.category === category);
+                  if (categoryItems.length === 0) return null;
 
-                        {/* Category Items Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                          {categoryItems.map((item, index) => (
-                            <GridArtItem
-                              key={item._id}
-                              item={item}
-                              quantity={getQty(item._id)}
-                              onAdd={() => addToCart(item._id)}
-                              onRemove={() => removeFromCart(item._id)}
-                              onView={() => openArtModal(item)}
-                              index={index}
-                            />
-                          ))}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              ) : (
-                // Show normal grid for specific category
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {filtered.map((item, index) => (
-                    <GridArtItem
-                      key={item._id}
-                      item={item}
-                      quantity={getQty(item._id)}
-                      onAdd={() => addToCart(item._id)}
-                      onRemove={() => removeFromCart(item._id)}
-                      onView={() => openArtModal(item)}
-                      index={index}
+                  return (
+                    <ArtCategoryCarousel
+                      key={category}
+                      title={category}
+                      items={categoryItems}
+                      getQuantity={getQty}
+                      onAdd={addToCart}
+                      onRemove={removeFromCart}
+                      onView={openArtModal}
                     />
-                  ))}
-                </div>
-              )
+                  );
+                })
             ) : (
-              // List view
-              <div className="space-y-3 max-w-4xl mx-auto">
-                {filtered.map((item, index) => (
-                  <ListArtItem
-                    key={item._id}
-                    item={item}
-                    quantity={getQty(item._id)}
-                    onAdd={() => addToCart(item._id)}
-                    onRemove={() => removeFromCart(item._id)}
-                    onView={() => openArtModal(item)}
-                    index={index}
-                  />
-                ))}
-              </div>
+              <ArtCategoryCarousel
+                title={activeCategory}
+                items={filtered}
+                getQuantity={getQty}
+                onAdd={addToCart}
+                onRemove={removeFromCart}
+                onView={openArtModal}
+              />
             )
           ) : (
             <motion.div
@@ -662,14 +534,14 @@ export default function ArtGalleryPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-4xl max-h-[85vh] md:max-h-[90vh] overflow-y-auto mx-auto"
               style={{
                 background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
                 border: '2px solid rgba(184, 115, 51, 0.4)',
                 backdropFilter: 'blur(20px)',
               }}
             >
-              <div className="p-6">
+              <div className="p-4 md:p-6">
                 {/* Close Button */}
                 <button
                   onClick={closeArtModal}

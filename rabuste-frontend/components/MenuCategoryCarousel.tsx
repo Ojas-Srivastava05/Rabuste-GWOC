@@ -73,10 +73,10 @@ export default function MenuCategoryCarousel({
   return (
     <div className="mb-8">
       {/* Category Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 md:mb-4">
         <div>
           <h2
-            className="text-xl md:text-2xl mb-1"
+            className="text-lg md:text-2xl mb-1"
             style={{
               fontFamily: 'var(--font-heading)',
               color: '#F5F1E8',
@@ -123,7 +123,7 @@ export default function MenuCategoryCarousel({
       {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4"
+        className="flex gap-2 md:gap-4 overflow-x-auto snap-x snap-mandatory pb-4"
         style={{
           scrollBehavior: 'smooth',
           scrollbarWidth: 'none',

@@ -292,6 +292,7 @@ export default function Navbar() {
               FAVORITES
             </NavButton>
           )}
+          <NavButton href="/art-gallery">DISCOVER</NavButton>
           <NavButton href="/art">GALLERY</NavButton>
           {user ? (
             <div className="relative" ref={dropdownRef}>
@@ -740,6 +741,12 @@ export default function Navbar() {
                       onClick={() => setOpen(false)}
                     />
                   )}
+                  <MobileNavItem
+                    href="/art-gallery"
+                    icon={Palette}
+                    label="DISCOVER ART"
+                    onClick={() => setOpen(false)}
+                  />
                   <MobileNavItem
                     href="/art"
                     icon={Palette}
