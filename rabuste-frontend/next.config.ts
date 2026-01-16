@@ -169,8 +169,6 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
-  // Optimize production builds
-  swcMinify: true,
   // Production optimizations
   productionBrowserSourceMaps: false, // Disable source maps in production
   output: 'standalone',
