@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { formatTokenForDisplay } from "@/lib/tokenUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -171,7 +172,7 @@ export default function ReceiptPage() {
 
           {/* Receipt */}
           <OrderReceipt
-            token={order.token || order._id.slice(-8).toUpperCase()}
+            token={order.token || '999'}
             orderDate={order.createdAt}
             items={order.items}
             totalAmount={order.totalAmount}

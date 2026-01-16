@@ -116,11 +116,13 @@ export async function POST(req: Request) {
     if (defaultPreparationTime !== null) orderData.preparationTime = defaultPreparationTime;
     
     // Generate unique daily serial token
+    console.log('🎫 Starting token generation...');
     let orderToken: string;
     try {
       orderToken = await generateOrderToken();
       orderData.token = orderToken;
       
+      console.log('✅ Token generated successfully:', orderToken);
       console.log('💾 API - Creating order:', {
         customerName: orderData.customerName,
         totalAmount: orderData.totalAmount,
@@ -159,13 +161,16 @@ export async function POST(req: Request) {
     // Fetch back to verify all fields were saved
     const savedOrder = await Order.findById(order._id).lean();
     
-    console.log('✅ API - Order saved:', {
+    console.log('✅ API - Order saved successfully:', {
       _id: savedOrder?._id,
+      token: savedOrder?.token,
       totalAmount: savedOrder?.totalAmount,
       couponCode: savedOrder?.couponCode,
       couponDiscount: savedOrder?.couponDiscount,
+      createdAt: savedOrder?.createdAt,
       hasCouponCode: 'couponCode' in (savedOrder || {}),
       hasCouponDiscount: 'couponDiscount' in (savedOrder || {}),
+      hasToken: 'token' in (savedOrder || {}),
     });
 
     // Send premium order confirmation email (non-blocking)

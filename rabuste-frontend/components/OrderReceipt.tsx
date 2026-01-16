@@ -3,6 +3,7 @@
 import { Coffee, Calendar, Hash, Download, Printer } from "lucide-react";
 import { motion } from "framer-motion";
 import { jsPDF } from "jspdf";
+import { formatTokenForDisplay } from "@/lib/tokenUtils";
 
 type ReceiptItem = {
   name: string;
@@ -35,6 +36,9 @@ export default function OrderReceipt({
   
   const subtotal = totalAmount + (couponDiscount || 0);
   const tax = 0; // Tax is inclusive in totalAmount
+  
+  // Format token with date prefix for display
+  const displayToken = formatTokenForDisplay(token, orderDate);
   
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -85,7 +89,7 @@ export default function OrderReceipt({
       doc.text("Order Token:", 20, yPos);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(184, 115, 51);
-      doc.text(token, 60, yPos);
+      doc.text(displayToken, 60, yPos);
       
       yPos += 8;
       
@@ -190,7 +194,7 @@ export default function OrderReceipt({
       doc.text("Visit us again soon!", 105, yPos + 5, { align: "center" });
       
       // Download
-      doc.save(`Receipt_${token}.pdf`);
+      doc.save(`Receipt_${displayToken}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Failed to generate PDF. Please try again.");
@@ -278,7 +282,7 @@ export default function OrderReceipt({
               letterSpacing: '0.05em',
             }}
           >
-            {token}
+            {displayToken}
           </span>
         </div>
 

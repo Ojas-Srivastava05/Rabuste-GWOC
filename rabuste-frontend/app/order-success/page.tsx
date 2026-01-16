@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { CheckCircle, Hash, Receipt, ArrowRight, Loader2, Coffee } from "lucide-react";
+import { formatTokenForDisplay } from "@/lib/tokenUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -11,7 +12,7 @@ import confetti from "canvas-confetti";
 
 type Order = {
   _id: string;
-  token: string;
+  token?: string;
   items: Array<{
     name: string;
     price: number;
@@ -219,7 +220,7 @@ export default function OrderSuccessPage() {
                     backgroundClip: 'text',
                   }}
                 >
-                  {order.token}
+                  {order.token ? formatTokenForDisplay(order.token, order.createdAt) : 'N/A'}
                 </p>
               </motion.div>
 

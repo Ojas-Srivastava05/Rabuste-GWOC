@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store, Receipt, Hash, Star, CheckCircle2 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
+import { formatTokenForDisplay } from "@/lib/tokenUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
 import Footer from "@/components/sections/footer";
@@ -1017,7 +1018,7 @@ export default function OrderStatusPage() {
                                 letterSpacing: '0.05em',
                               }}
                             >
-                              {order.token}
+                              {formatTokenForDisplay(order.token, order.createdAt)}
                             </span>
                           </div>
                         )}
@@ -1212,26 +1213,24 @@ export default function OrderStatusPage() {
                     </div>
 
                     {/* View Receipt Button */}
-                    {order.token && (
-                      <div className="mt-6 flex justify-center">
-                        <button
-                          onClick={() => router.push(`/receipt/${order._id}`)}
-                          className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
-                          style={{
-                            background: 'rgba(184, 115, 51, 0.2)',
-                            border: '2px solid rgba(184, 115, 51, 0.4)',
-                            color: '#D4A574',
-                            fontFamily: 'var(--font-heading)',
-                            fontSize: '14px',
-                            fontWeight: 900,
-                            letterSpacing: '0.1em',
-                          }}
-                        >
-                          <Receipt size={18} />
-                          VIEW RECEIPT
-                        </button>
-                      </div>
-                    )}
+                    <div className="mt-6 flex justify-center">
+                      <button
+                        onClick={() => router.push(`/receipt/${order._id}`)}
+                        className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
+                        style={{
+                          background: 'rgba(184, 115, 51, 0.2)',
+                          border: '2px solid rgba(184, 115, 51, 0.4)',
+                          color: '#D4A574',
+                          fontFamily: 'var(--font-heading)',
+                          fontSize: '14px',
+                          fontWeight: 900,
+                          letterSpacing: '0.1em',
+                        }}
+                      >
+                        <Receipt size={18} />
+                        VIEW RECEIPT
+                      </button>
+                    </div>
                   </motion.div>
                     ))}
                   </AnimatePresence>
@@ -1360,7 +1359,7 @@ export default function OrderStatusPage() {
                                   letterSpacing: '0.05em',
                                 }}
                               >
-                                {order.token}
+                                {formatTokenForDisplay(order.token, order.createdAt)}
                               </span>
                             </div>
                           )}
@@ -1602,24 +1601,23 @@ export default function OrderStatusPage() {
 
                         {/* Action Buttons */}
                         <div className="mt-6 flex flex-wrap gap-3 justify-center">
-                          {order.token && (
-                            <button
-                              onClick={() => router.push(`/receipt/${order._id}`)}
-                              className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
-                              style={{
-                                background: 'rgba(94, 125, 76, 0.2)',
-                                border: '2px solid rgba(94, 125, 76, 0.4)',
-                                color: '#5E7D4C',
-                                fontFamily: 'var(--font-heading)',
-                                fontSize: '14px',
-                                fontWeight: 900,
-                                letterSpacing: '0.1em',
-                              }}
-                            >
-                              <Receipt size={18} />
-                              VIEW RECEIPT
-                            </button>
-                          )}
+                          <button
+                            onClick={() => router.push(`/receipt/${order._id}`)}
+                            className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
+                            style={{
+                              background: 'rgba(94, 125, 76, 0.2)',
+                              border: '2px solid rgba(94, 125, 76, 0.4)',
+                              color: '#5E7D4C',
+                              fontFamily: 'var(--font-heading)',
+                              fontSize: '14px',
+                              fontWeight: 900,
+                              letterSpacing: '0.1em',
+                            }}
+                          >
+                            <Receipt size={18} />
+                            VIEW RECEIPT
+                          </button>
+                          
                           <button
                             onClick={() => router.push(`/feedback?orderId=${order._id}`)}
                             className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
