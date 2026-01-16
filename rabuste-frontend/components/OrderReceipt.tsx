@@ -2,7 +2,7 @@
 
 import { Coffee, Calendar, Hash, Download, Printer } from "lucide-react";
 import { motion } from "framer-motion";
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 
 type ReceiptItem = {
   name: string;
@@ -48,148 +48,153 @@ export default function OrderReceipt({
   };
 
   const downloadPDF = () => {
-    const doc = new jsPDF();
-    
-    // Set font
-    doc.setFont("helvetica");
-    
-    // Header - Business Name
-    doc.setFontSize(24);
-    doc.setTextColor(184, 115, 51);
-    doc.text("RABUSTE", 105, 20, { align: "center" });
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Premium Robusta Coffee", 105, 28, { align: "center" });
-    doc.text("Dimple Row House, 15, Gymkhana Road, Piplod, Surat - 395007", 105, 34, { align: "center" });
-    
-    // Divider
-    doc.setDrawColor(184, 115, 51);
-    doc.setLineWidth(0.5);
-    doc.line(20, 40, 190, 40);
-    
-    // Receipt Title
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text("ORDER RECEIPT", 105, 50, { align: "center" });
-    
-    // Order Details
-    doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
-    
-    let yPos = 60;
-    
-    // Token
-    doc.setFont("helvetica", "bold");
-    doc.text("Order Token:", 20, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(184, 115, 51);
-    doc.text(token, 60, yPos);
-    
-    yPos += 8;
-    
-    // Date & Time
-    doc.setTextColor(60, 60, 60);
-    doc.setFont("helvetica", "bold");
-    doc.text("Date & Time:", 20, yPos);
-    doc.setFont("helvetica", "normal");
-    doc.text(formatDate(orderDate), 60, yPos);
-    
-    yPos += 8;
-    
-    // Customer Name (if available)
-    if (customerName) {
+    try {
+      const doc = new jsPDF();
+      
+      // Set font
+      doc.setFont("helvetica");
+      
+      // Header - Business Name
+      doc.setFontSize(24);
+      doc.setTextColor(184, 115, 51);
+      doc.text("RABUSTE", 105, 20, { align: "center" });
+      
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text("Premium Robusta Coffee", 105, 28, { align: "center" });
+      doc.text("Dimple Row House, 15, Gymkhana Road, Piplod, Surat - 395007", 105, 34, { align: "center" });
+      
+      // Divider
+      doc.setDrawColor(184, 115, 51);
+      doc.setLineWidth(0.5);
+      doc.line(20, 40, 190, 40);
+      
+      // Receipt Title
+      doc.setFontSize(16);
+      doc.setTextColor(0, 0, 0);
+      doc.text("ORDER RECEIPT", 105, 50, { align: "center" });
+      
+      // Order Details
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      
+      let yPos = 60;
+      
+      // Token
       doc.setFont("helvetica", "bold");
-      doc.text("Customer:", 20, yPos);
+      doc.text("Order Token:", 20, yPos);
       doc.setFont("helvetica", "normal");
-      doc.text(customerName, 60, yPos);
+      doc.setTextColor(184, 115, 51);
+      doc.text(token, 60, yPos);
+      
       yPos += 8;
-    }
-    
-    // Divider
-    yPos += 5;
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(0.3);
-    doc.line(20, yPos, 190, yPos);
-    yPos += 10;
-    
-    // Items Header
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text("Item", 20, yPos);
-    doc.text("Qty", 130, yPos);
-    doc.text("Price", 155, yPos);
-    doc.text("Total", 175, yPos, { align: "right" });
-    
-    yPos += 6;
-    doc.setLineWidth(0.2);
-    doc.line(20, yPos, 190, yPos);
-    yPos += 8;
-    
-    // Items
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(60, 60, 60);
-    
-    items.forEach((item) => {
-      // Check if we need a new page
-      if (yPos > 250) {
-        doc.addPage();
-        yPos = 20;
+      
+      // Date & Time
+      doc.setTextColor(60, 60, 60);
+      doc.setFont("helvetica", "bold");
+      doc.text("Date & Time:", 20, yPos);
+      doc.setFont("helvetica", "normal");
+      doc.text(formatDate(orderDate), 60, yPos);
+      
+      yPos += 8;
+      
+      // Customer Name (if available)
+      if (customerName) {
+        doc.setFont("helvetica", "bold");
+        doc.text("Customer:", 20, yPos);
+        doc.setFont("helvetica", "normal");
+        doc.text(customerName, 60, yPos);
+        yPos += 8;
       }
       
-      // Item name (wrap if too long)
-      const itemName = item.name.length > 40 ? item.name.substring(0, 37) + "..." : item.name;
-      doc.text(itemName, 20, yPos);
-      doc.text(String(item.quantity), 130, yPos);
-      doc.text(`₹${item.price}`, 155, yPos);
-      doc.text(`₹${item.price * item.quantity}`, 190, yPos, { align: "right" });
+      // Divider
+      yPos += 5;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(20, yPos, 190, yPos);
+      yPos += 10;
+      
+      // Items Header
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.text("Item", 20, yPos);
+      doc.text("Qty", 130, yPos);
+      doc.text("Price", 155, yPos);
+      doc.text("Total", 175, yPos, { align: "right" });
+      
+      yPos += 6;
+      doc.setLineWidth(0.2);
+      doc.line(20, yPos, 190, yPos);
       yPos += 8;
-    });
-    
-    // Divider before totals
-    yPos += 5;
-    doc.setLineWidth(0.2);
-    doc.line(20, yPos, 190, yPos);
-    yPos += 10;
-    
-    // Subtotal
-    doc.setFont("helvetica", "normal");
-    doc.text("Subtotal:", 130, yPos);
-    doc.text(`₹${subtotal}`, 190, yPos, { align: "right" });
-    yPos += 8;
-    
-    // Coupon Discount (if applicable)
-    if (couponCode && couponDiscount > 0) {
-      doc.setTextColor(94, 125, 76);
-      doc.text(`Discount (${couponCode}):`, 130, yPos);
-      doc.text(`- ₹${couponDiscount}`, 190, yPos, { align: "right" });
+      
+      // Items
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(60, 60, 60);
+      
+      items.forEach((item) => {
+        // Check if we need a new page
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        // Item name (wrap if too long)
+        const itemName = item.name.length > 40 ? item.name.substring(0, 37) + "..." : item.name;
+        doc.text(itemName, 20, yPos);
+        doc.text(String(item.quantity), 130, yPos);
+        doc.text(`₹${item.price}`, 155, yPos);
+        doc.text(`₹${item.price * item.quantity}`, 190, yPos, { align: "right" });
+        yPos += 8;
+      });
+      
+      // Divider before totals
+      yPos += 5;
+      doc.setLineWidth(0.2);
+      doc.line(20, yPos, 190, yPos);
+      yPos += 10;
+      
+      // Subtotal
+      doc.setFont("helvetica", "normal");
+      doc.text("Subtotal:", 130, yPos);
+      doc.text(`₹${subtotal}`, 190, yPos, { align: "right" });
       yPos += 8;
+      
+      // Coupon Discount (if applicable)
+      if (couponCode && couponDiscount > 0) {
+        doc.setTextColor(94, 125, 76);
+        doc.text(`Discount (${couponCode}):`, 130, yPos);
+        doc.text(`- ₹${couponDiscount}`, 190, yPos, { align: "right" });
+        yPos += 8;
+      }
+      
+      // Tax note
+      doc.setTextColor(100, 100, 100);
+      doc.setFontSize(9);
+      doc.text("(All prices inclusive of taxes)", 130, yPos);
+      yPos += 10;
+      
+      // Total
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
+      doc.text("TOTAL:", 130, yPos);
+      doc.setTextColor(184, 115, 51);
+      doc.text(`₹${totalAmount}`, 190, yPos, { align: "right" });
+      
+      // Footer
+      yPos = 270;
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(150, 150, 150);
+      doc.text("Thank you for choosing Rabuste!", 105, yPos, { align: "center" });
+      doc.text("Visit us again soon!", 105, yPos + 5, { align: "center" });
+      
+      // Download
+      doc.save(`Receipt_${token}.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
     }
-    
-    // Tax note
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(9);
-    doc.text("(All prices inclusive of taxes)", 130, yPos);
-    yPos += 10;
-    
-    // Total
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text("TOTAL:", 130, yPos);
-    doc.setTextColor(184, 115, 51);
-    doc.text(`₹${totalAmount}`, 190, yPos, { align: "right" });
-    
-    // Footer
-    yPos = 270;
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(150, 150, 150);
-    doc.text("Thank you for choosing Rabuste!", 105, yPos, { align: "center" });
-    doc.text("Visit us again soon!", 105, yPos + 5, { align: "center" });
-    
-    // Download
-    doc.save(`Receipt_${token}.pdf`);
   };
 
   const printReceipt = () => {

@@ -116,20 +116,45 @@ export async function POST(req: Request) {
     if (defaultPreparationTime !== null) orderData.preparationTime = defaultPreparationTime;
     
     // Generate unique daily serial token
-    const orderToken = await generateOrderToken();
-    orderData.token = orderToken;
-    
-    console.log('💾 API - Creating order:', {
-      customerName: orderData.customerName,
-      totalAmount: orderData.totalAmount,
-      couponCode: orderData.couponCode,
-      couponDiscount: orderData.couponDiscount,
-      itemsCount: orderData.items.length,
-      token: orderToken,
-    });
+    let orderToken: string;
+    try {
+      orderToken = await generateOrderToken();
+      orderData.token = orderToken;
+      
+      console.log('💾 API - Creating order:', {
+        customerName: orderData.customerName,
+        totalAmount: orderData.totalAmount,
+        couponCode: orderData.couponCode,
+        couponDiscount: orderData.couponDiscount,
+        itemsCount: orderData.items.length,
+        token: orderToken,
+      });
+    } catch (tokenError) {
+      console.error('❌ Token generation failed:', tokenError);
+      return NextResponse.json(
+        { error: "Failed to generate order token. Please try again." },
+        { status: 500 }
+      );
+    }
     
     // Create order - explicitly type as single document
-    const order = await Order.create(orderData) as any;
+    let order: any;
+    try {
+      order = await Order.create(orderData);
+    } catch (createError: any) {
+      console.error('❌ Order creation failed:', createError);
+      
+      // Check if it's a duplicate token error
+      if (createError.code === 11000 && createError.keyPattern?.token) {
+        console.error('❌ Duplicate token detected:', orderToken);
+        return NextResponse.json(
+          { error: "Order token conflict. Please try again." },
+          { status: 409 }
+        );
+      }
+      
+      throw createError;
+    }
     
     // Fetch back to verify all fields were saved
     const savedOrder = await Order.findById(order._id).lean();

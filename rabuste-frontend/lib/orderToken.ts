@@ -20,7 +20,7 @@ function getTodayDateString(): string {
 
 /**
  * Generate a unique order token for today
- * Uses atomic MongoDB operations to prevent race conditions
+ * Uses retry logic to handle race conditions
  * 
  * @returns Promise<string> - Token in format YYYYMMDD-XXX
  */
@@ -30,28 +30,53 @@ export async function generateOrderToken(): Promise<string> {
   const today = getTodayDateString();
   const tokenPrefix = `${today}-`;
   
-  // Use MongoDB aggregation to find the highest serial number for today
-  // This is race-condition safe as it queries the current state atomically
-  const lastOrder = await Order.findOne({
-    token: { $regex: `^${tokenPrefix}` }
-  })
-    .sort({ token: -1 })
-    .select('token')
-    .lean()
-    .exec();
-  
-  let serialNumber = 1;
-  
-  if (lastOrder && lastOrder.token) {
-    // Extract the serial number from the last token
-    const lastSerial = parseInt(lastOrder.token.split('-')[1], 10);
-    serialNumber = lastSerial + 1;
+  // Retry up to 5 times to handle race conditions
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      // Find the highest serial number for today
+      const lastOrder = await Order.findOne({
+        token: { $regex: `^${tokenPrefix}` }
+      })
+        .sort({ createdAt: -1, token: -1 })
+        .select('token')
+        .lean()
+        .exec();
+      
+      let serialNumber = 1;
+      
+      if (lastOrder && lastOrder.token) {
+        // Extract the serial number from the last token
+        const parts = lastOrder.token.split('-');
+        if (parts.length === 2) {
+          const lastSerial = parseInt(parts[1], 10);
+          if (!isNaN(lastSerial)) {
+            serialNumber = lastSerial + 1;
+          }
+        }
+      }
+      
+      // Format: YYYYMMDD-XXX (pad to 3 digits)
+      const token = `${tokenPrefix}${String(serialNumber).padStart(3, '0')}`;
+      
+      // Verify this token doesn't already exist
+      const existingOrder = await Order.findOne({ token }).lean().exec();
+      if (!existingOrder) {
+        return token;
+      }
+      
+      // If token exists, wait a bit and retry
+      await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
+    } catch (error) {
+      console.error(`Token generation attempt ${attempt + 1} failed:`, error);
+      if (attempt === 4) {
+        throw error;
+      }
+    }
   }
   
-  // Format: YYYYMMDD-XXX (pad to 3 digits)
-  const token = `${tokenPrefix}${String(serialNumber).padStart(3, '0')}`;
-  
-  return token;
+  // Fallback: use timestamp-based token
+  const timestamp = Date.now().toString().slice(-6);
+  return `${tokenPrefix}${timestamp}`;
 }
 
 /**

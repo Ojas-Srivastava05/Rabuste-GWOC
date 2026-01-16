@@ -18,7 +18,7 @@ type OrderItem = {
 
 type Order = {
   _id: string;
-  token: string;
+  token?: string;
   items: OrderItem[];
   totalAmount: number;
   couponCode?: string | null;
@@ -171,7 +171,7 @@ export default function ReceiptPage() {
 
           {/* Receipt */}
           <OrderReceipt
-            token={order.token}
+            token={order.token || order._id.slice(-8).toUpperCase()}
             orderDate={order.createdAt}
             items={order.items}
             totalAmount={order.totalAmount}
