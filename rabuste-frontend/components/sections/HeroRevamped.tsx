@@ -162,7 +162,6 @@ export default function HeroRevamped() {
                 }
               }}
             >
-              <source src={videoUrls.heroVideo} type="video/quicktime" />
               <source src={videoUrls.heroVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
@@ -516,7 +515,6 @@ export default function HeroRevamped() {
                   video.play().catch(() => {});
                 }}
               >
-                <source src={videoUrls.rightVideo} type="video/quicktime" />
                 <source src={videoUrls.rightVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
