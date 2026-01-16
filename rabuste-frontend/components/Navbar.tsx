@@ -285,6 +285,7 @@ export default function Navbar() {
 
         {/* RIGHT (hidden on small screens) */}
         <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
+          <NavButton href="/about">ABOUT</NavButton>
           <NavButton href="/menu">MENU</NavButton>
           {user && (
             <NavButton href="/user/favorites">

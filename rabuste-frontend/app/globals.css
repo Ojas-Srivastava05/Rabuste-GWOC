@@ -53,6 +53,16 @@ body {
   scrollbar-width: none;
 }
 
+/* Hide scrollbar for overflow-x-auto elements */
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-x-auto {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @layer base {
   * {
     margin: 0;
