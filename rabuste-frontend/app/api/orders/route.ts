@@ -7,6 +7,7 @@ import User from "@/src/models/Users";
 import Coupon from "@/src/models/Coupon";
 import { sendOrderConfirmation } from "@/src/lib/email";
 import { calculateDistance, calculateTimeToCafe, CAFE_LOCATION } from "@/lib/locationUtils";
+import { generateOrderToken } from "@/lib/orderToken";
 
 export async function POST(req: Request) {
   await connectDB();
@@ -18,10 +19,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
+    const authToken = authHeader.split(" ")[1];
 
     const decoded: any = jwt.verify(
-      token,
+      authToken,
       process.env.JWT_SECRET!
     );
 
@@ -114,12 +115,17 @@ export async function POST(req: Request) {
     if (estimatedTimeToCafe !== null) orderData.estimatedTimeToCafe = estimatedTimeToCafe;
     if (defaultPreparationTime !== null) orderData.preparationTime = defaultPreparationTime;
     
+    // Generate unique daily serial token
+    const orderToken = await generateOrderToken();
+    orderData.token = orderToken;
+    
     console.log('💾 API - Creating order:', {
       customerName: orderData.customerName,
       totalAmount: orderData.totalAmount,
       couponCode: orderData.couponCode,
       couponDiscount: orderData.couponDiscount,
       itemsCount: orderData.items.length,
+      token: orderToken,
     });
     
     // Create order - explicitly type as single document
@@ -144,6 +150,7 @@ export async function POST(req: Request) {
       totalAmount: savedOrder?.totalAmount || 0,
       instructions: savedOrder?.instructions || "",
       orderId: savedOrder?._id?.toString() || "",
+      token: savedOrder?.token || undefined,
     }).catch(err => console.error("Email failed:", err));
 
     return NextResponse.json(savedOrder, { status: 201 });
@@ -162,9 +169,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
+    const authToken = authHeader.split(" ")[1];
     const decoded: any = jwt.verify(
-      token,
+      authToken,
       process.env.JWT_SECRET!
     );
     const isAdmin = decoded.role === "admin" || decoded.isAdmin === true;

@@ -63,6 +63,45 @@ body {
   scrollbar-width: none;
 }
 
+/* Print styles for receipts */
+@media print {
+  @page {
+    margin: 0.5in;
+    size: portrait;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Hide navigation and footer when printing */
+  nav,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure receipt prints properly */
+  .brutal-card {
+    border: 2px solid #B87333 !important;
+    background: white !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Adjust gradient text for print */
+  .gradient-text {
+    color: #B87333 !important;
+    -webkit-text-fill-color: #B87333 !important;
+  }
+  
+  /* Hide action buttons when printing */
+  button {
+    display: none !important;
+  }
+}
+
 @layer base {
   * {
     margin: 0;

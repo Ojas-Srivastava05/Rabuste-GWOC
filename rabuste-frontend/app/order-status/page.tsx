@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store, Receipt, Hash } from "lucide-react";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import Navbar from "@/components/Navbar";
 import DynamicBackground from "@/components/DynamicBackground";
@@ -18,6 +18,7 @@ type OrderItem = {
 
 type Order = {
   _id: string;
+  token?: string;
   items: OrderItem[];
   totalAmount: number;
   status: "pending" | "completed";
@@ -31,6 +32,8 @@ type Order = {
   estimatedTimeToCafe?: number; // in minutes, calculated when order is created
   preparationTime?: number; // in minutes, admin configurable
   distanceFromCafe?: number; // in km
+  couponCode?: string | null;
+  couponDiscount?: number;
 };
 
 // Coffee facts database
@@ -996,6 +999,21 @@ export default function OrderStatusPage() {
                             })}
                           </span>
                         </div>
+                        {order.token && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <Hash size={16} style={{ color: '#B87333' }} />
+                            <span
+                              className="text-sm font-bold"
+                              style={{
+                                color: '#B87333',
+                                fontFamily: 'var(--font-heading)',
+                                letterSpacing: '0.05em',
+                              }}
+                            >
+                              {order.token}
+                            </span>
+                          </div>
+                        )}
                         <p
                           className="text-xs"
                           style={{
@@ -1185,6 +1203,28 @@ export default function OrderStatusPage() {
                         Your order is being prepared with love ❤️
                       </p>
                     </div>
+
+                    {/* View Receipt Button */}
+                    {order.token && (
+                      <div className="mt-6 flex justify-center">
+                        <button
+                          onClick={() => router.push(`/receipt/${order._id}`)}
+                          className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
+                          style={{
+                            background: 'rgba(184, 115, 51, 0.2)',
+                            border: '2px solid rgba(184, 115, 51, 0.4)',
+                            color: '#D4A574',
+                            fontFamily: 'var(--font-heading)',
+                            fontSize: '14px',
+                            fontWeight: 900,
+                            letterSpacing: '0.1em',
+                          }}
+                        >
+                          <Receipt size={18} />
+                          VIEW RECEIPT
+                        </button>
+                      </div>
+                    )}
                   </motion.div>
                     ))}
                   </AnimatePresence>
@@ -1302,6 +1342,21 @@ export default function OrderStatusPage() {
                               })}
                             </span>
                           </div>
+                          {order.token && (
+                            <div className="flex items-center gap-2 mb-1">
+                              <Hash size={16} style={{ color: '#5E7D4C' }} />
+                              <span
+                                className="text-sm font-bold"
+                                style={{
+                                  color: '#5E7D4C',
+                                  fontFamily: 'var(--font-heading)',
+                                  letterSpacing: '0.05em',
+                                }}
+                              >
+                                {order.token}
+                              </span>
+                            </div>
+                          )}
                           <p
                             className="text-xs"
                             style={{
@@ -1424,21 +1479,41 @@ export default function OrderStatusPage() {
                           </span>
                         </div>
 
-                        {/* Feedback Button */}
-                        <div className="mt-6 flex justify-center">
+                        {/* Action Buttons */}
+                        <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                          {order.token && (
+                            <button
+                              onClick={() => router.push(`/receipt/${order._id}`)}
+                              className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
+                              style={{
+                                background: 'rgba(94, 125, 76, 0.2)',
+                                border: '2px solid rgba(94, 125, 76, 0.4)',
+                                color: '#5E7D4C',
+                                fontFamily: 'var(--font-heading)',
+                                fontSize: '14px',
+                                fontWeight: 900,
+                                letterSpacing: '0.1em',
+                              }}
+                            >
+                              <Receipt size={18} />
+                              VIEW RECEIPT
+                            </button>
+                          )}
                           <button
                             onClick={() => router.push(`/feedback?orderId=${order._id}`)}
-                            className="flex items-center gap-2 px-6 py-3 rounded-xl transition-all hover:scale-105"
+                            className="flex items-center gap-2 px-6 py-3 transition-all hover:scale-105"
                             style={{
                               background: 'rgba(184, 115, 51, 0.2)',
                               border: '2px solid rgba(184, 115, 51, 0.4)',
                               color: '#D4A574',
+                              fontFamily: 'var(--font-heading)',
+                              fontSize: '14px',
+                              fontWeight: 900,
+                              letterSpacing: '0.1em',
                             }}
                           >
                             <MessageSquare size={18} />
-                            <span className="text-sm font-bold uppercase tracking-wide" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                              Share Feedback
-                            </span>
+                            SHARE FEEDBACK
                           </button>
                         </div>
 

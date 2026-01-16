@@ -122,6 +122,7 @@ export const generateOrderConfirmationEmail = (order: {
   totalAmount: number;
   instructions?: string;
   orderId: string;
+  token?: string;
 }) => {
   const itemsList = order.items.map(item => `
     <tr>
@@ -158,6 +159,21 @@ export const generateOrderConfirmationEmail = (order: {
       </p>
     </div>
 
+    <!-- Order Token Card -->
+    ${order.token ? `
+    <div style="background: linear-gradient(135deg, rgba(184, 115, 51, 0.2), rgba(205, 127, 50, 0.1)); border: 2px solid ${BRAND_COLORS.copper}; border-radius: 8px; padding: 25px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 20px rgba(184, 115, 51, 0.2);">
+      <p style="margin: 0 0 12px; font-size: 12px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 700;">
+        🎫 YOUR ORDER TOKEN
+      </p>
+      <p style="margin: 0 0 10px; font-family: 'Courier New', monospace; font-size: 32px; font-weight: 700; color: ${BRAND_COLORS.golden}; letter-spacing: 0.08em; text-shadow: 0 2px 10px rgba(184, 115, 51, 0.3);">
+        ${order.token}
+      </p>
+      <p style="margin: 0; font-size: 11px; color: ${BRAND_COLORS.cream}; opacity: 0.8; line-height: 1.5;">
+        Use this token to collect your order at our café
+      </p>
+    </div>
+    ` : ''}
+    
     <!-- Order ID Card -->
     <div style="background: rgba(184, 115, 51, 0.1); border: 1px solid ${BRAND_COLORS.copper}; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: center;">
       <p style="margin: 0 0 8px; font-size: 11px; letter-spacing: 0.15em; color: ${BRAND_COLORS.copper}; text-transform: uppercase; font-weight: 600;">

@@ -8,6 +8,14 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Order token for daily serial tracking
+    token: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
     items: [
       {
         itemId: String,

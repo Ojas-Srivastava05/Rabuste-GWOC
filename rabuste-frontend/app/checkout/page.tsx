@@ -201,15 +201,8 @@ export default function CheckoutPage() {
         console.error("Failed to clear cart:", clearError);
       }
       
-      // Check if order contains art items
-      const hasArtItems = cart!.items.some((item) => item.itemType === 'art');
-      
-      // Redirect to appropriate order status page
-      if (hasArtItems) {
-        router.push(`/art-order-status?orderId=${orderData._id}`);
-      } else {
-        router.push("/order-status");
-      }
+      // Redirect to order success page
+      router.push(`/order-success?orderId=${orderData._id}`);
     } catch (err) {
       console.error("Order creation error:", err);
       alert("Payment successful but order creation failed. Please contact support.");

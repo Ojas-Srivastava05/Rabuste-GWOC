@@ -9,6 +9,14 @@ const OrderSchema = new Schema(
       required: true,
     },
 
+    // Order token for daily serial tracking
+    token: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
     // snapshot info (fine to keep)
     customerName: { type: String, required: true },
     customerEmail: { type: String, required: true },
