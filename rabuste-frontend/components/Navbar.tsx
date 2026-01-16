@@ -154,13 +154,16 @@ export default function Navbar() {
           {/* More Dropdown */}
           <div className="relative group">
             <button
-              className="px-4 py-2.5 text-[#FFFEF9] border border-transparent hover:border-[#B87333]/40 hover:bg-[#B87333]/10 transition-all duration-300 inline-flex items-center justify-center gap-2 uppercase tracking-wider text-xs md:text-sm font-black"
+              className="px-5 py-2.5 text-[#FFFEF9] border border-transparent hover:border-[#B87333]/40 hover:bg-[#B87333]/10 transition-all duration-300 inline-flex items-center justify-center gap-2 uppercase tracking-wider text-lg md:text-xl font-black relative overflow-hidden group"
               style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}
             >
-              MORE
-              <svg className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <span className="relative z-10 flex items-center gap-2">
+                MORE
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+              <span className="absolute inset-0 bg-gradient-to-r from-[#B87333] to-[#CD7F32] translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             </button>
             <div className="absolute top-full left-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
               <div className="bg-[rgba(0,0,0,0.98)] backdrop-blur-xl border-2 border-[#B87333]/40 shadow-2xl">

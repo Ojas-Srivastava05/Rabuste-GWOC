@@ -8,12 +8,35 @@
  * For local development, videos will be served from /public/gallery/
  */
 
+// Helper function to convert Cloudinary URL to MP4 format
+function convertToMp4(url: string): string {
+  // If it's already a Cloudinary URL with format, return as is
+  if (url.includes('/f_mp4/') || url.includes('/f_webm/')) {
+    return url;
+  }
+  
+  // If it's a Cloudinary URL, add format transformation to convert to MP4
+  if (url.includes('res.cloudinary.com')) {
+    // Example: https://res.cloudinary.com/dvraokarg/video/upload/v1768594386/HeroVideo_vqpe1l.mov
+    // Becomes: https://res.cloudinary.com/dvraokarg/video/upload/f_mp4/v1768594386/HeroVideo_vqpe1l
+    // Remove .mov extension and add f_mp4 transformation before the version
+    const mp4Url = url.replace(/\/upload\/(v\d+\/)/, '/upload/f_mp4/$1').replace(/\.mov$/, '');
+    return mp4Url;
+  }
+  
+  return url;
+}
+
 export const videoUrls = {
-  // Main hero background video
-  heroVideo: process.env.NEXT_PUBLIC_HERO_VIDEO_URL || 'https://res.cloudinary.com/dvraokarg/video/upload/v1768594386/HeroVideo_vqpe1l.mov',
+  // Main hero background video (converted to MP4 for browser compatibility)
+  heroVideo: process.env.NEXT_PUBLIC_HERO_VIDEO_URL 
+    ? convertToMp4(process.env.NEXT_PUBLIC_HERO_VIDEO_URL)
+    : convertToMp4('https://res.cloudinary.com/dvraokarg/video/upload/v1768594386/HeroVideo_vqpe1l.mov'),
   
   // Right side video (if needed)
-  rightVideo: process.env.NEXT_PUBLIC_RIGHT_VIDEO_URL || 'https://res.cloudinary.com/dvraokarg/video/upload/v1768594386/HeroVideo_vqpe1l.mov',
+  rightVideo: process.env.NEXT_PUBLIC_RIGHT_VIDEO_URL 
+    ? convertToMp4(process.env.NEXT_PUBLIC_RIGHT_VIDEO_URL)
+    : convertToMp4('https://res.cloudinary.com/dvraokarg/video/upload/v1768594386/HeroVideo_vqpe1l.mov'),
 };
 
 /**
