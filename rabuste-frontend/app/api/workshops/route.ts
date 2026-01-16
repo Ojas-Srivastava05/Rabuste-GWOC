@@ -6,7 +6,13 @@ export async function GET() {
   try {
     await connectDB();
     const workshops = await Workshop.find().sort({ date: 1 });
-    return NextResponse.json(workshops);
+    return NextResponse.json(workshops, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+        'CDN-Cache-Control': 'public, s-maxage=120',
+        'Vercel-CDN-Cache-Control': 'public, s-maxage=120',
+      },
+    });
   } catch (error) {
     console.error("❌ GET /api/workshops failed:", error);
     return NextResponse.json([], { status: 500 });

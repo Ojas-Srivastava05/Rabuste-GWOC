@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import { Sprout, Coffee, Flame, Package, ChevronRight } from 'lucide-react';
 
 export default function ProcessSectionRevamped() {
@@ -304,13 +305,17 @@ export default function ProcessSectionRevamped() {
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
-              <img
+              <Image
                 src={currentStep.image}
                 alt={currentStep.imageAlt}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
                 style={{
                   filter: 'contrast(1.1) brightness(0.95)',
                 }}
+                loading="lazy"
+                quality={85}
               />
 
               {/* Gradient overlay */}

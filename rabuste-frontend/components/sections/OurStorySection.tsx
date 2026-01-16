@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import Image from 'next/image';
 import { Award, Heart, TrendingUp, Users } from 'lucide-react';
 
 export default function OurStorySection() {
@@ -179,10 +180,14 @@ export default function OurStorySection() {
                 aspectRatio: '3/4',
               }}
             >
-              <img
+              <Image
                 src="https://images.pexels.com/photos/6612601/pexels-photo-6612601.jpeg"
                 alt="Espresso machine by Pavel Danilyuk on Pexels"
-                className="w-full h-full object-cover"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                loading="lazy"
+                quality={85}
               />
 
               {/* Overlay gradient */}

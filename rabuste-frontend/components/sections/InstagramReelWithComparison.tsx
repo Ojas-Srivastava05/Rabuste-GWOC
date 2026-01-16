@@ -73,14 +73,16 @@ export default function InstagramReelWithComparison() {
     setIsMounted(true);
   }, []);
 
-  // Load Instagram embed script (client-only)
+  // Load Instagram embed script ONLY when component is in view (defer to prevent blocking LCP)
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !isInView) return;
 
+    // Only load Instagram script when component is visible to prevent blocking critical path
     if (typeof window !== 'undefined' && !window.instgrm) {
       const script = document.createElement('script');
       script.src = '//www.instagram.com/embed.js';
       script.async = true;
+      script.defer = true;
       script.onload = () => {
         setIsLoaded(true);
         if (window.instgrm) {
@@ -109,7 +111,7 @@ export default function InstagramReelWithComparison() {
         }
       }, 300);
     }
-  }, [isMounted]);
+  }, [isMounted, isInView]);
 
   // Intersection Observer for autoplay on scroll
   useEffect(() => {
