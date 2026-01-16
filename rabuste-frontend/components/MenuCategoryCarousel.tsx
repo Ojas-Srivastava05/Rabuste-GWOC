@@ -43,6 +43,23 @@ export default function MenuCategoryCarousel({
 }: MenuCategoryCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const categoryImages: Record<string, string> = {
+    Coffee: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
+    Brew: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80",
+    Espresso: "https://images.unsplash.com/photo-1510626176961-4b37d0b4e904?auto=format&fit=crop&w=800&q=80",
+    Latte: "https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80",
+    Shake: "https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=800&q=80",
+    Bakery: "https://images.unsplash.com/photo-1481391032119-d89fee407e44?auto=format&fit=crop&w=800&q=80",
+    Dessert: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+    Sandwich: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=800&q=80",
+    Default: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+  };
+
+  const getFallbackImage = (category: string | undefined) => {
+    if (!category) return categoryImages.Default;
+    return categoryImages[category as keyof typeof categoryImages] || categoryImages.Default;
+  };
+
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const scrollAmount = 300;
@@ -118,6 +135,7 @@ export default function MenuCategoryCarousel({
           const hasDiscount = hasAIDiscount?.(item._id);
           const discountedPrice = getDiscountedPrice?.(item);
           const originalPrice = getOriginalPrice?.(item);
+          const fallbackImage = getFallbackImage(item.category);
 
           return (
             <motion.div
@@ -138,11 +156,17 @@ export default function MenuCategoryCarousel({
                 }}
               >
                 <Image
-                  src={item.image}
+                  src={item.image || fallbackImage}
                   alt={item.name}
                   fill
                   sizes="140px"
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (target.src !== fallbackImage) {
+                      target.src = fallbackImage;
+                    }
+                  }}
                 />
 
                 {/* Overlay on hover */}
