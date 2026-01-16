@@ -25,20 +25,6 @@ export async function POST(req: Request) {
       orderId,
       rating,
       comments,
-      // Order specific
-      foodQuality,
-      deliveryTime,
-      packaging,
-      // Cafe specific
-      ambience,
-      service,
-      cleanliness,
-      music,
-      // Website specific
-      easeOfUse,
-      design,
-      speed,
-      features,
     } = body;
 
     if (!type || !rating) {
@@ -63,31 +49,9 @@ export async function POST(req: Request) {
       </h2>
       <p><strong>User:</strong> ${userName} (${userEmail || 'Guest'})</p>
       ${userId ? `<p><strong>User ID:</strong> ${userId}</p>` : ''}
+      ${orderId ? `<p><strong>Order ID:</strong> ${orderId}</p>` : ''}
       <p><strong>Overall Rating:</strong> ${rating}/5 ⭐</p>
     `;
-
-    if (type === 'order') {
-      feedbackSummary += `
-        ${orderId ? `<p><strong>Order ID:</strong> ${orderId}</p>` : ''}
-        <p><strong>Food Quality:</strong> ${foodQuality || 0}/5 ⭐</p>
-        <p><strong>Delivery Time:</strong> ${deliveryTime || 0}/5 ⭐</p>
-        <p><strong>Packaging:</strong> ${packaging || 0}/5 ⭐</p>
-      `;
-    } else if (type === 'cafe') {
-      feedbackSummary += `
-        <p><strong>Ambience:</strong> ${ambience || 0}/5 ⭐</p>
-        <p><strong>Service:</strong> ${service || 0}/5 ⭐</p>
-        <p><strong>Cleanliness:</strong> ${cleanliness || 0}/5 ⭐</p>
-        <p><strong>Music & Atmosphere:</strong> ${music || 0}/5 ⭐</p>
-      `;
-    } else if (type === 'website') {
-      feedbackSummary += `
-        <p><strong>Ease of Use:</strong> ${easeOfUse || 0}/5 ⭐</p>
-        <p><strong>Design:</strong> ${design || 0}/5 ⭐</p>
-        <p><strong>Speed:</strong> ${speed || 0}/5 ⭐</p>
-        <p><strong>Features:</strong> ${features || 0}/5 ⭐</p>
-      `;
-    }
 
     if (comments) {
       feedbackSummary += `<p><strong>Comments:</strong><br>${comments}</p>`;
