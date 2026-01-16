@@ -12,6 +12,7 @@ import PersonalizedComboPopup from "@/components/PersonalizedComboPopup";
 import SectionTracker from "@/components/SectionTracker";
 import SEOContent from "@/components/SEOContent";
 import { useUser } from "@/contexts/UserContext";
+import ComparisonWheel from '@/components/ComparisonWheel';
 
 // Lazy load below-the-fold components for better initial load performance
 const HorizontalScroll = dynamic(() => import("@/components/sections/HorizontalScroll"), {
@@ -23,9 +24,7 @@ const ExperienceSection = dynamic(() => import("@/components/sections/Experience
 const BenefitsShowcase = dynamic(() => import("@/components/sections/BenefitsShowcase"), {
   loading: () => <div style={{ minHeight: '50vh' }} />,
 });
-const InstagramReelWithComparison = dynamic(() => import("@/components/sections/InstagramReelWithComparison"), {
-  loading: () => <div style={{ minHeight: '50vh' }} />,
-});
+// ComparisonWheel is imported statically above to avoid dynamic HMR issues
 const VRExperienceSection = dynamic(() => import("@/components/sections/VRExperienceSection"), {
   loading: () => <div style={{ minHeight: '50vh' }} />,
 });
@@ -121,9 +120,14 @@ export default function Home() {
           <BenefitsShowcase />
         </SectionTracker>
 
-        {/* Instagram Reel with Comparison - Latest Content */}
+        {/* Instagram Reel slot — rendering ComparisonWheel instead */}
         <SectionTracker sectionName="instagram_reel">
-          <InstagramReelWithComparison />
+          <div className="max-w-6xl mx-auto px-6 py-12">
+            <h3 className="text-center text-3xl md:text-4xl mb-6" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)', fontWeight: 500 }}>
+              Latest Reel & Interactive Comparison
+            </h3>
+            <ComparisonWheel showInfo={false} />
+          </div>
         </SectionTracker>
 
         {/* VR/AR Experience - Virtual Exploration */}

@@ -123,9 +123,10 @@ const features: Feature[] = [
 
 interface ComparisonWheelProps {
   size?: number;
+  showInfo?: boolean;
 }
 
-export default function ComparisonWheel({ size = 600 }: ComparisonWheelProps) {
+export default function ComparisonWheel({ size = 600, showInfo = true }: ComparisonWheelProps) {
   const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
 
@@ -188,9 +189,12 @@ export default function ComparisonWheel({ size = 600 }: ComparisonWheelProps) {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full">
+    <div
+      className="relative flex flex-col items-center justify-center w-full"
+      style={{ paddingBottom: `${Math.max(140, size * 0.35)}px`, zIndex: 10 }}
+    >
       {/* Wheel Container */}
-      <div className="relative" style={{ width: `${svgSize}px`, height: `${svgSize}px` }}>
+      <div className="relative" style={{ width: `${svgSize}px`, height: `${svgSize}px`, zIndex: 20 }}>
         <svg
           width={svgSize}
           height={svgSize}
@@ -334,8 +338,8 @@ export default function ComparisonWheel({ size = 600 }: ComparisonWheelProps) {
           })}
         </svg>
 
-        {/* Legend */}
-        <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-8">
+        {/* Legend - placed below the SVG to avoid overlapping other content */}
+        <div className="relative mt-6 flex items-center justify-center gap-8">
           <div className="flex items-center gap-3">
             <div
               className="w-8 h-8 border-2"
@@ -369,13 +373,15 @@ export default function ComparisonWheel({ size = 600 }: ComparisonWheelProps) {
         </div>
       </div>
 
-      {/* Info text */}
-      <p
-        className="mt-28 text-center text-base tracking-wider"
-        style={{ color: '#8B6F47', maxWidth: '600px', fontFamily: 'var(--font-body)' }}
-      >
-        Click on any sector to explore the detailed comparison between Arabica and Robusta beans
-      </p>
+      {/* Optional info/caption below the wheel */}
+      {showInfo && (
+        <p
+          className="mt-8 text-center text-base tracking-wider"
+          style={{ color: '#8B6F47', maxWidth: '600px', fontFamily: 'var(--font-body)' }}
+        >
+          Click on any sector to explore the detailed comparison between Arabica and Robusta beans
+        </p>
+      )}
 
       {/* Detail Modal */}
       <AnimatePresence>
