@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store, Receipt, Hash } from "lucide-react";
+import { Clock, Package, AlertCircle, Coffee, Sparkles, Trophy, RefreshCw, Lightbulb, Heart, MapPin, Navigation, MessageSquare, X, Store, Receipt, Hash, Star, CheckCircle2 } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 import { getCurrentLocation, calculateDistance, calculateDeliveryTime, formatDistance, CAFE_LOCATION, LocationError } from "@/lib/locationUtils";
 import { formatTokenForDisplay } from "@/lib/tokenUtils";
 import Navbar from "@/components/Navbar";
@@ -352,6 +353,7 @@ const OriginGame = ({ onWin }: { onWin: () => void }) => {
 
 export default function OrderStatusPage() {
   const router = useRouter();
+  const { user } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentFact, setCurrentFact] = useState(0);
@@ -363,6 +365,11 @@ export default function OrderStatusPage() {
   const [completedOrdersVisible, setCompletedOrdersVisible] = useState(3);
   const [showPickupModal, setShowPickupModal] = useState(false);
   const [showPastOrders, setShowPastOrders] = useState(false);
+  const [ratingOrderId, setRatingOrderId] = useState<string | null>(null);
+  const [rating, setRating] = useState(0);
+  const [ratingComments, setRatingComments] = useState('');
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const [ratingSubmitted, setRatingSubmitted] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchOrders();
@@ -1367,23 +1374,137 @@ export default function OrderStatusPage() {
                           </p>
                         </div>
 
-                        {/* Feedback Button */}
-                        <div className="mb-4">
-                          <button
-                            onClick={() => router.push(`/feedback?orderId=${order._id}`)}
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:scale-105"
-                            style={{
-                              background: 'rgba(184, 115, 51, 0.2)',
-                              border: '1px solid rgba(184, 115, 51, 0.4)',
-                              color: '#D4A574',
-                            }}
-                          >
-                            <MessageSquare size={16} />
-                            <span className="text-sm font-bold uppercase tracking-wide" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
-                              Share Feedback
-                            </span>
-                          </button>
-                        </div>
+                        {/* Rating Section */}
+                        {ratingSubmitted.has(order._id) ? (
+                          <div className="mb-4 p-4 rounded-lg" style={{
+                            background: 'rgba(94, 125, 76, 0.1)',
+                            border: '1px solid rgba(94, 125, 76, 0.3)',
+                          }}>
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 size={18} style={{ color: '#5E7D4C' }} />
+                              <span className="text-sm" style={{ color: '#5E7D4C', fontFamily: 'var(--font-heading)' }}>
+                                THANK YOU FOR YOUR FEEDBACK!
+                              </span>
+                            </div>
+                          </div>
+                        ) : ratingOrderId === order._id ? (
+                          <div className="mb-4 p-4 rounded-lg" style={{
+                            background: 'rgba(61, 43, 31, 0.6)',
+                            border: '2px solid rgba(184, 115, 51, 0.4)',
+                          }}>
+                            <div className="space-y-4">
+                              <div>
+                                <label className="block text-sm font-bold mb-2 uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                                  RATE YOUR ORDER
+                                </label>
+                                <div className="flex items-center gap-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                      key={star}
+                                      type="button"
+                                      onClick={() => setRating(star)}
+                                      className="transition-all hover:scale-110 active:scale-95"
+                                    >
+                                      <Star
+                                        size={28}
+                                        style={{
+                                          color: star <= rating ? '#B87333' : 'rgba(139, 111, 71, 0.3)',
+                                          fill: star <= rating ? '#B87333' : 'transparent',
+                                          transition: 'all 0.2s ease',
+                                        }}
+                                      />
+                                    </button>
+                                  ))}
+                                  {rating > 0 && (
+                                    <span className="ml-3 text-base font-bold" style={{ color: '#D4A574', fontFamily: 'var(--font-heading)' }}>
+                                      {rating}/5
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-bold mb-2 uppercase tracking-wide" style={{ color: '#D4A574', fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                                  COMMENTS (OPTIONAL)
+                                </label>
+                                <textarea
+                                  value={ratingComments}
+                                  onChange={(e) => setRatingComments(e.target.value)}
+                                  rows={3}
+                                  className="w-full rounded-lg px-4 py-3 focus:outline-none transition-all resize-none"
+                                  style={{
+                                    background: 'rgba(26, 17, 16, 0.6)',
+                                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                                    color: '#F5F1E8',
+                                    fontFamily: 'var(--font-body)',
+                                  }}
+                                  onFocus={(e) => {
+                                    e.currentTarget.style.borderColor = 'rgba(212, 165, 116, 0.6)';
+                                    e.currentTarget.style.boxShadow = '0 0 0 3px rgba(184, 115, 51, 0.2)';
+                                  }}
+                                  onBlur={(e) => {
+                                    e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.3)';
+                                    e.currentTarget.style.boxShadow = 'none';
+                                  }}
+                                  placeholder="Tell us about your experience..."
+                                />
+                              </div>
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleSubmitRating(order._id)}
+                                  disabled={isSubmittingRating || rating === 0}
+                                  className="flex-1 py-2.5 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                  style={{
+                                    background: isSubmittingRating || rating === 0
+                                      ? 'rgba(61, 43, 31, 0.6)'
+                                      : 'linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)',
+                                    color: rating === 0 ? '#8B6F47' : '#000000',
+                                    fontFamily: 'var(--font-heading)',
+                                    letterSpacing: '0.1em',
+                                    fontWeight: 600,
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
+                                  {isSubmittingRating ? 'SUBMITTING...' : 'SUBMIT RATING'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setRatingOrderId(null);
+                                    setRating(0);
+                                    setRatingComments('');
+                                  }}
+                                  className="px-4 py-2.5 rounded-lg transition-all"
+                                  style={{
+                                    background: 'rgba(61, 43, 31, 0.6)',
+                                    border: '2px solid rgba(184, 115, 51, 0.3)',
+                                    color: '#D4A574',
+                                    fontFamily: 'var(--font-heading)',
+                                    letterSpacing: '0.1em',
+                                    fontSize: '0.875rem',
+                                  }}
+                                >
+                                  CANCEL
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mb-4">
+                            <button
+                              onClick={() => setRatingOrderId(order._id)}
+                              className="flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all hover:scale-105"
+                              style={{
+                                background: 'rgba(184, 115, 51, 0.15)',
+                                border: '2px solid rgba(212, 165, 116, 0.5)',
+                                color: '#D4A574',
+                              }}
+                            >
+                              <Star size={18} />
+                              <span className="text-sm font-bold uppercase tracking-wide" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}>
+                                RATE THIS ORDER
+                              </span>
+                            </button>
+                          </div>
+                        )}
 
                         {/* Order Items */}
                         <div className="space-y-3 mb-6">

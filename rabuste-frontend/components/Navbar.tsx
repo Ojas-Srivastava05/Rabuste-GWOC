@@ -146,12 +146,45 @@ export default function Navbar() {
 
       {/* top row - left/right groups, center logo */}
       <div className="flex items-center justify-between max-w-7xl mx-auto relative z-10">
-        {/* LEFT (hidden on small screens) */}
-        <div className="hidden md:flex gap-4 flex-1">
-          <NavButton href="/franchise">FRANCHISE</NavButton>
-          <NavButton href="/workshops">WORKSHOP</NavButton>
-          <NavButton href="/order-status">MY ORDERS</NavButton>
-          <NavButton href="/feedback">FEEDBACK</NavButton>
+        {/* LEFT - Main Navigation with Dropdown */}
+        <div className="hidden md:flex gap-2 flex-1">
+          <NavButton href="/menu">MENU</NavButton>
+          <NavButton href="/art-gallery">DISCOVER</NavButton>
+          
+          {/* More Dropdown */}
+          <div className="relative group">
+            <button
+              className="px-4 py-2.5 text-[#FFFEF9] border border-transparent hover:border-[#B87333]/40 hover:bg-[#B87333]/10 transition-all duration-300 inline-flex items-center justify-center gap-2 uppercase tracking-wider text-xs md:text-sm font-black"
+              style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}
+            >
+              MORE
+              <svg className="w-3 h-3 md:w-4 md:h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div className="absolute top-full left-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+              <div className="bg-[rgba(0,0,0,0.98)] backdrop-blur-xl border-2 border-[#B87333]/40 shadow-2xl">
+                <Link href="/workshops" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  WORKSHOPS
+                </Link>
+                <Link href="/franchise" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  FRANCHISE
+                </Link>
+                <Link href="/about" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  ABOUT
+                </Link>
+                <Link href="/science" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  SCIENCE
+                </Link>
+                <Link href="/moodBrewer" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  MOOD BREWER
+                </Link>
+                <Link href="/feedback" className="block px-5 py-3 text-[#FFFEF9] hover:bg-[#B87333]/10 transition-colors uppercase tracking-wider text-sm font-black border-t border-[#B87333]/20" style={{ fontFamily: "var(--font-heading)", letterSpacing: "0.1em" }}>
+                  FEEDBACK
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* MOBILE: hamburger on left */}
@@ -284,16 +317,11 @@ export default function Navbar() {
         </div>
 
         {/* RIGHT (hidden on small screens) */}
-        <div className="hidden md:flex gap-4 flex-1 justify-end items-center">
-          <NavButton href="/about">ABOUT</NavButton>
-          <NavButton href="/menu">MENU</NavButton>
-          {user && (
-            <NavButton href="/user/favorites">
-              FAVORITES
-            </NavButton>
-          )}
-          <NavButton href="/art-gallery">DISCOVER</NavButton>
+        <div className="hidden md:flex gap-2 flex-1 justify-end items-center">
           <NavButton href="/art">GALLERY</NavButton>
+          {user && (
+            <NavButton href="/order-status">ORDERS</NavButton>
+          )}
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <div className="flex items-center gap-0 border-2 border-[#B87333]/40 hover:bg-[#B87333]/20 transition-all duration-300">
