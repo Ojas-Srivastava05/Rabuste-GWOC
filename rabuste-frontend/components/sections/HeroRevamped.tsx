@@ -381,154 +381,60 @@ export default function HeroRevamped() {
             </motion.div>
           </div>
 
-          {/* Right Column - Premium Stats & Features Card */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, x: 50 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="relative h-full flex items-center justify-center hidden lg:flex"
-          >
-            <div 
-              className="relative w-full max-w-md p-8 rounded-3xl backdrop-blur-xl"
+          {/* Right Column - Video */}
+          {isMounted && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, x: 50 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
               style={{
-                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.6), rgba(43, 24, 16, 0.4))',
-                border: '2px solid rgba(184, 115, 51, 0.3)',
                 boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 165, 116, 0.1)',
               }}
             >
-              {/* Animated background glow */}
-              <motion.div
-                animate={{
-                  opacity: [0.3, 0.5, 0.3],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute inset-0 rounded-3xl opacity-20"
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
                 style={{
-                  background: 'radial-gradient(circle at center, rgba(184, 115, 51, 0.4), transparent)',
+                  filter: 'brightness(0.9) contrast(1.05)',
+                }}
+              >
+                <source src="/gallery/Screen Recording 2026-01-16 at 11.18.48 PM.mov" type="video/quicktime" />
+              </video>
+              
+              {/* Subtle overlay for depth */}
+              <div 
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.1) 100%)',
                 }}
               />
-
-              <div className="relative z-10 space-y-8">
-                {/* Premium Stats */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid rgba(184, 115, 51, 0.3)' }}>
-                    <Zap size={24} style={{ color: '#B87333' }} />
-                    <h3 style={{
-                      fontFamily: 'var(--font-heading)',
-                      fontSize: '1.5rem',
-                      color: '#D4A574',
-                      letterSpacing: '0.1em',
-                      fontWeight: 400,
-                    }}>
-                      POWER METRICS
-                    </h3>
-                  </div>
-
-                  {[
-                    { value: '2.7%', label: 'Caffeine Content', desc: 'Double the strength' },
-                    { value: '6-8hrs', label: 'Energy Duration', desc: 'Sustained power' },
-                    { value: '100%', label: 'Robusta Beans', desc: 'Premium quality' },
-                  ].map((stat, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.6, delay: 1.2 + i * 0.15 }}
-                      className="flex items-start gap-4 group"
-                    >
-                      <div 
-                        className="p-2 rounded-lg transition-all duration-300 group-hover:scale-110"
-                        style={{
-                          background: 'rgba(184, 115, 51, 0.2)',
-                          border: '1px solid rgba(212, 165, 116, 0.2)',
-                        }}
-                      >
-                        <div className="w-2 h-2 rounded-full" style={{ background: '#B87333' }} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-baseline gap-2 mb-1">
-                          <span style={{
-                            fontFamily: 'var(--font-heading)',
-                            fontSize: '2rem',
-                            color: '#D4A574',
-                            fontWeight: 400,
-                            lineHeight: 1,
-                          }}>
-                            {stat.value}
-                          </span>
-                        </div>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.875rem',
-                          color: '#D4A574',
-                          fontWeight: 600,
-                          letterSpacing: '0.05em',
-                          textTransform: 'uppercase',
-                          marginBottom: '2px',
-                        }}>
-                          {stat.label}
-                        </p>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.75rem',
-                          color: 'rgba(255, 254, 249, 0.6)',
-                        }}>
-                          {stat.desc}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Premium Divider */}
-                <div className="h-px" style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.5), transparent)',
-                }} />
-
-                {/* Key Features */}
-                <div className="space-y-4">
-                  <h3 style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '1.25rem',
-                    color: '#D4A574',
-                    letterSpacing: '0.1em',
-                    fontWeight: 400,
-                  }}>
-                    WHY RABUSTE
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      'Double caffeine content',
-                      'Bold, intense flavor',
-                      'Sustained energy boost',
-                      'Premium quality beans'
-                    ].map((feature, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 1.6 + i * 0.1 }}
-                        className="flex items-center gap-3"
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#B87333' }} />
-                        <span style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.875rem',
-                          color: 'rgba(255, 254, 249, 0.8)',
-                        }}>
-                          {feature}
-                        </span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+              
+              {/* Copper accent border glow */}
+              <div 
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  boxShadow: 'inset 0 0 0 2px rgba(184, 115, 51, 0.2)',
+                  borderRadius: 'inherit',
+                }}
+              />
+            </motion.div>
+          )}
+          
+          {/* Fallback for SSR */}
+          {!isMounted && (
+            <div 
+              className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] rounded-2xl lg:rounded-3xl overflow-hidden hidden lg:block"
+              style={{
+                background: 'linear-gradient(135deg, rgba(26, 17, 16, 0.8), rgba(43, 24, 16, 0.6))',
+                border: '2px solid rgba(184, 115, 51, 0.3)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+              }}
+            />
+          )}
         </div>
       </motion.div>
 

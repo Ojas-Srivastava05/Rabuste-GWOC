@@ -98,16 +98,18 @@ export default function FranchisePage() {
   }: any) => {
     const isFocused = focusedField === name;
     const hasValue = value && value.toString().length > 0;
+    // For select, check if a non-empty value is selected
+    const hasSelectValue = type === 'select' ? (value && value !== '') : hasValue;
 
     if (type === 'select') {
       return (
         <div className="relative group">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-            <Icon className="w-5 h-5 transition-colors" style={{ color: isFocused || hasValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+            <Icon className="w-5 h-5 transition-colors" style={{ color: isFocused || hasSelectValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
           </div>
           <label 
             className={`absolute left-12 transition-all duration-300 pointer-events-none ${
-              isFocused || hasValue 
+              isFocused || hasSelectValue 
                 ? 'top-2 text-xs text-[#B87333] font-semibold' 
                 : 'top-1/2 -translate-y-1/2 text-base text-zinc-400'
             }`}
@@ -117,15 +119,15 @@ export default function FranchisePage() {
           </label>
           <select
             name={name}
-            value={value}
+            value={value || ''}
             onChange={onChange}
             onFocus={() => setFocusedField(name)}
             onBlur={() => setFocusedField(null)}
             required={required}
-            className="w-full h-16 pl-12 pr-4 pt-6 bg-transparent border-2 rounded-xl transition-all duration-300 appearance-none cursor-pointer"
+            className="w-full h-16 pl-12 pr-10 pt-6 bg-transparent border-2 rounded-xl transition-all duration-300 appearance-none cursor-pointer"
             style={{
               borderColor: isFocused ? '#B87333' : 'rgba(39, 39, 42, 0.6)',
-              color: '#F5F1E8',
+              color: hasSelectValue ? '#F5F1E8' : 'rgba(161, 161, 170, 0.6)',
               fontFamily: 'var(--font-body)',
               boxShadow: isFocused ? '0 0 0 4px rgba(184, 115, 51, 0.1)' : 'none',
             }}
@@ -136,9 +138,17 @@ export default function FranchisePage() {
               </option>
             ))}
           </select>
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-            <ArrowRight className="w-4 h-4 rotate-90" style={{ color: isFocused ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+            <ArrowRight className="w-4 h-4 rotate-90" style={{ color: isFocused || hasSelectValue ? '#B87333' : 'rgba(161, 161, 170, 0.5)' }} />
           </div>
+          {isFocused && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              className="absolute bottom-0 left-0 right-0 h-0.5 origin-left"
+              style={{ background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)' }}
+            />
+          )}
         </div>
       );
     }
@@ -161,7 +171,7 @@ export default function FranchisePage() {
           </label>
           <textarea
             name={name}
-            value={value}
+            value={value || ''}
             onChange={onChange}
             onFocus={() => setFocusedField(name)}
             onBlur={() => setFocusedField(null)}
@@ -175,6 +185,14 @@ export default function FranchisePage() {
             }}
             placeholder={isFocused ? placeholder : ''}
           />
+          {isFocused && (
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              className="absolute bottom-0 left-0 right-0 h-0.5 origin-left"
+              style={{ background: 'linear-gradient(90deg, #B87333, #CD7F32, #D4A574)' }}
+            />
+          )}
         </div>
       );
     }
