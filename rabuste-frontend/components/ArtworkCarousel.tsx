@@ -67,10 +67,12 @@ export default function ArtworkCarousel({ artworks, onArtworkHover, title }: Art
 
       <div
         ref={scrollContainerRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2"
+        className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2"
         style={{
           scrollBehavior: 'smooth',
-        }}
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+        } as React.CSSProperties & { scrollbarWidth?: string; msOverflowStyle?: string }}
       >
         {artworks.map((artwork) => (
           <motion.div
@@ -107,11 +109,16 @@ export default function ArtworkCarousel({ artworks, onArtworkHover, title }: Art
               />
             </div>
             <p 
-              className="text-center mt-2 text-xs"
+              className="text-center mt-2 text-xs font-medium"
               style={{ 
                 color: '#F5F1E8',
                 fontFamily: 'var(--font-body)',
+                maxWidth: '100px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
+              title={artwork.title}
             >
               {artwork.title}
             </p>
