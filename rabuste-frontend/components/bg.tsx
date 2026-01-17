@@ -133,6 +133,17 @@ void main() {
 }
 `;
 
+// Helper function to check WebGL support
+function isWebGLSupported(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    return !!gl;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function Balatro({
   spinRotation = -2.0,
   spinSpeed = 7.0,
@@ -160,81 +171,145 @@ export default function Balatro({
     container.style.zIndex = "0";
     container.style.pointerEvents = "none";
 
-    const renderer = new Renderer();
-    const gl = renderer.gl;
-    gl.clearColor(0, 0, 0, 1);
-
-    let program: Program;
-
-    function resize() {
-      renderer.setSize(container.offsetWidth, container.offsetHeight);
-      if (program) {
-        program.uniforms.iResolution.value = [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height];
-      }
+    // Check WebGL support before attempting to create context
+    if (!isWebGLSupported()) {
+      console.warn('WebGL is not supported on this device. Using fallback background.');
+      // Set a solid background color as fallback
+      container.style.backgroundColor = color1;
+      return;
     }
-    window.addEventListener('resize', resize);
-    resize();
 
-    const geometry = new Triangle(gl);
-    program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        iTime: { value: 0 },
-        iResolution: {
-          value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height]
-        },
-        uSpinRotation: { value: spinRotation },
-        uSpinSpeed: { value: spinSpeed },
-        uOffset: { value: offset },
-        uColor1: { value: hexToVec4(color1) },
-        uColor2: { value: hexToVec4(color2) },
-        uColor3: { value: hexToVec4(color3) },
-        uContrast: { value: contrast },
-        uLighting: { value: lighting },
-        uSpinAmount: { value: spinAmount },
-        uPixelFilter: { value: pixelFilter },
-        uSpinEase: { value: spinEase },
-        uIsRotate: { value: isRotate },
-        uMouse: { value: [0.5, 0.5] }
+    let renderer: Renderer | null = null;
+    let gl: WebGLRenderingContext | null = null;
+    let program: Program | null = null;
+    let animationFrameId: number | null = null;
+
+    try {
+      renderer = new Renderer();
+      if (!renderer || !renderer.gl) {
+        throw new Error('Failed to create WebGL renderer');
       }
-    });
+      
+      gl = renderer.gl;
+      if (!gl) {
+        throw new Error('Failed to get WebGL context');
+      }
+      
+      gl.clearColor(0, 0, 0, 1);
 
-    const mesh = new Mesh(gl, { geometry, program });
-    let animationFrameId: number;
+      function resize() {
+        if (!renderer || !gl || !program) return;
+        try {
+          renderer.setSize(container.offsetWidth, container.offsetHeight);
+          if (program && gl.canvas) {
+            program.uniforms.iResolution.value = [
+              gl.canvas.width, 
+              gl.canvas.height, 
+              gl.canvas.width / gl.canvas.height
+            ];
+          }
+        } catch (e) {
+          console.warn('Error during resize:', e);
+        }
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-    function update(time: number) {
+      const geometry = new Triangle(gl);
+      program = new Program(gl, {
+        vertex: vertexShader,
+        fragment: fragmentShader,
+        uniforms: {
+          iTime: { value: 0 },
+          iResolution: {
+            value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height]
+          },
+          uSpinRotation: { value: spinRotation },
+          uSpinSpeed: { value: spinSpeed },
+          uOffset: { value: offset },
+          uColor1: { value: hexToVec4(color1) },
+          uColor2: { value: hexToVec4(color2) },
+          uColor3: { value: hexToVec4(color3) },
+          uContrast: { value: contrast },
+          uLighting: { value: lighting },
+          uSpinAmount: { value: spinAmount },
+          uPixelFilter: { value: pixelFilter },
+          uSpinEase: { value: spinEase },
+          uIsRotate: { value: isRotate },
+          uMouse: { value: [0.5, 0.5] }
+        }
+      });
+
+      const mesh = new Mesh(gl, { geometry, program });
+
+      function update(time: number) {
+        if (!renderer || !program || !gl) return;
+        try {
+          animationFrameId = requestAnimationFrame(update);
+          program.uniforms.iTime.value = time * 0.001;
+          renderer.render({ scene: mesh });
+        } catch (e) {
+          console.warn('Error during render:', e);
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+          }
+        }
+      }
       animationFrameId = requestAnimationFrame(update);
-      program.uniforms.iTime.value = time * 0.001;
-      renderer.render({ scene: mesh });
+      
+      if (gl.canvas && container) {
+        container.appendChild(gl.canvas);
+
+        // make sure the canvas fills container and does not create an interactive stacking context
+        gl.canvas.style.position = "absolute";
+        gl.canvas.style.left = "0";
+        gl.canvas.style.top = "0";
+        gl.canvas.style.width = "100%";
+        gl.canvas.style.height = "100%";
+        gl.canvas.style.pointerEvents = "none";
+      }
+
+      function handleMouseMove(e: MouseEvent) {
+        if (!mouseInteraction || !program) return;
+        try {
+          const rect = container.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width;
+          const y = 1.0 - (e.clientY - rect.top) / rect.height;
+          program.uniforms.uMouse.value = [x, y];
+        } catch (e) {
+          console.warn('Error handling mouse move:', e);
+        }
+      }
+      container.addEventListener('mousemove', handleMouseMove);
+
+      return () => {
+        try {
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+          }
+          window.removeEventListener('resize', resize);
+          container.removeEventListener('mousemove', handleMouseMove);
+          if (gl && gl.canvas && container.contains(gl.canvas)) {
+            container.removeChild(gl.canvas);
+          }
+          if (gl) {
+            const loseContext = gl.getExtension('WEBGL_lose_context');
+            if (loseContext) {
+              loseContext.loseContext();
+            }
+          }
+        } catch (e) {
+          console.warn('Error during cleanup:', e);
+        }
+      };
+    } catch (error) {
+      console.error('Failed to initialize WebGL background:', error);
+      // Fallback to solid background color
+      container.style.backgroundColor = color1;
+      return () => {
+        // Cleanup for fallback case (no-op)
+      };
     }
-    animationFrameId = requestAnimationFrame(update);
-    container.appendChild(gl.canvas);
-
-    // make sure the canvas fills container and does not create an interactive stacking context
-    gl.canvas.style.position = "absolute";
-    gl.canvas.style.left = "0";
-    gl.canvas.style.top = "0";
-    gl.canvas.style.width = "100%";
-    gl.canvas.style.height = "100%";
-    gl.canvas.style.pointerEvents = "none";
-
-    function handleMouseMove(e: MouseEvent) {
-      if (!mouseInteraction) return;
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = 1.0 - (e.clientY - rect.top) / rect.height;
-      program.uniforms.uMouse.value = [x, y];
-    }
-    container.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', resize);
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-    };
   }, [
     spinRotation,
     spinSpeed,
