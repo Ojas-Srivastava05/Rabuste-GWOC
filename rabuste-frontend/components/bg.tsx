@@ -1,7 +1,7 @@
 "use client";
 
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './bg.css';
 
@@ -20,6 +20,16 @@ interface BalatroProps {
   isRotate?: boolean;
   mouseInteraction?: boolean;
 }
+
+const oglAttributes = {
+  alpha: false,
+  depth: true,
+  stencil: false,
+  antialias: false,
+  premultipliedAlpha: false,
+  preserveDrawingBuffer: false,
+  powerPreference: 'default' as const
+};
 
 function hexToVec4(hex: string): [number, number, number, number] {
   let hexStr = hex.replace('#', '');
@@ -149,8 +159,26 @@ export default function Balatro({
   mouseInteraction = true
 }: BalatroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  function canCreateWebGL() {
+    if (typeof document === 'undefined') return false;
+    const testCanvas = document.createElement('canvas');
+    const gl =
+      testCanvas.getContext('webgl2', oglAttributes) ||
+      testCanvas.getContext('webgl', oglAttributes) ||
+      testCanvas.getContext('experimental-webgl', oglAttributes);
+    return !!gl;
+  }
+
+  useEffect(() => {
+    if (!isClient) return;
+
+    try {
     if (!containerRef.current) return;
     const container = containerRef.current;
 
@@ -160,13 +188,59 @@ export default function Balatro({
     container.style.zIndex = "0";
     container.style.pointerEvents = "none";
 
-    const renderer = new Renderer();
-    const gl = renderer.gl;
+    if (!canCreateWebGL()) {
+      console.warn('WebGL not available, skipping background.');
+      return;
+    }
+
+      const canvas = document.createElement('canvas');
+      const originalConsoleError = console.error;
+      let suppressedWebglError = false;
+      let renderer: Renderer | null = null;
+      try {
+        console.error = (...args: unknown[]) => {
+          if (typeof args[0] === 'string' && args[0].toLowerCase().includes('unable to create webgl context')) {
+            suppressedWebglError = true;
+            return;
+          }
+          originalConsoleError(...args);
+        };
+
+        renderer = new Renderer({
+          canvas,
+          alpha: oglAttributes.alpha,
+          depth: oglAttributes.depth,
+          stencil: oglAttributes.stencil,
+          antialias: oglAttributes.antialias,
+          premultipliedAlpha: oglAttributes.premultipliedAlpha,
+          preserveDrawingBuffer: oglAttributes.preserveDrawingBuffer,
+          powerPreference: oglAttributes.powerPreference,
+          webgl: 1
+        });
+      } catch (err) {
+        console.warn('WebGL unavailable, skipping background', err);
+        return;
+      } finally {
+        console.error = originalConsoleError;
+      }
+
+      if (suppressedWebglError) {
+        console.warn('WebGL unavailable, skipping background');
+        return;
+      }
+
+      const gl = renderer.gl;
+      if (!gl) {
+        console.warn('WebGL context could not be created.');
+        return;
+      }
+
     gl.clearColor(0, 0, 0, 1);
 
     let program: Program;
 
     function resize() {
+      if (!renderer) return;
       renderer.setSize(container.offsetWidth, container.offsetHeight);
       if (program) {
         program.uniforms.iResolution.value = [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height];
@@ -206,7 +280,7 @@ export default function Balatro({
     function update(time: number) {
       animationFrameId = requestAnimationFrame(update);
       program.uniforms.iTime.value = time * 0.001;
-      renderer.render({ scene: mesh });
+      renderer?.render({ scene: mesh });
     }
     animationFrameId = requestAnimationFrame(update);
     container.appendChild(gl.canvas);
@@ -235,6 +309,10 @@ export default function Balatro({
       container.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
+    } catch (err) {
+      console.warn('WebGL background disabled due to error', err);
+      return;
+    }
   }, [
     spinRotation,
     spinSpeed,
@@ -248,8 +326,9 @@ export default function Balatro({
     pixelFilter,
     spinEase,
     isRotate,
-    mouseInteraction
+    mouseInteraction,
+    isClient
   ]);
 
-  return <div ref={containerRef} className="balatro-container" />;
+  return <div ref={containerRef} className="balatro-container" suppressHydrationWarning />;
 }
