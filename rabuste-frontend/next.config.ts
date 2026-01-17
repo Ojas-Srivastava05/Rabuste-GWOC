@@ -181,7 +181,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   turbopack: {
-    root: __dirname,
+    // Explicitly set root to frontend directory to avoid workspace confusion
+    root: process.cwd(),
     rules: {
       '*.svg': {
         loaders: ['@svgr/webpack'],
