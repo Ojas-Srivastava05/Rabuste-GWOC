@@ -181,6 +181,7 @@ const nextConfig: NextConfig = {
     return config;
   },
   turbopack: {
+    root: __dirname,
     rules: {
       '*.svg': {
         loaders: ['@svgr/webpack'],
