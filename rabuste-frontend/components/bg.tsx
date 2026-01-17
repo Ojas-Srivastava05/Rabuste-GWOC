@@ -1,7 +1,7 @@
 "use client";
 
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './bg.css';
 
@@ -160,16 +160,20 @@ export default function Balatro({
   mouseInteraction = true
 }: BalatroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only render on client to prevent hydration mismatches
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    // Don't run on server or before mount
+    if (!isMounted || typeof window === 'undefined' || !containerRef.current) return;
+    
     const container = containerRef.current;
 
-    // ensure background sits behind UI and doesn't intercept events
-    container.style.position = "fixed";
-    container.style.inset = "0";
-    container.style.zIndex = "0";
-    container.style.pointerEvents = "none";
+    // Styles are handled by CSS class, only set backgroundColor as fallback if needed
 
     // Check WebGL support before attempting to create context
     if (!isWebGLSupported()) {
@@ -323,8 +327,18 @@ export default function Balatro({
     pixelFilter,
     spinEase,
     isRotate,
-    mouseInteraction
+    mouseInteraction,
+    isMounted
   ]);
 
-  return <div ref={containerRef} className="balatro-container" />;
+  // Always render the container with consistent styles to prevent hydration mismatch
+  // CSS class handles positioning, backgroundColor is set as fallback until WebGL initializes
+  // This ensures server and client initial render match
+  return (
+    <div 
+      ref={containerRef} 
+      className="balatro-container"
+      style={{ backgroundColor: color1 }}
+    />
+  );
 }
