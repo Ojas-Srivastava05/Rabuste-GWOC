@@ -143,6 +143,17 @@ void main() {
 }
 `;
 
+// Helper function to check WebGL support
+function isWebGLSupported(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    return !!gl;
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function Balatro({
   spinRotation = -2.0,
   spinSpeed = 7.0,
@@ -159,159 +170,158 @@ export default function Balatro({
   mouseInteraction = true
 }: BalatroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isClient, setIsClient] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
+  // Only render on client to prevent hydration mismatches
   useEffect(() => {
-    setIsClient(true);
+    setIsMounted(true);
   }, []);
 
-  function canCreateWebGL() {
-    if (typeof document === 'undefined') return false;
-    const testCanvas = document.createElement('canvas');
-    const gl =
-      testCanvas.getContext('webgl2', oglAttributes) ||
-      testCanvas.getContext('webgl', oglAttributes) ||
-      testCanvas.getContext('experimental-webgl', oglAttributes);
-    return !!gl;
-  }
-
   useEffect(() => {
-    if (!isClient) return;
-
-    try {
-    if (!containerRef.current) return;
+    // Don't run on server or before mount
+    if (!isMounted || typeof window === 'undefined' || !containerRef.current) return;
     const container = containerRef.current;
 
-    // ensure background sits behind UI and doesn't intercept events
-    container.style.position = "fixed";
-    container.style.inset = "0";
-    container.style.zIndex = "0";
-    container.style.pointerEvents = "none";
+    // Styles are handled by CSS class, only set backgroundColor as fallback if needed
 
-    if (!canCreateWebGL()) {
-      console.warn('WebGL not available, skipping background.');
+    // Check WebGL support before attempting to create context
+    if (!isWebGLSupported()) {
+      console.warn('WebGL is not supported on this device. Using fallback background.');
+      // Set a solid background color as fallback
+      container.style.backgroundColor = color1;
       return;
     }
 
-      const canvas = document.createElement('canvas');
-      const originalConsoleError = console.error;
-      let suppressedWebglError = false;
-      let renderer: Renderer | null = null;
-      try {
-        console.error = (...args: unknown[]) => {
-          if (typeof args[0] === 'string' && args[0].toLowerCase().includes('unable to create webgl context')) {
-            suppressedWebglError = true;
-            return;
-          }
-          originalConsoleError(...args);
-        };
+    let renderer: Renderer | null = null;
+    let gl: WebGLRenderingContext | null = null;
+    let program: Program | null = null;
+    let animationFrameId: number | null = null;
 
-        renderer = new Renderer({
-          canvas,
-          alpha: oglAttributes.alpha,
-          depth: oglAttributes.depth,
-          stencil: oglAttributes.stencil,
-          antialias: oglAttributes.antialias,
-          premultipliedAlpha: oglAttributes.premultipliedAlpha,
-          preserveDrawingBuffer: oglAttributes.preserveDrawingBuffer,
-          powerPreference: oglAttributes.powerPreference,
-          webgl: 1
-        });
-      } catch (err) {
-        console.warn('WebGL unavailable, skipping background', err);
-        return;
-      } finally {
-        console.error = originalConsoleError;
+    try {
+      renderer = new Renderer();
+      if (!renderer || !renderer.gl) {
+        throw new Error('Failed to create WebGL renderer');
       }
-
-      if (suppressedWebglError) {
-        console.warn('WebGL unavailable, skipping background');
-        return;
-      }
-
-      const gl = renderer.gl;
+      
+      gl = renderer.gl;
       if (!gl) {
-        console.warn('WebGL context could not be created.');
-        return;
+        throw new Error('Failed to get WebGL context');
       }
+      
+      gl.clearColor(0, 0, 0, 1);
 
-    gl.clearColor(0, 0, 0, 1);
-
-    let program: Program;
-
-    function resize() {
-      if (!renderer) return;
-      renderer.setSize(container.offsetWidth, container.offsetHeight);
-      if (program) {
-        program.uniforms.iResolution.value = [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height];
+      function resize() {
+        if (!renderer || !gl || !program) return;
+        try {
+          renderer.setSize(container.offsetWidth, container.offsetHeight);
+          if (program && gl.canvas) {
+            program.uniforms.iResolution.value = [
+              gl.canvas.width, 
+              gl.canvas.height, 
+              gl.canvas.width / gl.canvas.height
+            ];
+          }
+        } catch (e) {
+          console.warn('Error during resize:', e);
+        }
       }
-    }
-    window.addEventListener('resize', resize);
-    resize();
+      window.addEventListener('resize', resize);
+      resize();
 
-    const geometry = new Triangle(gl);
-    program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        iTime: { value: 0 },
-        iResolution: {
-          value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height]
-        },
-        uSpinRotation: { value: spinRotation },
-        uSpinSpeed: { value: spinSpeed },
-        uOffset: { value: offset },
-        uColor1: { value: hexToVec4(color1) },
-        uColor2: { value: hexToVec4(color2) },
-        uColor3: { value: hexToVec4(color3) },
-        uContrast: { value: contrast },
-        uLighting: { value: lighting },
-        uSpinAmount: { value: spinAmount },
-        uPixelFilter: { value: pixelFilter },
-        uSpinEase: { value: spinEase },
-        uIsRotate: { value: isRotate },
-        uMouse: { value: [0.5, 0.5] }
+      const geometry = new Triangle(gl);
+      program = new Program(gl, {
+        vertex: vertexShader,
+        fragment: fragmentShader,
+        uniforms: {
+          iTime: { value: 0 },
+          iResolution: {
+            value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height]
+          },
+          uSpinRotation: { value: spinRotation },
+          uSpinSpeed: { value: spinSpeed },
+          uOffset: { value: offset },
+          uColor1: { value: hexToVec4(color1) },
+          uColor2: { value: hexToVec4(color2) },
+          uColor3: { value: hexToVec4(color3) },
+          uContrast: { value: contrast },
+          uLighting: { value: lighting },
+          uSpinAmount: { value: spinAmount },
+          uPixelFilter: { value: pixelFilter },
+          uSpinEase: { value: spinEase },
+          uIsRotate: { value: isRotate },
+          uMouse: { value: [0.5, 0.5] }
+        }
+      });
+
+      const mesh = new Mesh(gl, { geometry, program });
+
+      function update(time: number) {
+        if (!renderer || !program || !gl) return;
+        try {
+          animationFrameId = requestAnimationFrame(update);
+          program.uniforms.iTime.value = time * 0.001;
+          renderer.render({ scene: mesh });
+        } catch (e) {
+          console.warn('Error during render:', e);
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+          }
+        }
       }
-    });
-
-    const mesh = new Mesh(gl, { geometry, program });
-    let animationFrameId: number;
-
-    function update(time: number) {
       animationFrameId = requestAnimationFrame(update);
-      program.uniforms.iTime.value = time * 0.001;
-      renderer?.render({ scene: mesh });
-    }
-    animationFrameId = requestAnimationFrame(update);
-    container.appendChild(gl.canvas);
+      
+      if (gl.canvas && container) {
+        container.appendChild(gl.canvas);
 
-    // make sure the canvas fills container and does not create an interactive stacking context
-    gl.canvas.style.position = "absolute";
-    gl.canvas.style.left = "0";
-    gl.canvas.style.top = "0";
-    gl.canvas.style.width = "100%";
-    gl.canvas.style.height = "100%";
-    gl.canvas.style.pointerEvents = "none";
+        // make sure the canvas fills container and does not create an interactive stacking context
+        gl.canvas.style.position = "absolute";
+        gl.canvas.style.left = "0";
+        gl.canvas.style.top = "0";
+        gl.canvas.style.width = "100%";
+        gl.canvas.style.height = "100%";
+        gl.canvas.style.pointerEvents = "none";
+      }
 
-    function handleMouseMove(e: MouseEvent) {
-      if (!mouseInteraction) return;
-      const rect = container.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = 1.0 - (e.clientY - rect.top) / rect.height;
-      program.uniforms.uMouse.value = [x, y];
-    }
-    container.addEventListener('mousemove', handleMouseMove);
+      function handleMouseMove(e: MouseEvent) {
+        if (!mouseInteraction || !program) return;
+        try {
+          const rect = container.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width;
+          const y = 1.0 - (e.clientY - rect.top) / rect.height;
+          program.uniforms.uMouse.value = [x, y];
+        } catch (e) {
+          console.warn('Error handling mouse move:', e);
+        }
+      }
+      container.addEventListener('mousemove', handleMouseMove);
 
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', resize);
-      container.removeEventListener('mousemove', handleMouseMove);
-      container.removeChild(gl.canvas);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
-    };
-    } catch (err) {
-      console.warn('WebGL background disabled due to error', err);
-      return;
+      return () => {
+        try {
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+          }
+          window.removeEventListener('resize', resize);
+          container.removeEventListener('mousemove', handleMouseMove);
+          if (gl && gl.canvas && container.contains(gl.canvas)) {
+            container.removeChild(gl.canvas);
+          }
+          if (gl) {
+            const loseContext = gl.getExtension('WEBGL_lose_context');
+            if (loseContext) {
+              loseContext.loseContext();
+            }
+          }
+        } catch (e) {
+          console.warn('Error during cleanup:', e);
+        }
+      };
+    } catch (error) {
+      console.error('Failed to initialize WebGL background:', error);
+      // Fallback to solid background color
+      container.style.backgroundColor = color1;
+      return () => {
+        // Cleanup for fallback case (no-op)
+      };
     }
   }, [
     spinRotation,
@@ -327,8 +337,17 @@ export default function Balatro({
     spinEase,
     isRotate,
     mouseInteraction,
-    isClient
+    isMounted
   ]);
 
-  return <div ref={containerRef} className="balatro-container" suppressHydrationWarning />;
+  // Always render the container with consistent styles to prevent hydration mismatch
+  // CSS class handles positioning, backgroundColor is set as fallback until WebGL initializes
+  // This ensures server and client initial render match
+  return (
+    <div 
+      ref={containerRef} 
+      className="balatro-container"
+      style={{ backgroundColor: color1 }}
+    />
+  );
 }
