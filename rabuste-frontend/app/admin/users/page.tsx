@@ -253,13 +253,13 @@ export default function AdminUsersPage() {
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-black"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder:text-gray-500"
             />
           </div>
           <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value as any)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
           >
             <option value="all">All Roles</option>
             <option value="admin">Admins</option>
@@ -268,7 +268,7 @@ export default function AdminUsersPage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value as any)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -277,7 +277,7 @@ export default function AdminUsersPage() {
           <select
             value={filterOrderFrequency}
             onChange={(e) => setFilterOrderFrequency(e.target.value as any)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black"
           >
             <option value="all">All Order Frequency</option>
             <option value="none">No Orders</option>
