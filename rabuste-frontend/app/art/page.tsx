@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal, Palette, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
@@ -40,7 +40,7 @@ type Cart = {
   totalAmount: number;
 };
 
-export default function ArtGalleryPage() {
+function ArtGalleryPageContent() {
   const router = useRouter();
   const [gallery, setGallery] = useState<ArtItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
@@ -48,8 +48,12 @@ export default function ArtGalleryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name">("default");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedArt, setSelectedArt] = useState<ArtItem | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedHeroArt, setSelectedHeroArt] = useState<ArtItem | null>(null);
+  const contentRef = useRef<HTMLElement>(null);
+
+  const { scrollY } = useScroll();
+  const panelOpacity = useTransform(scrollY, [0, 200], [1, 1]);
+  const panelX = useTransform(scrollY, [0, 200], [0, 0]);
 
   useEffect(() => {
     fetchGallery();
@@ -61,8 +65,12 @@ export default function ArtGalleryPage() {
       const res = await fetch("/api/art");
       const data = await res.json();
       setGallery(data);
+      if (!selectedHeroArt && data.length > 0) {
+        setSelectedHeroArt(data[0]);
+      }
     } catch (err) {
-      console.error("Failed to fetch gallery", err);
+      console.error("Failed to fetch gallery, using empty fallback", err);
+      setGallery([]);
     }
   }
 
@@ -76,312 +84,380 @@ export default function ArtGalleryPage() {
     }
   }
 
-  async function addToCart(artItemId: string) {
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ artItemId, quantity: 1 }),
-      });
-      if (res.ok) {
-        await fetchCart();
-      }
-    } catch (err) {
-      console.error("Failed to add to cart", err);
-    }
-  }
+  // Helper functions
+  const categories = ["All", ...new Set(gallery.map((item: ArtItem) => item.category))];
+  const filtered = gallery
+    .filter((item: ArtItem) => {
+      if (activeCategory !== "All" && item.category !== activeCategory) return false;
+      if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+    })
+    .sort((a: ArtItem, b: ArtItem) => {
+      if (sortBy === "price-low") return a.price - b.price;
+      if (sortBy === "price-high") return b.price - a.price;
+      if (sortBy === "name") return a.title.localeCompare(b.title);
+      return 0;
+    });
 
-  async function removeFromCart(artItemId: string) {
-    const item = gallery.find(a => a._id === artItemId);
-    
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ artItemId, quantity: -1 }),
-      });
-      if (res.ok) {
-        await fetchCart();
-        
-        // Track remove from cart
-        if (item) {
-          trackRemoveFromCart(item._id, item.title, 'art');
-        }
-      }
-    } catch (err) {
-      console.error("Failed to remove from cart", err);
-    }
-  }
+  const getQty = (itemId: string) => {
+    const item = cart?.items.find((i: CartItem) => i.artItem === itemId && i.itemType === "art");
+    return item?.quantity || 0;
+  };
 
-  function getQty(artItemId: string) {
-    return cart?.items.find((i) => i.itemType === "art" && i.artItem === artItemId)?.quantity || 0;
-  }
+  const totalItems = cart?.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0) || 0;
+  const totalPrice = cart?.totalAmount || 0;
 
-  const totalItems = cart?.items.filter((i) => i.itemType === "art").reduce((s, i) => s + i.quantity, 0) || 0;
-  const totalPrice = cart?.items.filter((i) => i.itemType === "art").reduce((s, i) => s + (i.price * i.quantity), 0) || 0;
+  const addToCart = (itemId: string) => {
+    console.log("Add to cart:", itemId);
+  };
 
-  const categories = ["All", ...Array.from(new Set(gallery.map((a) => a.category)))];
-  
-  // Filter and sort
-  let filtered = gallery.filter((item) => {
-    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
-    const matchesSearch = searchQuery === "" || 
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    return matchesCategory && matchesSearch;
-  });
+  const removeFromCart = (itemId: string) => {
+    console.log("Remove from cart:", itemId);
+  };
 
-  // Sort
-  if (sortBy === "price-low") {
-    filtered = [...filtered].sort((a, b) => a.price - b.price);
-  } else if (sortBy === "price-high") {
-    filtered = [...filtered].sort((a, b) => b.price - a.price);
-  } else if (sortBy === "name") {
-    filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
-  }
-
-  function openArtModal(art: ArtItem) {
-    setSelectedArt(art);
-    setCurrentImageIndex(0);
-    
-    // Track art item view
-    trackArtItemView(
-      art._id,
-      art.title,
-      art.artist,
-      art.category,
-      art.price
-    );
-  }
-
-  function closeArtModal() {
-    setSelectedArt(null);
-    setCurrentImageIndex(0);
-  }
-
-  function nextImage() {
-    if (selectedArt && currentImageIndex < selectedArt.images.length - 1) {
-      setCurrentImageIndex(currentImageIndex + 1);
-    }
-  }
-
-  function prevImage() {
-    if (currentImageIndex > 0) {
-      setCurrentImageIndex(currentImageIndex - 1);
-    }
-  }
+  const openArtModal = (art: ArtItem) => {
+    console.log("Open modal:", art);
+  };
 
   return (
     <>
       <Navbar />
       <DynamicBackground />
 
-      <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)' }}>
-        <div className="container mx-auto px-4 md:px-6 relative z-10 py-6 md:py-8 lg:py-12">
-          {/* Premium Header - Mobile responsive */}
-          <motion.div 
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-8 md:mb-12 lg:mb-16 text-center relative"
-          >
-            {/* Decorative Lines */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-4 mb-6"
-            >
-              <div className="h-px w-16 bg-gradient-to-r from-transparent to-[#B87333]" />
-              <span className="text-xs uppercase tracking-[0.3em]" style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}>
-                CURATED COLLECTION
-              </span>
-              <div className="h-px w-16 bg-gradient-to-l from-transparent to-[#B87333]" />
-            </motion.div>
-            
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-6xl md:text-8xl mb-4"
-              style={{
-                fontFamily: 'var(--font-heading)',
-                lineHeight: 0.9,
-                color: '#F5F1E8',
-              }}
-            >
-              THE <span className="gradient-text">GALLERY</span>
-            </motion.h1>
+      <div className="noise-overlay" />
 
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="text-lg md:text-xl max-w-2xl mx-auto mt-8"
-              style={{ color: '#8B6F47', lineHeight: 1.6 }}
-            >
-              Discover extraordinary artworks from visionary artists. Each piece tells a story of passion, 
-              creativity, and the bold pursuit of artistic excellence.
-            </motion.p>
+      <div
+        className="fixed top-0 left-0 right-0 h-1 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #B87333, #CD7F32, #D4A574, #CD7F32, #B87333, transparent)",
+          zIndex: 100,
+          boxShadow: "0 0 20px rgba(184, 115, 51, 0.5)",
+        }}
+      />
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="mt-6 flex items-center justify-center gap-8 text-sm"
-              style={{ color: '#8B6F47' }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#B87333] to-[#CD7F32]" />
-                <span>{filtered.length} Artworks</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#B87333] to-[#CD7F32]" />
-                <span>{categories.length - 1} Categories</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-gradient-to-r from-[#B87333] to-[#CD7F32]" />
-                <span>Handpicked Selection</span>
-              </div>
-            </motion.div>
-          </motion.div>
+      <main style={{ background: "transparent", position: "relative", zIndex: 2, minHeight: "100vh" }}>
+        <section
+          className="lg:fixed lg:top-0 lg:left-0"
+          style={{
+            width: "100%",
+            height: "auto",
+            ...(typeof window !== "undefined" && window.innerWidth >= 1024
+              ? {
+                  width: "50%",
+                  height: "100vh",
+                }
+              : {}),
+            zIndex: 10,
+          }}
+        >
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(26, 17, 16, 0.3) 100%)",
+              zIndex: -1,
+            }}
+          />
 
-          {/* Premium Search and Filter Bar - Mobile responsive */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-8 md:mb-12"
-          >
-            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
-              {/* Premium Search */}
-              {/* <div 
-                className="flex-1 relative group"
+          {selectedHeroArt && (
+            <div className="flex items-center relative overflow-hidden pt-12 pb-10">
+              <div
+                className="absolute inset-0 opacity-30"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(26, 17, 16, 0.8))',
-                  border: '2px solid rgba(184, 115, 51, 0.2)',
-                  backdropFilter: 'blur(30px)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                  transition: 'all 0.3s ease',
+                  background: "radial-gradient(circle at 70% 50%, rgba(184, 115, 51, 0.2) 0%, transparent 50%)",
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.5)';
-                  e.currentTarget.style.boxShadow = '0 12px 48px rgba(184, 115, 51, 0.2)';
+              />
+
+              <div className="px-6 lg:px-10 w-full relative z-10">
+                <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-10 items-center">
+                  <motion.div
+                    className="relative flex items-center justify-center"
+                    initial={{ opacity: 0, x: -40, scale: 0.9 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    <div
+                      className="relative"
+                      style={{
+                        width: "clamp(220px, 32vw, 340px)",
+                        height: "clamp(220px, 32vw, 340px)",
+                      }}
+                    >
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          borderRadius: "50%",
+                          background: "radial-gradient(circle, rgba(184, 115, 51, 0.3) 0%, transparent 70%)",
+                          filter: "blur(20px)",
+                          transform: "scale(1.1)",
+                        }}
+                      />
+
+                      <div
+                        className="relative overflow-hidden"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "50%",
+                          border: "4px solid rgba(184, 115, 51, 0.4)",
+                          boxShadow: "0 15px 45px rgba(0, 0, 0, 0.6)",
+                        }}
+                      >
+                        <Image
+                          src={selectedHeroArt.images?.[0] || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"}
+                          alt={selectedHeroArt.title}
+                          fill
+                          sizes="(max-width: 768px) 260px, 380px"
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
+
+                      <motion.div
+                        className="absolute bottom-0 right-0"
+                        style={{
+                          background: "linear-gradient(135deg, #B87333 0%, #CD7F32 50%, #D4A574 100%)",
+                          borderRadius: "16px",
+                          padding: "12px 20px",
+                          boxShadow: "0 8px 24px rgba(184, 115, 51, 0.4)",
+                        }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.5, type: "spring" }}
+                      >
+                        <p
+                          className="text-base font-bold mb-1"
+                          style={{ color: "#000000", fontFamily: "var(--font-heading)" }}
+                        >
+                          {selectedHeroArt.title}
+                        </p>
+                        <div className="flex items-center justify-between gap-3">
+                          <p
+                            className="text-xl font-bold"
+                            style={{ color: "#000000", fontFamily: "var(--font-heading)" }}
+                          >
+                            ₹{selectedHeroArt.price.toLocaleString()}
+                          </p>
+                          <span className="text-xs" style={{ color: "#000" }}>
+                            {selectedHeroArt.year || "Limited"}
+                          </span>
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    <motion.h1
+                      className="mb-4 gradient-text"
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
+                        lineHeight: "0.95",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                      }}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      The Gallery
+                    </motion.h1>
+
+                    <motion.p
+                      className="text-sm md:text-base mb-3"
+                      style={{
+                        color: "#F5F1E8",
+                        fontFamily: "var(--font-body)",
+                        lineHeight: "1.6",
+                        maxWidth: "420px",
+                      }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      {selectedHeroArt.description}
+                    </motion.p>
+
+                    <div className="flex items-center gap-3 text-xs mb-4" style={{ color: "#B87333" }}>
+                      <span>{selectedHeroArt.artist}</span>
+                      <span>•</span>
+                      <span>{selectedHeroArt.medium || "Mixed Media"}</span>
+                      {selectedHeroArt.year && <span>• {selectedHeroArt.year}</span>}
+                    </div>
+
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => openArtModal(selectedHeroArt)}
+                        className="btn btn-primary"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+                      >
+                        View details
+                      </button>
+                      <button
+                        onClick={() => addToCart(selectedHeroArt._id)}
+                        className="px-4 py-2"
+                        style={{
+                          background: "rgba(184, 115, 51, 0.2)",
+                          border: "1px solid rgba(184, 115, 51, 0.5)",
+                          color: "#D4A574",
+                          fontFamily: "var(--font-body)",
+                        }}
+                      >
+                        Add to cart
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <motion.section
+          ref={contentRef}
+          className="lg:fixed lg:right-0 lg:top-0 lg:overflow-y-auto"
+          style={{
+            ...(typeof window !== "undefined" && window.innerWidth >= 1024
+              ? {
+                  width: "50%",
+                  height: "100vh",
+                  overflow: "auto",
+                  position: "fixed",
+                  right: 0,
+                  top: 0,
+                }
+              : {
+                  width: "100%",
+                  marginTop: "auto",
+                }),
+            zIndex: 20,
+            opacity: panelOpacity,
+            x: panelX,
+          }}
+        >
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(26, 17, 16, 0.5) 0%, transparent 50%, rgba(184, 115, 51, 0.1) 100%)",
+              zIndex: -1,
+            }}
+          />
+
+          <div className="pt-24 md:pt-28 lg:pt-32 px-6 pb-20">
+            <div className="mb-8">
+              <motion.p
+                className="text-xs uppercase tracking-[0.3em] mb-4"
+                style={{ color: "#B87333", fontFamily: "var(--font-body)" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                Curated Collection
+              </motion.p>
+
+              <motion.h1
+                className="text-3xl md:text-4xl lg:text-5xl mb-4"
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  lineHeight: 0.9,
+                  color: "#F5F1E8",
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.2)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.4)';
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <span className="gradient-text">Art Menu</span>
+              </motion.h1>
+            </div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+              <div
+                className="relative"
+                style={{
+                  background: "rgba(26, 17, 16, 0.8)",
+                  border: "1px solid rgba(184, 115, 51, 0.3)",
+                  backdropFilter: "blur(20px)",
                 }}
               >
-                <Search 
-                  size={20} 
-                  className="absolute left-5 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: '#B87333' }}
+                <Search
+                  size={18}
+                  className="absolute left-3 top-1/2 -translate-y-1/2"
+                  style={{ color: "#B87333" }}
                 />
                 <input
                   type="text"
-                  placeholder="Discover artworks, artists, and masterpieces..."
+                  placeholder="Search artworks, artists, styles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-14 pr-12 py-5 bg-transparent outline-none text-base"
-                  style={{
-                    color: '#F5F1E8',
-                    fontFamily: 'var(--font-body)',
-                    fontWeight: 300,
-                  }}
+                  className="w-full pl-11 pr-12 py-3 bg-transparent outline-none text-sm"
+                  style={{ color: "#F5F1E8", fontFamily: "var(--font-body)" }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2 transition-transform active:scale-90"
                   >
-                    <X size={18} style={{ color: '#B87333' }} />
+                    <X size={18} style={{ color: "#B87333" }} />
                   </button>
                 )}
-              </div> */}
-
-              {/* Premium Controls */}
-              <div className="flex gap-3">
-                {/* Filters Button */}
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="px-6 py-5 flex items-center gap-3 transition-all duration-300"
-                  style={{
-                    background: showFilters 
-                      ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.2))' 
-                      : 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(26, 17, 16, 0.8))',
-                    border: '2px solid rgba(184, 115, 51, 0.2)',
-                    backdropFilter: 'blur(30px)',
-                    boxShadow: showFilters 
-                      ? '0 12px 48px rgba(184, 115, 51, 0.3)' 
-                      : '0 8px 32px rgba(0, 0, 0, 0.4)',
-                  }}
-                >
-                  <SlidersHorizontal size={20} style={{ color: showFilters ? '#D4A574' : '#B87333' }} />
-                  <span 
-                    className="text-sm hidden sm:inline uppercase tracking-wider font-medium" 
-                    style={{ 
-                      color: showFilters ? '#D4A574' : '#B87333',
-                      fontFamily: 'var(--font-heading)',
-                      letterSpacing: '0.1em',
-                    }}
-                  >
-                    Filters
-                  </span>
-                </button>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Premium Expandable Filters */}
+            <motion.button
+              onClick={() => setShowFilters(!showFilters)}
+              className="mb-4 px-4 py-2 flex items-center gap-2 text-sm w-full"
+              style={{
+                background: showFilters ? "rgba(184, 115, 51, 0.3)" : "rgba(26, 17, 16, 0.8)",
+                border: "1px solid rgba(184, 115, 51, 0.3)",
+                color: "#B87333",
+                fontFamily: "var(--font-body)",
+              }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <SlidersHorizontal size={16} />
+              <span>Filters & Sort</span>
+            </motion.button>
+
             <AnimatePresence>
               {showFilters && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0, y: -20 }}
-                  animate={{ height: "auto", opacity: 1, y: 0 }}
-                  exit={{ height: 0, opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                  className="overflow-hidden"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden mb-6"
                 >
-                  <div 
-                    className="mt-6 p-8"
+                  <div
+                    className="p-4"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.8), rgba(26, 17, 16, 0.9))',
-                      border: '2px solid rgba(184, 115, 51, 0.3)',
-                      backdropFilter: 'blur(30px)',
-                      boxShadow: '0 12px 48px rgba(0, 0, 0, 0.5)',
+                      background: "rgba(26, 17, 16, 0.8)",
+                      border: "1px solid rgba(184, 115, 51, 0.3)",
+                      backdropFilter: "blur(20px)",
                     }}
                   >
-                    {/* Categories */}
-                    <div className="mb-8">
-                      <label 
-                        className="text-sm mb-4 block uppercase tracking-widest font-semibold flex items-center gap-2" 
-                        style={{ 
-                          color: '#D4A574', 
-                          letterSpacing: '0.15em',
-                          fontFamily: 'var(--font-heading)',
-                        }}
-                      >
-                        <Palette size={16} />
+                    <div className="mb-4">
+                      <label className="text-xs mb-2 block" style={{ color: "#8B6F47", letterSpacing: "0.1em" }}>
                         CATEGORY
                       </label>
-                      <div className="flex flex-wrap gap-3">
-                        {categories.map((c) => (
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map((c: string) => (
                           <button
                             key={c}
                             onClick={() => setActiveCategory(c)}
-                            className="px-5 py-3 text-sm transition-all duration-300 hover:scale-105"
+                            className="px-2 py-1 text-xs transition-all"
                             style={{
-                              background: activeCategory === c 
-                                ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.4), rgba(205, 127, 50, 0.3))' 
-                                : 'rgba(61, 43, 31, 0.4)',
-                              border: `2px solid ${activeCategory === c ? 'rgba(184, 115, 51, 0.8)' : 'rgba(184, 115, 51, 0.2)'}`,
-                              color: activeCategory === c ? '#F5F1E8' : '#B87333',
-                              fontFamily: 'var(--font-body)',
-                              fontWeight: activeCategory === c ? '600' : '400',
-                              textTransform: 'capitalize',
-                              boxShadow: activeCategory === c ? '0 4px 16px rgba(184, 115, 51, 0.3)' : 'none',
+                              background:
+                                activeCategory === c ? "rgba(184, 115, 51, 0.3)" : "rgba(61, 43, 31, 0.5)",
+                              border: `1px solid ${
+                                activeCategory === c ? "rgba(184, 115, 51, 0.6)" : "rgba(184, 115, 51, 0.2)"
+                              }`,
+                              color: activeCategory === c ? "#D4A574" : "#B87333",
+                              fontFamily: "var(--font-body)",
                             }}
                           >
                             {c}
@@ -390,46 +466,29 @@ export default function ArtGalleryPage() {
                       </div>
                     </div>
 
-                    {/* Divider */}
-                    <div 
-                      className="h-px mb-8"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent, rgba(184, 115, 51, 0.3), transparent)',
-                      }}
-                    />
-
-                    {/* Sort */}
                     <div>
-                      <label 
-                        className="text-sm mb-4 block uppercase tracking-widest font-semibold" 
-                        style={{ 
-                          color: '#D4A574', 
-                          letterSpacing: '0.15em',
-                          fontFamily: 'var(--font-heading)',
-                        }}
-                      >
+                      <label className="text-xs mb-2 block" style={{ color: "#8B6F47", letterSpacing: "0.1em" }}>
                         SORT BY
                       </label>
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-2">
                         {[
                           { value: "default", label: "Featured" },
-                          { value: "price-low", label: "Price: Low to High" },
-                          { value: "price-high", label: "Price: High to Low" },
+                          { value: "price-low", label: "Price ↑" },
+                          { value: "price-high", label: "Price ↓" },
                           { value: "name", label: "Alphabetical" },
                         ].map((sort) => (
                           <button
                             key={sort.value}
-                            onClick={() => setSortBy(sort.value as any)}
-                            className="px-5 py-3 text-sm transition-all duration-300 hover:scale-105"
+                            onClick={() => setSortBy(sort.value as "default" | "price-low" | "price-high" | "name")}
+                            className="px-2 py-1 text-xs transition-all"
                             style={{
-                              background: sortBy === sort.value 
-                                ? 'linear-gradient(135deg, rgba(184, 115, 51, 0.4), rgba(205, 127, 50, 0.3))' 
-                                : 'rgba(61, 43, 31, 0.4)',
-                              border: `2px solid ${sortBy === sort.value ? 'rgba(184, 115, 51, 0.8)' : 'rgba(184, 115, 51, 0.2)'}`,
-                              color: sortBy === sort.value ? '#F5F1E8' : '#B87333',
-                              fontFamily: 'var(--font-body)',
-                              fontWeight: sortBy === sort.value ? '600' : '400',
-                              boxShadow: sortBy === sort.value ? '0 4px 16px rgba(184, 115, 51, 0.3)' : 'none',
+                              background:
+                                sortBy === sort.value ? "rgba(184, 115, 51, 0.3)" : "rgba(61, 43, 31, 0.5)",
+                              border: `1px solid ${
+                                sortBy === sort.value ? "rgba(184, 115, 51, 0.6)" : "rgba(184, 115, 51, 0.2)"
+                              }`,
+                              color: sortBy === sort.value ? "#D4A574" : "#B87333",
+                              fontFamily: "var(--font-body)",
                             }}
                           >
                             {sort.label}
@@ -441,682 +500,80 @@ export default function ArtGalleryPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
 
-          {/* Cart Float Button */}
-          <AnimatePresence>
-            {totalItems > 0 && (
-              <motion.button
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => router.push("/cart")}
-                className="fixed bottom-6 right-6 z-50 px-6 py-4 flex items-center gap-3"
-                style={{
-                  background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                  boxShadow: '0 10px 40px rgba(184, 115, 51, 0.5)',
-                  color: '#000',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '14px',
-                  letterSpacing: '0.1em',
-                }}
-              >
-                <ShoppingCart size={20} />
-                <span className="font-bold">{totalItems}</span>
-                <span>₹{totalPrice.toLocaleString()}</span>
-              </motion.button>
-            )}
-          </AnimatePresence>
+            {filtered.length > 0 ? (
+              activeCategory === "All" ? (
+                categories
+                  .filter((c: string) => c !== "All")
+                  .map((category: string) => {
+                    const categoryItems = filtered.filter((item: ArtItem) => item.category === category);
+                    if (categoryItems.length === 0) return null;
 
-          {/* Gallery Items (carousel per category like menu) */}
-          {filtered.length > 0 ? (
-            activeCategory === "All" ? (
-              categories
-                .filter((c) => c !== "All")
-                .map((category) => {
-                  const categoryItems = filtered.filter((item) => item.category === category);
-                  if (categoryItems.length === 0) return null;
-
-                  return (
-                    <ArtCategoryCarousel
-                      key={category}
-                      title={category}
-                      items={categoryItems}
-                      getQuantity={getQty}
-                      onAdd={addToCart}
-                      onRemove={removeFromCart}
-                      onView={openArtModal}
-                    />
-                  );
-                })
-            ) : (
-              <ArtCategoryCarousel
-                title={activeCategory}
-                items={filtered}
-                getQuantity={getQty}
-                onAdd={addToCart}
-                onRemove={removeFromCart}
-                onView={openArtModal}
-              />
-            )
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-20"
-            >
-              <p className="text-xl mb-2" style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}>
-                NO ARTWORKS FOUND
-              </p>
-              <p className="text-sm" style={{ color: '#8B6F47' }}>
-                Try adjusting your search or filters
-              </p>
-            </motion.div>
-          )}
-        </div>
-      </div>
-
-      {/* Art Detail Modal */}
-      <AnimatePresence>
-        {selectedArt && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-            style={{ background: 'rgba(0, 0, 0, 0.95)', backdropFilter: 'blur(10px)' }}
-            onClick={closeArtModal}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-4xl max-h-[85vh] md:max-h-[90vh] overflow-y-auto mx-auto"
-              style={{
-                background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.98), rgba(26, 17, 16, 0.98))',
-                border: '2px solid rgba(184, 115, 51, 0.4)',
-                backdropFilter: 'blur(20px)',
-              }}
-            >
-              <div className="p-4 md:p-6">
-                {/* Close Button */}
-                <button
-                  onClick={closeArtModal}
-                  className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors z-10"
-                >
-                  <X size={24} style={{ color: '#B87333' }} />
-                </button>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Image Gallery */}
-                  <div>
-                    <div className="relative aspect-square overflow-hidden rounded-sm mb-4">
-                      <img
-                        src={selectedArt.images[currentImageIndex]}
-                        alt={selectedArt.title}
-                        className="w-full h-full object-cover"
+                    return (
+                      <ArtCategoryCarousel
+                        key={category}
+                        title={category}
+                        items={categoryItems}
+                        getQuantity={getQty}
+                        onAdd={addToCart}
+                        onRemove={removeFromCart}
+                        onView={openArtModal}
                       />
-                      
-                      {selectedArt.images.length > 1 && (
-                        <>
-                          <button
-                            onClick={prevImage}
-                            disabled={currentImageIndex === 0}
-                            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed rounded-full transition-colors"
-                          >
-                            <ChevronLeft size={24} style={{ color: '#B87333' }} />
-                          </button>
-                          <button
-                            onClick={nextImage}
-                            disabled={currentImageIndex === selectedArt.images.length - 1}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed rounded-full transition-colors"
-                          >
-                            <ChevronRight size={24} style={{ color: '#B87333' }} />
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    );
+                  })
+              ) : (
+                <ArtCategoryCarousel
+                  title={activeCategory}
+                  items={filtered}
+                  getQuantity={getQty}
+                  onAdd={addToCart}
+                  onRemove={removeFromCart}
+                  onView={openArtModal}
+                />
+              )
+            ) : (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                <p className="text-xl mb-2" style={{ color: "#8B6F47", fontFamily: "var(--font-heading)" }}>
+                  NO ARTWORKS FOUND
+                </p>
+                <p className="text-sm" style={{ color: "#8B6F47" }}>
+                  Try adjusting your search or filters
+                </p>
+              </motion.div>
+            )}
+          </div>
+        </motion.section>
+      </main>
 
-                    {/* Thumbnail Navigation */}
-                    {selectedArt.images.length > 1 && (
-                      <div className="flex gap-2 overflow-x-auto pb-2">
-                        {selectedArt.images.map((img, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentImageIndex(idx)}
-                            className="flex-shrink-0 w-20 h-20 overflow-hidden rounded-sm"
-                            style={{
-                              border: idx === currentImageIndex ? '2px solid #B87333' : '2px solid transparent',
-                              opacity: idx === currentImageIndex ? 1 : 0.6,
-                            }}
-                          >
-                            <img
-                              src={img}
-                              alt={`${selectedArt.title} - ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Details */}
-                  <div>
-                    <span
-                      className="text-xs uppercase tracking-widest mb-2 block"
-                      style={{ color: '#8B6F47', fontFamily: 'var(--font-heading)' }}
-                    >
-                      {selectedArt.category}
-                    </span>
-
-                    <h2
-                      className="text-3xl md:text-4xl mb-2"
-                      style={{
-                        fontFamily: 'var(--font-heading)',
-                        color: '#F5F1E8',
-                      }}
-                    >
-                      {selectedArt.title}
-                    </h2>
-
-                    <p className="text-lg mb-4" style={{ color: '#B87333' }}>
-                      by {selectedArt.artist}
-                    </p>
-
-                    <p className="text-base mb-6" style={{ color: '#8B6F47', lineHeight: 1.6 }}>
-                      {selectedArt.description}
-                    </p>
-
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-6 p-4" style={{ background: 'rgba(61, 43, 31, 0.5)' }}>
-                      {selectedArt.medium && (
-                        <div>
-                          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: '#8B6F47' }}>
-                            Medium
-                          </div>
-                          <div className="text-sm" style={{ color: '#F5F1E8' }}>
-                            {selectedArt.medium}
-                          </div>
-                        </div>
-                      )}
-                      {selectedArt.dimensions && (
-                        <div>
-                          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: '#8B6F47' }}>
-                            Dimensions
-                          </div>
-                          <div className="text-sm" style={{ color: '#F5F1E8' }}>
-                            {selectedArt.dimensions}
-                          </div>
-                        </div>
-                      )}
-                      {selectedArt.year && (
-                        <div>
-                          <div className="text-xs uppercase tracking-wide mb-1" style={{ color: '#8B6F47' }}>
-                            Year
-                          </div>
-                          <div className="text-sm" style={{ color: '#F5F1E8' }}>
-                            {selectedArt.year}
-                          </div>
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-xs uppercase tracking-wide mb-1" style={{ color: '#8B6F47' }}>
-                          Stock
-                        </div>
-                        <div className="text-sm" style={{ color: selectedArt.stock > 0 ? '#4ADE80' : '#FF6B6B' }}>
-                          {selectedArt.stock > 0 ? `${selectedArt.stock} available` : 'Out of stock'}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Price and Action */}
-                    <div className="flex items-center justify-between mb-6">
-                      <span
-                        className="text-4xl gradient-text"
-                        style={{ fontFamily: 'var(--font-heading)' }}
-                      >
-                        ₹{selectedArt.price.toLocaleString()}
-                      </span>
-                    </div>
-
-                    {selectedArt.stock > 0 ? (
-                      getQty(selectedArt._id) > 0 ? (
-                        <div
-                          className="flex items-center justify-center gap-6 p-4"
-                          style={{
-                            background: 'rgba(184, 115, 51, 0.2)',
-                            border: '2px solid rgba(184, 115, 51, 0.5)',
-                          }}
-                        >
-                          <button
-                            onClick={() => removeFromCart(selectedArt._id)}
-                            className="text-[#B87333] hover:text-[#D4A574] transition-colors"
-                          >
-                            <Minus size={24} />
-                          </button>
-                          <span className="text-2xl font-bold gradient-text" style={{ minWidth: '40px', textAlign: 'center' }}>
-                            {getQty(selectedArt._id)}
-                          </span>
-                          <button
-                            onClick={() => addToCart(selectedArt._id)}
-                            className="text-[#B87333] hover:text-[#D4A574] transition-colors"
-                          >
-                            <Plus size={24} />
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => addToCart(selectedArt._id)}
-                          className="w-full py-4 flex items-center justify-center gap-3"
-                          style={{
-                            background: 'linear-gradient(135deg, #B87333 0%, #CD7F32 100%)',
-                            color: '#000',
-                            fontFamily: 'var(--font-heading)',
-                            letterSpacing: '0.1em',
-                            fontSize: '16px',
-                          }}
-                        >
-                          <Plus size={20} />
-                          ADD TO CART
-                        </button>
-                      )
-                    ) : (
-                      <div
-                        className="w-full py-4 text-center"
-                        style={{
-                          background: 'rgba(220, 38, 38, 0.2)',
-                          border: '2px solid rgba(220, 38, 38, 0.5)',
-                          color: '#FCA5A5',
-                          fontFamily: 'var(--font-heading)',
-                          letterSpacing: '0.1em',
-                        }}
-                      >
-                        OUT OF STOCK
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+      <AnimatePresence>
+        {totalItems > 0 && (
+          <motion.button
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => router.push("/cart")}
+            className="fixed bottom-6 right-6 z-50 px-6 py-4 flex items-center gap-3"
+            style={{
+              background: "linear-gradient(135deg, #B87333 0%, #CD7F32 100%)",
+              boxShadow: "0 10px 40px rgba(184, 115, 51, 0.5)",
+              color: "#000",
+              fontFamily: "var(--font-heading)",
+              fontSize: "14px",
+              letterSpacing: "0.1em",
+            }}
+          >
+            <ShoppingCart size={20} />
+            <span className="font-bold">{totalItems}</span>
+            <span>₹{totalPrice.toLocaleString()}</span>
+          </motion.button>
         )}
       </AnimatePresence>
-
-      <Footer />
     </>
   );
 }
 
-// Premium Grid View Component
-function GridArtItem({
-  item,
-  quantity,
-  onAdd,
-  onRemove,
-  onView,
-  index,
-}: {
-  item: ArtItem;
-  quantity: number;
-  onAdd: () => void;
-  onRemove: () => void;
-  onView: () => void;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        delay: index * 0.05,
-        duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94]
-      }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="group relative cursor-pointer overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(26, 17, 16, 0.8))',
-        border: '2px solid rgba(184, 115, 51, 0.2)',
-        backdropFilter: 'blur(30px)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-        transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-      }}
-      onClick={onView}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.6)';
-        e.currentTarget.style.boxShadow = '0 20px 60px rgba(184, 115, 51, 0.25), 0 0 0 1px rgba(184, 115, 51, 0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'rgba(184, 115, 51, 0.2)';
-        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.6)';
-      }}
-    >
-      {/* Premium Image Container */}
-      <div className="aspect-[3/4] overflow-hidden relative">
-        {/* Gradient Overlay */}
-        <div 
-          className="absolute inset-0 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: 'linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%)',
-          }}
-        />
-        
-        <Image
-          src={item.images[0]}
-          alt={item.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300 ease-out"
-          loading={index < 6 ? "eager" : "lazy"}
-          quality={85}
-          priority={index < 3}
-        />
-        
-        {/* Premium Badges */}
-        {item.images.length > 1 && (
-          <div
-            className="absolute top-3 right-3 px-3 py-2 text-xs flex items-center gap-2 z-20"
-            style={{
-              background: 'rgba(0, 0, 0, 0.9)',
-              border: '1px solid rgba(184, 115, 51, 0.5)',
-              backdropFilter: 'blur(10px)',
-              color: '#D4A574',
-              fontFamily: 'var(--font-heading)',
-              letterSpacing: '0.05em',
-            }}
-          >
-            <ImagePlus size={14} />
-            {item.images.length} Photos
-          </div>
-        )}
-
-        {/* Category Badge */}
-        <div
-          className="absolute top-3 left-3 px-3 py-2 text-xs uppercase z-20"
-          style={{
-            background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.9), rgba(205, 127, 50, 0.8))',
-            color: '#000',
-            fontFamily: 'var(--font-heading)',
-            fontSize: '10px',
-            letterSpacing: '0.15em',
-            fontWeight: 700,
-            boxShadow: '0 4px 12px rgba(184, 115, 51, 0.4)',
-          }}
-        >
-          {item.category}
-        </div>
-      </div>
-
-      {/* Premium Content */}
-      <div className="p-6">
-        <h3
-          className="text-lg mb-2 line-clamp-1 group-hover:text-[#D4A574] transition-colors duration-300"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            color: '#F5F1E8',
-            letterSpacing: '0.02em',
-            fontWeight: 600,
-          }}
-        >
-          {item.title}
-        </h3>
-        <p 
-          className="text-sm mb-4" 
-          style={{ 
-            color: '#B87333',
-            fontWeight: 300,
-            fontStyle: 'italic',
-          }}
-        >
-          by {item.artist}
-        </p>
-
-        {/* Price and Action */}
-        <div className="flex justify-between items-center pt-4 border-t border-[#B87333]/20">
-          <div>
-            <div className="text-xs uppercase tracking-wider mb-1" style={{ color: '#8B6F47' }}>
-              Price
-            </div>
-            <span
-              className="text-2xl gradient-text font-bold"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              ₹{item.price.toLocaleString()}
-            </span>
-          </div>
-
-          <div onClick={(e) => e.stopPropagation()}>
-            {item.stock > 0 ? (
-              quantity > 0 ? (
-                <div
-                  className="flex items-center gap-3 px-3 py-2"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.2))',
-                    border: '2px solid rgba(184, 115, 51, 0.5)',
-                    backdropFilter: 'blur(10px)',
-                    boxShadow: '0 4px 12px rgba(184, 115, 51, 0.2)',
-                  }}
-                >
-                  <button 
-                    onClick={onRemove} 
-                    className="text-[#B87333] hover:text-[#D4A574] hover:scale-110 transition-all"
-                  >
-                    <Minus size={16} strokeWidth={3} />
-                  </button>
-                  <span 
-                    className="text-base font-bold gradient-text" 
-                    style={{ minWidth: '20px', textAlign: 'center' }}
-                  >
-                    {quantity}
-                  </span>
-                  <button 
-                    onClick={onAdd} 
-                    className="text-[#B87333] hover:text-[#D4A574] hover:scale-110 transition-all"
-                  >
-                    <Plus size={16} strokeWidth={3} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={onAdd}
-                  className="px-5 py-3 text-sm flex items-center gap-2 hover:scale-105 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.3), rgba(205, 127, 50, 0.2))',
-                    border: '2px solid rgba(184, 115, 51, 0.5)',
-                    color: '#F5F1E8',
-                    fontFamily: 'var(--font-heading)',
-                    letterSpacing: '0.1em',
-                    fontWeight: 600,
-                    boxShadow: '0 4px 12px rgba(184, 115, 51, 0.2)',
-                  }}
-                >
-                  <Plus size={16} strokeWidth={3} />
-                  ADD
-                </button>
-              )
-            ) : (
-              <span 
-                className="text-xs px-3 py-2 uppercase tracking-wider" 
-                style={{ 
-                  color: '#FF6B6B',
-                  background: 'rgba(220, 38, 38, 0.1)',
-                  border: '1px solid rgba(220, 38, 38, 0.3)',
-                }}
-              >
-                Sold Out
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Premium Corner Accent */}
-      <div 
-        className="absolute bottom-0 right-0 w-16 h-16 opacity-20 group-hover:opacity-40 transition-opacity duration-500"
-        style={{
-          background: 'linear-gradient(135deg, transparent 50%, #B87333 50%)',
-        }}
-      />
-    </motion.div>
-  );
-}
-
-// List View Component
-function ListArtItem({
-  item,
-  quantity,
-  onAdd,
-  onRemove,
-  onView,
-  index,
-}: {
-  item: ArtItem;
-  quantity: number;
-  onAdd: () => void;
-  onRemove: () => void;
-  onView: () => void;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.03 }}
-      whileHover={{ x: 4 }}
-      className="group relative cursor-pointer"
-      style={{
-        backgroundImage: 'linear-gradient(90deg, rgba(42, 24, 16, 0.9), rgba(26, 17, 16, 0.9))',
-        border: '1px solid rgba(184, 115, 51, 0.2)',
-        backdropFilter: 'blur(20px)',
-        transition: 'all 0.3s ease',
-        overflow: 'hidden',
-      }}
-      onClick={onView}
-    >
-      <div className="flex gap-4 p-4">
-        {/* Image */}
-        <div className="w-32 h-32 flex-shrink-0 overflow-hidden relative rounded-sm">
-          <Image
-            src={item.images[0]}
-            alt={item.title}
-            fill
-            sizes="128px"
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            quality={75}
-          />
-          {item.images.length > 1 && (
-            <div
-              className="absolute bottom-1 right-1 px-1.5 py-0.5 text-xs flex items-center gap-1"
-              style={{
-                background: 'rgba(0, 0, 0, 0.8)',
-                color: '#D4A574',
-                fontSize: '10px',
-              }}
-            >
-              <ImagePlus size={10} />
-              {item.images.length}
-            </div>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div className="flex-1">
-              <h3
-                className="text-lg mb-1"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  color: '#F5F1E8',
-                  letterSpacing: '0.03em',
-                }}
-              >
-                {item.title}
-              </h3>
-              <p className="text-sm mb-2" style={{ color: '#B87333' }}>
-                by {item.artist}
-              </p>
-              <p className="text-xs line-clamp-2 mb-2" style={{ color: '#8B6F47', lineHeight: 1.4 }}>
-                {item.description}
-              </p>
-              
-              <div className="flex flex-wrap gap-2 text-xs">
-                <span
-                  className="px-2 py-0.5 uppercase"
-                  style={{
-                    background: 'rgba(184, 115, 51, 0.2)',
-                    color: '#B87333',
-                    fontSize: '10px',
-                  }}
-                >
-                  {item.category}
-                </span>
-                {item.stock > 0 ? (
-                  <span style={{ color: '#4ADE80' }}>
-                    {item.stock} in stock
-                  </span>
-                ) : (
-                  <span style={{ color: '#FF6B6B' }}>
-                    Out of stock
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <span
-              className="text-2xl gradient-text flex-shrink-0"
-              style={{ fontFamily: 'var(--font-heading)' }}
-            >
-              ₹{item.price.toLocaleString()}
-            </span>
-          </div>
-
-          {/* Action */}
-          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-            {item.stock > 0 ? (
-              quantity > 0 ? (
-                <div
-                  className="flex items-center gap-3"
-                  style={{
-                    background: 'rgba(184, 115, 51, 0.2)',
-                    padding: '6px 12px',
-                    border: '1px solid rgba(184, 115, 51, 0.4)',
-                  }}
-                >
-                  <button onClick={onRemove} className="text-[#B87333] hover:text-[#D4A574]">
-                    <Minus size={16} />
-                  </button>
-                  <span className="text-sm font-bold gradient-text" style={{ minWidth: '20px', textAlign: 'center' }}>
-                    {quantity}
-                  </span>
-                  <button onClick={onAdd} className="text-[#B87333] hover:text-[#D4A574]">
-                    <Plus size={16} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={onAdd}
-                  className="px-4 py-2 text-xs"
-                  style={{
-                    background: 'rgba(184, 115, 51, 0.2)',
-                    border: '1px solid rgba(184, 115, 51, 0.4)',
-                    color: '#D4A574',
-                    fontFamily: 'var(--font-body)',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  ADD TO CART
-                </button>
-              )
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
+export default function Page() {
+  return <ArtGalleryPageContent />;
 }
