@@ -184,7 +184,6 @@ export default function Balatro({
     }
 
     let renderer: Renderer | null = null;
-    let gl: WebGLRenderingContext | null = null;
     let program: Program | null = null;
     let animationFrameId: number | null = null;
 
@@ -194,22 +193,19 @@ export default function Balatro({
         throw new Error('Failed to create WebGL renderer');
       }
       
-      gl = renderer.gl;
-      if (!gl) {
-        throw new Error('Failed to get WebGL context');
-      }
+      const gl = renderer.gl;
       
       gl.clearColor(0, 0, 0, 1);
 
       function resize() {
-        if (!renderer || !gl || !program) return;
+        if (!renderer || !renderer.gl || !program) return;
         try {
           renderer.setSize(container.offsetWidth, container.offsetHeight);
-          if (program && gl.canvas) {
+          if (program && renderer.gl.canvas) {
             program.uniforms.iResolution.value = [
-              gl.canvas.width, 
-              gl.canvas.height, 
-              gl.canvas.width / gl.canvas.height
+              renderer.gl.canvas.width, 
+              renderer.gl.canvas.height, 
+              renderer.gl.canvas.width / renderer.gl.canvas.height
             ];
           }
         } catch (e) {
@@ -226,7 +222,7 @@ export default function Balatro({
         uniforms: {
           iTime: { value: 0 },
           iResolution: {
-            value: [gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height]
+            value: [renderer.gl.canvas.width, renderer.gl.canvas.height, renderer.gl.canvas.width / renderer.gl.canvas.height]
           },
           uSpinRotation: { value: spinRotation },
           uSpinSpeed: { value: spinSpeed },
@@ -247,7 +243,7 @@ export default function Balatro({
       const mesh = new Mesh(gl, { geometry, program });
 
       function update(time: number) {
-        if (!renderer || !program || !gl) return;
+        if (!renderer || !program || !renderer.gl) return;
         try {
           animationFrameId = requestAnimationFrame(update);
           program.uniforms.iTime.value = time * 0.001;
@@ -261,16 +257,16 @@ export default function Balatro({
       }
       animationFrameId = requestAnimationFrame(update);
       
-      if (gl.canvas && container) {
-        container.appendChild(gl.canvas);
+      if (renderer.gl.canvas && container) {
+        container.appendChild(renderer.gl.canvas);
 
         // make sure the canvas fills container and does not create an interactive stacking context
-        gl.canvas.style.position = "absolute";
-        gl.canvas.style.left = "0";
-        gl.canvas.style.top = "0";
-        gl.canvas.style.width = "100%";
-        gl.canvas.style.height = "100%";
-        gl.canvas.style.pointerEvents = "none";
+        renderer.gl.canvas.style.position = "absolute";
+        renderer.gl.canvas.style.left = "0";
+        renderer.gl.canvas.style.top = "0";
+        renderer.gl.canvas.style.width = "100%";
+        renderer.gl.canvas.style.height = "100%";
+        renderer.gl.canvas.style.pointerEvents = "none";
       }
 
       function handleMouseMove(e: MouseEvent) {
@@ -293,11 +289,11 @@ export default function Balatro({
           }
           window.removeEventListener('resize', resize);
           container.removeEventListener('mousemove', handleMouseMove);
-          if (gl && gl.canvas && container.contains(gl.canvas)) {
-            container.removeChild(gl.canvas);
+          if (renderer && renderer.gl && renderer.gl.canvas && container.contains(renderer.gl.canvas)) {
+            container.removeChild(renderer.gl.canvas);
           }
-          if (gl) {
-            const loseContext = gl.getExtension('WEBGL_lose_context');
+          if (renderer && renderer.gl) {
+            const loseContext = renderer.gl.getExtension('WEBGL_lose_context');
             if (loseContext) {
               loseContext.loseContext();
             }
