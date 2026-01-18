@@ -124,21 +124,42 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
     }
   }, [isOpen]);
 
-  // Preload images
+  // Preload images with lazy loading optimization
   useEffect(() => {
     if (!isOpen) return;
 
     const unique = [...new Set(scenes.map(s => s.image))];
-    Promise.all(
-      unique.map(
-        src =>
-          new Promise(res => {
-            const img = new Image();
-            img.onload = res;
-            img.src = src;
-          })
-      )
-    ).then(() => setImagesPreloaded(true));
+    
+    // Use Intersection Observer for lazy loading
+    const loadImage = (src: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.loading = 'lazy'; // Native lazy loading
+        img.decoding = 'async'; // Async decoding
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = src;
+      });
+    };
+
+    // Load images in batches for better performance
+    const batchSize = 2;
+    const loadBatch = async (startIdx: number) => {
+      const batch = unique.slice(startIdx, startIdx + batchSize);
+      await Promise.all(batch.map(loadImage));
+      
+      if (startIdx + batchSize < unique.length) {
+        // Load next batch
+        await loadBatch(startIdx + batchSize);
+      }
+    };
+
+    loadBatch(0)
+      .then(() => setImagesPreloaded(true))
+      .catch((err) => {
+        console.warn('Error preloading VR images:', err);
+        setImagesPreloaded(true); // Continue anyway
+      });
   }, [isOpen]);
 
   // Mobile detection
@@ -177,6 +198,7 @@ export default function VRViewer({ isOpen, onClose }: VRViewerProps) {
       sky.setAttribute('src', scenes[index].image);
       sky.setAttribute('rotation', scenes[index].rotation);
       sky.setAttribute('radius', '500');
+      sky.setAttribute('material', 'shader: flat; side: back; npot: true'); // Optimize material
       scene.appendChild(sky);
 
       // Camera rig
