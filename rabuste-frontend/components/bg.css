@@ -14,13 +14,23 @@
   -webkit-filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  /* Prevent transforms that might cause blur */
-  transform: translateZ(0) !important;
+  /* CRITICAL: Prevent transforms that might cause blur - use scale(1) for no scaling */
+  transform: scale(1) translateZ(0) !important;
+  transform-origin: 0 0 !important;
   will-change: auto !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
   /* Force hardware acceleration without blur */
   isolation: isolate !important;
+  /* Prevent any subpixel rendering */
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  text-rendering: optimizeSpeed !important;
+  /* Force pixel-perfect rendering */
+  -webkit-transform: scale(1) translateZ(0) !important;
+  -moz-transform: scale(1) translateZ(0) !important;
+  -ms-transform: scale(1) translateZ(0) !important;
+  -o-transform: scale(1) translateZ(0) !important;
 }
 
 /* AGGRESSIVE: ensure canvas is pixel-perfect - NO BLUR */
@@ -40,14 +50,27 @@
   -webkit-filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  /* Prevent transforms that might cause blur */
-  transform: translateZ(0) !important;
+  /* CRITICAL: Prevent transforms that might cause blur - use scale(1) for 1:1 pixel ratio */
+  transform: scale(1) translateZ(0) !important;
+  transform-origin: 0 0 !important;
+  -webkit-transform: scale(1) translateZ(0) !important;
+  -moz-transform: scale(1) translateZ(0) !important;
+  -ms-transform: scale(1) translateZ(0) !important;
+  -o-transform: scale(1) translateZ(0) !important;
   will-change: auto !important;
   backface-visibility: hidden !important;
   -webkit-backface-visibility: hidden !important;
   /* Force no smoothing */
   -webkit-font-smoothing: none !important;
   -moz-osx-font-smoothing: unset !important;
+  text-rendering: optimizeSpeed !important;
   /* Isolation to prevent parent effects */
   isolation: isolate !important;
+  /* CRITICAL: Force no subpixel rendering */
+  -webkit-perspective: 1000px !important;
+  perspective: 1000px !important;
+  /* Prevent any scaling from device pixel ratio */
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: none !important;
 }

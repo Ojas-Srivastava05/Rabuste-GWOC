@@ -213,7 +213,7 @@ export default function Balatro({
       gl.disable(gl.SAMPLE_ALPHA_TO_COVERAGE);
       gl.disable(gl.SAMPLE_COVERAGE);
       
-      // Disable multisample and smoothing features (if available)
+      // CRITICAL: Disable multisample anti-aliasing (if available)
       try {
         const MULTISAMPLE = (gl as any).MULTISAMPLE;
         if (MULTISAMPLE !== undefined) gl.disable(MULTISAMPLE);
@@ -221,7 +221,7 @@ export default function Balatro({
         // MULTISAMPLE may not exist, ignore
       }
       
-      // Disable polygon and line smoothing (if available - deprecated in WebGL2 but may exist in WebGL1)
+      // CRITICAL: Disable polygon and line smoothing (if available)
       try {
         const POLYGON_SMOOTH = (gl as any).POLYGON_SMOOTH_HINT || (gl as any).POLYGON_SMOOTH;
         const LINE_SMOOTH = (gl as any).LINE_SMOOTH_HINT || (gl as any).LINE_SMOOTH;
@@ -231,8 +231,29 @@ export default function Balatro({
         // These constants may not exist in WebGL2, ignore
       }
       
+      // CRITICAL: Set hint for fastest rendering (no quality smoothing)
+      try {
+        const FASTEST = (gl as any).FASTEST || gl.DONT_CARE;
+        if (FASTEST !== undefined) {
+          gl.hint((gl as any).POLYGON_SMOOTH_HINT || gl.DONT_CARE, FASTEST);
+          gl.hint((gl as any).LINE_SMOOTH_HINT || gl.DONT_CARE, FASTEST);
+        }
+      } catch (e) {
+        // Hints may not be available, ignore
+      }
+      
       // Set clear color
       gl.clearColor(0, 0, 0, 1);
+      
+      // CRITICAL: Disable any texture filtering that might cause blur
+      // This will be set per-texture, but we ensure no default smoothing
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      
+      // CRITICAL: Get canvas IMMEDIATELY after renderer creation and apply styles BEFORE anything else
+      const canvas = renderer.gl.canvas;
+      if (!canvas) {
+        throw new Error('Canvas not available');
+      }
       
       // Helper function to apply crisp styles to canvas
       const applyCrispStyles = (canvas: HTMLCanvasElement) => {
@@ -245,8 +266,9 @@ export default function Balatro({
         canvas.style.setProperty('image-rendering', '-moz-crisp-edges', 'important');
         canvas.style.setProperty('image-rendering', '-o-crisp-edges', 'important');
         
-        // Disable any transforms that might cause blur
-        canvas.style.setProperty('transform', 'translateZ(0)', 'important');
+        // CRITICAL: Force 1:1 pixel ratio - no scaling
+        canvas.style.setProperty('transform', 'scale(1)', 'important');
+        canvas.style.setProperty('transform-origin', '0 0', 'important');
         canvas.style.setProperty('will-change', 'auto', 'important');
         canvas.style.setProperty('backface-visibility', 'hidden', 'important');
         canvas.style.setProperty('-webkit-backface-visibility', 'hidden', 'important');
@@ -256,59 +278,86 @@ export default function Balatro({
         canvas.style.setProperty('-webkit-filter', 'none', 'important');
         canvas.style.setProperty('backdrop-filter', 'none', 'important');
         canvas.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+        
+        // Force pixel-perfect positioning
+        canvas.style.setProperty('position', 'absolute', 'important');
+        canvas.style.setProperty('left', '0', 'important');
+        canvas.style.setProperty('top', '0', 'important');
+        canvas.style.setProperty('pointer-events', 'none', 'important');
       };
+      
+      // CRITICAL: Apply crisp styles IMMEDIATELY after renderer creation (before any rendering)
+      applyCrispStyles(canvas);
+      
+      // Set canvas display properties immediately
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
 
       function resize() {
-        if (!renderer || !renderer.gl || !program) return;
+        if (!renderer || !renderer.gl) return;
         try {
-          const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
-          const width = container.offsetWidth;
-          const height = container.offsetHeight;
+          const width = container.offsetWidth || window.innerWidth;
+          const height = container.offsetHeight || window.innerHeight;
           
-          // CRITICAL: Set canvas internal size to exact pixel dimensions (no scaling)
-          // Use 1:1 pixel ratio for maximum crispness
+          // CRITICAL: Use 1:1 pixel ratio for MAXIMUM crispness - NO scaling whatsoever
+          // This ensures pixel-perfect rendering without any blur from device pixel ratio scaling
           const canvasWidth = Math.floor(width);
           const canvasHeight = Math.floor(height);
           
+          // CRITICAL: Set canvas internal resolution FIRST (before renderer.setSize)
+          // This ensures the canvas is the correct size from the start
+          canvas.width = canvasWidth;
+          canvas.height = canvasHeight;
+          
+          // Set renderer size to exact pixel dimensions
           renderer.setSize(canvasWidth, canvasHeight);
           
-          // Set display size to match exactly - NO scaling
-          if (renderer.gl.canvas) {
-            const canvas = renderer.gl.canvas;
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
-            
-            // RESIZE PROTECTION: Reapply crisp styles on every resize
-            applyCrispStyles(canvas);
-            
-            // Force viewport to match exactly
-            gl.viewport(0, 0, canvasWidth, canvasHeight);
-            
-            if (program) {
-              program.uniforms.iResolution.value = [
-                canvasWidth, 
-                canvasHeight, 
-                canvasWidth / canvasHeight
-              ];
-            }
+          // Set display size to match container exactly - NO scaling
+          canvas.style.width = `${width}px`;
+          canvas.style.height = `${height}px`;
+          
+          // CRITICAL: Force no scaling transforms
+          canvas.style.setProperty('transform', 'scale(1)', 'important');
+          canvas.style.setProperty('transform-origin', '0 0', 'important');
+          
+          // RESIZE PROTECTION: Reapply crisp styles on every resize
+          applyCrispStyles(canvas);
+          
+          // Force viewport to match exactly - no scaling
+          gl.viewport(0, 0, canvasWidth, canvasHeight);
+          
+          if (program) {
+            program.uniforms.iResolution.value = [
+              canvasWidth, 
+              canvasHeight, 
+              canvasWidth / canvasHeight
+            ];
           }
         } catch (e) {
           console.warn('Error during resize:', e);
         }
       }
-      window.addEventListener('resize', resize);
+      
+      // CRITICAL: Set initial size IMMEDIATELY (before creating program/mesh)
+      // This ensures the canvas is the correct size from the very first render
       resize();
+      
+      window.addEventListener('resize', resize);
 
       const geometry = new Triangle(gl);
+      
+      // CRITICAL: Get canvas dimensions AFTER resize() has been called
+      // This ensures iResolution is set correctly from the start
+      const initialWidth = canvas.width;
+      const initialHeight = canvas.height;
+      
       program = new Program(gl, {
         vertex: vertexShader,
         fragment: fragmentShader,
         uniforms: {
           iTime: { value: 0 },
           iResolution: {
-            value: [renderer.gl.canvas.width, renderer.gl.canvas.height, renderer.gl.canvas.width / renderer.gl.canvas.height]
+            value: [initialWidth, initialHeight, initialWidth / initialHeight]
           },
           uSpinRotation: { value: spinRotation },
           uSpinSpeed: { value: spinSpeed },
@@ -331,15 +380,13 @@ export default function Balatro({
       function update(time: number) {
         if (!renderer || !program || !renderer.gl) return;
         try {
-          animationFrameId = requestAnimationFrame(update);
-          
-          // FRAME-BY-FRAME CHECK: Reapply crisp styles every frame to prevent blur
-          if (renderer.gl.canvas) {
-            applyCrispStyles(renderer.gl.canvas);
-          }
+          // CRITICAL: Reapply crisp styles BEFORE every render to prevent any blur
+          applyCrispStyles(canvas);
           
           program.uniforms.iTime.value = time * 0.001;
           renderer.render({ scene: mesh });
+          
+          animationFrameId = requestAnimationFrame(update);
         } catch (e) {
           console.warn('Error during render:', e);
           if (animationFrameId) {
@@ -347,78 +394,64 @@ export default function Balatro({
           }
         }
       }
-      // FIRST RENDER: Apply styles BEFORE DOM append
-      if (renderer.gl.canvas) {
-        const canvas = renderer.gl.canvas;
-        
-        // Apply crisp styles BEFORE appending to DOM
-        applyCrispStyles(canvas);
-        
-        // make sure the canvas fills container and does not create an interactive stacking context
-        canvas.style.position = "absolute";
-        canvas.style.left = "0";
-        canvas.style.top = "0";
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
-        canvas.style.pointerEvents = "none";
-        
-        // Try to disable smoothing via 2D context (if available)
-        try {
-          const ctx2d = canvas.getContext('2d');
-          if (ctx2d) {
-            (ctx2d as any).imageSmoothingEnabled = false;
-            (ctx2d as any).webkitImageSmoothingEnabled = false;
-            (ctx2d as any).mozImageSmoothingEnabled = false;
-            (ctx2d as any).msImageSmoothingEnabled = false;
+      
+      // CRITICAL: Start rendering AFTER everything is set up
+      // This ensures the first frame is already crisp
+      // CRITICAL: Styles are already applied above, now set up observer and append
+      // MUTATIONOBSERVER: Watch for style changes and revert any blur
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes') {
+            if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+              // Re-apply crisp rendering styles immediately
+              applyCrispStyles(canvas);
+            }
           }
-        } catch (e) {
-          // Ignore - WebGL context doesn't support 2D context methods
-        }
-        
-        // MUTATIONOBSERVER: Watch for style changes and revert any blur
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes') {
-              if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
-                // Re-apply crisp rendering styles immediately
+          // Also watch for child changes (in case canvas is replaced)
+          if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach((node) => {
+              if (node === canvas || (node as Element).querySelector?.('canvas')) {
                 applyCrispStyles(canvas);
               }
-            }
-            // Also watch for child changes (in case canvas is replaced)
-            if (mutation.type === 'childList') {
-              mutation.addedNodes.forEach((node) => {
-                if (node === canvas || (node as Element).querySelector?.('canvas')) {
-                  applyCrispStyles(canvas);
-                }
-              });
-            }
-          });
+            });
+          }
         });
-        
-        observer.observe(canvas, {
-          attributes: true,
-          attributeFilter: ['style', 'class'],
-          childList: false,
-          subtree: false
-        });
-        
-        // Also observe the container for any changes
-        observer.observe(container, {
-          attributes: false,
-          childList: true,
-          subtree: false
-        });
-        
-        // Store observer for cleanup
-        (canvas as any)._crispObserver = observer;
-        
-        // NOW append to DOM after styles are applied
-        container.appendChild(canvas);
-        
-        // Re-apply styles one more time after DOM append (first render protection)
-        requestAnimationFrame(() => {
-          applyCrispStyles(canvas);
-        });
+      });
+      
+      observer.observe(canvas, {
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+        childList: false,
+        subtree: false
+      });
+      
+      // Also observe the container for any changes
+      observer.observe(container, {
+        attributes: false,
+        childList: true,
+        subtree: false
+      });
+      
+      // Store observer for cleanup
+      (canvas as any)._crispObserver = observer;
+      
+      // CRITICAL: Append to DOM AFTER all styles and size are set
+      // This ensures the canvas appears crisp from the first frame
+      container.appendChild(canvas);
+      
+      // CRITICAL: Force one final style application synchronously after DOM append
+      // This ensures nothing can override our crisp styles
+      applyCrispStyles(canvas);
+      
+      // CRITICAL: Render first frame SYNCHRONOUSLY to ensure crispness from the start
+      // This prevents any blur during the initial render
+      if (program && renderer && renderer.gl) {
+        try {
+          program.uniforms.iTime.value = 0;
+          renderer.render({ scene: mesh });
+        } catch (e) {
+          console.warn('Error during initial render:', e);
+        }
       }
       
       // Start the update loop

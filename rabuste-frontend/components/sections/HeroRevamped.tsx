@@ -32,47 +32,74 @@ export default function HeroRevamped() {
   const scale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
 
   useEffect(() => {
-    setIsMounted(true);
+    // Only set mounted on client side after hydration
     if (typeof window !== 'undefined') {
+      setIsMounted(true);
       window.scrollTo({ top: 0, behavior: 'auto' });
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
+      const timer = setTimeout(() => setIsLoaded(true), 100);
+      
+      return () => {
+        clearTimeout(timer);
+      };
     }
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    
-    return () => {
-      clearTimeout(timer);
-    };
   }, []);
 
   useEffect(() => {
-    // Ensure video plays after mount
+    // Update video and fallback visibility after mount to prevent hydration mismatch
     if (isMounted && videoRef.current) {
       const video = videoRef.current;
+      const fallback = video.parentElement?.previousElementSibling as HTMLElement;
+      
+      if (!videoError) {
+        // Show video, hide fallback
+        video.style.opacity = '1';
+        video.style.pointerEvents = 'auto';
+        video.preload = 'auto';
+        video.load();
+        
+        if (fallback) {
+          fallback.style.opacity = '0';
+        }
+      } else {
+        // Show fallback, hide video
+        video.style.opacity = '0';
+        video.style.pointerEvents = 'none';
+        if (fallback) {
+          fallback.style.opacity = '1';
+        }
+      }
       
       const handleCanPlay = () => {
-        video.play().catch((err) => {
-          console.log('Video autoplay prevented:', err);
-        });
+        if (!videoError && videoRef.current) {
+          videoRef.current.play().catch((err) => {
+            console.log('Video autoplay prevented:', err);
+          });
+        }
       };
 
       const handleError = () => {
         console.error('Video failed to load');
         setVideoError(true);
+        if (videoRef.current) {
+          videoRef.current.style.opacity = '0';
+          videoRef.current.style.pointerEvents = 'none';
+        }
+        if (fallback) {
+          fallback.style.opacity = '1';
+        }
       };
 
       video.addEventListener('canplay', handleCanPlay);
       video.addEventListener('error', handleError);
-      
-      // Try to load and play
-      video.load();
       
       return () => {
         video.removeEventListener('canplay', handleCanPlay);
         video.removeEventListener('error', handleError);
       };
     }
-  }, [isMounted]);
+  }, [isMounted, videoError]);
 
   return (
     <section
@@ -102,117 +129,109 @@ export default function HeroRevamped() {
       />
 
       {/* Video Background - Full Width */}
-      {isMounted && (
-        <div 
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{
+      {/* Always render container with consistent structure to prevent hydration mismatch */}
+      <div 
+        className="absolute inset-0 pointer-events-none overflow-hidden"
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '100vh',
+          zIndex: 0,
+        }}
+      >
+        <motion.div
+          className="relative w-full h-full"
+          style={{ 
+            scale,
             width: '100%',
             height: '100%',
             minHeight: '100vh',
-            zIndex: 0,
           }}
         >
-          <motion.div
-            className="relative w-full h-full"
-            style={{ 
-              scale,
+          {/* Fallback gradient background - always rendered, visibility controlled by opacity */}
+          {/* Initial opacity matches server render (isMounted starts as false) */}
+          <div 
+            className="absolute inset-0 w-full h-full"
+            style={{
+              background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
+              zIndex: 1,
+              opacity: 1, // Always visible initially (matches server render)
+              transition: 'opacity 0.5s ease-in-out',
+              pointerEvents: 'none',
+            }}
+            suppressHydrationWarning
+          />
+          
+          {/* Video - always render to prevent hydration mismatch, visibility controlled by opacity */}
+          {/* Initial opacity matches server render (isMounted starts as false) */}
+          <video
+            ref={videoRef}
+            autoPlay={false}
+            loop
+            muted
+            playsInline
+            preload="none"
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
               width: '100%',
               height: '100%',
-              minHeight: '100vh',
+              minWidth: '100%',
+              minHeight: '100%',
+              objectFit: 'cover',
+              filter: 'brightness(0.85) contrast(1.1)',
+              zIndex: 1,
+              opacity: 0, // Always hidden initially (matches server render)
+              pointerEvents: 'none',
+              backgroundColor: '#000000',
+            }}
+            suppressHydrationWarning
+            onError={(e) => {
+              console.error('Video error:', e);
+              setVideoError(true);
+            }}
+            onLoadedData={() => {
+              if (videoRef.current && isMounted && !videoError) {
+                videoRef.current.play().catch((err) => {
+                  console.log('Play error:', err);
+                });
+              }
+            }}
+            onCanPlay={() => {
+              if (videoRef.current && isMounted && !videoError) {
+                videoRef.current.play().catch(() => {});
+              }
+            }}
+            onLoadedMetadata={() => {
+              if (videoRef.current && isMounted && !videoError) {
+                videoRef.current.play().catch(() => {});
+              }
             }}
           >
-            <video
-              ref={videoRef}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                width: '100%',
-                height: '100%',
-                minWidth: '100%',
-                minHeight: '100%',
-                objectFit: 'cover',
-                filter: 'brightness(0.85) contrast(1.1)',
-                zIndex: 1,
-                display: 'block',
-                backgroundColor: '#000000',
-              }}
-              onError={(e) => {
-                console.error('Video error:', e);
-                setVideoError(true);
-              }}
-              onLoadedData={() => {
-                if (videoRef.current) {
-                  videoRef.current.play().catch((err) => {
-                    console.log('Play error:', err);
-                  });
-                }
-              }}
-              onCanPlay={() => {
-                if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
-                }
-              }}
-              onLoadedMetadata={() => {
-                if (videoRef.current) {
-                  videoRef.current.play().catch(() => {});
-                }
-              }}
-            >
-              <source src={videoUrls.heroVideo} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            
-            {/* Fallback background */}
-            {videoError && (
-              <div 
-                className="absolute inset-0 w-full h-full"
-                style={{
-                  background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
-                  zIndex: 1,
-                }}
-              />
-            )}
-            
-            {/* Premium gradient overlays */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.65) 100%)',
-                zIndex: 2,
-                pointerEvents: 'none',
-              }}
-            />
-            
-            {/* Copper accent gradient overlay */}
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(184, 115, 51, 0.15) 100%)',
-                zIndex: 2,
-                pointerEvents: 'none',
-              }}
-            />
-          </motion.div>
-        </div>
-      )}
-      
-      {/* Fallback gradient background for SSR */}
-      {!isMounted && (
-        <div 
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{
-            width: '100%',
-            height: '100%',
-            minHeight: '100vh',
-            zIndex: 0,
-            background: 'linear-gradient(135deg, #1A1110 0%, #2B1810 50%, #1A1110 100%)',
-          }}
-        />
-      )}
+            <source src={videoUrls.heroVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          
+          {/* Premium gradient overlays */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.65) 100%)',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          />
+          
+          {/* Copper accent gradient overlay */}
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              background: 'linear-gradient(135deg, rgba(184, 115, 51, 0.1) 0%, transparent 50%, rgba(184, 115, 51, 0.15) 100%)',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          />
+        </motion.div>
+      </div>
 
       {/* Animated gradient orbs */}
       <motion.div
@@ -239,6 +258,7 @@ export default function HeroRevamped() {
         transition={{ duration: 1, delay: 0.5 }}
         style={{ opacity, y }}
         className="relative z-10 w-full max-w-[1600px] mx-auto px-6 lg:px-12 xl:px-16"
+        suppressHydrationWarning
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center min-h-screen py-12 lg:py-20">
           
