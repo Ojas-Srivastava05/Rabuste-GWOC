@@ -219,15 +219,32 @@ export default function Balatro({
       // Set clear color
       gl.clearColor(0, 0, 0, 1);
       
-      // CRITICAL: Disable any texture filtering that might cause blur
-      // This will be set per-texture if needed, but we're using shaders so it's less critical
+      // CRITICAL: Set initial canvas size BEFORE creating program
+      // This ensures the canvas has correct dimensions from the start
+      const initialWidth = container.offsetWidth || window.innerWidth;
+      const initialHeight = container.offsetHeight || window.innerHeight;
+      const canvasWidth = Math.floor(initialWidth);
+      const canvasHeight = Math.floor(initialHeight);
+      
+      // Set renderer size immediately
+      renderer.setSize(canvasWidth, canvasHeight);
+      
+      // Set canvas internal dimensions
+      if (renderer.gl.canvas) {
+        renderer.gl.canvas.width = canvasWidth;
+        renderer.gl.canvas.height = canvasHeight;
+        renderer.gl.canvas.style.width = `${initialWidth}px`;
+        renderer.gl.canvas.style.height = `${initialHeight}px`;
+        
+        // Set viewport immediately
+        gl.viewport(0, 0, canvasWidth, canvasHeight);
+      }
 
       function resize() {
-        if (!renderer || !renderer.gl || !program) return;
+        if (!renderer || !renderer.gl) return;
         try {
-          const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
-          const width = container.offsetWidth;
-          const height = container.offsetHeight;
+          const width = container.offsetWidth || window.innerWidth;
+          const height = container.offsetHeight || window.innerHeight;
           
           // CRITICAL: Set canvas internal size to exact pixel dimensions (no scaling)
           // Use 1:1 pixel ratio for maximum crispness
@@ -259,7 +276,6 @@ export default function Balatro({
         }
       }
       window.addEventListener('resize', resize);
-      resize();
 
       const geometry = new Triangle(gl);
       program = new Program(gl, {
@@ -268,7 +284,7 @@ export default function Balatro({
         uniforms: {
           iTime: { value: 0 },
           iResolution: {
-            value: [renderer.gl.canvas.width, renderer.gl.canvas.height, renderer.gl.canvas.width / renderer.gl.canvas.height]
+            value: [canvasWidth, canvasHeight, canvasWidth / canvasHeight]
           },
           uSpinRotation: { value: spinRotation },
           uSpinSpeed: { value: spinSpeed },
@@ -288,21 +304,8 @@ export default function Balatro({
 
       const mesh = new Mesh(gl, { geometry, program });
 
-      function update(time: number) {
-        if (!renderer || !program || !renderer.gl) return;
-        try {
-          animationFrameId = requestAnimationFrame(update);
-          program.uniforms.iTime.value = time * 0.001;
-          renderer.render({ scene: mesh });
-        } catch (e) {
-          console.warn('Error during render:', e);
-          if (animationFrameId) {
-            cancelAnimationFrame(animationFrameId);
-          }
-        }
-      }
-      animationFrameId = requestAnimationFrame(update);
-      
+      // CRITICAL: Append canvas BEFORE creating update function
+      // This ensures canvas is in DOM with correct dimensions
       if (renderer.gl.canvas && container) {
         container.appendChild(renderer.gl.canvas);
 
@@ -316,46 +319,33 @@ export default function Balatro({
         canvas.style.height = "100%";
         canvas.style.pointerEvents = "none";
         
-        // AGGRESSIVE: Force crisp rendering with ALL possible methods
-        // Set CSS properties for crisp rendering (try all variants)
-        canvas.style.imageRendering = 'pixelated';
-        canvas.style.imageRendering = '-webkit-optimize-contrast';
-        canvas.style.imageRendering = 'crisp-edges';
-        canvas.style.imageRendering = '-moz-crisp-edges';
-        canvas.style.imageRendering = '-o-crisp-edges';
+        // CRITICAL: Apply crisp rendering styles IMMEDIATELY after appending
+        // Use setProperty with !important to override any defaults
+        canvas.style.setProperty('image-rendering', 'pixelated', 'important');
+        canvas.style.setProperty('image-rendering', '-webkit-optimize-contrast', 'important');
+        canvas.style.setProperty('image-rendering', 'crisp-edges', 'important');
+        canvas.style.setProperty('image-rendering', '-moz-crisp-edges', 'important');
+        canvas.style.setProperty('image-rendering', '-o-crisp-edges', 'important');
         
         // Disable any transforms that might cause blur
-        canvas.style.transform = 'translateZ(0)';
-        canvas.style.willChange = 'auto';
-        canvas.style.backfaceVisibility = 'hidden';
-        canvas.style.webkitBackfaceVisibility = 'hidden';
+        canvas.style.setProperty('transform', 'translateZ(0)', 'important');
+        canvas.style.setProperty('will-change', 'auto', 'important');
+        canvas.style.setProperty('backface-visibility', 'hidden', 'important');
+        canvas.style.setProperty('-webkit-backface-visibility', 'hidden', 'important');
         
         // Force no filters
-        canvas.style.filter = 'none';
-        canvas.style.webkitFilter = 'none';
-        canvas.style.backdropFilter = 'none';
-        
-        // Try to disable smoothing via 2D context (if available)
-        try {
-          const ctx2d = canvas.getContext('2d');
-          if (ctx2d) {
-            (ctx2d as any).imageSmoothingEnabled = false;
-            (ctx2d as any).webkitImageSmoothingEnabled = false;
-            (ctx2d as any).mozImageSmoothingEnabled = false;
-            (ctx2d as any).msImageSmoothingEnabled = false;
-          }
-        } catch (e) {
-          // Ignore - WebGL context doesn't support 2D context methods
-        }
+        canvas.style.setProperty('filter', 'none', 'important');
+        canvas.style.setProperty('-webkit-filter', 'none', 'important');
+        canvas.style.setProperty('backdrop-filter', 'none', 'important');
         
         // Use MutationObserver to enforce styles if something tries to change them
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-              // Re-apply crisp rendering styles
-              canvas.style.imageRendering = 'pixelated';
-              canvas.style.filter = 'none';
-              canvas.style.webkitFilter = 'none';
+              // Re-apply crisp rendering styles with !important
+              canvas.style.setProperty('image-rendering', 'pixelated', 'important');
+              canvas.style.setProperty('filter', 'none', 'important');
+              canvas.style.setProperty('-webkit-filter', 'none', 'important');
             }
           });
         });
@@ -368,6 +358,42 @@ export default function Balatro({
         // Store observer for cleanup
         (canvas as any)._crispObserver = observer;
       }
+
+      function update(time: number) {
+        if (!renderer || !program || !renderer.gl) return;
+        try {
+          animationFrameId = requestAnimationFrame(update);
+          program.uniforms.iTime.value = time * 0.001;
+          renderer.render({ scene: mesh });
+        } catch (e) {
+          console.warn('Error during render:', e);
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+          }
+        }
+      }
+      
+      // CRITICAL: Force initial render with correct dimensions BEFORE starting animation loop
+      // This ensures the first frame is crisp from the very start
+      requestAnimationFrame(() => {
+        if (program && renderer && renderer.gl && renderer.gl.canvas) {
+          const canvas = renderer.gl.canvas;
+          // Ensure resolution is correct
+          const finalWidth = canvas.width || canvasWidth;
+          const finalHeight = canvas.height || canvasHeight;
+          program.uniforms.iResolution.value = [
+            finalWidth,
+            finalHeight,
+            finalWidth / finalHeight
+          ];
+          // Force viewport and render first frame
+          gl.viewport(0, 0, finalWidth, finalHeight);
+          renderer.render({ scene: mesh });
+          
+          // Now start the animation loop
+          animationFrameId = requestAnimationFrame(update);
+        }
+      });
 
       function handleMouseMove(e: MouseEvent) {
         if (!mouseInteraction || !program) return;
