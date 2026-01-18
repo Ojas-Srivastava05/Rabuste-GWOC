@@ -247,10 +247,10 @@ export default function Balatro({
       
       // CRITICAL: Set initial canvas size BEFORE creating program
       // This ensures the canvas has correct dimensions from the start
-      const initialWidth = container.offsetWidth || window.innerWidth;
-      const initialHeight = container.offsetHeight || window.innerHeight;
-      const canvasWidth = Math.floor(initialWidth);
-      const canvasHeight = Math.floor(initialHeight);
+      const containerWidth = container.offsetWidth || window.innerWidth;
+      const containerHeight = container.offsetHeight || window.innerHeight;
+      const canvasWidth = Math.floor(containerWidth);
+      const canvasHeight = Math.floor(containerHeight);
       
       // Set renderer size immediately
       renderer.setSize(canvasWidth, canvasHeight);
@@ -259,8 +259,8 @@ export default function Balatro({
       if (renderer.gl.canvas) {
         renderer.gl.canvas.width = canvasWidth;
         renderer.gl.canvas.height = canvasHeight;
-        renderer.gl.canvas.style.width = `${initialWidth}px`;
-        renderer.gl.canvas.style.height = `${initialHeight}px`;
+        renderer.gl.canvas.style.width = `${containerWidth}px`;
+        renderer.gl.canvas.style.height = `${containerHeight}px`;
         
         // Set viewport immediately
         gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -287,34 +287,32 @@ export default function Balatro({
           
           // CRITICAL: Use 1:1 pixel ratio for MAXIMUM crispness - NO scaling whatsoever
           // This ensures pixel-perfect rendering without any blur from device pixel ratio scaling
-          const canvasWidth = Math.floor(width);
-          const canvasHeight = Math.floor(height);
+          const resizeCanvasWidth = Math.floor(width);
+          const resizeCanvasHeight = Math.floor(height);
           
           // Ensure we have valid dimensions before proceeding
-          if (canvasWidth <= 0 || canvasHeight <= 0) return;
+          if (resizeCanvasWidth <= 0 || resizeCanvasHeight <= 0) return;
           
-          renderer.setSize(canvasWidth, canvasHeight);
+          renderer.setSize(resizeCanvasWidth, resizeCanvasHeight);
           
           // Set display size to match container exactly - NO scaling
-          canvas.style.width = `${width}px`;
-          canvas.style.height = `${height}px`;
-          
-          // CRITICAL: Force no scaling transforms
-          canvas.style.setProperty('transform', 'scale(1)', 'important');
-          canvas.style.setProperty('transform-origin', '0 0', 'important');
-          
-          // RESIZE PROTECTION: Reapply crisp styles on resize (but only if needed)
-          (canvas as any)._stylesApplied = false;
-          applyCrispStyles(canvas, true);
+          if (renderer.gl.canvas) {
+            renderer.gl.canvas.style.width = `${width}px`;
+            renderer.gl.canvas.style.height = `${height}px`;
+            
+            // CRITICAL: Force no scaling transforms
+            renderer.gl.canvas.style.setProperty('transform', 'scale(1)', 'important');
+            renderer.gl.canvas.style.setProperty('transform-origin', '0 0', 'important');
+          }
           
           // Force viewport to match exactly - no scaling
-          gl.viewport(0, 0, canvasWidth, canvasHeight);
+          gl.viewport(0, 0, resizeCanvasWidth, resizeCanvasHeight);
           
           if (program) {
             program.uniforms.iResolution.value = [
-              canvasWidth, 
-              canvasHeight, 
-              canvasWidth / canvasHeight
+              resizeCanvasWidth, 
+              resizeCanvasHeight, 
+              resizeCanvasWidth / resizeCanvasHeight
             ];
           }
         } catch (e) {
@@ -340,11 +338,6 @@ export default function Balatro({
       });
 
       const geometry = new Triangle(gl);
-      
-      // CRITICAL: Get canvas dimensions AFTER resize() has been called
-      // This ensures iResolution is set correctly from the start
-      const initialWidth = canvas.width;
-      const initialHeight = canvas.height;
       
       program = new Program(gl, {
         vertex: vertexShader,
@@ -493,10 +486,6 @@ export default function Balatro({
             const canvas = renderer.gl.canvas;
             if ((canvas as any)._crispObserver) {
               (canvas as any)._crispObserver.disconnect();
-            }
-            // Clear debounce timeout
-            if (observerTimeout) {
-              clearTimeout(observerTimeout);
             }
           }
           
