@@ -214,7 +214,7 @@ export default function Balatro({
       gl.disable(gl.SAMPLE_COVERAGE);
       
       // Force pixel-perfect rendering - disable all smoothing
-      gl.disable(gl.MULTISAMPLE);
+      // gl.disable(gl.MULTISAMPLE); // Not available in WebGL
       
       // Set clear color
       gl.clearColor(0, 0, 0, 1);
@@ -334,7 +334,6 @@ export default function Balatro({
         canvas.style.filter = 'none';
         canvas.style.webkitFilter = 'none';
         canvas.style.backdropFilter = 'none';
-        canvas.style.webkitBackdropFilter = 'none';
         
         // Try to disable smoothing via 2D context (if available)
         try {

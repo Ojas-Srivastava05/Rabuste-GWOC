@@ -181,7 +181,7 @@ export default function HeroRevamped() {
             <div 
               className="absolute inset-0"
               style={{
-                background: 'linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.2) 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.6) 100%)',
+                background: 'linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.65) 100%)',
                 zIndex: 2,
                 pointerEvents: 'none',
               }}
@@ -498,18 +498,6 @@ export default function HeroRevamped() {
           <ChevronDown size={20} style={{ color: 'rgba(212, 165, 116, 0.6)' }} />
         </motion.div>
       </motion.div>
-
-      {/* Subtle grid overlay */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
-        className="absolute inset-0 pointer-events-none opacity-[0.02] hidden lg:block" 
-        style={{ 
-          backgroundImage: 'linear-gradient(rgba(184, 115, 51, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(184, 115, 51, 0.3) 1px, transparent 1px)', 
-          backgroundSize: '60px 60px' 
-        }} 
-      />
     </section>
   );
 }
