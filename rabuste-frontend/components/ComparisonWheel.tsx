@@ -132,10 +132,16 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
   const [hoveredSector, setHoveredSector] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [computedSize, setComputedSize] = useState<number>(size);
+  const [mounted, setMounted] = useState(false);
+
+  // Set mounted state
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Responsive resize handling
   useEffect(() => {
-    if (!responsive || !containerRef.current) return;
+    if (!responsive || !containerRef.current || !mounted) return;
 
     const ro = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width || 0;
@@ -150,7 +156,7 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
     if (rect.width) setComputedSize(Math.max(300, Math.min(700, Math.floor(rect.width * 0.7))));
 
     return () => ro.disconnect();
-  }, [responsive]);
+  }, [responsive, mounted]);
 
   const effectiveSize = responsive ? computedSize : size;
   const svgSize = effectiveSize + 200;
@@ -216,6 +222,7 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
       ref={containerRef}
       className="relative flex flex-col items-center justify-center w-full"
       style={{ paddingBottom: `${Math.max(140, effectiveSize * 0.35)}px`, zIndex: 10 }}
+      suppressHydrationWarning
     >
       {/* Wheel Container */}
       <div className="relative" style={{ width: `${svgSize}px`, height: `${svgSize}px`, zIndex: 20 }}>
