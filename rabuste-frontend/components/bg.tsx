@@ -212,7 +212,14 @@ export default function Balatro({
       gl.disable(gl.DITHER);
       gl.disable(gl.SAMPLE_ALPHA_TO_COVERAGE);
       gl.disable(gl.SAMPLE_COVERAGE);
-      gl.disable(gl.MULTISAMPLE);
+      
+      // Disable multisample and smoothing features (if available)
+      try {
+        const MULTISAMPLE = (gl as any).MULTISAMPLE;
+        if (MULTISAMPLE !== undefined) gl.disable(MULTISAMPLE);
+      } catch (e) {
+        // MULTISAMPLE may not exist, ignore
+      }
       
       // Disable polygon and line smoothing (if available - deprecated in WebGL2 but may exist in WebGL1)
       try {
