@@ -157,8 +157,23 @@ function ArtGalleryPageContent() {
   const totalItems = cart?.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0) || 0;
   const totalPrice = cart?.totalAmount || 0;
 
-  const addToCart = (itemId: string) => {
-    console.log("Add to cart:", itemId);
+  const addToCart = async (itemId: string) => {
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artItemId: itemId, quantity: 1 }),
+      });
+      if (res.ok) {
+        await fetchCart();
+        const item = gallery.find((i) => i._id === itemId);
+        if (item) {
+          trackAddToCart(item.title, item.price, "art");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to add to cart", err);
+    }
   };
 
   const removeFromCart = (itemId: string) => {
@@ -186,18 +201,10 @@ function ArtGalleryPageContent() {
         }}
       />
 
-      <main style={{ background: "transparent", position: "relative", zIndex: 2, minHeight: "100vh" }}>
+      <main className="lg:flex" style={{ background: "transparent", position: "relative", zIndex: 2, minHeight: "100vh" }}>
         <section
-          className="lg:fixed lg:top-0 lg:left-0"
+          className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0"
           style={{
-            width: "100%",
-            height: "auto",
-            ...(typeof window !== "undefined" && window.innerWidth >= 1024
-              ? {
-                  width: "50%",
-                  height: "100vh",
-                }
-              : {}),
             zIndex: 10,
           }}
         >
@@ -367,20 +374,15 @@ function ArtGalleryPageContent() {
 
                   <div className="flex gap-3 justify-center">
                     <button
-                      onClick={() => openArtModal(selectedHeroArt)}
-                      className="btn btn-primary"
-                      style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
-                    >
-                      View details
-                    </button>
-                    <button
                       onClick={() => addToCart(selectedHeroArt._id)}
-                      className="px-4 py-2"
+                      className="px-6 py-3 rounded-lg transition-all hover:scale-105 active:scale-95"
                       style={{
-                        background: "rgba(184, 115, 51, 0.2)",
-                        border: "1px solid rgba(184, 115, 51, 0.5)",
-                        color: "#D4A574",
+                        background: "linear-gradient(135deg, #B87333 0%, #CD7F32 100%)",
+                        border: "1px solid rgba(184, 115, 51, 0.8)",
+                        color: "#000",
                         fontFamily: "var(--font-body)",
+                        fontWeight: 600,
+                        boxShadow: "0 4px 12px rgba(184, 115, 51, 0.3)",
                       }}
                     >
                       Add to cart
@@ -394,21 +396,8 @@ function ArtGalleryPageContent() {
 
         <motion.section
           ref={contentRef}
-          className="lg:fixed lg:right-0 lg:top-0 lg:overflow-y-auto"
+          className="w-full lg:w-1/2 lg:h-screen lg:overflow-y-auto"
           style={{
-            ...(typeof window !== "undefined" && window.innerWidth >= 1024
-              ? {
-                  width: "50%",
-                  height: "100vh",
-                  overflow: "auto",
-                  position: "fixed",
-                  right: 0,
-                  top: 0,
-                }
-              : {
-                  width: "100%",
-                  marginTop: "auto",
-                }),
             zIndex: 20,
             opacity: panelOpacity,
             x: panelX,
