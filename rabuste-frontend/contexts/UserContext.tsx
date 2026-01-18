@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/app/store/cartStore";
 
@@ -36,47 +36,80 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const router = useRouter();
 
-  // Check authentication on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
+      // Check if we're in browser environment
+      if (typeof window === 'undefined') {
+        setIsLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem("token");
       if (!token) {
         setIsLoading(false);
         return;
       }
 
-      // Verify token with backend
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/protected/verify`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Check if API URL is configured
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) {
+        console.warn("NEXT_PUBLIC_API_URL is not configured");
+        setIsLoading(false);
+        return;
+      }
 
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-      } else {
-        // Token invalid, clear it
-        localStorage.removeItem("token");
-        setUser(null);
+      // Verify token with backend - add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+      try {
+        const res = await fetch(`${apiUrl}/api/protected/verify`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          // Token invalid, clear it
+          localStorage.removeItem("token");
+          setUser(null);
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        // Handle abort (timeout) or other fetch errors
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          console.warn("Auth check timed out - backend may be slow or unavailable");
+          // Don't clear token on timeout - backend might just be slow
+        } else {
+          throw fetchError; // Re-throw to be caught by outer catch
+        }
       }
     } catch (error) {
       console.error("Auth check failed:", error);
       // Don't remove token on network errors - backend might be temporarily down
       // Only clear on actual auth failures
       const errorMessage = error instanceof Error ? error.message : String(error);
-      if (!errorMessage.includes("Failed to fetch") && !errorMessage.includes("NetworkError")) {
+      if (!errorMessage.includes("Failed to fetch") && 
+          !errorMessage.includes("NetworkError") &&
+          !errorMessage.includes("aborted")) {
         localStorage.removeItem("token");
         setUser(null);
       }
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Check authentication on mount
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const login = (token: string, userData: User, fromDirectLogin = false) => {
     localStorage.setItem("token", token);
@@ -110,7 +143,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     
     // Redirect to home page
     router.push("/");
-  };
+  }
 
   const updateUser = (userData: User) => {
     setUser(userData);

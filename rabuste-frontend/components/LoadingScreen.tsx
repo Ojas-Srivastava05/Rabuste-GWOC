@@ -8,12 +8,41 @@ export default function LoadingScreen() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Ensure we're in browser environment
+    if (typeof window === 'undefined') {
+      setIsLoading(false);
+      return;
+    }
+
+    // Set a maximum timeout to ensure loading screen always hides
+    const maxTimeout = setTimeout(() => {
+      console.warn("LoadingScreen: Force hiding after maximum timeout");
+      setIsLoading(false);
+    }, 5000); // Maximum 5 seconds
+
+    // Normal timeout
     const timeout = setTimeout(() => {
       setIsLoading(false);
+      clearTimeout(maxTimeout);
     }, 2000);
+
+    // Also hide when page is fully loaded
+    const handleLoad = () => {
+      setIsLoading(false);
+      clearTimeout(timeout);
+      clearTimeout(maxTimeout);
+    };
+
+    if (document.readyState === 'complete') {
+      handleLoad();
+    } else {
+      window.addEventListener('load', handleLoad);
+    }
 
     return () => {
       clearTimeout(timeout);
+      clearTimeout(maxTimeout);
+      window.removeEventListener('load', handleLoad);
     };
   }, []);
 
@@ -64,6 +93,11 @@ export default function LoadingScreen() {
                 width={200}
                 height={200}
                 priority
+                onError={() => {
+                  // If image fails to load, hide loading screen anyway
+                  console.warn("LoadingScreen: Logo image failed to load");
+                  setIsLoading(false);
+                }}
                 style={{
                   filter: 'drop-shadow(0 0 30px rgba(184, 115, 51, 0.5))',
                 }}
