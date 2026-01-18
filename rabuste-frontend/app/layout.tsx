@@ -96,6 +96,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Explicit viewport meta tag - required for responsive design */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes, viewport-fit=cover" />
+        
         {/* Google Analytics - Required for Search Console verification */}
         {/* Must be in <head> section and unmodified for verification */}
         {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
