@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/app/store/cartStore";
 
 interface User {
   id: string;
@@ -91,8 +92,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Clear token from localStorage
     localStorage.removeItem("token");
     
-    // Optional: Clear cart data on logout
+    // Clear cart data on logout
     localStorage.removeItem("cart");
+    
+    // Clear Zustand cart store in memory
+    useCartStore.getState().clearCart();
     
     // Clear user-specific favorites (optional - you might want to keep them)
     // If you want to clear favorites on logout, uncomment the next line:
