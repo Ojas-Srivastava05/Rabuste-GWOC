@@ -222,17 +222,32 @@ export default function Balatro({
       // CRITICAL: Disable any texture filtering that might cause blur
       // This will be set per-texture if needed, but we're using shaders so it's less critical
 
-      function resize() {
-        if (!renderer || !renderer.gl || !program) return;
+      // Debounce utility for resize handler
+      let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+      let lastWidth = 0;
+      let lastHeight = 0;
+
+      function performResize() {
+        if (!renderer || !renderer.gl || !program || !container) return;
+
         try {
-          const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
           const width = container.offsetWidth;
           const height = container.offsetHeight;
+          
+          // Skip if dimensions are invalid or haven't changed
+          if (width <= 0 || height <= 0) return;
+          if (width === lastWidth && height === lastHeight) return;
+          
+          lastWidth = width;
+          lastHeight = height;
           
           // CRITICAL: Set canvas internal size to exact pixel dimensions (no scaling)
           // Use 1:1 pixel ratio for maximum crispness
           const canvasWidth = Math.floor(width);
           const canvasHeight = Math.floor(height);
+          
+          // Ensure we have valid dimensions before proceeding
+          if (canvasWidth <= 0 || canvasHeight <= 0) return;
           
           renderer.setSize(canvasWidth, canvasHeight);
           
@@ -258,8 +273,23 @@ export default function Balatro({
           console.warn('Error during resize:', e);
         }
       }
-      window.addEventListener('resize', resize);
-      resize();
+
+      // Debounced resize handler to prevent excessive calls
+      const debouncedResize = () => {
+        if (resizeTimeout) {
+          clearTimeout(resizeTimeout);
+        }
+        resizeTimeout = setTimeout(() => {
+          performResize();
+        }, 150); // 150ms debounce delay
+      };
+
+      window.addEventListener('resize', debouncedResize, { passive: true });
+      
+      // Initial resize - use requestAnimationFrame to ensure container is ready
+      requestAnimationFrame(() => {
+        performResize();
+      });
 
       const geometry = new Triangle(gl);
       program = new Program(gl, {
@@ -387,7 +417,11 @@ export default function Balatro({
           if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
           }
-          window.removeEventListener('resize', resize);
+          if (resizeTimeout) {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = null;
+          }
+          window.removeEventListener('resize', debouncedResize);
           container.removeEventListener('mousemove', handleMouseMove);
           
           // Clean up MutationObserver if it exists
