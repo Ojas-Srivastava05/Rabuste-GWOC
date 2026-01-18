@@ -229,7 +229,7 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="mb-6 text-center"
+        className="mb-2 text-center"
         style={{ zIndex: 15 }}
       >
         <p

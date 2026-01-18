@@ -25,10 +25,13 @@ const oglAttributes = {
   alpha: false,
   depth: true,
   stencil: false,
-  antialias: false,
+  antialias: false, // CRITICAL: Disable antialiasing for crisp rendering
   premultipliedAlpha: false,
   preserveDrawingBuffer: false,
-  powerPreference: 'default' as const
+  powerPreference: 'default' as const,
+  // Additional attributes to force crisp rendering
+  desynchronized: false,
+  failIfMajorPerformanceCaveat: false
 };
 
 function hexToVec4(hex: string): [number, number, number, number] {
@@ -204,35 +207,50 @@ export default function Balatro({
       
       const gl = renderer.gl;
       
-      // Disable antialiasing and smoothing for crisp rendering
+      // AGGRESSIVE: Disable ALL smoothing and blending for crisp rendering
       gl.disable(gl.BLEND);
       gl.disable(gl.DITHER);
+      gl.disable(gl.SAMPLE_ALPHA_TO_COVERAGE);
+      gl.disable(gl.SAMPLE_COVERAGE);
       
-      // Set pixel-perfect rendering
-      const devicePixelRatio = window.devicePixelRatio || 1;
+      // Force pixel-perfect rendering - disable all smoothing
+      gl.disable(gl.MULTISAMPLE);
       
+      // Set clear color
       gl.clearColor(0, 0, 0, 1);
+      
+      // CRITICAL: Disable any texture filtering that might cause blur
+      // This will be set per-texture if needed, but we're using shaders so it's less critical
 
       function resize() {
         if (!renderer || !renderer.gl || !program) return;
         try {
-          const devicePixelRatio = window.devicePixelRatio || 1;
+          const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
           const width = container.offsetWidth;
           const height = container.offsetHeight;
           
-          // Set canvas size with device pixel ratio for crisp rendering
-          renderer.setSize(width * devicePixelRatio, height * devicePixelRatio);
+          // CRITICAL: Set canvas internal size to exact pixel dimensions (no scaling)
+          // Use 1:1 pixel ratio for maximum crispness
+          const canvasWidth = Math.floor(width);
+          const canvasHeight = Math.floor(height);
           
-          // Scale down to display size
+          renderer.setSize(canvasWidth, canvasHeight);
+          
+          // Set display size to match exactly - NO scaling
           if (renderer.gl.canvas) {
+            renderer.gl.canvas.width = canvasWidth;
+            renderer.gl.canvas.height = canvasHeight;
             renderer.gl.canvas.style.width = `${width}px`;
             renderer.gl.canvas.style.height = `${height}px`;
             
+            // Force viewport to match exactly
+            gl.viewport(0, 0, canvasWidth, canvasHeight);
+            
             if (program) {
               program.uniforms.iResolution.value = [
-                renderer.gl.canvas.width, 
-                renderer.gl.canvas.height, 
-                renderer.gl.canvas.width / renderer.gl.canvas.height
+                canvasWidth, 
+                canvasHeight, 
+                canvasWidth / canvasHeight
               ];
             }
           }
@@ -288,27 +306,68 @@ export default function Balatro({
       if (renderer.gl.canvas && container) {
         container.appendChild(renderer.gl.canvas);
 
-        // make sure the canvas fills container and does not create an interactive stacking context
-        renderer.gl.canvas.style.position = "absolute";
-        renderer.gl.canvas.style.left = "0";
-        renderer.gl.canvas.style.top = "0";
-        renderer.gl.canvas.style.width = "100%";
-        renderer.gl.canvas.style.height = "100%";
-        renderer.gl.canvas.style.pointerEvents = "none";
+        const canvas = renderer.gl.canvas;
         
-        // Force crisp rendering - disable image smoothing
-        const ctx = renderer.gl.canvas.getContext('2d');
-        if (ctx) {
-          (ctx as any).imageSmoothingEnabled = false;
-          (ctx as any).webkitImageSmoothingEnabled = false;
-          (ctx as any).mozImageSmoothingEnabled = false;
-          (ctx as any).msImageSmoothingEnabled = false;
+        // make sure the canvas fills container and does not create an interactive stacking context
+        canvas.style.position = "absolute";
+        canvas.style.left = "0";
+        canvas.style.top = "0";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.style.pointerEvents = "none";
+        
+        // AGGRESSIVE: Force crisp rendering with ALL possible methods
+        // Set CSS properties for crisp rendering (try all variants)
+        canvas.style.imageRendering = 'pixelated';
+        canvas.style.imageRendering = '-webkit-optimize-contrast';
+        canvas.style.imageRendering = 'crisp-edges';
+        canvas.style.imageRendering = '-moz-crisp-edges';
+        canvas.style.imageRendering = '-o-crisp-edges';
+        
+        // Disable any transforms that might cause blur
+        canvas.style.transform = 'translateZ(0)';
+        canvas.style.willChange = 'auto';
+        canvas.style.backfaceVisibility = 'hidden';
+        canvas.style.webkitBackfaceVisibility = 'hidden';
+        
+        // Force no filters
+        canvas.style.filter = 'none';
+        canvas.style.webkitFilter = 'none';
+        canvas.style.backdropFilter = 'none';
+        canvas.style.webkitBackdropFilter = 'none';
+        
+        // Try to disable smoothing via 2D context (if available)
+        try {
+          const ctx2d = canvas.getContext('2d');
+          if (ctx2d) {
+            (ctx2d as any).imageSmoothingEnabled = false;
+            (ctx2d as any).webkitImageSmoothingEnabled = false;
+            (ctx2d as any).mozImageSmoothingEnabled = false;
+            (ctx2d as any).msImageSmoothingEnabled = false;
+          }
+        } catch (e) {
+          // Ignore - WebGL context doesn't support 2D context methods
         }
         
-        // Set CSS properties for crisp rendering
-        renderer.gl.canvas.style.imageRendering = 'pixelated';
-        renderer.gl.canvas.style.imageRendering = '-webkit-optimize-contrast';
-        renderer.gl.canvas.style.imageRendering = 'crisp-edges';
+        // Use MutationObserver to enforce styles if something tries to change them
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+              // Re-apply crisp rendering styles
+              canvas.style.imageRendering = 'pixelated';
+              canvas.style.filter = 'none';
+              canvas.style.webkitFilter = 'none';
+            }
+          });
+        });
+        
+        observer.observe(canvas, {
+          attributes: true,
+          attributeFilter: ['style', 'class']
+        });
+        
+        // Store observer for cleanup
+        (canvas as any)._crispObserver = observer;
       }
 
       function handleMouseMove(e: MouseEvent) {
@@ -331,6 +390,15 @@ export default function Balatro({
           }
           window.removeEventListener('resize', resize);
           container.removeEventListener('mousemove', handleMouseMove);
+          
+          // Clean up MutationObserver if it exists
+          if (renderer && renderer.gl && renderer.gl.canvas) {
+            const canvas = renderer.gl.canvas;
+            if ((canvas as any)._crispObserver) {
+              (canvas as any)._crispObserver.disconnect();
+            }
+          }
+          
           if (renderer && renderer.gl && renderer.gl.canvas && container.contains(renderer.gl.canvas)) {
             container.removeChild(renderer.gl.canvas);
           }
