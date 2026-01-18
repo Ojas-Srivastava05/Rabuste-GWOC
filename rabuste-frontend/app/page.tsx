@@ -129,11 +129,117 @@ export default function Home() {
 
         {/* Instagram Reel slot — rendering ComparisonWheel instead */}
         <SectionTracker sectionName="instagram_reel">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <h3 className="text-center text-3xl md:text-4xl mb-6" style={{ color: '#F5F1E8', fontFamily: 'var(--font-heading)', fontWeight: 500 }}>
-              Latest Reel & Interactive Comparison
-            </h3>
-            <ComparisonWheel showInfo={false} />
+          <div className="relative overflow-hidden" style={{ isolation: 'isolate' }}>
+            <div
+              className="absolute inset-0 -z-10"
+              style={{
+                background: 'linear-gradient(180deg, #1A1110 0%, #000000 50%, #1A1110 100%)',
+              }}
+            />
+            <div className="absolute inset-0 -z-[5] noise-overlay opacity-20" />
+
+            <div className="container mx-auto px-4 py-20">
+              <div className="text-center mb-16">
+                <p
+                  className="section-label mb-4"
+                  style={{ color: '#B87333', fontFamily: 'var(--font-body)' }}
+                >
+                  BEAN COMPARISON
+                </p>
+                <h3
+                  className="text-4xl md:text-6xl mb-4"
+                  style={{
+                    color: '#FFFEF9',
+                    fontFamily: 'var(--font-heading)',
+                    fontWeight: 400,
+                    letterSpacing: '0.05em',
+                    textShadow: '0 6px 22px rgba(0, 0, 0, 0.7)',
+                    lineHeight: 0.95,
+                  }}
+                >
+                  ARABICA VS ROBUSTA
+                </h3>
+                <div
+                  className="w-20 h-1 mx-auto mb-5"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, #B87333, #CD7F32, #B87333, transparent)',
+                  }}
+                />
+                <p
+                  className="text-lg md:text-xl max-w-2xl mx-auto"
+                  style={{
+                    color: '#D4A574',
+                    fontFamily: 'var(--font-body)',
+                    lineHeight: 1.6,
+                    textShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+                  }}
+                >
+                  Explore the unique characteristics of each coffee bean variety. Click any sector to dive into detailed insights.
+                </p>
+              </div>
+            </div>
+
+              <div className="flex justify-center items-center min-h-[700px]">
+                <ComparisonWheel size={600} />
+              </div>
+
+            <div className="mt-32 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div
+                className="brutal-card p-8"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(232, 195, 158, 0.1), rgba(212, 165, 116, 0.05))',
+                  border: '2px solid rgba(232, 195, 158, 0.3)',
+                }}
+              >
+                <h3
+                  className="text-2xl mb-4"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#E8C39E',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  ARABICA BEANS
+                </h3>
+                <p
+                  className="leading-relaxed"
+                  style={{ color: '#F5F1E8', fontFamily: 'var(--font-body)' }}
+                >
+                  Known for their smooth, sweet flavor profile with delicate aromatic notes. 
+                  Arabica beans are cultivated at higher altitudes and are prized for their 
+                  refined taste and natural sweetness. Perfect for those who appreciate 
+                  nuanced coffee experiences.
+                </p>
+              </div>
+
+              <div
+                className="brutal-card p-8"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(42, 24, 16, 0.6), rgba(61, 43, 31, 0.4))',
+                  border: '2px solid rgba(184, 115, 51, 0.4)',
+                }}
+              >
+                <h3
+                  className="text-2xl mb-4"
+                  style={{
+                    fontFamily: 'var(--font-heading)',
+                    color: '#B87333',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  ROBUSTA BEANS
+                </h3>
+                <p
+                  className="leading-relaxed"
+                  style={{ color: '#F5F1E8', fontFamily: 'var(--font-body)' }}
+                >
+                  Robust and powerful with double the caffeine content. Robusta beans deliver 
+                  a strong, earthy flavor with exceptional energy-boosting properties. Ideal 
+                  for those seeking maximum performance, extended energy, and bold taste at 
+                  an excellent value.
+                </p>
+              </div>
+            </div>
           </div>
         </SectionTracker>
 
