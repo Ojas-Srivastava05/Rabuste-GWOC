@@ -168,7 +168,14 @@ function ArtGalleryPageContent() {
         await fetchCart();
         const item = gallery.find((i) => i._id === itemId);
         if (item) {
-          trackAddToCart(item.title, item.price, "art");
+          trackAddToCart({
+            itemId: item._id,
+            itemName: item.title,
+            itemType: "art",
+            price: item.price,
+            quantity: 1,
+            category: item.category,
+          });
         }
       }
     } catch (err) {
