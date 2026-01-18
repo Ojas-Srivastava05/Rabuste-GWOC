@@ -149,7 +149,6 @@ export default function Navbar() {
         {/* LEFT - Main Navigation with Dropdown */}
         <div className="hidden md:flex gap-2 flex-1">
           <NavButton href="/menu">MENU</NavButton>
-          <NavButton href="/art-gallery">DISCOVER</NavButton>
           
           {/* More Dropdown */}
           <div className="relative group">
@@ -772,12 +771,6 @@ export default function Navbar() {
                       onClick={() => setOpen(false)}
                     />
                   )}
-                  <MobileNavItem
-                    href="/art-gallery"
-                    icon={Palette}
-                    label="DISCOVER ART"
-                    onClick={() => setOpen(false)}
-                  />
                   <MobileNavItem
                     href="/art"
                     icon={Palette}
