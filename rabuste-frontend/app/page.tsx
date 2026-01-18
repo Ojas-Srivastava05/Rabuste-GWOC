@@ -9,6 +9,7 @@ import SectionTracker from "@/components/SectionTracker";
 import SEOContent from "@/components/SEOContent";
 import { useUser } from "@/contexts/UserContext";
 import ComparisonWheel from '@/components/ComparisonWheel';
+import LazySection from "@/components/LazySection";
 
 // Lazy load below-the-fold components for better initial load performance
 const DynamicBackground = dynamic(() => import("@/components/DynamicBackground"), {
@@ -114,33 +115,39 @@ export default function Home() {
         </SectionTracker>
 
         {/* Horizontal Scroll Section - UNIQUE EXPERIENCE */}
-        <SectionTracker sectionName="horizontal_scroll">
-          <HorizontalScroll />
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '100vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="horizontal_scroll">
+            <HorizontalScroll />
+          </SectionTracker>
+        </LazySection>
 
         {/* Experience - What We Offer */}
-        <SectionTracker sectionName="experience">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <ExperienceSection />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="experience">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <ExperienceSection />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Benefits - Science Backed Power */}
-        <SectionTracker sectionName="benefits">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          >
-            <BenefitsShowcase />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="benefits">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            >
+              <BenefitsShowcase />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Instagram Reel slot — rendering ComparisonWheel instead */}
         <SectionTracker sectionName="instagram_reel">
@@ -166,76 +173,88 @@ export default function Home() {
         </SectionTracker>
 
         {/* VR/AR Experience - Virtual Exploration */}
-        <SectionTracker sectionName="vr_experience">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <VRExperienceSection />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="vr_experience">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <VRExperienceSection />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Process - Bean to Cup Journey (Revamped) */}
-        <SectionTracker sectionName="process">
-          <motion.div
-            initial={{ opacity: 0, x: -60 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <ProcessSectionRevamped />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="process">
+            <motion.div
+              initial={{ opacity: 0, x: -60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <ProcessSectionRevamped />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Strong CTA Section - Visit Us */}
-        <SectionTracker sectionName="call_to_action">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <CallToAction />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="call_to_action">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <CallToAction />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Social Proof - Customer Testimonials */}
-        <SectionTracker sectionName="testimonials">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <TestimonialsSection />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="testimonials">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <TestimonialsSection />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Instagram Showcase */}
-        <SectionTracker sectionName="instagram_showcase">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-          >
-            <InstagramShowcase />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="instagram_showcase">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            >
+              <InstagramShowcase />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
 
         {/* Contact Section - Get in Touch */}
-        <SectionTracker sectionName="contact">
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <ContactSection />
-          </motion.div>
-        </SectionTracker>
+        <LazySection fallback={<div style={{ minHeight: '50vh', background: '#000000' }} />}>
+          <SectionTracker sectionName="contact">
+            <motion.div
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              <ContactSection />
+            </motion.div>
+          </SectionTracker>
+        </LazySection>
       </main>
 
       {/* Footer */}
