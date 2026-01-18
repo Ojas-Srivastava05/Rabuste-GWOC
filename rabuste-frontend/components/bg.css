@@ -1,32 +1,53 @@
 .balatro-container {
-  position: fixed;
-  inset: 0;
-  z-index: 0;          /* behind UI */
-  pointer-events: none;/* let clicks pass through */
-  /* Force crisp rendering - no blur */
-  image-rendering: pixelated;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  /* Prevent any blur effects */
-  filter: none !important;
-  -webkit-filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* ensure canvas occupies full container and doesn't intercept events */
-.balatro-container canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  /* Force crisp rendering - no blur */
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  /* AGGRESSIVE: Force crisp rendering - no blur EVER */
   image-rendering: pixelated !important;
   image-rendering: -webkit-optimize-contrast !important;
   image-rendering: crisp-edges !important;
-  /* Prevent any blur effects */
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: -o-crisp-edges !important;
+  /* Prevent ANY blur effects */
   filter: none !important;
   -webkit-filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  /* Prevent transforms that might cause blur */
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Force hardware acceleration without blur */
+  isolation: isolate !important;
+}
+
+/* AGGRESSIVE: ensure canvas is pixel-perfect - NO BLUR */
+.balatro-container canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  /* CRITICAL: Force crisp rendering with ALL variants */
+  image-rendering: pixelated !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: -o-crisp-edges !important;
+  /* Prevent ANY blur effects - override everything */
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* Prevent transforms that might cause blur */
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+  /* Force no smoothing */
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+  /* Isolation to prevent parent effects */
+  isolation: isolate !important;
 }
