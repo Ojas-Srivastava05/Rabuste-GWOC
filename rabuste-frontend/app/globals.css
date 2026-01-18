@@ -53,6 +53,21 @@ body {
   scrollbar-width: none;
 }
 
+/* CRITICAL: Global CSS override to prevent ANY blur on Balatro canvas */
+.balatro-container,
+.balatro-container *,
+.balatro-container canvas {
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  image-rendering: pixelated !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: -o-crisp-edges !important;
+}
+
 /* Hide scrollbar for overflow-x-auto elements */
 .overflow-x-auto::-webkit-scrollbar {
   display: none;
