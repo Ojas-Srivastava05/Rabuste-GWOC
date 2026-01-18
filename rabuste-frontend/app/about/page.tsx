@@ -352,6 +352,7 @@ const AboutPage = () => {
               alt="Coffee cup with steam by Lood Goosen on Pexels"
               fill
               className="object-cover"
+              loading="lazy"
               quality={90}
               unoptimized
             />
@@ -486,6 +487,7 @@ const VisionBlock = ({ image, icon: Icon, title, text, side }: {
           alt={title}
           fill
           className="object-cover"
+          loading="lazy"
           quality={85}
           unoptimized
           priority={false}

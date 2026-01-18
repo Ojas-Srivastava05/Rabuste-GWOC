@@ -98,6 +98,7 @@ export default function ArtworkCarousel({ artworks, onArtworkHover, title }: Art
                 fill
                 sizes="100px"
                 className="object-cover"
+                loading="lazy"
                 style={{ borderRadius: '50%' }}
               />
               <div 

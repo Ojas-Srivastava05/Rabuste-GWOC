@@ -161,6 +161,7 @@ export default function MenuCategoryCarousel({
                   fill
                   sizes="140px"
                   className="object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
                     if (target.src !== fallbackImage) {

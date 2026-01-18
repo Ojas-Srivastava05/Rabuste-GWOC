@@ -63,6 +63,7 @@ export default function LoadingScreen() {
                 alt="Rabuste Coffee"
                 width={200}
                 height={200}
+                priority
                 style={{
                   filter: 'drop-shadow(0 0 30px rgba(184, 115, 51, 0.5))',
                 }}

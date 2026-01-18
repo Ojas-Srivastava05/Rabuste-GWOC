@@ -481,6 +481,7 @@ function ArtworkListItem({
           fill
           sizes="96px"
           className="object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
           quality={80}
         />
 
