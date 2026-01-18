@@ -224,6 +224,38 @@ export default function ComparisonWheel({ size = 600, showInfo = true, responsiv
       style={{ paddingBottom: `${Math.max(140, effectiveSize * 0.35)}px`, zIndex: 10 }}
       suppressHydrationWarning
     >
+      {/* Clickable Hint Text */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="mb-6 text-center"
+        style={{ zIndex: 15 }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(0.875rem, 1.5vw, 1.125rem)',
+            color: '#D4A574',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            fontWeight: 500,
+            marginBottom: '8px',
+          }}
+        >
+          Click Any Sector to Explore
+        </p>
+        <div
+          style={{
+            width: '60px',
+            height: '2px',
+            background: 'linear-gradient(90deg, transparent, #D4A574, transparent)',
+            margin: '0 auto',
+            borderRadius: '2px',
+          }}
+        />
+      </motion.div>
+
       {/* Wheel Container */}
       <div className="relative" style={{ width: `${svgSize}px`, height: `${svgSize}px`, zIndex: 20 }}>
         <svg
