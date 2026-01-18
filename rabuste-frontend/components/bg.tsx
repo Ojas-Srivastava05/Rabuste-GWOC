@@ -256,10 +256,16 @@ export default function Balatro({
       }
       
       // Helper function to apply crisp styles to canvas
-      const applyCrispStyles = (canvas: HTMLCanvasElement) => {
+      // CRITICAL: This is expensive, so only call it when necessary, not every frame!
+      const applyCrispStyles = (canvas: HTMLCanvasElement, force = false) => {
         if (!canvas) return;
         
+        // Use a flag to prevent excessive style updates
+        if (!force && (canvas as any)._stylesApplied) return;
+        (canvas as any)._stylesApplied = true;
+        
         // CRITICAL: Apply ALL crisp rendering styles with !important via setProperty
+        // Batch these operations to reduce reflows
         canvas.style.setProperty('image-rendering', 'pixelated', 'important');
         canvas.style.setProperty('image-rendering', '-webkit-optimize-contrast', 'important');
         canvas.style.setProperty('image-rendering', 'crisp-edges', 'important');
@@ -287,7 +293,7 @@ export default function Balatro({
       };
       
       // CRITICAL: Apply crisp styles IMMEDIATELY after renderer creation (before any rendering)
-      applyCrispStyles(canvas);
+      applyCrispStyles(canvas, true);
       
       // Set canvas display properties immediately
       canvas.style.width = "100%";
@@ -320,8 +326,9 @@ export default function Balatro({
           canvas.style.setProperty('transform', 'scale(1)', 'important');
           canvas.style.setProperty('transform-origin', '0 0', 'important');
           
-          // RESIZE PROTECTION: Reapply crisp styles on every resize
-          applyCrispStyles(canvas);
+          // RESIZE PROTECTION: Reapply crisp styles on resize (but only if needed)
+          (canvas as any)._stylesApplied = false;
+          applyCrispStyles(canvas, true);
           
           // Force viewport to match exactly - no scaling
           gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -380,8 +387,8 @@ export default function Balatro({
       function update(time: number) {
         if (!renderer || !program || !renderer.gl) return;
         try {
-          // CRITICAL: Reapply crisp styles BEFORE every render to prevent any blur
-          applyCrispStyles(canvas);
+          // CRITICAL: Don't call applyCrispStyles every frame - it's expensive!
+          // Styles are already applied once, MutationObserver will handle any changes
           
           program.uniforms.iTime.value = time * 0.001;
           renderer.render({ scene: mesh });
@@ -399,23 +406,31 @@ export default function Balatro({
       // This ensures the first frame is already crisp
       // CRITICAL: Styles are already applied above, now set up observer and append
       // MUTATIONOBSERVER: Watch for style changes and revert any blur
+      // CRITICAL: Debounce observer callbacks to prevent excessive style updates
+      let observerTimeout: NodeJS.Timeout | null = null;
       const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes') {
-            if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
-              // Re-apply crisp rendering styles immediately
-              applyCrispStyles(canvas);
-            }
-          }
-          // Also watch for child changes (in case canvas is replaced)
-          if (mutation.type === 'childList') {
-            mutation.addedNodes.forEach((node) => {
-              if (node === canvas || (node as Element).querySelector?.('canvas')) {
-                applyCrispStyles(canvas);
+        // Debounce to prevent excessive style updates
+        if (observerTimeout) clearTimeout(observerTimeout);
+        observerTimeout = setTimeout(() => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes') {
+              if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+                // Re-apply crisp rendering styles, but only if actually changed
+                (canvas as any)._stylesApplied = false;
+                applyCrispStyles(canvas, true);
               }
-            });
-          }
-        });
+            }
+            // Also watch for child changes (in case canvas is replaced)
+            if (mutation.type === 'childList') {
+              mutation.addedNodes.forEach((node) => {
+                if (node === canvas || (node as Element).querySelector?.('canvas')) {
+                  (canvas as any)._stylesApplied = false;
+                  applyCrispStyles(canvas, true);
+                }
+              });
+            }
+          });
+        }, 100); // Debounce by 100ms
       });
       
       observer.observe(canvas, {
@@ -439,23 +454,25 @@ export default function Balatro({
       // This ensures the canvas appears crisp from the first frame
       container.appendChild(canvas);
       
-      // CRITICAL: Force one final style application synchronously after DOM append
-      // This ensures nothing can override our crisp styles
-      applyCrispStyles(canvas);
-      
-      // CRITICAL: Render first frame SYNCHRONOUSLY to ensure crispness from the start
-      // This prevents any blur during the initial render
-      if (program && renderer && renderer.gl) {
-        try {
-          program.uniforms.iTime.value = 0;
-          renderer.render({ scene: mesh });
-        } catch (e) {
-          console.warn('Error during initial render:', e);
+      // CRITICAL: Apply styles once after DOM append (not synchronously to avoid blocking)
+      // Use requestAnimationFrame to avoid blocking the main thread
+      requestAnimationFrame(() => {
+        applyCrispStyles(canvas, true);
+        
+        // CRITICAL: Render first frame AFTER styles are applied
+        // This prevents any blur during the initial render
+        if (program && renderer && renderer.gl) {
+          try {
+            program.uniforms.iTime.value = 0;
+            renderer.render({ scene: mesh });
+          } catch (e) {
+            console.warn('Error during initial render:', e);
+          }
         }
-      }
-      
-      // Start the update loop
-      animationFrameId = requestAnimationFrame(update);
+        
+        // Start the update loop AFTER first render
+        animationFrameId = requestAnimationFrame(update);
+      });
 
       function handleMouseMove(e: MouseEvent) {
         if (!mouseInteraction || !program) return;
@@ -483,6 +500,10 @@ export default function Balatro({
             const canvas = renderer.gl.canvas;
             if ((canvas as any)._crispObserver) {
               (canvas as any)._crispObserver.disconnect();
+            }
+            // Clear debounce timeout
+            if (observerTimeout) {
+              clearTimeout(observerTimeout);
             }
           }
           
