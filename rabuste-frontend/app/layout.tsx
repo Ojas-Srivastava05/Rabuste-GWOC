@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Bebas_Neue, Work_Sans } from "next/font/google";
+import { Oswald, Work_Sans } from "next/font/google";
 import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import LoadingScreen from "@/components/LoadingScreen";
@@ -74,9 +74,9 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
-const bebasNeue = Bebas_Neue({
+const oswald = Oswald({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["200", "300"],
   display: "swap",
   variable: "--font-display",
 });
@@ -153,7 +153,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
       <body
-        className={`${workSans.variable} ${bebasNeue.variable} antialiased`}
+        className={`${workSans.variable} ${oswald.variable} antialiased`}
         suppressHydrationWarning
       >
         <StructuredData />
