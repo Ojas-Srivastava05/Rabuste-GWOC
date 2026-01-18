@@ -213,14 +213,50 @@ export default function Balatro({
       gl.disable(gl.SAMPLE_ALPHA_TO_COVERAGE);
       gl.disable(gl.SAMPLE_COVERAGE);
       
-      // Force pixel-perfect rendering - disable all smoothing
-      // gl.disable(gl.MULTISAMPLE); // Not available in WebGL
+      // Disable multisample and smoothing features (if available)
+      try {
+        const MULTISAMPLE = (gl as any).MULTISAMPLE;
+        if (MULTISAMPLE !== undefined) gl.disable(MULTISAMPLE);
+      } catch (e) {
+        // MULTISAMPLE may not exist, ignore
+      }
+      
+      // Disable polygon and line smoothing (if available - deprecated in WebGL2 but may exist in WebGL1)
+      try {
+        const POLYGON_SMOOTH = (gl as any).POLYGON_SMOOTH_HINT || (gl as any).POLYGON_SMOOTH;
+        const LINE_SMOOTH = (gl as any).LINE_SMOOTH_HINT || (gl as any).LINE_SMOOTH;
+        if (POLYGON_SMOOTH !== undefined) gl.disable(POLYGON_SMOOTH);
+        if (LINE_SMOOTH !== undefined) gl.disable(LINE_SMOOTH);
+      } catch (e) {
+        // These constants may not exist in WebGL2, ignore
+      }
       
       // Set clear color
       gl.clearColor(0, 0, 0, 1);
       
-      // CRITICAL: Disable any texture filtering that might cause blur
-      // This will be set per-texture if needed, but we're using shaders so it's less critical
+      // Helper function to apply crisp styles to canvas
+      const applyCrispStyles = (canvas: HTMLCanvasElement) => {
+        if (!canvas) return;
+        
+        // CRITICAL: Apply ALL crisp rendering styles with !important via setProperty
+        canvas.style.setProperty('image-rendering', 'pixelated', 'important');
+        canvas.style.setProperty('image-rendering', '-webkit-optimize-contrast', 'important');
+        canvas.style.setProperty('image-rendering', 'crisp-edges', 'important');
+        canvas.style.setProperty('image-rendering', '-moz-crisp-edges', 'important');
+        canvas.style.setProperty('image-rendering', '-o-crisp-edges', 'important');
+        
+        // Disable any transforms that might cause blur
+        canvas.style.setProperty('transform', 'translateZ(0)', 'important');
+        canvas.style.setProperty('will-change', 'auto', 'important');
+        canvas.style.setProperty('backface-visibility', 'hidden', 'important');
+        canvas.style.setProperty('-webkit-backface-visibility', 'hidden', 'important');
+        
+        // Force no filters
+        canvas.style.setProperty('filter', 'none', 'important');
+        canvas.style.setProperty('-webkit-filter', 'none', 'important');
+        canvas.style.setProperty('backdrop-filter', 'none', 'important');
+        canvas.style.setProperty('-webkit-backdrop-filter', 'none', 'important');
+      };
 
       function resize() {
         if (!renderer || !renderer.gl || !program) return;
@@ -238,10 +274,14 @@ export default function Balatro({
           
           // Set display size to match exactly - NO scaling
           if (renderer.gl.canvas) {
-            renderer.gl.canvas.width = canvasWidth;
-            renderer.gl.canvas.height = canvasHeight;
-            renderer.gl.canvas.style.width = `${width}px`;
-            renderer.gl.canvas.style.height = `${height}px`;
+            const canvas = renderer.gl.canvas;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
+            
+            // RESIZE PROTECTION: Reapply crisp styles on every resize
+            applyCrispStyles(canvas);
             
             // Force viewport to match exactly
             gl.viewport(0, 0, canvasWidth, canvasHeight);
@@ -292,6 +332,12 @@ export default function Balatro({
         if (!renderer || !program || !renderer.gl) return;
         try {
           animationFrameId = requestAnimationFrame(update);
+          
+          // FRAME-BY-FRAME CHECK: Reapply crisp styles every frame to prevent blur
+          if (renderer.gl.canvas) {
+            applyCrispStyles(renderer.gl.canvas);
+          }
+          
           program.uniforms.iTime.value = time * 0.001;
           renderer.render({ scene: mesh });
         } catch (e) {
@@ -301,12 +347,12 @@ export default function Balatro({
           }
         }
       }
-      animationFrameId = requestAnimationFrame(update);
-      
-      if (renderer.gl.canvas && container) {
-        container.appendChild(renderer.gl.canvas);
-
+      // FIRST RENDER: Apply styles BEFORE DOM append
+      if (renderer.gl.canvas) {
         const canvas = renderer.gl.canvas;
+        
+        // Apply crisp styles BEFORE appending to DOM
+        applyCrispStyles(canvas);
         
         // make sure the canvas fills container and does not create an interactive stacking context
         canvas.style.position = "absolute";
@@ -315,25 +361,6 @@ export default function Balatro({
         canvas.style.width = "100%";
         canvas.style.height = "100%";
         canvas.style.pointerEvents = "none";
-        
-        // AGGRESSIVE: Force crisp rendering with ALL possible methods
-        // Set CSS properties for crisp rendering (try all variants)
-        canvas.style.imageRendering = 'pixelated';
-        canvas.style.imageRendering = '-webkit-optimize-contrast';
-        canvas.style.imageRendering = 'crisp-edges';
-        canvas.style.imageRendering = '-moz-crisp-edges';
-        canvas.style.imageRendering = '-o-crisp-edges';
-        
-        // Disable any transforms that might cause blur
-        canvas.style.transform = 'translateZ(0)';
-        canvas.style.willChange = 'auto';
-        canvas.style.backfaceVisibility = 'hidden';
-        canvas.style.webkitBackfaceVisibility = 'hidden';
-        
-        // Force no filters
-        canvas.style.filter = 'none';
-        canvas.style.webkitFilter = 'none';
-        canvas.style.backdropFilter = 'none';
         
         // Try to disable smoothing via 2D context (if available)
         try {
@@ -348,26 +375,54 @@ export default function Balatro({
           // Ignore - WebGL context doesn't support 2D context methods
         }
         
-        // Use MutationObserver to enforce styles if something tries to change them
+        // MUTATIONOBSERVER: Watch for style changes and revert any blur
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-              // Re-apply crisp rendering styles
-              canvas.style.imageRendering = 'pixelated';
-              canvas.style.filter = 'none';
-              canvas.style.webkitFilter = 'none';
+            if (mutation.type === 'attributes') {
+              if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+                // Re-apply crisp rendering styles immediately
+                applyCrispStyles(canvas);
+              }
+            }
+            // Also watch for child changes (in case canvas is replaced)
+            if (mutation.type === 'childList') {
+              mutation.addedNodes.forEach((node) => {
+                if (node === canvas || (node as Element).querySelector?.('canvas')) {
+                  applyCrispStyles(canvas);
+                }
+              });
             }
           });
         });
         
         observer.observe(canvas, {
           attributes: true,
-          attributeFilter: ['style', 'class']
+          attributeFilter: ['style', 'class'],
+          childList: false,
+          subtree: false
+        });
+        
+        // Also observe the container for any changes
+        observer.observe(container, {
+          attributes: false,
+          childList: true,
+          subtree: false
         });
         
         // Store observer for cleanup
         (canvas as any)._crispObserver = observer;
+        
+        // NOW append to DOM after styles are applied
+        container.appendChild(canvas);
+        
+        // Re-apply styles one more time after DOM append (first render protection)
+        requestAnimationFrame(() => {
+          applyCrispStyles(canvas);
+        });
       }
+      
+      // Start the update loop
+      animationFrameId = requestAnimationFrame(update);
 
       function handleMouseMove(e: MouseEvent) {
         if (!mouseInteraction || !program) return;
