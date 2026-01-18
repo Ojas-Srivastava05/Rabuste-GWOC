@@ -26,6 +26,7 @@ interface ArtCategoryCarouselProps {
   onAdd: (id: string) => void;
   onRemove: (id: string) => void;
   onView: (item: ArtItem) => void;
+  onHover?: (item: ArtItem) => void;
 }
 
 const FALLBACK_IMAGE =
@@ -38,6 +39,7 @@ export default function ArtCategoryCarousel({
   onAdd,
   onRemove,
   onView,
+  onHover,
 }: ArtCategoryCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -120,6 +122,7 @@ export default function ArtCategoryCarousel({
               key={item._id}
               className="flex-shrink-0 snap-center cursor-pointer"
               onClick={() => onView(item)}
+              onMouseEnter={() => onHover?.(item)}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
             >

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal } from "lucide-react";
+import { Plus, Minus, ShoppingCart, Search, X, SlidersHorizontal, Star, Flame, Clock, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
@@ -40,20 +40,53 @@ type Cart = {
   totalAmount: number;
 };
 
+type QuickFilter = "all" | "bestseller" | "trending" | "limited";
+
+// Deterministic hash for consistent flags
+const hashCode = (value: string): number => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    const char = value.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
+
+const getArtworkFlags = (artwork: ArtItem) => {
+  const seed = `${artwork._id}-${artwork.title}-${artwork.artist}`;
+  const hash = hashCode(seed);
+
+  return {
+    isBestseller: hash % 10 < 3,
+    isTrending: hash % 11 < 2,
+    isLimited: artwork.stock <= 5,
+    editionsLeft: artwork.stock,
+    yearHighlight: artwork.year && artwork.year >= 2024,
+  };
+};
+
 function ArtGalleryPageContent() {
   const router = useRouter();
   const [gallery, setGallery] = useState<ArtItem[]>([]);
   const [cart, setCart] = useState<Cart | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name">("default");
+  const [lastSearchQuery, setLastSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"default" | "price-low" | "price-high" | "name" | "rating" | "new">("default");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedHeroArt, setSelectedHeroArt] = useState<ArtItem | null>(null);
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const contentRef = useRef<HTMLElement>(null);
 
   const { scrollY } = useScroll();
   const panelOpacity = useTransform(scrollY, [0, 200], [1, 1]);
   const panelX = useTransform(scrollY, [0, 200], [0, 0]);
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
 
   useEffect(() => {
     fetchGallery();
@@ -85,19 +118,36 @@ function ArtGalleryPageContent() {
   }
 
   // Helper functions
-  const categories = ["All", ...new Set(gallery.map((item: ArtItem) => item.category))];
-  const filtered = gallery
-    .filter((item: ArtItem) => {
-      if (activeCategory !== "All" && item.category !== activeCategory) return false;
-      if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      return true;
-    })
-    .sort((a: ArtItem, b: ArtItem) => {
-      if (sortBy === "price-low") return a.price - b.price;
-      if (sortBy === "price-high") return b.price - a.price;
-      if (sortBy === "name") return a.title.localeCompare(b.title);
-      return 0;
-    });
+  const categories = ["All", ...Array.from(new Set(gallery.map((item: ArtItem) => item.category)))];
+  
+  let filtered = gallery.filter((item: ArtItem) => {
+    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+    const search = searchQuery.trim().toLowerCase();
+    const matchesSearch =
+      search === "" ||
+      item.title.toLowerCase().includes(search) ||
+      item.description.toLowerCase().includes(search) ||
+      item.artist.toLowerCase().includes(search) ||
+      (item.medium && item.medium.toLowerCase().includes(search)) ||
+      item.category.toLowerCase().includes(search);
+
+    const flags = getArtworkFlags(item);
+    if (quickFilter === "bestseller" && !flags.isBestseller) return false;
+    if (quickFilter === "trending" && !flags.isTrending) return false;
+    if (quickFilter === "limited" && !flags.isLimited) return false;
+
+    return matchesCategory && matchesSearch;
+  });
+
+  if (sortBy === "price-low") {
+    filtered = [...filtered].sort((a, b) => a.price - b.price);
+  } else if (sortBy === "price-high") {
+    filtered = [...filtered].sort((a, b) => b.price - a.price);
+  } else if (sortBy === "name") {
+    filtered = [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortBy === "new") {
+    filtered = [...filtered].sort((a, b) => (b.year || 0) - (a.year || 0));
+  }
 
   const getQty = (itemId: string) => {
     const item = cart?.items.find((i: CartItem) => i.artItem === itemId && i.itemType === "art");
@@ -161,28 +211,67 @@ function ArtGalleryPageContent() {
           />
 
           {selectedHeroArt && (
-            <div className="flex items-center relative overflow-hidden pt-12 pb-10">
+            <div className="flex flex-col items-center relative overflow-hidden pt-24 md:pt-28 lg:pt-32 pb-10 px-6 lg:px-10">
               <div
                 className="absolute inset-0 opacity-30"
                 style={{
-                  background: "radial-gradient(circle at 70% 50%, rgba(184, 115, 51, 0.2) 0%, transparent 50%)",
+                  background: "radial-gradient(circle at 50% 50%, rgba(184, 115, 51, 0.2) 0%, transparent 50%)",
                 }}
               />
 
-              <div className="px-6 lg:px-10 w-full relative z-10">
-                <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 lg:gap-10 items-center">
-                  <motion.div
-                    className="relative flex items-center justify-center"
-                    initial={{ opacity: 0, x: -40, scale: 0.9 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+              <div className="w-full max-w-lg relative z-10 flex flex-col items-center">
+                {/* Heading First */}
+                <motion.div
+                  className="text-center mb-8"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <motion.h1
+                    className="gradient-text mb-3"
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "clamp(2.5rem, 6vw, 4rem)",
+                      lineHeight: "0.95",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
                   >
-                    <div
+                    The Gallery
+                  </motion.h1>
+                  <motion.p
+                    className="text-sm md:text-base"
+                    style={{
+                      color: "#B87333",
+                      fontFamily: "var(--font-body)",
+                      lineHeight: "1.6",
+                      maxWidth: "400px",
+                      margin: "0 auto",
+                    }}
+                  >
+                    Combining metal, wood, and found objects to create three-dimensional narratives
+                  </motion.p>
+                </motion.div>
+
+                {/* Big Circle - Artwork */}
+                <motion.div
+                  className="relative flex items-center justify-center mb-8"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={selectedHeroArt._id}
                       className="relative"
                       style={{
-                        width: "clamp(220px, 32vw, 340px)",
-                        height: "clamp(220px, 32vw, 340px)",
+                        width: "clamp(280px, 35vw, 380px)",
+                        height: "clamp(280px, 35vw, 380px)",
                       }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <div
                         className="absolute inset-0"
@@ -205,10 +294,11 @@ function ArtGalleryPageContent() {
                         }}
                       >
                         <Image
+                          key={`${selectedHeroArt._id}-${selectedHeroArt.images?.[0]}`}
                           src={selectedHeroArt.images?.[0] || "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80"}
                           alt={selectedHeroArt.title}
                           fill
-                          sizes="(max-width: 768px) 260px, 380px"
+                          sizes="(max-width: 768px) 280px, 400px"
                           className="object-cover"
                           priority
                         />
@@ -224,7 +314,7 @@ function ArtGalleryPageContent() {
                         }}
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        transition={{ delay: 0.5, type: "spring" }}
+                        transition={{ delay: 0.2, type: "spring" }}
                       >
                         <p
                           className="text-base font-bold mb-1"
@@ -244,75 +334,59 @@ function ArtGalleryPageContent() {
                           </span>
                         </div>
                       </motion.div>
-                    </div>
-                  </motion.div>
+                    </motion.div>
+                  </AnimatePresence>
+                </motion.div>
 
-                  <motion.div
-                    initial={{ opacity: 0, x: 40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
+                {/* Details and CTA Buttons Under Circle */}
+                <motion.div
+                  className="text-center w-full"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <motion.p
+                    className="text-sm md:text-base mb-3"
+                    style={{
+                      color: "#F5F1E8",
+                      fontFamily: "var(--font-body)",
+                      lineHeight: "1.6",
+                      maxWidth: "420px",
+                      margin: "0 auto",
+                    }}
                   >
-                    <motion.h1
-                      className="mb-4 gradient-text"
-                      style={{
-                        fontFamily: "var(--font-heading)",
-                        fontSize: "clamp(2.2rem, 7vw, 4.5rem)",
-                        lineHeight: "0.95",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.05em",
-                      }}
-                      initial={{ opacity: 0, y: 30 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      The Gallery
-                    </motion.h1>
+                    {selectedHeroArt.description}
+                  </motion.p>
 
-                    <motion.p
-                      className="text-sm md:text-base mb-3"
+                  <div className="flex items-center justify-center gap-3 text-xs mb-6" style={{ color: "#B87333" }}>
+                    <span>{selectedHeroArt.artist}</span>
+                    <span>•</span>
+                    <span>{selectedHeroArt.medium || "Mixed Media"}</span>
+                    {selectedHeroArt.year && <span>• {selectedHeroArt.year}</span>}
+                  </div>
+
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      onClick={() => openArtModal(selectedHeroArt)}
+                      className="btn btn-primary"
+                      style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
+                    >
+                      View details
+                    </button>
+                    <button
+                      onClick={() => addToCart(selectedHeroArt._id)}
+                      className="px-4 py-2"
                       style={{
-                        color: "#F5F1E8",
+                        background: "rgba(184, 115, 51, 0.2)",
+                        border: "1px solid rgba(184, 115, 51, 0.5)",
+                        color: "#D4A574",
                         fontFamily: "var(--font-body)",
-                        lineHeight: "1.6",
-                        maxWidth: "420px",
                       }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.4 }}
                     >
-                      {selectedHeroArt.description}
-                    </motion.p>
-
-                    <div className="flex items-center gap-3 text-xs mb-4" style={{ color: "#B87333" }}>
-                      <span>{selectedHeroArt.artist}</span>
-                      <span>•</span>
-                      <span>{selectedHeroArt.medium || "Mixed Media"}</span>
-                      {selectedHeroArt.year && <span>• {selectedHeroArt.year}</span>}
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => openArtModal(selectedHeroArt)}
-                        className="btn btn-primary"
-                        style={{ display: "inline-flex", alignItems: "center", gap: "8px" }}
-                      >
-                        View details
-                      </button>
-                      <button
-                        onClick={() => addToCart(selectedHeroArt._id)}
-                        className="px-4 py-2"
-                        style={{
-                          background: "rgba(184, 115, 51, 0.2)",
-                          border: "1px solid rgba(184, 115, 51, 0.5)",
-                          color: "#D4A574",
-                          fontFamily: "var(--font-body)",
-                        }}
-                      >
-                        Add to cart
-                      </button>
-                    </div>
-                  </motion.div>
-                </div>
+                      Add to cart
+                    </button>
+                  </div>
+                </motion.div>
               </div>
             </div>
           )}
@@ -406,6 +480,82 @@ function ArtGalleryPageContent() {
                   </button>
                 )}
               </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              <button
+                onClick={() => {
+                  setQuickFilter("all");
+                  setActiveCategory("All");
+                }}
+                className="px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs"
+                style={{
+                  background:
+                    quickFilter === "all" && activeCategory === "All"
+                      ? "rgba(184, 115, 51, 0.3)"
+                      : "rgba(26, 17, 16, 0.8)",
+                  border: `1px solid ${
+                    quickFilter === "all" && activeCategory === "All"
+                      ? "rgba(184, 115, 51, 0.6)"
+                      : "rgba(184, 115, 51, 0.3)"
+                  }`,
+                  color:
+                    quickFilter === "all" && activeCategory === "All" ? "#D4A574" : "#B87333",
+                  fontFamily: "var(--font-heading)",
+                }}
+              >
+                ALL
+              </button>
+              <button
+                onClick={() => setQuickFilter("bestseller")}
+                className="px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs"
+                style={{
+                  background: quickFilter === "bestseller" ? "rgba(184, 115, 51, 0.3)" : "rgba(26, 17, 16, 0.8)",
+                  border: `1px solid ${
+                    quickFilter === "bestseller" ? "rgba(184, 115, 51, 0.6)" : "rgba(184, 115, 51, 0.3)"
+                  }`,
+                  color: quickFilter === "bestseller" ? "#D4A574" : "#B87333",
+                  fontFamily: "var(--font-heading)",
+                }}
+              >
+                <Star size={12} fill={quickFilter === "bestseller" ? "#D4A574" : "none"} />
+                BEST
+              </button>
+              <button
+                onClick={() => setQuickFilter("trending")}
+                className="px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs"
+                style={{
+                  background: quickFilter === "trending" ? "rgba(255, 107, 107, 0.3)" : "rgba(26, 17, 16, 0.8)",
+                  border: `1px solid ${
+                    quickFilter === "trending" ? "rgba(255, 107, 107, 0.6)" : "rgba(184, 115, 51, 0.3)"
+                  }`,
+                  color: quickFilter === "trending" ? "#FF6B6B" : "#B87333",
+                  fontFamily: "var(--font-heading)",
+                }}
+              >
+                <Flame size={12} />
+                HOT
+              </button>
+              <button
+                onClick={() => setQuickFilter("limited")}
+                className="px-3 py-1.5 flex items-center gap-2 transition-all whitespace-nowrap text-xs"
+                style={{
+                  background: quickFilter === "limited" ? "rgba(255, 183, 77, 0.3)" : "rgba(26, 17, 16, 0.8)",
+                  border: `1px solid ${
+                    quickFilter === "limited" ? "rgba(255, 183, 77, 0.6)" : "rgba(184, 115, 51, 0.3)"
+                  }`,
+                  color: quickFilter === "limited" ? "#FFB74D" : "#B87333",
+                  fontFamily: "var(--font-heading)",
+                }}
+              >
+                <Clock size={12} />
+                LIMITED
+              </button>
             </motion.div>
 
             <motion.button
@@ -518,6 +668,7 @@ function ArtGalleryPageContent() {
                         onAdd={addToCart}
                         onRemove={removeFromCart}
                         onView={openArtModal}
+                        onHover={setSelectedHeroArt}
                       />
                     );
                   })
@@ -529,6 +680,7 @@ function ArtGalleryPageContent() {
                   onAdd={addToCart}
                   onRemove={removeFromCart}
                   onView={openArtModal}
+                  onHover={setSelectedHeroArt}
                 />
               )
             ) : (
